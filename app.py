@@ -365,13 +365,41 @@ def media_detail(media_type, media_id):
         else:
             res['overview'] = "Sinopsis no disponible en este momento."
 
-    # Mapeo de estados (lo que ya tenías)
+    # Mapeo de estados
     status_map = {
         'Ended':'Finalizada','Returning Series':'En emisión',
         'Planned':'Planeada','Canceled':'Cancelada',
         'In Production':'En producción','Released':'Estrenada'
     }
     res['status'] = status_map.get(res.get('status'), res.get('status'))
+
+    # --- LÓGICA DE BANDERA ---
+    paises_prod = [c['iso_3166_1'].upper() for c in res.get('production_countries', [])]
+    paises_origin = [p.upper() for p in res.get('origin_country', [])]
+    todos_paises = list(set(paises_prod + paises_origin))
+    idioma_orig = res.get('original_language', '').lower()
+
+    bandera_final = None
+    if 'KR' in todos_paises: bandera_final = '🇰🇷'
+    elif 'JP' in todos_paises: bandera_final = '🇯🇵'
+    elif 'HK' in todos_paises: bandera_final = '🇭🇰'
+    elif 'TW' in todos_paises: bandera_final = '🇹🇼'
+    elif 'CN' in todos_paises: bandera_final = '🇨🇳'
+    elif 'TH' in todos_paises: bandera_final = '🇹🇭'
+    elif 'VN' in todos_paises: bandera_final = '🇻🇳'
+    elif 'IN' in todos_paises: bandera_final = '🇮🇳'
+    elif 'PH' in todos_paises: bandera_final = '🇵🇭'
+
+    if not bandera_final:
+        if idioma_orig == 'ko': bandera_final = '🇰🇷'
+        elif idioma_orig == 'ja': bandera_final = '🇯🇵'
+        elif idioma_orig in ['zh', 'cn', 'yue']: bandera_final = '🇭🇰' if idioma_orig == 'yue' else '🇨🇳'
+        elif idioma_orig == 'th': bandera_final = '🇹🇭'
+        elif idioma_orig == 'vn': bandera_final = '🇻🇳'
+        elif idioma_orig == 'hi': bandera_final = '🇮🇳'
+        else: bandera_final = '🌏'
+    
+    res['flag'] = bandera_final
 
     # Lógica de favoritos y status (lo que ya tenías)
     current_status = None
