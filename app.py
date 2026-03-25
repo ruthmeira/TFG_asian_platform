@@ -367,6 +367,22 @@ def media_detail(media_type, media_id):
         else:
             res['overview'] = "Sinopsis no disponible en este momento."
 
+    # --- TRADUCCIÓN DE GÉNEROS ---
+    genre_map = {
+        'Action': 'Acción', 'Adventure': 'Aventura', 'Animation': 'Animación', 'Comedy': 'Comedia', 
+        'Crime': 'Crimen', 'Documentary': 'Documental', 'Drama': 'Drama', 'Family': 'Familia', 
+        'Fantasy': 'Fantasía', 'History': 'Historia', 'Horror': 'Terror', 'Music': 'Música', 
+        'Mystery': 'Misterio', 'Romance': 'Romance', 'Science Fiction': 'Ciencia Ficción', 
+        'TV Movie': 'Película de TV', 'Thriller': 'Suspense', 'War': 'Bélica', 'Western': 'Western',
+        'Action & Adventure': 'Acción y Aventura', 'Kids': 'Infantil', 'News': 'Noticias', 
+        'Reality': 'Telerrealidad / Reality', 'Sci-Fi & Fantasy': 'Ciencia Ficción y Fantasía', 
+        'Soap': 'Telenovela', 'Talk': 'Charlas / Entrevistas', 'War & Politics': 'Guerra y Política'
+    }
+    if 'genres' in res:
+        for g in res['genres']:
+            if g['name'] in genre_map:
+                g['name'] = genre_map[g['name']]
+
     # Mapeo de estados
     status_map = {
         'Ended':'Finalizada','Returning Series':'En emisión',
