@@ -398,6 +398,7 @@ def explore():
     media_type = request.args.get('type', 'tv') 
     year = request.args.get('year', '')
     country_code = request.args.get('lang', '') 
+    genre_id = request.args.get('genre', '')
     page_to_start = request.args.get('page', 1, type=int) 
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
@@ -439,6 +440,16 @@ def explore():
         if year:
             year_param = 'first_air_date_year' if target_type == 'tv' else 'primary_release_year'
             url += f"&{year_param}={year}"
+
+        if genre_id:
+            # TMDB tiene IDs distintos para algunos géneros en TV vs Movie
+            actual_genre = genre_id
+            if target_type == 'tv':
+                if genre_id == '28': actual_genre = '10759' # Action & Adventure
+                elif genre_id == '10749': actual_genre = '10766' # Romance -> Soap (donde están los dramas)
+                elif genre_id == '14' or genre_id == '878': actual_genre = '10765' # Sci-Fi & Fantasy
+            
+            url += f"&with_genres={actual_genre}"
 
         try:
             res = requests.get(url).json()
@@ -529,9 +540,16 @@ def explore():
         'PH': 'Filipinas', 'ID': 'Indonesia', 'MY': 'Malasia'
     }
 
+    # Géneros comunes (IDs unificados o mayoritarios)
+    common_genres = {
+        '18': 'Drama', '35': 'Comedia', '10749': 'Romance', '28': 'Acción', 
+        '80': 'Crimen', '9648': 'Misterio', '14': 'Fantasía', '16': 'Animación', 
+        '10751': 'Familia', '27': 'Terror', '53': 'Thriller'
+    }
+
     return render_template('explore.html', items=final_items, media_type=media_type, 
-                           current_year=year, current_lang=country_code, 
-                           asia_langs=asia_countries, next_api_page=current_api_page)
+                           current_year=year, current_lang=country_code, current_genre=genre_id,
+                           asia_langs=asia_countries, genres=common_genres, next_api_page=current_api_page)
 
 if __name__ == '__main__':
     with app.app_context():

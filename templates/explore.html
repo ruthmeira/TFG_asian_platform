@@ -27,6 +27,16 @@
             </div>
 
             <div class="filter-group">
+                <label>Género</label>
+                <select name="genre" class="custom-select">
+                    <option value="">Todos</option>
+                    {% for gid, gname in genres.items() %}
+                        <option value="{{ gid }}" {% if current_genre == gid %}selected{% endif %}>{{ gname }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
                 <label>Año</label>
                 <input type="number" name="year" value="{{ current_year }}" placeholder="Ej: 2024" class="no-spin">
             </div>
