@@ -430,7 +430,24 @@ def explore():
     status_id = request.args.get('status', '')
 
     asia_countries = {'KR': 'Corea del Sur', 'JP': 'Japón', 'CN': 'China', 'TW': 'Taiwán', 'HK': 'Hong Kong', 'TH': 'Tailandia', 'VN': 'Vietnam', 'IN': 'India', 'PH': 'Filipinas', 'ID': 'Indonesia', 'MY': 'Malasia'}
-    common_genres = {'18': 'Drama', '35': 'Comedia', '10749': 'Romance', '28': 'Acción', '80': 'Crimen', '9648': 'Misterio', '14': 'Fantasía', '16': 'Animación', '10751': 'Familia', '27': 'Terror', '53': 'Thriller'}
+    
+    genres_by_type = {
+        'movie': {
+            '28':'Acción', '16':'Animación', '12':'Aventura', '10752':'Bélica', '878':'Ciencia ficción', 
+            '35':'Comedia', '80':'Crimen', '99':'Documental', '18':'Drama', '10751':'Familia', 
+            '14':'Fantasía', '36':'Historia', '9648':'Misterio', '10402':'Música', '10770':'Película de TV', 
+            '10749':'Romance', '53':'Suspense', '27':'Terror', '37':'Western'
+        },
+        'tv': {
+            '10759':'Acción y Aventura', '16':'Animación', '35':'Comedia', '80':'Crimen', 
+            '18':'Drama', '10751':'Familia', '10762':'Infantil', '9648':'Misterio', 
+            '10765':'Ciencia Ficción y Fantasía', '10766':'Telenovela', '10768':'Guerra y Política', '37':'Western'
+        },
+        'show': {
+            '10764':'Telerrealidad / Reality', '99':'Documental', '10763':'Noticias', '10767':'Charlas / Entrevistas'
+        }
+    }
+    
     target_type = 'movie' if media_type == 'movie' else 'tv'
     date_key = 'primary_release_date' if target_type == 'movie' else 'first_air_date'
     sort_options = {'popularity.desc': 'Más Populares', 'popularity.asc': 'Menos Populares', 'vote_average.desc': 'Mejor Valorados', 'vote_average.asc': 'Peor Valorados', f'{date_key}.desc': 'Más Recientes', f'{date_key}.asc': 'Más Antiguos', 'vote_count.desc': 'Más Votados', 'vote_count.asc': 'Menos Votados'}
@@ -439,7 +456,7 @@ def explore():
     return render_template('explore.html', items=[], media_type=media_type, 
                            current_year=year, current_lang=country_code, 
                            current_genre=genre_id, current_sort=sort_by, current_status_id=status_id,
-                           asia_langs=asia_countries, genres=common_genres, 
+                           asia_langs=asia_countries, genres_by_type=genres_by_type, 
                            sort_options=sort_options, status_options=status_options)
 
 @app.route('/api/explore')
@@ -490,7 +507,7 @@ def api_explore():
             actual_genre = genre_id
             if target_type == 'tv':
                 if genre_id == '28': actual_genre = '10759'
-                elif genre_id == '10749': actual_genre = '10766'
+                elif genre_id == '10749': actual_genre = '10766|10749|18' # Soap, Romance or Drama
                 elif genre_id == '14' or genre_id == '878': actual_genre = '10765'
             url += f"&with_genres={actual_genre}"
         

@@ -38,9 +38,9 @@
 
             <div class="filter-group">
                 <label>Género</label>
-                <select name="genre" class="custom-select">
+                <select name="genre" id="genre-select" class="custom-select">
                     <option value="">Todos</option>
-                    {% for gid, gname in genres.items() %}
+                    {% for gid, gname in genres_by_type[media_type].items() %}
                         <option value="{{ gid }}" {% if current_genre == gid %}selected{% endif %}>{{ gname }}</option>
                     {% endfor %}
                 </select>
@@ -93,6 +93,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const loader = document.getElementById('explore-loader');
     const loadMoreBtn = document.getElementById('load-more-btn');
     const loadMoreWrapper = document.getElementById('load-more-wrapper');
+    const typeSelect = document.getElementById('media-type-select');
+    const genreSelect = document.getElementById('genre-select');
+    const statusGroup = document.getElementById('status-filter-group');
+
+    // Datos de géneros desde Python
+    const genresByType = {{ genres_by_type | tojson }};
     
     // Capturamos filtros actuales de la URL de Python/Jinja
     const filters = {
@@ -105,6 +111,28 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     let currentPage = 1;
+
+    // --- LÓGICA DE CAMBIO DINÁMICO DE GÉNEROS ---
+    typeSelect.addEventListener('change', function() {
+        const selectedType = this.value;
+        const genres = genresByType[selectedType] || {};
+        
+        // Limpiamos y rellenamos el select de géneros
+        genreSelect.innerHTML = '<option value="">Todos</option>';
+        for (const [id, name] of Object.entries(genres)) {
+            const option = document.createElement('option');
+            option.value = id;
+            option.textContent = name;
+            genreSelect.appendChild(option);
+        }
+
+        // Lógica de visibilidad del estado (solo series/shows)
+        if (selectedType === 'movie') {
+            statusGroup.style.display = 'none';
+        } else {
+            statusGroup.style.display = 'block';
+        }
+    });
 
     // Función principal para cargar items
     function loadItems(page = 1, append = false) {
