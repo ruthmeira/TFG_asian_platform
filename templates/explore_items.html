@@ -1,0 +1,16 @@
+{% for item in items %}
+<a href="{{ url_for('media_detail', media_type=item.media_type_fixed, media_id=item.id) }}" class="card-link">
+    <div class="card">
+        <div class="badge">{{ item.tipo_label }}</div>
+        <img src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}" alt="{{ item.display_title }}">
+        <div class="card-body">
+            <h4>{{ item.display_title }}</h4>
+            <h6>{{ item.original_title_h6 }}</h6>
+            <div class="card-meta">
+                <span class="rating">⭐ {{ item.vote_average|round(1) }}</span>
+                <span class="lang">{{ item.flag }}</span>
+            </div>
+        </div>
+    </div>
+</a>
+{% endfor %}

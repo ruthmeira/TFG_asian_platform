@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}{{ media.title or media.name }} - AsianPlatform{% endblock %}
+
+{% block content %}
+
+<div class="media-detail-container">
+
+    <div class="media-poster">
+        {% if media.poster_path %}
+            <img src="https://image.tmdb.org/t/p/w500{{ media.poster_path }}" alt="{{ media.title or media.name }}">
+        {% else %}
+            <div class="no-poster">Sin Imagen</div>
+        {% endif %}
+    </div>
+
+    <div class="media-info">
+
+        <h1>
+            {# Usamos el título que ya viene procesado (ES o EN) desde app.py #}
+            {{ media.title or media.name }}
+
+            {# Mostramos el año de lanzamiento #}
+            {% set release_date = media.release_date or media.first_air_date %}
+            {% if release_date %}
+                <span class="detail-year">({{ release_date[:4] }})</span>
+            {% endif %}
+
+            <div class="favorite-container">
+                <span id="favorite-btn"
+                    class="favorite-btn {% if is_favorite %}active{% endif %}"
+                    data-id="{{ media.id }}"
+                    data-type="{{ 'tv' if media.name else 'movie' }}"
+                    data-title="{{ media.title or media.name }}"
+                    data-poster="{{ media.poster_path }}">
+                    ♥
+                </span>
+                <span class="favorite-label">Favoritos</span>
+            </div>
+        </h1>
+
+        <div class="detail-meta">
+            <p><strong>Rating:</strong> ⭐ {{ media.vote_average|round(1) }}</p>
+            <p><strong>Título original:</strong> {{ media.original_title or media.original_name }}</p>
+            <p><strong>Estado:</strong> {{ media.status }}</p>
+
+            <p><strong>Géneros:</strong>
+                {% for genre in media.genres %}
+                    {{ genre.name }}{% if not loop.last %}, {% endif %}
+                {% else %}
+                    No especificado
+                {% endfor %}
+            </p>
+        </div>
+
+        <div class="detail-overview">
+            <p><strong>Sinopsis:</strong></p>
+            <p class="overview-text">{{ media.overview or "No hay sinopsis disponible en este momento." }}</p>
+        </div>
+
+        <div class="collection-dropdown">
+            <button id="collection-toggle" class="btn-main">Añadir a Colección ▼</button>
+
+            <div id="collection-options" class="hidden">
+                {% for s in ["Viendo","Visto","Pendiente","Abandonado"] %}
+                    <button class="collection-option {% if current_status == s %}active{% endif %}"
+                            data-status="{{ s }}">
+                        {{ s }}
+                    </button>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

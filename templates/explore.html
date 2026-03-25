@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="explore-container">
+    <aside class="filter-sidebar">
+        <h3>Filtros</h3>
+        <form action="{{ url_for('explore') }}" method="GET">
+            <div class="filter-group">
+                <label>Tipo</label>
+                <select name="type" class="custom-select">
+                    <option value="tv" {% if media_type == 'tv' %}selected{% endif %}>Series</option>
+                    <option value="movie" {% if media_type == 'movie' %}selected{% endif %}>Películas</option>
+                    <option value="show" {% if media_type == 'show' %}selected{% endif %}>Programas</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>País</label>
+                <select name="lang" class="custom-select">
+                    <option value="">Todos</option>
+                    {% if asia_langs %}
+                        {% for code, name in asia_langs.items() %}
+                        <option value="{{ code }}" {% if current_lang == code %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Año</label>
+                <input type="number" name="year" value="{{ current_year }}" placeholder="Ej: 2024" class="no-spin">
+            </div>
+
+            <button type="submit" class="apply-filters-btn">Aplicar Filtros</button>
+        </form>
+    </aside>
+
+    <main class="explore-results">
+        <div id="items-container" class="collection-grid">
+            {# Aquí incluimos el fragmento de las tarjetas para la carga inicial #}
+            {% include 'explore_items.html' %}
+        </div>
+        
+        <div class="load-more-wrapper">
+            <button id="load-more-btn" data-page="{{ next_api_page }}">Ver más</button>
+        </div>
+    </main>
+</div>
+{% endblock %}

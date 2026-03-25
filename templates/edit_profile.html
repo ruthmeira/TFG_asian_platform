@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Perfil - AsianPlatform{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Editar Perfil</h2>
+
+        <form method="POST" action="{{ url_for('edit_profile') }}">
+            <label>Usuario</label>
+            <input type="text" name="username" value="{{ current_user.username }}" required>
+
+            <label>Email</label>
+            <input type="email" name="email" value="{{ current_user.email }}" required>
+
+            <label>Nueva contraseña (opcional)</label>
+            <input type="password" name="password" placeholder="Dejar en blanco si no cambia">
+
+            <button type="submit">Guardar cambios</button>
+        </form>
+
+        <a href="{{ url_for('profile') }}">Volver a Mi Perfil</a>
+    </div>
+</div>
+{% endblock %}

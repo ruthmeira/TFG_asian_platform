@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="view-all-container">
+    <div class="header-back">
+        <a href="{{ url_for('collections') }}" class="back-link">← Volver a Colecciones</a>
+        <h1>{{ display_name }}</h1>
+    </div>
+
+    {% if items %}
+    <div class="collection-grid">
+        {% for item in items %}
+            <a href="{{ url_for('media_detail', media_type=item.media_type, media_id=item.media_id) }}" class="card-link">
+                <div class="cardColeccion full-card">
+                    <img src="https://image.tmdb.org/t/p/w300{{ item.poster_path }}">
+                    <div class="cardCollection-body">
+                        <h4>{{ item.title }}</h4>
+                        <span class="badge-type">{{ 'Serie' if item.media_type == 'tv' else 'Película' }}</span>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p class="empty-msg-collection">Esta lista está vacía.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

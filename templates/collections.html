@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Mis Colecciones - AsianPlatform{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="home-header">
+        <div class="title-section">
+            <h1>Mis Colecciones</h1>
+            <p>Gestiona tus series y películas favoritas</p>
+        </div>
+    </div>
+
+    {% if favorites %}
+    <section class="collection-section">
+        <div class="section-header">
+            <h2>Favoritos</h2>
+            <a href="{{ url_for('view_collection', status='favoritos') }}" class="view-all-link">Ver todo >></a>
+        </div>
+        
+        <div class="carouselCollection">
+            {% for item in favorites %}
+                <a href="{{ url_for('media_detail', media_type=item.media_type, media_id=item.media_id) }}" class="card-link">
+                    <div class="cardColeccion">
+                        <img src="https://image.tmdb.org/t/p/w300{{ item.poster_path }}" alt="{{ item.title }}">
+                        <div class="cardCollection-body">
+                            <h4>{{ item.title }}</h4>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% for status, items in collections.items() %}
+    <section class="collection-section">
+        <div class="section-header">
+            <h2>{{ status }}</h2>
+            {% if items %}
+                <a href="{{ url_for('view_collection', status=status) }}" class="view-all-link">Ver todo >></a>
+            {% endif %}
+        </div>
+
+        {% if items %}
+        <div class="carouselCollection">
+            {% for item in items %}
+                <a href="{{ url_for('media_detail', media_type=item.media_type, media_id=item.media_id) }}" class="card-link">
+                    <div class="cardColeccion">
+                        <img src="https://image.tmdb.org/t/p/w300{{ item.poster_path }}" alt="{{ item.title }}">
+                        <div class="cardCollection-body">
+                            <h4>{{ item.title }}</h4>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+        {% else %}
+            <p class="empty-msg-collection">No hay elementos en esta categoría.</p>
+        {% endif %}
+    </section>
+    {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Mi Perfil - AsianPlatform{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <h1>Hola, {{ current_user.username }}</h1>
+
+    <div class="stats-card">
+        <a href="{{ url_for('view_collection', status='favoritos') }}" class="stat-link">
+            <div class="stat">
+                <h3>{{ counts.favoritos }}</h3>
+                <p>Favoritos</p>
+            </div>
+        </a>
+        
+        <a href="{{ url_for('view_collection', status='Viendo') }}" class="stat-link">
+            <div class="stat">
+                <h3>{{ counts.viendo }}</h3>
+                <p>Viendo</p>
+            </div>
+        </a>
+
+        <a href="{{ url_for('view_collection', status='Visto') }}" class="stat-link">
+            <div class="stat">
+                <h3>{{ counts.vistos }}</h3>
+                <p>Vistos</p>
+            </div>
+        </a>
+
+        <a href="{{ url_for('view_collection', status='Pendiente') }}" class="stat-link">
+            <div class="stat">
+                <h3>{{ counts.pendientes }}</h3>
+                <p>Pendientes</p>
+            </div>
+        </a>
+
+        <a href="{{ url_for('view_collection', status='Abandonado') }}" class="stat-link">
+            <div class="stat">
+                <h3>{{ counts.abandonados }}</h3>
+                <p>Abandonados</p>
+            </div>
+        </a>
+    </div>
+
+    <div class="profile-actions">
+        <a href="{{ url_for('edit_profile') }}" class="profile-btn">Editar Perfil</a>
+        <a href="{{ url_for('logout') }}" class="profile-btn">Cerrar Sesión</a>
+    </div>
+
+</div>
+{% endblock %}

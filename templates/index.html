@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - AsianPlatform{% endblock %}
+
+{% block content %}
+
+<div class="home-header">
+    <div class="title-section">
+        <h1>Explorar Tendencias</h1>
+        <p>Lo que está en tendencia de Asia</p>
+    </div>
+    <div class="filter-controls">
+        <a href="{{ url_for('home', window='day') }}" class="filter-btn {{ 'active' if active_window == 'day' }}">Hoy</a>
+        <a href="{{ url_for('home', window='week') }}" class="filter-btn {{ 'active' if active_window == 'week' }}">Esta Semana</a>
+    </div>
+</div>
+
+<section class="content-section">
+    <h2>📺 Top 20 Series</h2>
+    <div class="carousel">
+        {% for show in series %}
+        <a href="{{ url_for('media_detail', media_type='tv', media_id=show.id) }}" class="card-link">
+            <div class="card">
+                <div class="badge">Serie</div>
+                <img src="https://image.tmdb.org/t/p/w500{{ show.poster_path }}" alt="{{ show.name }}">
+                <div class="card-body">
+                    <h4>{{ show.name }}</h4>
+                    <h6>{{ show.original_name }}</h6>
+                    <div class="card-meta">
+                        <span class="rating">⭐ {{ show.vote_average|round(1) }}</span>
+                        <span class="lang">{{ show.flag }}</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="content-section">
+    <h2>🎬 Top 20 Películas</h2>
+    <div class="carousel">
+        {% for movie in movies %}
+        <a href="{{ url_for('media_detail', media_type='movie', media_id=movie.id) }}" class="card-link">
+            <div class="card">
+                <div class="badge">Película</div>
+                <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.title }}">
+                <div class="card-body">
+                    <h4>{{ movie.title }}</h4>
+                    <h6>{{ movie.original_title }}</h6>
+                    <div class="card-meta">
+                        <span class="rating">⭐ {{ movie.vote_average|round(1) }}</span>
+                        <span class="lang">{{ movie.flag }}</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="content-section">
+    <h2>🌟 Top 20 Programas</h2>
+    <div class="carousel">
+        {% for prog in shows %}
+        <a href="{{ url_for('media_detail', media_type='tv', media_id=prog.id) }}" class="card-link">
+            <div class="card">
+                <div class="badge">Programa</div>
+                <img src="https://image.tmdb.org/t/p/w500{{ prog.poster_path }}" alt="{{ prog.name }}">
+                <div class="card-body">
+                    <h4>{{ prog.name }}</h4>
+                    <h6>{{ prog.original_name }}</h6>
+                    <div class="card-meta">
+                        <span class="rating">⭐ {{ prog.vote_average|round(1) }}</span>
+                        <span class="lang">{{ prog.flag }}</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}

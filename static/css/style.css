@@ -1,0 +1,835 @@
+/* ===================================================== */
+/* RESET */
+/* ===================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0f0f0f;
+    color: #ffffff;
+}
+
+.container {
+    padding: 40px 60px;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    margin-top: 60px;
+    background-color: #000;
+    font-size: 13px;
+    color: #666;
+}
+
+/* ===================================================== */
+/* NAVBAR */
+/* ===================================================== */
+
+.navbar {
+    background-color: #000;
+    padding: 18px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #1f1f1f;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ff4500;
+    letter-spacing: 1px;
+}
+
+.navbar a {
+    color: #ddd;
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.navbar a:hover {
+    color: #ff4500;
+}
+
+/* ===================================================== */
+/* HOME HEADER */
+/* ===================================================== */
+
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 40px;
+    border-bottom: 1px solid #222;
+    padding-bottom: 20px;
+}
+
+.title-section h1 {
+    font-size: 2.3rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #ff4500, #ff8c42);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.title-section p {
+    margin-top: 8px;
+    color: #888;
+}
+
+/* ===================================================== */
+/* FILTER BUTTONS */
+/* ===================================================== */
+
+.filter-controls {
+    display: flex;
+    gap: 12px;
+}
+
+.filter-btn {
+    text-decoration: none;
+    color: #ccc;
+    background: #1c1c1c;
+    padding: 8px 22px;
+    border-radius: 25px;
+    font-size: 13px;
+    transition: 0.3s ease;
+    border: 1px solid #333;
+}
+
+.filter-btn:hover {
+    background: #252525;
+}
+
+.filter-btn.active {
+    background: #ff4500;
+    border-color: #ff4500;
+    color: #fff;
+    font-weight: 600;
+}
+
+/* ===================================================== */
+/* CONTENT SECTIONS */
+/* ===================================================== */
+
+.content-section {
+    margin-bottom: 60px;
+}
+
+.content-section h2 {
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+/* ===================================================== */
+/* CAROUSEL (HOME) */
+/* ===================================================== */
+
+.carousel {
+    display: flex;
+    overflow-x: auto;
+    gap: 25px;
+    padding: 15px 0 30px 0;
+    scroll-behavior: smooth;
+}
+
+.carousel::-webkit-scrollbar {
+    height: 6px;
+}
+
+.carousel::-webkit-scrollbar-thumb {
+    background: #ff4500;
+    border-radius: 10px;
+}
+
+/* ===================================================== */
+/* HOME CARDS */
+/* ===================================================== */
+
+.card {
+    position: relative;
+    flex: 0 0 auto;
+    width: 210px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #1a1a1a;
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+    cursor: pointer;
+}
+
+.card img {
+    width: 100%;
+    height: 310px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px) scale(1.04);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+}
+
+.card:hover img {
+    transform: scale(1.08);
+}
+
+.card-body {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(
+        to top,
+        rgba(0,0,0,0.95),
+        rgba(0,0,0,0.6),
+        rgba(0,0,0,0.0)
+    );
+}
+
+.card-body h4 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.rating {
+    color: #f5c518;
+    font-weight: bold;
+}
+
+.lang {
+    font-family: 'Noto Color Emoji', sans-serif;
+    font-size: 1.2rem; /* Ajusta el tamaño para que se vea bien el dibujo */
+    vertical-align: middle;
+}
+
+.badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(255, 69, 0, 0.95);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+/* ===================================================== */
+/* COLLECTION PAGE */
+/* ===================================================== */
+
+.collection-section {
+    margin-bottom: 50px;
+}
+
+.collection-section h2 {
+    font-size: 1.6rem;
+    margin-bottom: 15px;
+    color: #ff4500;
+}
+
+.empty-msg-collection {
+    color: #888;
+    font-style: italic;
+}
+
+.carouselCollection {
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.carouselCollection::-webkit-scrollbar {
+    height: 6px;
+}
+
+.carouselCollection::-webkit-scrollbar-thumb {
+    background: #ff4500;
+    border-radius: 10px;
+}
+
+.cardColeccion {
+    flex: 0 0 auto;
+    width: 160px;
+    border-radius: 14px;
+    overflow: hidden;
+    background-color: #1a1a1a;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+}
+
+.cardColeccion:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+}
+
+.cardColeccion img {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+}
+
+.cardCollection-body {
+    padding: 8px;
+    text-align: center;
+}
+
+.cardCollection-body h4 {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ===================================================== */
+/* MEDIA DETAIL */
+/* ===================================================== */
+
+.media-detail-container {
+    display: flex;
+    gap: 40px;
+    margin-top: 40px;
+    align-items: flex-start;
+}
+
+.media-poster img {
+    width: 320px;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+
+.media-info {
+    flex: 1;
+}
+
+.media-info h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.media-info p {
+    margin-bottom: 12px;
+    color: #ccc;
+    line-height: 1.6;
+}
+
+/* FAVORITE HEART */
+
+.favorite-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 10px; /* si está al lado del título */
+    font-size: 14px;
+    color: #ccc;
+}
+
+.favorite-btn {
+    cursor: pointer;
+    font-size: 28px;
+    transition: transform 0.2s ease;
+    color: #888;
+}
+
+.favorite-btn:hover {
+    transform: scale(1.2);
+}
+
+.favorite-btn.active {
+    color: #ff4d6d;
+}
+
+.favorite-label {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #ccc;
+}
+
+/* ============================= */
+/* COLLECTION DROPDOWN - MEJORADO */
+/* ============================= */
+
+.collection-dropdown {
+    position: relative;
+    display: inline-block;
+    margin-top: 20px;
+}
+
+.collection-btn, #collection-toggle {
+    padding: 10px 18px;
+    background: linear-gradient(90deg, #ff4500, #ff6a00);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.collection-btn:hover, #collection-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255,69,0,0.4);
+}
+
+#collection-options {
+    position: absolute;
+    top: 100%; /* por defecto debajo del botón */
+    left: 0;
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 180px;
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    z-index: 50;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.collection-option {
+    background-color: #222;
+    border: none;
+    color: #ccc;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+    text-align: left;
+}
+
+.collection-option:hover {
+    background-color: #333;
+    color: white;
+}
+
+.collection-option.active {
+    background-color: #c62828;
+    color: white;
+}
+
+.collection-dropdown.upwards #collection-options {
+    bottom: 100%;
+    top: auto;
+}
+
+
+/* ===================================================== */
+/* AUTH (LOGIN / REGISTER / EDIT) */
+/* ===================================================== */
+
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+}
+
+.auth-card {
+    background-color: #1c1c1c;
+    padding: 45px;
+    border-radius: 16px;
+    width: 380px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+}
+
+.auth-card h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+
+.auth-card form {
+    display: flex;
+    flex-direction: column;
+}
+
+.auth-card input {
+    padding: 13px;
+    margin-bottom: 18px;
+    border: 1px solid #2c2c2c;
+    border-radius: 8px;
+    background-color: #121212;
+    color: white;
+    font-size: 14px;
+}
+
+.auth-card input:focus {
+    outline: none;
+    border-color: #ff4500;
+    box-shadow: 0 0 0 2px rgba(255,69,0,0.2);
+}
+
+.auth-card button {
+    padding: 13px;
+    background: linear-gradient(90deg, #ff4500, #ff6a00);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.auth-card button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255,69,0,0.4);
+}
+
+.auth-card a {
+    text-align: center;
+    margin-top: 18px;
+    display: block;
+    color: #888;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.auth-card a:hover {
+    color: #ff4500;
+}
+
+/* ===================================================== */
+/* PROFILE DASHBOARD */
+/* ===================================================== */
+
+.stats-card {
+    display: flex;
+    justify-content: space-around;
+    background-color: #1c1c1c;
+    padding: 25px;
+    border-radius: 12px;
+    margin: 30px 0 40px 0;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.stat {
+    flex: 1 1 120px;
+    text-align: center;
+    background-color: #222;
+    border-radius: 10px;
+    padding: 20px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.stat:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+}
+
+.stat h3 {
+    color: #ff4500;
+    font-size: 2rem;
+}
+
+.stat p {
+    color: #ccc;
+    font-size: 14px;
+    margin-top: 6px;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.profile-btn {
+    background-color: #222;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.profile-btn:hover {
+    background-color: #ff4500;
+}
+
+
+/* ===================================================== */
+/* CARD LINKS */
+/* ===================================================== */
+.card-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.card-link:hover .card {
+    transform: scale(1.03);
+    transition: 0.3s;
+}
+
+
+/* Estilos para los títulos con "Ver todo" */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.view-all-link {
+    color: #ff4500;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.view-all-link:hover {
+    text-decoration: underline;
+    letter-spacing: 1px;
+}
+
+/* Estilos para la vista completa (Grid) */
+.collection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.header-back {
+    margin-bottom: 40px;
+}
+
+.back-link {
+    color: #888;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.back-link:hover {
+    color: #ff4500;
+}
+
+.full-card {
+    width: 100% !important; /* Para que se adapte al grid */
+}
+
+.badge-type {
+    font-size: 10px;
+    background: #333;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #aaa;
+}
+
+/* Elimina el formato de enlace en las estadísticas del perfil */
+.stat-link {
+    text-decoration: none;
+    flex: 1 1 120px; /* Mantiene el tamaño que tenías en .stat */
+}
+
+/* El efecto hover ahora se aplica cuando pasas sobre el enlace */
+.stat-link:hover .stat {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 25px rgba(255, 69, 0, 0.3); /* Un brillo naranja sutil */
+    background-color: #2a2a2a;
+}
+
+.stat-link:hover .stat h3 {
+    transform: scale(1.1);
+    transition: 0.3s;
+}
+
+/* ===================================================== */
+/* EXPLORE PAGE LAYOUT & FILTERS (Tu diseño original) */
+/* ===================================================== */
+
+.explore-container {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    margin-top: 20px;
+    padding: 0 5%;
+}
+
+.filter-sidebar {
+    flex: 0 0 260px;
+    background: #161616;
+    padding: 25px;
+    border-radius: 16px;
+    position: sticky;
+    top: 20px;
+    border: 1px solid #222;
+}
+
+.filter-sidebar h3 {
+    margin-bottom: 25px;
+    color: #ff4500;
+    font-size: 1.2rem;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+}
+
+.filter-group {
+    margin-bottom: 20px;
+}
+
+.filter-group label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #666;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.filter-group select, 
+.filter-group input {
+    width: 100%;
+    padding: 12px;
+    background: #0a0a0a;
+    border: 1px solid #333;
+    color: white;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+/* Quitar flechas del input Año */
+input.no-spin::-webkit-inner-spin-button, 
+input.no-spin::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+}
+input.no-spin {
+    -moz-appearance: textfield;
+}
+
+.filter-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 18px;
+    padding-right: 35px;
+}
+
+.filter-group select:focus, 
+.filter-group input:focus {
+    outline: none;
+    border-color: #ff4500;
+}
+
+.apply-filters-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(90deg, #ff4500, #ff6a00);
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* --- BOTÓN VER MÁS (Ajustado a tu estilo) --- */
+.load-more-wrapper {
+    text-align: center;
+    padding: 40px 0;
+}
+
+#load-more-btn {
+    background: #161616;
+    color: #ff4500;
+    border: 1px solid #ff4500;
+    padding: 12px 40px;
+    border-radius: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#load-more-btn:hover {
+    background: #ff4500;
+    color: white;
+}
+
+/* ===================================================== */
+/* EXPLORE RESULTS & CARDS (IGUAL AL RANKING) */
+/* ===================================================== */
+
+.explore-results {
+    flex: 1;
+}
+
+.collection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 25px;
+}
+
+.explore-results .card {
+    position: relative;
+    width: 210px; 
+    height: 310px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #1a1a1a;
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.explore-results .card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.explore-results .card-body {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.6), rgba(0,0,0,0.0));
+}
+
+.explore-results .card-body h4 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.explore-results .card-body h6 {
+    font-size: 11px;
+    color: #bbb;
+}
