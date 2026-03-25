@@ -211,27 +211,31 @@ def home():
 def api_trending():
     api_key = os.getenv("TMDB_API_KEY")
     window = request.args.get('window', 'day')
+    media_type = request.args.get('type', 'series') # series, movies, shows
+    
     if window not in ['day', 'week']: 
         window = 'day'
 
     current_time = time.time()
     cache = api_cache[window]
-    seconds_passed = current_time - cache['last_updated']
     
-    # Si el cache está vacío, disparamos la carga manual (proceder reactivo)
-    # Si ya tiene datos (incluso si está 'expirado' según el contador de app.py), servimos los de la cache
-    # porque el Scheduler se encarga de refrescarla por detrás.
-    if not cache.get('series'):
-        print(f"⚠️ Caché {window} vacía. Realizando carga manual de emergencia...")
-        cache['series'] = get_top_20(api_key, 'tv', window)
-        cache['movies'] = get_top_20(api_key, 'movie', window)
-        cache['shows'] = get_top_20(api_key, 'show', window)
+    # Mapeo interno de tipos
+    type_map = {
+        'series': 'tv',
+        'movies': 'movie',
+        'shows': 'show'
+    }
+    
+    # Si el cache del tipo específico está vacío, disparamos carga manual
+    if not cache.get(media_type):
+        api_type = type_map.get(media_type, 'tv')
+        print(f"⚠️ Caché {window}/{media_type} vacía. Realizando carga manual de emergencia...")
+        cache[media_type] = get_top_20(api_key, api_type, window)
         cache['last_updated'] = current_time
     
+    # Devolvemos solo lo solicitado para optimizar carga paralela
     return jsonify({
-        'series': cache['series'],
-        'movies': cache['movies'],
-        'shows': cache.get('shows', [])
+        media_type: cache.get(media_type, [])
     })
 
 # --- PROFILE ---

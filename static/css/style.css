@@ -1122,3 +1122,29 @@ body {
     0% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
     100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.3); }
 }
+/* Progressive Loading */
+.carousel-loader {
+    width: 100%;
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    font-size: 1.1rem;
+    gap: 15px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 20px;
+    margin-bottom: 20px;
+}
+
+.carousel-loader i {
+    font-size: 2rem;
+}
+
+.error-msg {
+    color: #ff4444;
+    padding: 20px;
+    text-align: center;
+}
+

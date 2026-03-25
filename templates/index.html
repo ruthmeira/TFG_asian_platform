@@ -15,69 +15,54 @@
     </div>
 </div>
 
-<!-- CONTENEDOR DE CARGA (FAROLILLO ASIÁTICO) CON RETRASO INTELIGENTE -->
-<div id="loading-overlay" class="loading-overlay" style="display: none;">
-    <div class="lantern-animation">
-        <div class="lantern">
-            <div class="lantern-top"></div>
-            <div class="lantern-body">
-                <div class="lantern-glow"></div>
-            </div>
-            <div class="lantern-bottom"></div>
-        </div>
-        <p class="loading-text">Sincronizando con Asia<span>...</span></p>
-    </div>
-</div>
-
-<div id="main-content" style="opacity: 0; transition: opacity 0.4s ease;">
+<div id="main-content" style="opacity: 1;">
     <section class="content-section">
         <h2>📺 Top 20 Series</h2>
-        <div id="carousel-series" class="carousel"></div>
+        <div id="carousel-series" class="carousel">
+            <div class="carousel-loader"><i class="fas fa-circle-notch fa-spin"></i> Cargando series...</div>
+        </div>
     </section>
 
     <section class="content-section">
         <h2>🎬 Top 20 Películas</h2>
-        <div id="carousel-movies" class="carousel"></div>
+        <div id="carousel-movies" class="carousel">
+            <div class="carousel-loader"><i class="fas fa-circle-notch fa-spin"></i> Cargando películas...</div>
+        </div>
     </section>
 
     <section class="content-section">
         <h2>🌟 Top 20 Programas</h2>
-        <div id="carousel-shows" class="carousel"></div>
+        <div id="carousel-shows" class="carousel">
+            <div class="carousel-loader"><i class="fas fa-circle-notch fa-spin"></i> Cargando programas...</div>
+        </div>
     </section>
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const windowType = "{{ active_window }}";
-    const overlay = document.getElementById('loading-overlay');
-    const mainContent = document.getElementById('main-content');
     
-    // Sólo mostramos el farolillo si la carga tarda más de 200ms (Evita parpadeos en caché)
-    const showLoaderTimeout = setTimeout(() => {
-        overlay.style.display = 'flex';
-    }, 200);
+    // Lanzamos las 3 peticiones en paralelo
+    loadCarousel('series', 'carousel-series', 'tv', 'Serie');
+    loadCarousel('movies', 'carousel-movies', 'movie', 'Película');
+    loadCarousel('shows', 'carousel-shows', 'tv', 'Programa');
 
-    fetch(`/api/trending?window=${windowType}`)
-        .then(response => response.json())
-        .then(data => {
-            clearTimeout(showLoaderTimeout); // Si llega rápido, cancelamos el farolillo
-            
-            renderCarousel('carousel-series', data.series, 'tv', 'Serie');
-            renderCarousel('carousel-movies', data.movies, 'movie', 'Película');
-            renderCarousel('carousel-shows', data.shows, 'tv', 'Programa');
+    function loadCarousel(type, containerId, apiType, label) {
+        const container = document.getElementById(containerId);
+        
+        fetch(`/api/trending?window=${windowType}&type=${type}`)
+            .then(response => response.json())
+            .then(data => {
+                const items = data[type];
+                renderItems(container, items, apiType, label);
+            })
+            .catch(err => {
+                console.error(`Error cargando ${type}:`, err);
+                container.innerHTML = "<p class='error-msg'>No se pudo sincronizar con Asia.</p>";
+            });
+    }
 
-            overlay.style.display = 'none';
-            mainContent.style.opacity = '1';
-        })
-        .catch(err => {
-            clearTimeout(showLoaderTimeout);
-            console.error("Error cargando tendencias:", err);
-            overlay.style.display = 'flex';
-            overlay.innerHTML = "<p>Error al sincronizar con TMDB. Recarga la página.</p>";
-        });
-
-    function renderCarousel(id, items, type, label) {
-        const container = document.getElementById(id);
+    function renderItems(container, items, type, label) {
         if (!items || items.length === 0) {
             container.innerHTML = "<p>No se encontraron resultados.</p>";
             return;
