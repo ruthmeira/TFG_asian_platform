@@ -1148,3 +1148,120 @@ body {
     text-align: center;
 }
 
+/* --- PREMIUM MATRIX LOADER --- */
+.carousel-loader {
+    position: relative;
+    overflow: hidden;
+    background: #000 !important;
+    border: 1px solid rgba(255, 69, 0, 0.4);
+    box-shadow: inset 0 0 120px rgba(255, 69, 0, 0.15);
+    min-height: 280px;
+    border-radius: 20px;
+}
+
+.matrix-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    display: flex;
+    justify-content: space-around;
+    padding: 0 2%;
+    opacity: 0.6; /* Increased opacity */
+}
+
+.matrix-column {
+    display: flex;
+    flex-direction: column;
+    color: var(--primary);
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.2;
+    font-family: 'Noto Color Emoji', sans-serif;
+    text-shadow: 0 0 10px var(--primary), 0 0 20px rgba(255, 69, 0, 0.6);
+    animation: matrixFall linear infinite;
+    white-space: pre-wrap;
+    width: 25px;
+    text-align: center;
+}
+
+@keyframes matrixFall {
+    0% { transform: translateY(-100%); opacity: 0; }
+    15% { opacity: 1; filter: blur(0); }
+    85% { opacity: 1; filter: blur(0); }
+    100% { transform: translateY(100%); opacity: 0; filter: blur(1px); }
+}
+
+.carousel-loader .loading-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 25px 50px;
+    border-radius: 24px;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+}
+
+.shimmer-text {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    background: linear-gradient(90deg, #fff, var(--primary), #fff);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmerEffect 2s linear infinite;
+}
+
+@keyframes shimmerEffect {
+    to { background-position: 200% center; }
+}
+
+.loading-dots-glow {
+    font-size: 1.5rem;
+    color: var(--primary);
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.loading-dots-glow span {
+    animation: dotPulseGlow 1.2s infinite ease-in-out;
+}
+.loading-dots-glow span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots-glow span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotPulseGlow {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); filter: drop-shadow(0 0 0 var(--primary)); }
+    50% { opacity: 1; transform: scale(1.2); filter: drop-shadow(0 0 8px var(--primary)); }
+}
+
+/* CARDS BOUNCE ENTRANCE */
+.card-link {
+    animation: zoomInBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+@keyframes zoomInBounce {
+    0% { opacity: 0; transform: scale(0.3); }
+    70% { opacity: 0.8; transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.carousel .card-link:nth-child(1) { animation-delay: 0.05s; }
+.carousel .card-link:nth-child(2) { animation-delay: 0.1s; }
+.carousel .card-link:nth-child(3) { animation-delay: 0.15s; }
+.carousel .card-link:nth-child(4) { animation-delay: 0.2s; }
+.carousel .card-link:nth-child(5) { animation-delay: 0.25s; }
+.carousel .card-link:nth-child(n+6) { animation-delay: 0.3s; }
+
