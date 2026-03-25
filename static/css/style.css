@@ -1265,3 +1265,111 @@ body {
 .carousel .card-link:nth-child(5) { animation-delay: 0.25s; }
 .carousel .card-link:nth-child(n+6) { animation-delay: 0.3s; }
 
+/* --- DIGITAL SCAN LOADER (EXPLORE) --- */
+.explore-loader-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.scan-container {
+    position: relative;
+    width: 250px;
+    height: 350px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(255, 69, 0, 0.2);
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 30px rgba(255, 69, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--primary-gradient);
+    box-shadow: 0 0 15px var(--primary), 0 0 30px var(--primary);
+    z-index: 5;
+    animation: scanMove 2.5s ease-in-out infinite;
+}
+
+@keyframes scanMove {
+    0%, 100% { top: 0%; opacity: 0.8; }
+    50% { top: 100%; opacity: 1; }
+}
+
+.scan-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(255, 69, 0, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 69, 0, 0.05) 1px, transparent 1px);
+    background-size: 25px 25px;
+}
+
+.scan-character {
+    font-size: 4rem;
+    color: var(--primary);
+    opacity: 0.2;
+    animation: charFlicker 1.5s infinite alternate;
+    font-family: 'Noto Color Emoji', sans-serif;
+}
+
+@keyframes charFlicker {
+    0% { opacity: 0.1; transform: scale(1); filter: blur(2px); }
+    100% { opacity: 0.4; transform: scale(1.1); filter: blur(0); }
+}
+
+.scanning-text-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 35px;
+}
+
+.scanning-text {
+    font-family: 'Outfit', sans-serif;
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(255, 69, 0, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.scanning-dots {
+    display: flex;
+    gap: 10px;
+}
+
+.scanning-dots span {
+    width: 10px;
+    height: 10px;
+    background: var(--primary);
+    border-radius: 50%;
+    animation: scanDot 1s infinite alternate;
+}
+
+.scanning-dots span:nth-child(2) { animation-delay: 0.2s; }
+.scanning-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes scanDot {
+    from { opacity: 0.2; transform: scale(0.5); }
+    to { opacity: 1; transform: scale(1.2); box-shadow: 0 0 10px var(--primary); }
+}
+
