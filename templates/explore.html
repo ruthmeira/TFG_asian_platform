@@ -112,6 +112,10 @@ document.addEventListener('DOMContentLoaded', function() {
             container.innerHTML = '';
             // Retraso inteligente para el farolillo
             setTimeout(() => { if(container.innerHTML === '') loader.style.display = 'flex'; }, 200);
+        } else {
+            // Estado de carga en el botón si estamos paginando
+            loadMoreBtn.textContent = 'Cargando más...';
+            loadMoreBtn.disabled = true;
         }
         
         const params = new URLSearchParams({...filters, page: page});
@@ -120,6 +124,11 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(res => res.json())
             .then(data => {
                 loader.style.display = 'none';
+                
+                // Restaurar botón
+                loadMoreBtn.textContent = 'Ver más';
+                loadMoreBtn.disabled = false;
+
                 if (append) {
                     container.insertAdjacentHTML('beforeend', data.html);
                 } else {
@@ -138,6 +147,8 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(err => {
                 loader.style.display = 'none';
+                loadMoreBtn.textContent = 'Ver más';
+                loadMoreBtn.disabled = false;
                 container.innerHTML = "<p>Error al cargar resultados.</p>";
             });
     }
