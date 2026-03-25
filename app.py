@@ -4,6 +4,7 @@ from deep_translator import GoogleTranslator # Añade esto arriba con los otros 
 from dotenv import load_dotenv
 from models import db, User, CollectionItem
 from datetime import datetime
+from apscheduler.schedulers.background import BackgroundScheduler
 import requests
 import os
 import time
@@ -160,6 +161,45 @@ def get_top_20(api_key, media_type, time_window):
     return final_list
 
 
+def refresh_trending_cache(window):
+    """
+    Función para actualizar el caché de tendencias en segundo plano.
+    """
+    api_key = os.getenv("TMDB_API_KEY")
+    if not api_key:
+        print(f"❌ Error: TMDB_API_KEY no encontrada al refrescar caché {window}")
+        return
+
+    print(f"🔄 [BACKGROUND] Refrescando caché de {window} con TMDB...")
+    try:
+        api_cache[window]['series'] = get_top_20(api_key, 'tv', window)
+        api_cache[window]['movies'] = get_top_20(api_key, 'movie', window)
+        api_cache[window]['shows'] = get_top_20(api_key, 'show', window)
+        api_cache[window]['last_updated'] = time.time()
+        print(f"✅ [BACKGROUND] Caché {window} actualizada correctamente.")
+    except Exception as e:
+        print(f"❌ [BACKGROUND] Error al refrescar caché {window}: {e}")
+
+# --- INICIALIZACIÓN DEL PLANIFICADOR (SCHEDULER) ---
+scheduler = BackgroundScheduler()
+
+# Tarea para 'day' cada 4 horas
+scheduler.add_job(func=refresh_trending_cache, trigger="interval", seconds=14400, args=['day'])
+# Tarea para 'week' cada 24 horas
+scheduler.add_job(func=refresh_trending_cache, trigger="interval", seconds=86400, args=['week'])
+
+scheduler.start()
+
+# Forzar una carga inicial de 'day' para que las primeras personas no tengan que esperar
+# (La hacemos solo si el caché está vacío y solo para 'day' por el tiempo que tarda)
+with app.app_context():
+    # Solo disparamos la inicial de 'day' si no hay datos
+    if not api_cache['day']['series']:
+        import threading
+        # Lo hacemos en un hilo separado para no bloquear el arranque de Flask
+        threading.Thread(target=refresh_trending_cache, args=['day']).start()
+        # 'week' se refrescará cuando pasen 24 horas o en su primer uso manual para no saturar
+
 @app.route('/')
 def home():
     window = request.args.get('window', 'day')
@@ -178,9 +218,11 @@ def api_trending():
     cache = api_cache[window]
     seconds_passed = current_time - cache['last_updated']
     
-    # Si el cache está vacío o expiró, cargamos las 3 categorías
-    if not cache.get('series') or seconds_passed > cache['expire']:
-        print(f"🔄 Sincronizando {window} con TMDB (AJAX)...")
+    # Si el cache está vacío, disparamos la carga manual (proceder reactivo)
+    # Si ya tiene datos (incluso si está 'expirado' según el contador de app.py), servimos los de la cache
+    # porque el Scheduler se encarga de refrescarla por detrás.
+    if not cache.get('series'):
+        print(f"⚠️ Caché {window} vacía. Realizando carga manual de emergencia...")
         cache['series'] = get_top_20(api_key, 'tv', window)
         cache['movies'] = get_top_20(api_key, 'movie', window)
         cache['shows'] = get_top_20(api_key, 'show', window)
