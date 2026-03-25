@@ -21,10 +21,16 @@
         <div class="carouselCollection">
             {% for item in favorites %}
                 <a href="{{ url_for('media_detail', media_type=item.media_type, media_id=item.media_id) }}" class="card-link">
-                    <div class="cardColeccion">
-                        <img src="https://image.tmdb.org/t/p/w300{{ item.poster_path }}" alt="{{ item.title }}">
-                        <div class="cardCollection-body">
+                    <div class="card">
+                        <div class="badge">{{ 'Serie' if item.media_type == 'tv' else 'Película' }}</div>
+                        <img src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}" alt="{{ item.title }}">
+                        <div class="card-body">
                             <h4>{{ item.title }}</h4>
+                            <h6>{{ item.original_title }}</h6>
+                            <div class="card-meta">
+                                <span class="rating">⭐ {{ (item.vote_average|round(1)) if item.vote_average else '0.0' }}</span>
+                                <span class="lang">{{ item.flag or '🌏' }}</span>
+                            </div>
                         </div>
                     </div>
                 </a>
@@ -46,10 +52,16 @@
         <div class="carouselCollection">
             {% for item in items %}
                 <a href="{{ url_for('media_detail', media_type=item.media_type, media_id=item.media_id) }}" class="card-link">
-                    <div class="cardColeccion">
-                        <img src="https://image.tmdb.org/t/p/w300{{ item.poster_path }}" alt="{{ item.title }}">
-                        <div class="cardCollection-body">
+                    <div class="card">
+                        <div class="badge">{{ 'Serie' if item.media_type == 'tv' else 'Película' }}</div>
+                        <img src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}" alt="{{ item.title }}">
+                        <div class="card-body">
                             <h4>{{ item.title }}</h4>
+                            <h6>{{ item.original_title }}</h6>
+                            <div class="card-meta">
+                                <span class="rating">⭐ {{ (item.vote_average|round(1)) if item.vote_average else '0.0' }}</span>
+                                <span class="lang">{{ item.flag or '🌏' }}</span>
+                            </div>
                         </div>
                     </div>
                 </a>

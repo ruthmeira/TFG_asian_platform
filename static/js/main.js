@@ -9,6 +9,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const mediaId = favBtn.dataset.id;
         const mediaType = favBtn.dataset.type;
         const mediaTitle = favBtn.dataset.title;
+        const mediaOriginalTitle = favBtn.dataset.originalTitle;
+        const mediaVoteAverage = favBtn.dataset.voteAverage;
+        const mediaFlag = favBtn.dataset.flag;
         const mediaPoster = favBtn.dataset.poster;
 
         // ❤️ Favorito
@@ -20,6 +23,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     media_id: mediaId, 
                     media_type: mediaType,
                     title: mediaTitle,
+                    original_title: mediaOriginalTitle,
+                    vote_average: mediaVoteAverage,
+                    flag: mediaFlag,
                     poster: mediaPoster 
                 })
             });
@@ -39,6 +45,9 @@ document.addEventListener("DOMContentLoaded", function () {
                         media_type: mediaType, 
                         status: status,
                         title: mediaTitle,
+                        original_title: mediaOriginalTitle,
+                        vote_average: mediaVoteAverage,
+                        flag: mediaFlag,
                         poster: mediaPoster
                     })
                 });

@@ -26,7 +26,10 @@ class CollectionItem(db.Model):
     media_type = db.Column(db.String(10))
     # --- Añade estos campos ---
     title = db.Column(db.String(255))
+    original_title = db.Column(db.String(255))
     poster_path = db.Column(db.String(255))
+    vote_average = db.Column(db.Float)
+    flag = db.Column(db.String(50))
     # --------------------------
     status = db.Column(db.String(20))  
     is_favorite = db.Column(db.Boolean, default=False)

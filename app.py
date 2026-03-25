@@ -280,7 +280,10 @@ def toggle_favorite():
             media_id=media_id,
             media_type=data.get('media_type'),
             title=data.get('title'),
+            original_title=data.get('original_title'),
             poster_path=data.get('poster'),
+            vote_average=data.get('vote_average'),
+            flag=data.get('flag'),
             is_favorite=True
         )
         db.session.add(item)
@@ -305,7 +308,10 @@ def toggle_status():
             item.status = new_status
             # Actualizamos título y poster por si acaso
             item.title = data.get('title')
+            item.original_title = data.get('original_title')
             item.poster_path = data.get('poster')
+            item.vote_average = data.get('vote_average')
+            item.flag = data.get('flag')
             
         # LÓGICA DE BORRADO: Si tras el cambio no hay status ni es favorito
         if not item.status and not item.is_favorite:
@@ -319,7 +325,10 @@ def toggle_status():
             media_id=media_id,
             media_type=data.get('media_type'),
             title=data.get('title'),
+            original_title=data.get('original_title'),
             poster_path=data.get('poster'),
+            vote_average=data.get('vote_average'),
+            flag=data.get('flag'),
             status=new_status
         )
         db.session.add(item)
