@@ -162,6 +162,13 @@ def get_top_20(api_key, media_type, time_window):
 
 @app.route('/')
 def home():
+    window = request.args.get('window', 'day')
+    if window not in ['day', 'week']: 
+        window = 'day'
+    return render_template('index.html', active_window=window)
+ 
+@app.route('/api/trending')
+def api_trending():
     api_key = os.getenv("TMDB_API_KEY")
     window = request.args.get('window', 'day')
     if window not in ['day', 'week']: 
@@ -173,22 +180,17 @@ def home():
     
     # Si el cache está vacío o expiró, cargamos las 3 categorías
     if not cache.get('series') or seconds_passed > cache['expire']:
-        print(f"🔄 Sincronizando {window} con TMDB...")
-        
+        print(f"🔄 Sincronizando {window} con TMDB (AJAX)...")
         cache['series'] = get_top_20(api_key, 'tv', window)
         cache['movies'] = get_top_20(api_key, 'movie', window)
-        cache['shows'] = get_top_20(api_key, 'show', window) # <--- EL NUEVO TOP
-        
+        cache['shows'] = get_top_20(api_key, 'show', window)
         cache['last_updated'] = current_time
-    else:
-        faltan = int((cache['expire'] - seconds_passed) / 60)
-        print(f"⚡ Usando caché para {window}. Expira en {faltan} minutos.")
-
-    return render_template('index.html', 
-                           series=cache['series'], 
-                           movies=cache['movies'], 
-                           shows=cache.get('shows', []), # <--- ENVIADO AL HTML
-                           active_window=window)
+    
+    return jsonify({
+        'series': cache['series'],
+        'movies': cache['movies'],
+        'shows': cache.get('shows', [])
+    })
 
 # --- PROFILE ---
 @app.route('/profile')
@@ -420,17 +422,36 @@ def media_detail(media_type, media_id):
 
 @app.route('/explore')
 def explore():
-    api_key = os.getenv("TMDB_API_KEY")
-    
-    # Capturamos el tipo original (movie, tv, o el nuevo 'show' para programas)
     media_type = request.args.get('type', 'tv') 
     year = request.args.get('year', '')
     country_code = request.args.get('lang', '') 
     genre_id = request.args.get('genre', '')
     sort_by = request.args.get('sort_by', 'popularity.desc')
     status_id = request.args.get('status', '')
-    page_to_start = request.args.get('page', 1, type=int) 
-    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
+    asia_countries = {'KR': 'Corea del Sur', 'JP': 'Japón', 'CN': 'China', 'TW': 'Taiwán', 'HK': 'Hong Kong', 'TH': 'Tailandia', 'VN': 'Vietnam', 'IN': 'India', 'PH': 'Filipinas', 'ID': 'Indonesia', 'MY': 'Malasia'}
+    common_genres = {'18': 'Drama', '35': 'Comedia', '10749': 'Romance', '28': 'Acción', '80': 'Crimen', '9648': 'Misterio', '14': 'Fantasía', '16': 'Animación', '10751': 'Familia', '27': 'Terror', '53': 'Thriller'}
+    target_type = 'movie' if media_type == 'movie' else 'tv'
+    date_key = 'primary_release_date' if target_type == 'movie' else 'first_air_date'
+    sort_options = {'popularity.desc': 'Más Populares', 'popularity.asc': 'Menos Populares', 'vote_average.desc': 'Mejor Valorados', 'vote_average.asc': 'Peor Valorados', f'{date_key}.desc': 'Más Recientes', f'{date_key}.asc': 'Más Antiguos', 'vote_count.desc': 'Más Votados', 'vote_count.asc': 'Menos Votados'}
+    status_options = {'0': 'En Emisión', '3': 'Finalizada', '4': 'Cancelada'}
+
+    return render_template('explore.html', items=[], media_type=media_type, 
+                           current_year=year, current_lang=country_code, 
+                           current_genre=genre_id, current_sort=sort_by, current_status_id=status_id,
+                           asia_langs=asia_countries, genres=common_genres, 
+                           sort_options=sort_options, status_options=status_options)
+
+@app.route('/api/explore')
+def api_explore():
+    api_key = os.getenv("TMDB_API_KEY")
+    media_type = request.args.get('type', 'tv') 
+    year = request.args.get('year', '')
+    country_code = request.args.get('lang', '') 
+    genre_id = request.args.get('genre', '')
+    sort_by = request.args.get('sort_by', 'popularity.desc')
+    status_id = request.args.get('status', '')
+    page = request.args.get('page', 1, type=int) 
     
     today = datetime.now().strftime('%Y-%m-%d')
     
@@ -439,7 +460,7 @@ def explore():
     target_type = 'movie' if media_type == 'movie' else 'tv'
     
     final_items = []
-    current_api_page = page_to_start
+    current_api_page = page
     max_pages_to_scan = current_api_page + 10 
 
     idiomas_asiaticos = ['ko', 'ja', 'zh', 'cn', 'yue', 'th', 'vi', 'hi', 'tl', 'fil', 'id', 'ms']
@@ -449,72 +470,51 @@ def explore():
 
     while len(final_items) < 20 and current_api_page < max_pages_to_scan:
         url = f"https://api.themoviedb.org/3/discover/{target_type}?api_key={api_key}&language=es-ES&page={current_api_page}&sort_by={sort_by}"
-        
-        # Filtro de votos para mejor valorados (evita ruido)
-        if 'vote_average' in sort_by:
-            url += "&vote_count.gte=100"
+        if 'vote_average' in sort_by: url += "&vote_count.gte=100"
         
         if target_type == 'tv':
             url += f"&first_air_date.lte={today}"
-            # --- LÓGICA DE CATEGORÍAS ---
-            if media_type == 'show':
-                # Solo programas: incluimos los géneros de no-ficción
-                url += f"&with_genres={genres_no_ficcion}"
-            else:
-                # Series normales: excluimos los géneros de no-ficción
-                url += f"&without_genres={genres_no_ficcion}"
+            if media_type == 'show': url += f"&with_genres={genres_no_ficcion}"
+            else: url += f"&without_genres={genres_no_ficcion}"
         else:
             url += f"&primary_release_date.lte={today}"
 
-        if country_code:
-            url += f"&with_origin_country={country_code}"
-        else:
-            url += "&with_origin_country=KR|JP|CN|TW|HK|TH|VN|IN|PH|ID|MY"
+        if country_code: url += f"&with_origin_country={country_code}"
+        else: url += "&with_origin_country=KR|JP|CN|TW|HK|TH|VN|IN|PH|ID|MY"
 
         if year:
             year_param = 'first_air_date_year' if target_type == 'tv' else 'primary_release_year'
             url += f"&{year_param}={year}"
 
         if genre_id:
-            # TMDB tiene IDs distintos para algunos géneros en TV vs Movie
             actual_genre = genre_id
             if target_type == 'tv':
-                if genre_id == '28': actual_genre = '10759' # Action & Adventure
-                elif genre_id == '10749': actual_genre = '10766' # Romance -> Soap (donde están los dramas)
-                elif genre_id == '14' or genre_id == '878': actual_genre = '10765' # Sci-Fi & Fantasy
-            
+                if genre_id == '28': actual_genre = '10759'
+                elif genre_id == '10749': actual_genre = '10766'
+                elif genre_id == '14' or genre_id == '878': actual_genre = '10765'
             url += f"&with_genres={actual_genre}"
         
-        if status_id and target_type == 'tv':
-            url += f"&with_status={status_id}"
+        if status_id and target_type == 'tv': url += f"&with_status={status_id}"
 
         try:
             res = requests.get(url).json()
             results = res.get('results', [])
         except: break
-        
         if not results: break 
 
         for item in results:
             idioma_orig = item.get('original_language', '').lower()
-
-            if idioma_orig not in idiomas_asiaticos:
-                continue
+            if idioma_orig not in idiomas_asiaticos: continue
 
             item_id = item.get('id')
             item['media_type_fixed'] = target_type
             
-            # Ajuste de etiqueta según tu nueva lógica
-            if target_type == 'movie':
-                item['tipo_label'] = 'Película'
-            elif media_type == 'show':
-                item['tipo_label'] = 'Programa'
-            else:
-                item['tipo_label'] = 'Serie'
+            if target_type == 'movie': item['tipo_label'] = 'Película'
+            elif media_type == 'show': item['tipo_label'] = 'Programa'
+            else: item['tipo_label'] = 'Serie'
             
             det_url = f"https://api.themoviedb.org/3/{target_type}/{item_id}?api_key={api_key}&language=en-US"
-            try:
-                det_res = requests.get(det_url).json()
+            try: det_res = requests.get(det_url).json()
             except: det_res = {}
 
             paises_origin = [p.upper() for p in item.get('origin_country', [])]
@@ -522,7 +522,6 @@ def explore():
             todos_paises = list(set(paises_origin + paises_prod))
 
             bandera_final = None
-
             if country_code and country_code.upper() in todos_paises:
                 mapa_filtro = {'KR':'🇰🇷','JP':'🇯🇵','CN':'🇨🇳','TW':'🇹🇼','HK':'🇭🇰','TH':'🇹🇭','VN':'🇻🇳','IN':'🇮🇳','PH':'🇵🇭','ID':'🇮🇩','MY':'🇲🇾'}
                 bandera_final = mapa_filtro.get(country_code.upper())
@@ -540,77 +539,29 @@ def explore():
             if not bandera_final:
                 if idioma_orig == 'ko': bandera_final = '🇰🇷'
                 elif idioma_orig == 'ja': bandera_final = '🇯🇵'
-                elif idioma_orig in ['zh', 'cn', 'yue']:
-                    bandera_final = '🇭🇰' if idioma_orig == 'yue' else '🇨🇳'
+                elif idioma_orig in ['zh', 'cn', 'yue']: bandera_final = '🇭🇰' if idioma_orig == 'yue' else '🇨🇳'
                 elif idioma_orig == 'th': bandera_final = '🇹🇭'
                 else: bandera_final = '🌏'
 
-            if country_code and country_code.upper() == 'HK' and bandera_final == '🇨🇳':
-                continue
+            if country_code and country_code.upper() == 'HK' and bandera_final == '🇨🇳': continue
             
             item['flag'] = bandera_final
-
             title_es = item.get('name') if target_type == 'tv' else item.get('title')
             orig_title = item.get('original_name') if target_type == 'tv' else item.get('original_title')
             if title_es == orig_title or not title_es:
                 eng_title = det_res.get('name') if target_type == 'tv' else det_res.get('title')
                 item['display_title'] = eng_title if eng_title else orig_title
-            else:
-                item['display_title'] = title_es
+            else: item['display_title'] = title_es
 
             item['original_title_h6'] = orig_title
             final_items.append(item)
-
             if len(final_items) >= 20: break
-            
         current_api_page += 1
 
-    if is_ajax:
-        return jsonify({
-            'html': render_template('explore_items.html', items=final_items),
-            'next_api_page': current_api_page
-        })
-
-    asia_countries = {
-        'KR': 'Corea del Sur', 'JP': 'Japón', 'CN': 'China', 'TW': 'Taiwán', 
-        'HK': 'Hong Kong', 'TH': 'Tailandia', 'VN': 'Vietnam', 'IN': 'India', 
-        'PH': 'Filipinas', 'ID': 'Indonesia', 'MY': 'Malasia'
-    }
-
-    # Géneros comunes
-    common_genres = {
-        '18': 'Drama', '35': 'Comedia', '10749': 'Romance', '28': 'Acción', 
-        '80': 'Crimen', '9648': 'Misterio', '14': 'Fantasía', '16': 'Animación', 
-        '10751': 'Familia', '27': 'Terror', '53': 'Thriller'
-    }
-
-    # Dinámica de nombres para TMDB en SORT
-    date_key = 'primary_release_date' if target_type == 'movie' else 'first_air_date'
-
-    # Opciones de ordenación ampliadas (incluyendo las negativas)
-    sort_options = {
-        'popularity.desc': 'Más Populares',
-        'popularity.asc': 'Menos Populares',
-        'vote_average.desc': 'Mejor Valorados',
-        'vote_average.asc': 'Peor Valorados',
-        f'{date_key}.desc': 'Más Recientes',
-        f'{date_key}.asc': 'Más Antiguos',
-        'vote_count.desc': 'Más Votados',
-        'vote_count.asc': 'Menos Votados'
-    }
-
-    # Opciones de estado (solo TV)
-    status_options = {
-        '0': 'En Emisión',
-        '3': 'Finalizada',
-        '4': 'Cancelada'
-    }
-
-    return render_template('explore.html', items=final_items, media_type=media_type, 
-                           current_year=year, current_lang=country_code, 
-                           current_genre=genre_id, current_sort=sort_by, current_status_id=status_id,
-                           asia_langs=asia_countries, genres=common_genres, 
-                           sort_options=sort_options, status_options=status_options, next_api_page=current_api_page)
+    return jsonify({
+        'html': render_template('explore_items.html', items=final_items),
+        'next_api_page': current_api_page
+    })
 
 if __name__ == '__main__':
     with app.app_context():

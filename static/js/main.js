@@ -78,41 +78,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // --- LÓGICA DEL BOTÓN "VER MÁS" (EXPLORE) ---
-    const loadMoreBtn = document.getElementById('load-more-btn');
-    const container = document.getElementById('items-container');
-
-    if (loadMoreBtn) {
-        loadMoreBtn.addEventListener('click', function() {
-            const page = this.getAttribute('data-page');
-            const params = new URLSearchParams(window.location.search);
-            params.set('page', page);
-
-            this.innerText = 'Buscando más...';
-            this.disabled = true;
-
-            fetch(`/explore?${params.toString()}`, {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            })
-            .then(res => res.json()) // Esperamos el JSON del servidor
-            .then(data => {
-                if (data.html.trim() !== "") {
-                    // Añadimos las nuevas tarjetas al contenedor
-                    container.insertAdjacentHTML('beforeend', data.html);
-                    // Actualizamos el botón con la página donde se quedó la búsqueda
-                    this.setAttribute('data-page', data.next_api_page);
-                    this.innerText = 'Ver más';
-                    this.disabled = false;
-                } else {
-                    this.innerText = 'No hay más resultados';
-                }
-            })
-            .catch(err => {
-                console.error("Error cargando más elementos:", err);
-                this.innerText = 'Error al cargar';
-                this.disabled = false;
-            });
-        });
-    }
+    // (Ahora se maneja directamente en explore.html a través de la nueva API /api/explore)
 
     // --- LÓGICA DEL DROPDOWN ---
     if (toggleBtn) {

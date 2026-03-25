@@ -64,15 +64,89 @@
         </form>
     </aside>
 
-    <main class="explore-results">
+    <div class="explore-results">
+        <!-- CARGADOR (FAROLILLO) -->
+        <div id="explore-loader" class="loading-overlay" style="display: none;">
+            <div class="lantern-animation">
+                <div class="lantern">
+                    <div class="lantern-top"></div>
+                    <div class="lantern-body"><div class="lantern-glow"></div></div>
+                    <div class="lantern-bottom"></div>
+                </div>
+                <p class="loading-text">Sincronizando con Asia<span>...</span></p>
+            </div>
+        </div>
+
         <div id="items-container" class="collection-grid">
-            {# Aquí incluimos el fragmento de las tarjetas para la carga inicial #}
-            {% include 'explore_items.html' %}
+            <!-- Los items se cargarán por AJAX -->
         </div>
-        
-        <div class="load-more-wrapper">
-            <button id="load-more-btn" data-page="{{ next_api_page }}">Ver más</button>
+
+        <div id="load-more-wrapper" class="load-more-wrapper" style="display: none;">
+            <button id="load-more-btn" data-page="1">Ver más</button>
         </div>
-    </main>
+    </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('items-container');
+    const loader = document.getElementById('explore-loader');
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    const loadMoreWrapper = document.getElementById('load-more-wrapper');
+    
+    // Capturamos filtros actuales de la URL de Python/Jinja
+    const filters = {
+        type: '{{ media_type }}',
+        year: '{{ current_year }}',
+        lang: '{{ current_lang }}',
+        genre: '{{ current_genre }}',
+        sort_by: '{{ current_sort }}',
+        status: '{{ current_status_id }}'
+    };
+
+    let currentPage = 1;
+
+    // Función principal para cargar items
+    function loadItems(page = 1, append = false) {
+        if (!append) {
+            container.innerHTML = '';
+            // Retraso inteligente para el farolillo
+            setTimeout(() => { if(container.innerHTML === '') loader.style.display = 'flex'; }, 200);
+        }
+        
+        const params = new URLSearchParams({...filters, page: page});
+
+        fetch(`/api/explore?${params.toString()}`)
+            .then(res => res.json())
+            .then(data => {
+                loader.style.display = 'none';
+                if (append) {
+                    container.insertAdjacentHTML('beforeend', data.html);
+                } else {
+                    container.innerHTML = data.html;
+                }
+                
+                currentPage = data.next_api_page;
+                loadMoreBtn.setAttribute('data-page', currentPage);
+                
+                // Si tragas menos de 20 es que no hay más
+                if (data.html.trim() === "" || (data.html.match(/card-link/g) || []).length < 20) {
+                    loadMoreWrapper.style.display = 'none';
+                } else {
+                    loadMoreWrapper.style.display = 'block';
+                }
+            })
+            .catch(err => {
+                loader.style.display = 'none';
+                container.innerHTML = "<p>Error al cargar resultados.</p>";
+            });
+    }
+
+    // Carga inicial
+    loadItems(1);
+
+    // Botón Ver Más
+    loadMoreBtn.addEventListener('click', () => loadItems(currentPage, true));
+});
+</script>
 {% endblock %}

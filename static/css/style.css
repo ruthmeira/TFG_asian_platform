@@ -833,3 +833,94 @@ input.no-spin {
     font-size: 11px;
     color: #bbb;
 }
+
+/* ===================================================== */
+/* LOADING ANIMATION (LANTERN) */
+/* ===================================================== */
+
+.loading-overlay {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 500px;
+    width: 100%;
+}
+
+.lantern-animation {
+    text-align: center;
+}
+
+.lantern {
+    position: relative;
+    width: 60px;
+    height: 80px;
+    margin: 0 auto 30px;
+    background: #ff4500;
+    border-radius: 20px;
+    box-shadow: 0 0 50px rgba(255, 69, 0, 0.5);
+    animation: swing 3s ease-in-out infinite alternate;
+    transform-origin: top center;
+}
+
+.lantern::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 48%;
+    width: 2px;
+    height: 20px;
+    background: #ffd700;
+}
+
+.lantern-top, .lantern-bottom {
+    position: absolute;
+    width: 44px;
+    height: 8px;
+    background: #ffd700;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 4px;
+}
+
+.lantern-top { top: -4px; }
+.lantern-bottom { bottom: -4px; }
+
+.lantern-body {
+    position: absolute;
+    top: 10px;
+    left: 5px;
+    right: 5px;
+    bottom: 10px;
+    border: 2px solid rgba(255, 215, 0, 0.4);
+    border-radius: 12px;
+}
+
+.lantern-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    background: radial-gradient(circle, #fff, transparent);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite alternate;
+}
+
+.loading-text {
+    font-size: 1.1rem;
+    color: #ffd700;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+@keyframes swing {
+    0% { transform: rotate(-8deg); }
+    100% { transform: rotate(8deg); }
+}
+
+@keyframes pulse {
+    0% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.3); }
+}
