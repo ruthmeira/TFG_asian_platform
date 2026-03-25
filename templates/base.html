@@ -37,7 +37,7 @@
     </header>
 
     <!-- CONTENIDO DINÁMICO -->
-    <main class="container">
+    <main class="{{ 'auth-page-wrapper' if request.endpoint in ['login', 'register'] else 'container' }}">
         {% block content %}
         {% endblock %}
     </main>
