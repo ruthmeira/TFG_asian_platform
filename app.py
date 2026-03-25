@@ -400,6 +400,7 @@ def explore():
     country_code = request.args.get('lang', '') 
     genre_id = request.args.get('genre', '')
     sort_by = request.args.get('sort_by', 'popularity.desc')
+    status_id = request.args.get('status', '')
     page_to_start = request.args.get('page', 1, type=int) 
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
@@ -455,6 +456,9 @@ def explore():
                 elif genre_id == '14' or genre_id == '878': actual_genre = '10765' # Sci-Fi & Fantasy
             
             url += f"&with_genres={actual_genre}"
+        
+        if status_id and target_type == 'tv':
+            url += f"&with_status={status_id}"
 
         try:
             res = requests.get(url).json()
@@ -567,11 +571,18 @@ def explore():
         'vote_count.asc': 'Menos Votados'
     }
 
+    # Opciones de estado (solo TV)
+    status_options = {
+        '0': 'En Emisión',
+        '3': 'Finalizada',
+        '4': 'Cancelada'
+    }
+
     return render_template('explore.html', items=final_items, media_type=media_type, 
                            current_year=year, current_lang=country_code, 
-                           current_genre=genre_id, current_sort=sort_by,
+                           current_genre=genre_id, current_sort=sort_by, current_status_id=status_id,
                            asia_langs=asia_countries, genres=common_genres, 
-                           sort_options=sort_options, next_api_page=current_api_page)
+                           sort_options=sort_options, status_options=status_options, next_api_page=current_api_page)
 
 if __name__ == '__main__':
     with app.app_context():

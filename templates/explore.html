@@ -7,10 +7,20 @@
         <form action="{{ url_for('explore') }}" method="GET">
             <div class="filter-group">
                 <label>Tipo</label>
-                <select name="type" class="custom-select">
+                <select name="type" id="media-type-select" class="custom-select">
                     <option value="tv" {% if media_type == 'tv' %}selected{% endif %}>Series</option>
                     <option value="movie" {% if media_type == 'movie' %}selected{% endif %}>Películas</option>
                     <option value="show" {% if media_type == 'show' %}selected{% endif %}>Programas</option>
+                </select>
+            </div>
+
+            <div class="filter-group" id="status-filter-group" {% if media_type == 'movie' %}style="display:none"{% endif %}>
+                <label>Estado</label>
+                <select name="status" class="custom-select">
+                    <option value="">Todos</option>
+                    {% for sid, sname in status_options.items() %}
+                        <option value="{{ sid }}" {% if current_status_id == sid %}selected{% endif %}>{{ sname }}</option>
+                    {% endfor %}
                 </select>
             </div>
             

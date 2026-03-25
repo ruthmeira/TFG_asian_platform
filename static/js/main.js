@@ -63,6 +63,20 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // --- LÓGICA DE VISIBILIDAD DINÁMICA (EXPLORE) ---
+    const typeSelect = document.getElementById('media-type-select');
+    const statusGroup = document.getElementById('status-filter-group');
+    if (typeSelect && statusGroup) {
+        typeSelect.addEventListener('change', function() {
+            if (this.value === 'movie') {
+                statusGroup.style.display = 'none';
+                statusGroup.querySelector('select').value = ''; // Resetear al cambiar a pelis
+            } else {
+                statusGroup.style.display = 'block';
+            }
+        });
+    }
+
     // --- LÓGICA DEL BOTÓN "VER MÁS" (EXPLORE) ---
     const loadMoreBtn = document.getElementById('load-more-btn');
     const container = document.getElementById('items-container');
