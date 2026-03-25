@@ -375,8 +375,8 @@ def media_detail(media_type, media_id):
         'Mystery': 'Misterio', 'Romance': 'Romance', 'Science Fiction': 'Ciencia Ficción', 
         'TV Movie': 'Película de TV', 'Thriller': 'Suspense', 'War': 'Bélica', 'Western': 'Western',
         'Action & Adventure': 'Acción y Aventura', 'Kids': 'Infantil', 'News': 'Noticias', 
-        'Reality': 'Telerrealidad / Reality', 'Sci-Fi & Fantasy': 'Ciencia Ficción y Fantasía', 
-        'Soap': 'Telenovela', 'Talk': 'Charlas / Entrevistas', 'War & Politics': 'Guerra y Política'
+        'Reality': 'Reality', 'Sci-Fi & Fantasy': 'Ciencia Ficción y Fantasía', 
+        'Soap': 'Telenovela', 'Talk': 'Talk Show', 'War & Politics': 'Guerra y Política'
     }
     if 'genres' in res:
         for g in res['genres']:
@@ -460,7 +460,7 @@ def explore():
             '10765':'Ciencia Ficción y Fantasía', '10766':'Telenovela', '10768':'Guerra y Política', '37':'Western'
         },
         'show': {
-            '10764':'Telerrealidad / Reality', '99':'Documental', '10763':'Noticias', '10767':'Charlas / Entrevistas'
+            '10764':'Reality', '99':'Documental', '10763':'Noticias', '10767':'Talk Show'
         }
     }
     
