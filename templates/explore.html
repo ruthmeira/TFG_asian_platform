@@ -37,6 +37,15 @@
             </div>
 
             <div class="filter-group">
+                <label>Ordenar por</label>
+                <select name="sort_by" class="custom-select">
+                    {% for val, label in sort_options.items() %}
+                        <option value="{{ val }}" {% if current_sort == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
                 <label>Año</label>
                 <input type="number" name="year" value="{{ current_year }}" placeholder="Ej: 2024" class="no-spin">
             </div>

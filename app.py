@@ -399,6 +399,7 @@ def explore():
     year = request.args.get('year', '')
     country_code = request.args.get('lang', '') 
     genre_id = request.args.get('genre', '')
+    sort_by = request.args.get('sort_by', 'popularity.desc')
     page_to_start = request.args.get('page', 1, type=int) 
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     
@@ -418,7 +419,11 @@ def explore():
     genres_no_ficcion = "10764|99|10763|10767"
 
     while len(final_items) < 20 and current_api_page < max_pages_to_scan:
-        url = f"https://api.themoviedb.org/3/discover/{target_type}?api_key={api_key}&language=es-ES&page={current_api_page}&sort_by=popularity.desc"
+        url = f"https://api.themoviedb.org/3/discover/{target_type}?api_key={api_key}&language=es-ES&page={current_api_page}&sort_by={sort_by}"
+        
+        # Filtro de votos para mejor valorados (evita ruido)
+        if 'vote_average' in sort_by:
+            url += "&vote_count.gte=100"
         
         if target_type == 'tv':
             url += f"&first_air_date.lte={today}"
@@ -540,16 +545,33 @@ def explore():
         'PH': 'Filipinas', 'ID': 'Indonesia', 'MY': 'Malasia'
     }
 
-    # Géneros comunes (IDs unificados o mayoritarios)
+    # Géneros comunes
     common_genres = {
         '18': 'Drama', '35': 'Comedia', '10749': 'Romance', '28': 'Acción', 
         '80': 'Crimen', '9648': 'Misterio', '14': 'Fantasía', '16': 'Animación', 
         '10751': 'Familia', '27': 'Terror', '53': 'Thriller'
     }
 
+    # Dinámica de nombres para TMDB en SORT
+    date_key = 'primary_release_date' if target_type == 'movie' else 'first_air_date'
+
+    # Opciones de ordenación ampliadas (incluyendo las negativas)
+    sort_options = {
+        'popularity.desc': 'Más Populares',
+        'popularity.asc': 'Menos Populares',
+        'vote_average.desc': 'Mejor Valorados',
+        'vote_average.asc': 'Peor Valorados',
+        f'{date_key}.desc': 'Más Recientes',
+        f'{date_key}.asc': 'Más Antiguos',
+        'vote_count.desc': 'Más Votados',
+        'vote_count.asc': 'Menos Votados'
+    }
+
     return render_template('explore.html', items=final_items, media_type=media_type, 
-                           current_year=year, current_lang=country_code, current_genre=genre_id,
-                           asia_langs=asia_countries, genres=common_genres, next_api_page=current_api_page)
+                           current_year=year, current_lang=country_code, 
+                           current_genre=genre_id, current_sort=sort_by,
+                           asia_langs=asia_countries, genres=common_genres, 
+                           sort_options=sort_options, next_api_page=current_api_page)
 
 if __name__ == '__main__':
     with app.app_context():
