@@ -190,16 +190,15 @@ scheduler.add_job(func=refresh_trending_cache, trigger="interval", seconds=86400
 
 scheduler.start()
 
-# Forzar una carga inicial de 'day' para que las primeras personas no tengan que esperar
-# (La hacemos solo si el caché está vacío y solo para 'day' por el tiempo que tarda)
+# Forzar una carga inicial de TODO (en paralelo) para que las primeras personas no tengan que esperar
 with app.app_context():
-    # Solo disparamos la inicial de 'day' si no hay datos
+    # Solo disparamos la inicial si el caché de 'day' está vacío (indica reinicio o primer arranque)
     if not api_cache['day']['series']:
         import threading
-        # Lo hacemos en un hilo separado para no bloquear el arranque de Flask
+        # Lanzamos dos hilos de forma paralela para acelerar el arranque
         threading.Thread(target=refresh_trending_cache, args=['day']).start()
-        # 'week' se refrescará cuando pasen 24 horas o en su primer uso manual para no saturar
-
+        threading.Thread(target=refresh_trending_cache, args=['week']).start()
+ 
 @app.route('/')
 def home():
     window = request.args.get('window', 'day')
