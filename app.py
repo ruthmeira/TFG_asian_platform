@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_mail import Mail, Message  # Añadido
 from deep_translator import GoogleTranslator # Añade esto arriba con los otros imports
 from dotenv import load_dotenv
 from models import db, User, CollectionItem
@@ -14,7 +15,17 @@ load_dotenv()
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost:3306/asian_platform'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'secret_key'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'secret_key')
+
+# --- CONFIGURACIÓN DE CORREO GMAIL ---
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
+
+mail = Mail(app)
 
 db.init_app(app)
 
@@ -72,11 +83,20 @@ def forgot_password():
             s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
             token = s.dumps(user.email, salt='password-reset-salt')
             reset_url = url_for('reset_password', token=token, _external=True)
-            print("-" * 50)
-            print(f"📧 [SIMULADOR EMAIL] Reestablecer contraseña para: {user.email}")
-            print(f"🔗 Enlace: {reset_url}")
-            print("-" * 50)
-            flash("Si el email existe, se ha enviado un enlace de recuperación. Revisa la terminal.", "success")
+            
+            try:
+                msg = Message("SHIORI - Reestablecer Contraseña 🏮",
+                              recipients=[user.email])
+                # Plantilla HTML con el diseño premium
+                msg.html = render_template('emails/reset_password_email.html', reset_url=reset_url)
+                # Fallback en texto plano por seguridad
+                msg.body = f"Para reestablecer tu contraseña en SHIORI, haz clic en el siguiente enlace: {reset_url}"
+                
+                mail.send(msg)
+                flash("Se ha enviado un correo con las instrucciones a tu bandeja de entrada.", "success")
+            except Exception as e:
+                print(f"❌ Error enviando email: {e}")
+                flash("Error al enviar el email de recuperación.", "error")
         else:
             flash("Si el email existe, se ha enviado un enlace de recuperación.", "success")
         return redirect(url_for('forgot_password'))

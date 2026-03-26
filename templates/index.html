@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}Inicio - AsianPlatform{% endblock %}
+{% block title %}Inicio - SHIORI{% endblock %}
 
 {% block content %}
 
 <div class="home-header">
     <div class="title-section">
         <h1>Explorar Tendencias</h1>
-        <p>Lo que está en tendencia de Asia</p>
+        <p>Lo último en contenido asiático seleccionado para ti</p>
     </div>
     <div class="filter-controls">
         <a href="{{ url_for('home', window='day') }}" class="filter-btn {{ 'active' if active_window == 'day' }}">Hoy</a>
@@ -17,7 +17,7 @@
 
 <div id="main-content" style="opacity: 1;">
     <section class="content-section">
-        <h2> Top 20 Series</h2>
+        <h2>🔥 Top 20 Series</h2>
         <div id="carousel-series" class="carousel">
             <div class="carousel-loader">
                 <div class="matrix-container">
@@ -34,7 +34,7 @@
                     <div class="matrix-column" style="animation-duration: 4.4s; animation-delay: 0.2s;">み な さ ん</div>
                 </div>
                 <div class="loading-content">
-                    <div class="shimmer-text">Cargando Series</div>
+                    <div class="shimmer-text">Sincronizando con Shiori</div>
                     <div class="loading-dots-glow"><span>.</span><span>.</span><span>.</span></div>
                 </div>
             </div>
@@ -58,7 +58,7 @@
                     <div class="matrix-column" style="animation-duration: 5.5s; animation-delay: 0.9s;">な さ ん み</div>
                 </div>
                 <div class="loading-content">
-                    <div class="shimmer-text">Cargando Películas</div>
+                    <div class="shimmer-text">Buscando en Archivos</div>
                     <div class="loading-dots-glow"><span>.</span><span>.</span><span>.</span></div>
                 </div>
             </div>
@@ -82,7 +82,7 @@
                     <div class="matrix-column" style="animation-duration: 5.1s; animation-delay: 1.1s;">永 和 龙 美</div>
                 </div>
                 <div class="loading-content">
-                    <div class="shimmer-text">Cargando Programas</div>
+                    <div class="shimmer-text">Abriendo Marcapáginas</div>
                     <div class="loading-dots-glow"><span>.</span><span>.</span><span>.</span></div>
                 </div>
             </div>
@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function() {
             })
             .catch(err => {
                 console.error(`Error cargando ${type}:`, err);
-                container.innerHTML = "<p class='error-msg'>No se pudo sincronizar con Asia.</p>";
+                container.innerHTML = "<p class='error-msg'>No se pudo contactar con Shiori.</p>";
             });
     }
 

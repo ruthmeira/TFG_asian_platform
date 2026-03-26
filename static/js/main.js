@@ -103,13 +103,43 @@ document.addEventListener("DOMContentLoaded", function () {
     // --- LÓGICA DE MOSTRAR CONTRASEÑA ---
     const togglePassword = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('password');
+    const capsWarning = document.getElementById('capslock-warning');
 
-    if (togglePassword && passwordInput) {
-        togglePassword.addEventListener('click', function() {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.classList.toggle('fa-eye');
-            this.classList.toggle('fa-eye-slash');
+    if (passwordInput) {
+        if (togglePassword) {
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        }
+
+        // Detectar Bloq Mayús
+        const checkCaps = (e) => {
+            if (e.getModifierState('CapsLock')) {
+                capsWarning.classList.add('visible');
+                passwordInput.classList.add('caps-on');
+            } else {
+                capsWarning.classList.remove('visible');
+                passwordInput.classList.remove('caps-on');
+            }
+        };
+
+        passwordInput.addEventListener('keyup', checkCaps);
+        passwordInput.addEventListener('keydown', checkCaps);
+        
+        // También al enfocar por si ya estaba activo
+        passwordInput.addEventListener('focus', (e) => {
+            if (e.getModifierState && e.getModifierState('CapsLock')) {
+                capsWarning.classList.add('visible');
+                passwordInput.classList.add('caps-on');
+            }
+        });
+        
+        passwordInput.addEventListener('blur', () => {
+            capsWarning.classList.remove('visible');
+            passwordInput.classList.remove('caps-on');
         });
     }
 });
