@@ -31,9 +31,10 @@
                     class="favorite-btn {% if is_favorite %}active{% endif %}"
                     data-id="{{ media.id }}"
                     data-type="{{ 'tv' if media.name else 'movie' }}"
+                    data-media-subtype="{{ media.media_subtype }}"
                     data-title="{{ media.title or media.name }}"
                     data-original-title="{{ media.original_title or media.original_name }}"
-                    data-vote-average="{{ media.vote_average }}"
+                    data-vote_average="{{ media.vote_average }}"
                     data-flag="{{ media.flag or '🌏' }}"
                     data-poster="{{ media.poster_path }}">
                     ♥

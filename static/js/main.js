@@ -8,9 +8,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (favBtn) {
         const mediaId = favBtn.dataset.id;
         const mediaType = favBtn.dataset.type;
+        const mediaSubtype = favBtn.dataset.mediaSubtype;
         const mediaTitle = favBtn.dataset.title;
         const mediaOriginalTitle = favBtn.dataset.originalTitle;
-        const mediaVoteAverage = favBtn.dataset.voteAverage;
+        const mediaVoteAverage = favBtn.dataset.vote_average;
         const mediaFlag = favBtn.dataset.flag;
         const mediaPoster = favBtn.dataset.poster;
 
@@ -22,6 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: JSON.stringify({ 
                     media_id: mediaId, 
                     media_type: mediaType,
+                    media_subtype: mediaSubtype,
                     title: mediaTitle,
                     original_title: mediaOriginalTitle,
                     vote_average: mediaVoteAverage,
@@ -43,6 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     body: JSON.stringify({ 
                         media_id: mediaId, 
                         media_type: mediaType, 
+                        media_subtype: mediaSubtype,
                         status: status,
                         title: mediaTitle,
                         original_title: mediaOriginalTitle,

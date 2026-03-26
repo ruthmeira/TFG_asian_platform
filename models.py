@@ -23,13 +23,15 @@ class CollectionItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     media_id = db.Column(db.Integer)
-    media_type = db.Column(db.String(10))
-    # --- Añade estos campos ---
+    media_type = db.Column(db.String(10)) # 'movie' o 'tv'
+    # --- Datos de caché para evitar llamadas extra ---
     title = db.Column(db.String(255))
     original_title = db.Column(db.String(255))
     poster_path = db.Column(db.String(255))
     vote_average = db.Column(db.Float)
     flag = db.Column(db.String(50))
     # --------------------------
-    status = db.Column(db.String(20))  
+    status = db.Column(db.String(20))
     is_favorite = db.Column(db.Boolean, default=False)
+    media_subtype = db.Column(db.String(20)) # 'Serie' o 'Programa'
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

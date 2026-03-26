@@ -429,9 +429,9 @@ def collections():
     for status in statuses:
         user_collections[status] = CollectionItem.query.filter_by(
             user_id=current_user.id, status=status
-        ).all()
+        ).order_by(CollectionItem.created_at.desc()).limit(15).all()
 
-    favorites = CollectionItem.query.filter_by(user_id=current_user.id, is_favorite=True).all()
+    favorites = CollectionItem.query.filter_by(user_id=current_user.id, is_favorite=True).order_by(CollectionItem.created_at.desc()).limit(15).all()
     return render_template('collections.html', collections=user_collections, favorites=favorites)
 
 
@@ -439,15 +439,26 @@ def collections():
 @app.route('/collections/<status>')
 @login_required
 def view_collection(status):
-    # 'favoritos' es un caso especial porque no es un 'status' en la DB, sino un booleano
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+    
+    query = CollectionItem.query.filter_by(user_id=current_user.id).order_by(CollectionItem.created_at.desc())
+
     if status.lower() == 'favoritos':
-        items = CollectionItem.query.filter_by(user_id=current_user.id, is_favorite=True).all()
+        query = query.filter_by(is_favorite=True)
         display_name = "Mis Favoritos"
     else:
-        items = CollectionItem.query.filter_by(user_id=current_user.id, status=status).all()
+        query = query.filter_by(status=status)
         display_name = status
 
-    return render_template('collection_view.html', items=items, display_name=display_name)
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    items = pagination.items
+
+    return render_template('collection_view.html', 
+                          items=items, 
+                          display_name=display_name, 
+                          pagination=pagination, 
+                          status=status)
 
 
 # --- AJAX FAVORITE / COLLECTION ---
@@ -477,7 +488,8 @@ def toggle_favorite():
             poster_path=data.get('poster'),
             vote_average=data.get('vote_average'),
             flag=data.get('flag'),
-            is_favorite=True
+            is_favorite=True,
+            media_subtype=data.get('media_subtype', 'Serie')
         )
         db.session.add(item)
 
@@ -522,7 +534,8 @@ def toggle_status():
             poster_path=data.get('poster'),
             vote_average=data.get('vote_average'),
             flag=data.get('flag'),
-            status=new_status
+            status=new_status,
+            media_subtype=data.get('media_subtype', 'Serie')
         )
         db.session.add(item)
     
@@ -581,6 +594,13 @@ def media_detail(media_type, media_id):
         'In Production':'En producción','Released':'Estrenada'
     }
     res['status'] = status_map.get(res.get('status'), res.get('status'))
+
+    # --- LÓGICA DE PROGRAMA (Reality, Talk, Docu, News) ---
+    res['media_subtype'] = 'Serie'
+    if media_type == 'tv' and 'genres' in res:
+        nombres_programa = ['Reality', 'Talk Show', 'Documental', 'Noticias']
+        if any(g['name'] in nombres_programa for g in res['genres']):
+            res['media_subtype'] = 'Programa'
 
     # --- LÓGICA DE BANDERA ---
     paises_prod = [c['iso_3166_1'].upper() for c in res.get('production_countries', [])]

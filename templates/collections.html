@@ -7,7 +7,7 @@
     <div class="home-header">
         <div class="title-section">
             <h1>Mis Colecciones</h1>
-            <p>Gestiona tus series y películas favoritas</p>
+            <p>Toda tu crónica asiática en un solo lugar 🏮</p>
         </div>
     </div>
 
@@ -22,7 +22,7 @@
             {% for item in favorites %}
                 <a href="{{ url_for('media_detail', media_type=item.media_type, media_id=item.media_id) }}" class="card-link">
                     <div class="card">
-                        <div class="badge">{{ 'Serie' if item.media_type == 'tv' else 'Película' }}</div>
+                        <div class="badge">{{ item.media_subtype or ('Serie' if item.media_type == 'tv' else 'Película') }}</div>
                         <img src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}" alt="{{ item.title }}">
                         <div class="card-body">
                             <h4>{{ item.title }}</h4>
@@ -53,7 +53,7 @@
             {% for item in items %}
                 <a href="{{ url_for('media_detail', media_type=item.media_type, media_id=item.media_id) }}" class="card-link">
                     <div class="card">
-                        <div class="badge">{{ 'Serie' if item.media_type == 'tv' else 'Película' }}</div>
+                        <div class="badge">{{ item.media_subtype or ('Serie' if item.media_type == 'tv' else 'Película') }}</div>
                         <img src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}" alt="{{ item.title }}">
                         <div class="card-body">
                             <h4>{{ item.title }}</h4>
