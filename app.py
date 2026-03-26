@@ -1,4 +1,5 @@
-from flask import Flask, jsonify, render_template, request, redirect, url_for, flash, session
+from flask import Flask, jsonify, render_template, request, redirect, url_for, flash, session, Response, stream_with_context
+import json
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_mail import Mail, Message
 from authlib.integrations.flask_client import OAuth  # Nueva importación
@@ -700,6 +701,8 @@ def explore():
                            asia_langs=asia_countries, genres_by_type=genres_by_type, 
                            sort_options=sort_options, status_options=status_options)
 
+# --- API EXPLORE ---
+
 @app.route('/api/explore')
 def api_explore():
     api_key = os.getenv("TMDB_API_KEY")
@@ -712,114 +715,127 @@ def api_explore():
     page = request.args.get('page', 1, type=int) 
     
     today = datetime.now().strftime('%Y-%m-%d')
-    
-    # Determinamos el target para la API de TMDB
-    # Si es 'show', la API sigue siendo 'tv' pero con filtros de género
     target_type = 'movie' if media_type == 'movie' else 'tv'
-    
-    final_items = []
-    current_api_page = page
-    max_pages_to_scan = current_api_page + 10 
-
     idiomas_asiaticos = ['ko', 'ja', 'zh', 'cn', 'yue', 'th', 'vi', 'hi', 'tl', 'fil', 'id', 'ms']
-
-    # IDs de Géneros de No-Ficción: Reality (10764), Documental (99), News (10763), Talk (10767)
     genres_no_ficcion = "10764|99|10763|10767"
 
-    while len(final_items) < 20 and current_api_page < max_pages_to_scan:
-        url = f"https://api.themoviedb.org/3/discover/{target_type}?api_key={api_key}&language=es-ES&page={current_api_page}&sort_by={sort_by}"
-        if 'vote_average' in sort_by: url += "&vote_count.gte=100"
+    def generate():
+        final_items_count = 0
+        current_api_page = page
+        max_pages_to_scan = current_api_page + 10 
         
-        if target_type == 'tv':
-            url += f"&first_air_date.lte={today}"
-            if media_type == 'show': url += f"&with_genres={genres_no_ficcion}"
-            else: url += f"&without_genres={genres_no_ficcion}"
-        else:
-            url += f"&primary_release_date.lte={today}"
-
-        if country_code: url += f"&with_origin_country={country_code}"
-        else: url += "&with_origin_country=KR|JP|CN|TW|HK|TH|VN|IN|PH|ID|MY"
-
-        if year:
-            year_param = 'first_air_date_year' if target_type == 'tv' else 'primary_release_year'
-            url += f"&{year_param}={year}"
-
-        if genre_id:
-            actual_genre = genre_id
+        while final_items_count < 20 and current_api_page < max_pages_to_scan:
+            url = f"https://api.themoviedb.org/3/discover/{target_type}?api_key={api_key}&language=es-ES&page={current_api_page}&sort_by={sort_by}"
+            if 'vote_average' in sort_by: url += "&vote_count.gte=100"
+            
             if target_type == 'tv':
-                if genre_id == '28': actual_genre = '10759'
-                elif genre_id == '10749': actual_genre = '10766|10749|18' # Soap, Romance or Drama
-                elif genre_id == '14' or genre_id == '878': actual_genre = '10765'
-            url += f"&with_genres={actual_genre}"
-        
-        if status_id and target_type == 'tv': url += f"&with_status={status_id}"
+                url += f"&first_air_date.lte={today}"
+                if media_type == 'show': url += f"&with_genres={genres_no_ficcion}"
+                else: url += f"&without_genres={genres_no_ficcion}"
+            else:
+                url += f"&primary_release_date.lte={today}"
 
-        try:
-            res = requests.get(url).json()
-            results = res.get('results', [])
-        except: break
-        if not results: break 
+            if country_code: url += f"&with_origin_country={country_code}"
+            else: url += "&with_origin_country=KR|JP|CN|TW|HK|TH|VN|IN|PH|ID|MY"
 
-        for item in results:
-            idioma_orig = item.get('original_language', '').lower()
-            if idioma_orig not in idiomas_asiaticos: continue
+            if year:
+                year_param = 'first_air_date_year' if target_type == 'tv' else 'primary_release_year'
+                url += f"&{year_param}={year}"
 
-            item_id = item.get('id')
-            item['media_type_fixed'] = target_type
+            if genre_id:
+                actual_genre = genre_id
+                if target_type == 'tv':
+                    if genre_id == '28': actual_genre = '10759'
+                    elif genre_id == '10749': actual_genre = '10766|10749|18'
+                    elif genre_id == '14' or genre_id == '878': actual_genre = '10765'
+                url += f"&with_genres={actual_genre}"
             
-            if target_type == 'movie': item['tipo_label'] = 'Película'
-            elif media_type == 'show': item['tipo_label'] = 'Programa'
-            else: item['tipo_label'] = 'Serie'
+            if status_id and target_type == 'tv': url += f"&with_status={status_id}"
+
+            try:
+                res = requests.get(url).json()
+                results = res.get('results', [])
+            except: 
+                break
+                
+            if not results: 
+                break 
+
+            for item in results:
+                idioma_orig = item.get('original_language', '').lower()
+                if idioma_orig not in idiomas_asiaticos: continue
+
+                item_id = item.get('id')
+                item['media_type_fixed'] = target_type
+                
+                if target_type == 'movie': item['tipo_label'] = 'Película'
+                elif media_type == 'show': item['tipo_label'] = 'Programa'
+                else: item['tipo_label'] = 'Serie'
+                
+                det_url = f"https://api.themoviedb.org/3/{target_type}/{item_id}?api_key={api_key}&language=en-US"
+                try: 
+                    det_res = requests.get(det_url).json()
+                except: 
+                    det_res = {}
+
+                paises_origin = [p.upper() for p in item.get('origin_country', [])]
+                paises_prod = [c['iso_3166_1'].upper() for c in det_res.get('production_countries', [])]
+                todos_paises = list(set(paises_origin + paises_prod))
+
+                bandera_final = None
+                if country_code and country_code.upper() in todos_paises:
+                    mapa_filtro = {'KR':'🇰🇷','JP':'🇯🇵','CN':'🇨🇳','TW':'🇹🇼','HK':'🇭🇰','TH':'🇹🇭','VN':'🇻🇳','IN':'🇮🇳','PH':'🇵🇭','ID':'🇮🇩','MY':'🇲🇾'}
+                    bandera_final = mapa_filtro.get(country_code.upper())
+
+                if not bandera_final:
+                    if 'KR' in todos_paises: bandera_final = '🇰🇷'
+                    elif 'JP' in todos_paises: bandera_final = '🇯🇵'
+                    elif 'HK' in todos_paises: bandera_final = '🇭🇰'
+                    elif 'TW' in todos_paises: bandera_final = '🇹🇼'
+                    elif 'CN' in todos_paises: bandera_final = '🇨🇳'
+                    elif 'TH' in todos_paises: bandera_final = '🇹🇭'
+                    elif 'VN' in todos_paises: bandera_final = '🇻🇳'
+                    elif 'IN' in todos_paises: bandera_final = '🇮🇳'
+
+                if not bandera_final:
+                    if idioma_orig == 'ko': bandera_final = '🇰🇷'
+                    elif idioma_orig == 'ja': bandera_final = '🇯🇵'
+                    elif idioma_orig in ['zh', 'cn', 'yue']: bandera_final = '🇭🇰' if idioma_orig == 'yue' else '🇨🇳'
+                    elif idioma_orig == 'th': bandera_final = '🇹🇭'
+                    else: bandera_final = '🌏'
+
+                if country_code and country_code.upper() == 'HK' and bandera_final == '🇨🇳': continue
+                
+                item['flag'] = bandera_final
+                title_es = item.get('name') if target_type == 'tv' else item.get('title')
+                orig_title = item.get('original_name') if target_type == 'tv' else item.get('original_title')
+                if title_es == orig_title or not title_es:
+                    eng_title = det_res.get('name') if target_type == 'tv' else det_res.get('title')
+                    item['display_title'] = eng_title if eng_title else orig_title
+                else: 
+                    item['display_title'] = title_es
+
+                item['original_title_h6'] = orig_title
+                
+                # Renderizar HTML para este item solo
+                html = render_template('explore_items.html', items=[item])
+                yield json.dumps({'item_html': html}) + '\n'
+                
+                final_items_count += 1
+                if final_items_count >= 20: 
+                    break
             
-            det_url = f"https://api.themoviedb.org/3/{target_type}/{item_id}?api_key={api_key}&language=en-US"
-            try: det_res = requests.get(det_url).json()
-            except: det_res = {}
+            current_api_page += 1
 
-            paises_origin = [p.upper() for p in item.get('origin_country', [])]
-            paises_prod = [c['iso_3166_1'].upper() for c in det_res.get('production_countries', [])]
-            todos_paises = list(set(paises_origin + paises_prod))
+        # Al terminar, enviar información de paginación
+        yield json.dumps({
+            'done': True, 
+            'next_api_page': current_api_page,
+            'total_found': final_items_count
+        }) + '\n'
 
-            bandera_final = None
-            if country_code and country_code.upper() in todos_paises:
-                mapa_filtro = {'KR':'🇰🇷','JP':'🇯🇵','CN':'🇨🇳','TW':'🇹🇼','HK':'🇭🇰','TH':'🇹🇭','VN':'🇻🇳','IN':'🇮🇳','PH':'🇵🇭','ID':'🇮🇩','MY':'🇲🇾'}
-                bandera_final = mapa_filtro.get(country_code.upper())
+    return Response(stream_with_context(generate()), mimetype='application/x-ndjson')
 
-            if not bandera_final:
-                if 'KR' in todos_paises: bandera_final = '🇰🇷'
-                elif 'JP' in todos_paises: bandera_final = '🇯🇵'
-                elif 'HK' in todos_paises: bandera_final = '🇭🇰'
-                elif 'TW' in todos_paises: bandera_final = '🇹🇼'
-                elif 'CN' in todos_paises: bandera_final = '🇨🇳'
-                elif 'TH' in todos_paises: bandera_final = '🇹🇭'
-                elif 'VN' in todos_paises: bandera_final = '🇻🇳'
-                elif 'IN' in todos_paises: bandera_final = '🇮🇳'
-
-            if not bandera_final:
-                if idioma_orig == 'ko': bandera_final = '🇰🇷'
-                elif idioma_orig == 'ja': bandera_final = '🇯🇵'
-                elif idioma_orig in ['zh', 'cn', 'yue']: bandera_final = '🇭🇰' if idioma_orig == 'yue' else '🇨🇳'
-                elif idioma_orig == 'th': bandera_final = '🇹🇭'
-                else: bandera_final = '🌏'
-
-            if country_code and country_code.upper() == 'HK' and bandera_final == '🇨🇳': continue
-            
-            item['flag'] = bandera_final
-            title_es = item.get('name') if target_type == 'tv' else item.get('title')
-            orig_title = item.get('original_name') if target_type == 'tv' else item.get('original_title')
-            if title_es == orig_title or not title_es:
-                eng_title = det_res.get('name') if target_type == 'tv' else det_res.get('title')
-                item['display_title'] = eng_title if eng_title else orig_title
-            else: item['display_title'] = title_es
-
-            item['original_title_h6'] = orig_title
-            final_items.append(item)
-            if len(final_items) >= 20: break
-        current_api_page += 1
-
-    return jsonify({
-        'html': render_template('explore_items.html', items=final_items),
-        'next_api_page': current_api_page
-    })
 
 if __name__ == '__main__':
     with app.app_context():

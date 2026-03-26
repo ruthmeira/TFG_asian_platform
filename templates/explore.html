@@ -148,50 +148,69 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Función principal para cargar items
-    function loadItems(page = 1, append = false) {
+    async function loadItems(page = 1, append = false) {
         if (!append) {
             container.innerHTML = '';
-            // Retraso inteligente para el farolillo
+            // Retraso inteligente para el loader
             setTimeout(() => { if(container.innerHTML === '') loader.style.display = 'flex'; }, 200);
         } else {
-            // Estado de carga en el botón si estamos paginando
             loadMoreBtn.textContent = 'Cargando más...';
             loadMoreBtn.disabled = true;
         }
         
         const params = new URLSearchParams({...filters, page: page});
 
-        fetch(`/api/explore?${params.toString()}`)
-            .then(res => res.json())
-            .then(data => {
-                loader.style.display = 'none';
-                
-                // Restaurar botón
-                loadMoreBtn.textContent = 'Ver más';
-                loadMoreBtn.disabled = false;
+        try {
+            const response = await fetch(`/api/explore?${params.toString()}`);
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
 
-                if (append) {
-                    container.insertAdjacentHTML('beforeend', data.html);
-                } else {
-                    container.innerHTML = data.html;
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop(); // Re-add the last partial line to buffer
+
+                for (const line of lines) {
+                    if (!line.trim()) continue;
+                    try {
+                        const data = JSON.parse(line);
+                        
+                        if (data.item_html) {
+                            // Hide loader once we have at least one item
+                            loader.style.display = 'none';
+                            container.insertAdjacentHTML('beforeend', data.item_html);
+                        }
+                        
+                        if (data.done) {
+                            loader.style.display = 'none';
+                            currentPage = data.next_api_page;
+                            loadMoreBtn.setAttribute('data-page', currentPage);
+                            loadMoreBtn.textContent = 'Ver más';
+                            loadMoreBtn.disabled = false;
+                            
+                            // If we found less than 20 items, hide the "Ver más"
+                            if (data.total_found < 20) {
+                                loadMoreWrapper.style.display = 'none';
+                            } else {
+                                loadMoreWrapper.style.display = 'block';
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Error parsing NDJSON line:", e);
+                    }
                 }
-                
-                currentPage = data.next_api_page;
-                loadMoreBtn.setAttribute('data-page', currentPage);
-                
-                // Si tragas menos de 20 es que no hay más
-                if (data.html.trim() === "" || (data.html.match(/card-link/g) || []).length < 20) {
-                    loadMoreWrapper.style.display = 'none';
-                } else {
-                    loadMoreWrapper.style.display = 'block';
-                }
-            })
-            .catch(err => {
-                loader.style.display = 'none';
-                loadMoreBtn.textContent = 'Ver más';
-                loadMoreBtn.disabled = false;
-                container.innerHTML = "<p>Error al cargar resultados.</p>";
-            });
+            }
+        } catch (err) {
+            console.error(err);
+            loader.style.display = 'none';
+            loadMoreBtn.textContent = 'Ver más';
+            loadMoreBtn.disabled = false;
+            if (!append) container.innerHTML = "<p>Error al cargar resultados.</p>";
+        }
     }
 
     // Carga inicial
