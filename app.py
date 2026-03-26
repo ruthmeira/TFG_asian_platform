@@ -61,6 +61,50 @@ def login():
             flash("Credenciales incorrectas")
     return render_template('login.html')
 
+from itsdangerous import URLSafeTimedSerializer
+
+@app.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        user = User.query.filter_by(email=email).first()
+        if user:
+            s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+            token = s.dumps(user.email, salt='password-reset-salt')
+            reset_url = url_for('reset_password', token=token, _external=True)
+            print("-" * 50)
+            print(f"📧 [SIMULADOR EMAIL] Reestablecer contraseña para: {user.email}")
+            print(f"🔗 Enlace: {reset_url}")
+            print("-" * 50)
+            flash("Si el email existe, se ha enviado un enlace de recuperación. Revisa la terminal.", "success")
+        else:
+            flash("Si el email existe, se ha enviado un enlace de recuperación.", "success")
+        return redirect(url_for('forgot_password'))
+    return render_template('forgot_password.html')
+
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    try:
+        email = s.loads(token, salt='password-reset-salt', max_age=3600)
+    except:
+        flash("El enlace de recuperación es inválido o ha expirado.", "error")
+        return redirect(url_for('forgot_password'))
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return redirect(url_for('home'))
+
+    if request.method == 'POST':
+        new_password = request.form['password']
+        user.set_password(new_password)
+        db.session.commit()
+        login_user(user)
+        flash("¡Tu contraseña ha sido actualizada y ya estás dentro!", "success")
+        return redirect(url_for('home'))
+
+    return render_template('reset_password.html', token=token)
+
 @app.route('/logout')
 @login_required
 def logout():
