@@ -68,7 +68,8 @@ def register():
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
-        login_user(new_user)
+        # Loguear con sesión persistente tras el registro
+        login_user(new_user, remember=True)
         return redirect(url_for('home'))
 
     return render_template('register.html')
@@ -80,7 +81,8 @@ def login():
         password = request.form['password']
         user = User.query.filter_by(email=identifier).first() or User.query.filter_by(username=identifier).first()
         if user and user.check_password(password):
-            login_user(user)
+            remember = True if request.form.get('remember') else False
+            login_user(user, remember=remember)
             return redirect(url_for('home'))
         else:
             flash("Credenciales incorrectas")
@@ -115,8 +117,8 @@ def google_authorize():
             flash("No encontramos ninguna cuenta de SHIORI vinculada a este correo. Regístrate primero para poder conectar con Google.", "error")
             return redirect(url_for('login'))
         
-        # Loguear al usuario existente
-        login_user(user)
+        # Loguear al usuario existente con sesión persistente (por comodidad)
+        login_user(user, remember=True)
         return redirect(url_for('home'))
     except Exception as e:
         print(f"❌ Error en Google Auth: {str(e)}")
@@ -170,7 +172,8 @@ def reset_password(token):
         new_password = request.form['password']
         user.set_password(new_password)
         db.session.commit()
-        login_user(user)
+        # Loguear automáticamente con sesión persistente tras resetear
+        login_user(user, remember=True)
         return redirect(url_for('home'))
 
     return render_template('reset_password.html', token=token)
