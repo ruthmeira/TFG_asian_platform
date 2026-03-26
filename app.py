@@ -1,7 +1,8 @@
 from flask import Flask, jsonify, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from flask_mail import Mail, Message  # Añadido
-from deep_translator import GoogleTranslator # Añade esto arriba con los otros imports
+from flask_mail import Mail, Message
+from authlib.integrations.flask_client import OAuth  # Nueva importación
+from deep_translator import GoogleTranslator
 from dotenv import load_dotenv
 from models import db, User, CollectionItem
 from datetime import datetime
@@ -12,6 +13,9 @@ import time
 
 app = Flask(__name__)
 load_dotenv()
+
+# Permitir HTTP local para OAuth (Google permite localhost)
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost:3306/asian_platform'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -28,6 +32,16 @@ app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
 mail = Mail(app)
 
 db.init_app(app)
+
+# --- CONFIGURACIÓN GOOGLE OAUTH ---
+oauth = OAuth(app)
+google = oauth.register(
+    name='google',
+    client_id=os.getenv('GOOGLE_CLIENT_ID'),
+    client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
+    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+    client_kwargs={'scope': 'openid email profile'}
+)
 
 login_manager = LoginManager(app)
 
@@ -71,6 +85,43 @@ def login():
         else:
             flash("Credenciales incorrectas")
     return render_template('login.html')
+
+# --- RUTAS GOOGLE OAUTH ---
+@app.route('/login/google')
+def login_google():
+    redirect_uri = url_for('google_authorize', _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+@app.route('/login/google/authorize')
+def google_authorize():
+    try:
+        token = google.authorize_access_token()
+        # En Authlib 1.0+, el token ya suele incluir la información del usuario si hay OpenID
+        user_info = token.get('userinfo')
+        if not user_info:
+            # Si no, la pedimos manualmente
+            resp = google.get('userinfo')
+            user_info = resp.json()
+        
+        email = user_info['email']
+        name = user_info.get('name', email.split('@')[0])
+        
+        # Buscar usuario por email
+        user = User.query.filter_by(email=email).first()
+        
+        if not user:
+            # En lugar de registrar automáticamente, pedimos registro previo
+            # (así evitamos este error genérico y damos información útil)
+            flash("No encontramos ninguna cuenta de SHIORI vinculada a este correo. Regístrate primero para poder conectar con Google.", "error")
+            return redirect(url_for('login'))
+        
+        # Loguear al usuario existente
+        login_user(user)
+        return redirect(url_for('home'))
+    except Exception as e:
+        print(f"❌ Error en Google Auth: {str(e)}")
+        flash("Error al iniciar sesión con Google. Asegúrate de usar localhost:5000.", "error")
+        return redirect(url_for('login'))
 
 from itsdangerous import URLSafeTimedSerializer
 
@@ -120,7 +171,6 @@ def reset_password(token):
         user.set_password(new_password)
         db.session.commit()
         login_user(user)
-        flash("¡Tu contraseña ha sido actualizada y ya estás dentro!", "success")
         return redirect(url_for('home'))
 
     return render_template('reset_password.html', token=token)
