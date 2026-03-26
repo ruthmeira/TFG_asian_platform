@@ -415,8 +415,8 @@ def edit_profile():
         current_user.email = email
         if password: current_user.set_password(password)
         db.session.commit()
-        flash("Perfil actualizado correctamente.")
-        return redirect(url_for('profile'))
+        flash("Perfil actualizado correctamente.", "success")
+        return redirect(url_for('edit_profile'))
     return render_template('edit_profile.html')
 
 # --- COLLECTIONS ---

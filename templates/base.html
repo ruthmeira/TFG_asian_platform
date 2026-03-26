@@ -46,7 +46,7 @@
 
     <!-- CONTENIDO DINÁMICO -->
     <main
-        class="{{ 'auth-page-wrapper' if request.endpoint in ['login', 'register', 'forgot_password', 'reset_password'] else 'container' }}">
+        class="{{ 'auth-page-wrapper' if request.endpoint in ['login', 'register', 'forgot_password', 'reset_password', 'edit_profile'] else 'container' }}">
         {% block content %}
         {% endblock %}
     </main>
