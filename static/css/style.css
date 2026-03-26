@@ -1172,22 +1172,44 @@ body {
 }
 
 .filter-sidebar {
-    flex: 0 0 300px;
-    background: var(--glass-bg);
-    padding: 30px;
-    border-radius: 24px;
+    flex: 0 0 320px;
+    background: rgba(15, 15, 15, 0.85); /* Darker and more elegant */
+    padding: 35px 25px;
+    border-radius: 28px;
     position: sticky;
     top: 100px;
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.08); /* Finer border */
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    max-height: calc(100vh - 140px); /* Avoid cutting off at bottom */
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) transparent;
+}
+
+.filter-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.filter-sidebar::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
 }
 
 .filter-sidebar h3 {
-    margin-bottom: 30px;
+    margin-bottom: 25px;
+    color: var(--text-main);
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.filter-sidebar h3 i {
     color: var(--primary);
-    font-size: 1.4rem;
-    font-weight: 700;
-    letter-spacing: -0.5px;
+    font-size: 1.2rem;
 }
 
 .filter-group {
@@ -1195,32 +1217,75 @@ body {
 }
 
 .filter-group label {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 1.5px;
     color: var(--text-muted);
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     font-weight: 700;
+}
+
+.filter-group label i {
+    color: var(--primary);
+    font-size: 13px;
+    width: 20px;
+    text-align: center;
+    opacity: 0.9;
 }
 
 .filter-group select,
 .filter-group input {
     width: 100%;
     padding: 14px 18px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     color: white;
-    border-radius: 12px;
-    font-size: 15px;
+    border-radius: 14px;
+    font-size: 14px;
     transition: var(--transition);
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* HIDE NUMBER ARROWS */
+.filter-group input[type=number]::-webkit-inner-spin-button, 
+.filter-group input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+.filter-group input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* STYLE SELECT OPTIONS */
+.filter-group select option {
+    background-color: #1a1a1a;
+    color: white;
+    padding: 10px;
+}
+
+.filter-group select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 16px;
+    padding-right: 40px;
+    cursor: pointer;
 }
 
 .filter-group select:focus,
 .filter-group input:focus {
     outline: none;
     border-color: var(--primary);
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 15px rgba(255, 69, 0, 0.1);
+}
+
+.filter-group select:hover {
+    background-color: rgba(255, 255, 255, 0.06);
 }
 
 .apply-filters-btn {
@@ -1290,14 +1355,51 @@ body {
 }
 
 /* GENRE CHIPS MULTI-SELECT */
+.genre-collapsible-btn {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 12px 18px;
+    border-radius: 14px;
+    color: var(--text-muted);
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.genre-collapsible-btn:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: white;
+}
+
+.genre-collapsible-btn i.fa-chevron-down {
+    font-size: 10px;
+    transition: transform 0.3s ease;
+    color: var(--primary);
+}
+
+.genre-collapsible-btn.active i.fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+.genre-collapsible-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease-in-out;
+}
+
+.genre-collapsible-content.open {
+    max-height: 500px;
+}
+
 .genre-chips {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-top: 10px;
-    max-height: 200px;
-    overflow-y: auto;
-    padding-right: 5px;
+    padding: 15px 5px 5px 5px;
 }
 
 .genre-chips::-webkit-scrollbar {

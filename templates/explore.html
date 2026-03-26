@@ -3,74 +3,114 @@
 {% block content %}
 <div class="explore-container">
     <aside class="filter-sidebar">
-        <h3>Filtros</h3>
+        <h3><i class="fas fa-sliders-h"></i> Filtros</h3>
         <form action="{{ url_for('explore') }}" method="GET">
             <div class="filter-group">
-                <label>Tipo</label>
-                <select name="type" id="media-type-select" class="custom-select">
-                    <option value="tv" {% if media_type == 'tv' %}selected{% endif %}>Series</option>
-                    <option value="movie" {% if media_type == 'movie' %}selected{% endif %}>Películas</option>
-                    <option value="show" {% if media_type == 'show' %}selected{% endif %}>Programas</option>
-                </select>
+                <label><i class="fas fa-tv"></i> Tipo</label>
+                <div class="genre-collapsible-btn" id="toggle-type">
+                    <span class="selected-text">{% if media_type == 'movie' %}Películas{% elif media_type == 'show' %}Programas{% else %}Series{% endif %}</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="genre-collapsible-content">
+                    <div id="chips-type" class="genre-chips">
+                        <div class="genre-chip {% if media_type == 'tv' %}active{% endif %}" data-id="tv">Series</div>
+                        <div class="genre-chip {% if media_type == 'movie' %}active{% endif %}" data-id="movie">Películas</div>
+                        <div class="genre-chip {% if media_type == 'show' %}active{% endif %}" data-id="show">Programas</div>
+                    </div>
+                </div>
+                <input type="hidden" name="type" id="media-type-input" value="{{ media_type }}">
             </div>
 
             <div class="filter-group" id="status-filter-group" {% if media_type == 'movie' %}style="display:none"{% endif %}>
-                <label>Estado</label>
-                <select name="status" class="custom-select">
-                    <option value="">Todos</option>
-                    {% for sid, sname in status_options.items() %}
-                        <option value="{{ sid }}" {% if current_status_id == sid %}selected{% endif %}>{{ sname }}</option>
-                    {% endfor %}
-                </select>
+                <label><i class="fas fa-info-circle"></i> Estado</label>
+                <div class="genre-collapsible-btn" id="toggle-status">
+                    <span class="selected-text">{{ status_options.get(current_status_id, 'Todos') }}</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="genre-collapsible-content">
+                    <div id="chips-status" class="genre-chips">
+                        <div class="genre-chip {% if not current_status_id %}active{% endif %}" data-id="">Todos</div>
+                        {% for sid, sname in status_options.items() %}
+                            <div class="genre-chip {% if current_status_id == sid %}active{% endif %}" data-id="{{ sid }}">{{ sname }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <input type="hidden" name="status" id="status-input" value="{{ current_status_id }}">
             </div>
             
             <div class="filter-group">
-                <label>País</label>
-                <select name="lang" class="custom-select">
-                    <option value="">Todos</option>
-                    {% if asia_langs %}
-                        {% for code, name in asia_langs.items() %}
-                        <option value="{{ code }}" {% if current_lang == code %}selected{% endif %}>{{ name }}</option>
-                        {% endfor %}
-                    {% endif %}
-                </select>
+                <label><i class="fas fa-globe"></i> País</label>
+                <div class="genre-collapsible-btn" id="toggle-country">
+                    <span class="selected-text">{{ asia_langs.get(current_lang, 'Todos') }}</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="genre-collapsible-content">
+                    <div id="chips-country" class="genre-chips">
+                        <div class="genre-chip {% if not current_lang %}active{% endif %}" data-id="">Todos</div>
+                        {% if asia_langs %}
+                            {% for code, name in asia_langs.items() %}
+                                <div class="genre-chip {% if current_lang == code %}active{% endif %}" data-id="{{ code }}">{{ name }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                <input type="hidden" name="lang" id="country-input" value="{{ current_lang }}">
             </div>
 
             <div class="filter-group">
-                <label>Incluir Géneros</label>
-                <div id="genre-chips-include" class="genre-chips">
-                    {% for gid, gname in genres_by_type[media_type].items() %}
-                        <div class="genre-chip {% if gid in current_genre.split('|') %}active{% endif %}" data-id="{{ gid }}">
-                            {{ gname }}
-                        </div>
-                    {% endfor %}
+                <label><i class="fas fa-plus-circle"></i> Incluir Géneros</label>
+                <div class="genre-collapsible-btn" id="toggle-include">
+                    <span class="selected-text">Todos</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div id="genre-chips-include-container" class="genre-collapsible-content">
+                    <div id="genre-chips-include" class="genre-chips">
+                        {% for gid, gname in genres_by_type[media_type].items() %}
+                            <div class="genre-chip {% if gid in current_genre.split('|') %}active{% endif %}" data-id="{{ gid }}">
+                                {{ gname }}
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
                 <input type="hidden" name="genre" id="genre-input-include" value="{{ current_genre }}">
             </div>
 
             <div class="filter-group">
-                <label>Excluir Géneros</label>
-                <div id="genre-chips-exclude" class="genre-chips exclude-mode">
-                    {% for gid, gname in genres_by_type[media_type].items() %}
-                        <div class="genre-chip {% if gid in current_without_genre.split('|') %}active{% endif %}" data-id="{{ gid }}">
-                            {{ gname }}
-                        </div>
-                    {% endfor %}
+                <label><i class="fas fa-minus-circle"></i> Excluir Géneros</label>
+                <div class="genre-collapsible-btn" id="toggle-exclude">
+                    <span class="selected-text">Ninguno</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div id="genre-chips-exclude-container" class="genre-collapsible-content">
+                    <div id="genre-chips-exclude" class="genre-chips exclude-mode">
+                        {% for gid, gname in genres_by_type[media_type].items() %}
+                            <div class="genre-chip {% if gid in current_without_genre.split('|') %}active{% endif %}" data-id="{{ gid }}">
+                                {{ gname }}
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
                 <input type="hidden" name="without_genre" id="genre-input-exclude" value="{{ current_without_genre }}">
             </div>
 
             <div class="filter-group">
-                <label>Ordenar por</label>
-                <select name="sort_by" class="custom-select">
-                    {% for val, label in sort_options.items() %}
-                        <option value="{{ val }}" {% if current_sort == val %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
+                <label><i class="fas fa-sort-amount-down"></i> Ordenar por</label>
+                <div class="genre-collapsible-btn" id="toggle-sort">
+                    <span class="selected-text">{{ sort_options.get(current_sort, 'Más Populares') }}</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="genre-collapsible-content">
+                    <div id="chips-sort" class="genre-chips">
+                        {% for val, label in sort_options.items() %}
+                            <div class="genre-chip {% if current_sort == val %}active{% endif %}" data-id="{{ val }}">{{ label }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <input type="hidden" name="sort_by" id="sort-input" value="{{ current_sort }}">
             </div>
 
             <div class="filter-group">
-                <label>Año</label>
+                <label><i class="fas fa-calendar-alt"></i> Año</label>
                 <input type="number" name="year" value="{{ current_year }}" placeholder="Ej: 2024" class="no-spin">
             </div>
 
@@ -123,12 +163,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const loader = document.getElementById('explore-loader');
     const loadMoreBtn = document.getElementById('load-more-btn');
     const loadMoreWrapper = document.getElementById('load-more-wrapper');
-    const typeSelect = document.getElementById('media-type-select');
     
-    // Inputs y Contenedores de Género
+    // Inputs y Contenedores
+    const typeInput = document.getElementById('media-type-input');
+    const statusInput = document.getElementById('status-input');
+    const countryInput = document.getElementById('country-input');
+    const sortInput = document.getElementById('sort-input');
     const genreInputInclude = document.getElementById('genre-input-include');
-    const genreChipsInclude = document.getElementById('genre-chips-include');
     const genreInputExclude = document.getElementById('genre-input-exclude');
+
+    const chipsType = document.getElementById('chips-type');
+    const chipsStatus = document.getElementById('chips-status');
+    const chipsCountry = document.getElementById('chips-country');
+    const chipsSort = document.getElementById('chips-sort');
+    const genreChipsInclude = document.getElementById('genre-chips-include');
     const genreChipsExclude = document.getElementById('genre-chips-exclude');
     
     const statusGroup = document.getElementById('status-filter-group');
@@ -150,32 +198,80 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentPage = 1;
 
     // --- LÓGICA DE CHIPS DE GÉNERO ---
-    function setupGenreChips(container, input, filterKey) {
+    function setupFilterChips(container, input, filterKey, toggleBtn, options) {
+        const isMulti = options.multi || false;
+        const defaultText = options.defaultText || 'Todos';
+
+        toggleBtn.onclick = function() {
+            const content = container.parentElement;
+            this.classList.toggle('active');
+            content.classList.toggle('open');
+        };
+
         const chips = container.querySelectorAll('.genre-chip');
         chips.forEach(chip => {
             chip.addEventListener('click', function() {
+                if (!isMulti) {
+                    // Si es único, quitamos active de los demás
+                    container.querySelectorAll('.genre-chip').forEach(c => c.classList.remove('active'));
+                }
                 this.classList.toggle('active');
-                updateGenreValues(container, input, filterKey);
+                
+                // Si es único y se deselecciona, marcar el primero (Todos/Serie)
+                if (!isMulti && !container.querySelector('.genre-chip.active')) {
+                    chips[0].classList.add('active');
+                }
+
+                updateFilterValues(container, input, filterKey, toggleBtn, defaultText, isMulti);
+                if (options.onChange) options.onChange(this.dataset.id);
             });
         });
+        
+        updateFilterValues(container, input, filterKey, toggleBtn, defaultText, isMulti);
     }
 
-    function updateGenreValues(container, input, filterKey) {
+    function updateFilterValues(container, input, filterKey, toggleBtn, defaultText, isMulti) {
         const activeChips = Array.from(container.querySelectorAll('.genre-chip.active'));
         const selectedIds = activeChips.map(c => c.dataset.id).join('|');
         input.value = selectedIds;
-        filters[filterKey] = selectedIds; // Sincronizar con el objeto filters
+        filters[filterKey] = selectedIds;
+
+        const textSpan = toggleBtn.querySelector('.selected-text');
+        if (activeChips.length === 0) {
+            textSpan.textContent = defaultText;
+        } else if (activeChips.length === 1) {
+            textSpan.textContent = activeChips[0].textContent;
+        } else if (isMulti) {
+            textSpan.textContent = `${activeChips.length} seleccionados`;
+        } else {
+            textSpan.textContent = activeChips[0].textContent;
+        }
     }
 
-    setupGenreChips(genreChipsInclude, genreInputInclude, 'genre');
-    setupGenreChips(genreChipsExclude, genreInputExclude, 'without_genre');
+    const toggleType = document.getElementById('toggle-type');
+    const toggleStatus = document.getElementById('toggle-status');
+    const toggleCountry = document.getElementById('toggle-country');
+    const toggleSort = document.getElementById('toggle-sort');
+    const toggleInclude = document.getElementById('toggle-include');
+    const toggleExclude = document.getElementById('toggle-exclude');
+
+    setupFilterChips(chipsType, typeInput, 'type', toggleType, { 
+        multi: false, 
+        onChange: (val) => {
+            refreshGenreChips(val);
+            statusGroup.style.display = (val === 'movie') ? 'none' : 'block';
+        }
+    });
+    setupFilterChips(chipsStatus, statusInput, 'status', toggleStatus, { multi: false });
+    setupFilterChips(chipsCountry, countryInput, 'lang', toggleCountry, { multi: false });
+    setupFilterChips(chipsSort, sortInput, 'sort_by', toggleSort, { multi: false });
+    setupFilterChips(genreChipsInclude, genreInputInclude, 'genre', toggleInclude, { multi: true, defaultText: 'Todos' });
+    setupFilterChips(genreChipsExclude, genreInputExclude, 'without_genre', toggleExclude, { multi: true, defaultText: 'Ninguno' });
 
     // --- LÓGICA DE CAMBIO DINÁMICO DE GÉNEROS ---
-    typeSelect.addEventListener('change', function() {
-        const selectedType = this.value;
+    function refreshGenreChips(selectedType) {
         const genres = genresByType[selectedType] || {};
         
-        // Función auxiliar para repoblar contenedores
         const repopulate = (container) => {
             container.innerHTML = '';
             for (const [id, name] of Object.entries(genres)) {
@@ -190,19 +286,9 @@ document.addEventListener('DOMContentLoaded', function() {
         repopulate(genreChipsInclude);
         repopulate(genreChipsExclude);
 
-        setupGenreChips(genreChipsInclude, genreInputInclude, 'genre');
-        setupGenreChips(genreChipsExclude, genreInputExclude, 'without_genre');
-        
-        updateGenreValues(genreChipsInclude, genreInputInclude, 'genre');
-        updateGenreValues(genreChipsExclude, genreInputExclude, 'without_genre');
-
-        // Lógica de visibilidad del estado (solo series/shows)
-        if (selectedType === 'movie') {
-            statusGroup.style.display = 'none';
-        } else {
-            statusGroup.style.display = 'block';
-        }
-    });
+        setupFilterChips(genreChipsInclude, genreInputInclude, 'genre', toggleInclude, { multi: true, defaultText: 'Todos' });
+        setupFilterChips(genreChipsExclude, genreInputExclude, 'without_genre', toggleExclude, { multi: true, defaultText: 'Ninguno' });
+    }
 
     // Función principal para cargar items
     async function loadItems(page = 1, append = false) {
