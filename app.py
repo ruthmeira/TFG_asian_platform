@@ -274,15 +274,43 @@ def get_top_20(api_key, media_type, time_window):
                 det_url = f"https://api.themoviedb.org/3/{api_media_type}/{item_id}?api_key={api_key}&language=en-US"
                 det_res = requests.get(det_url).json()
 
-                paises_origin = item.get('origin_country', [])
-                paises_prod = [c['iso_3166_1'] for c in det_res.get('production_countries', [])]
-                todos_los_paises = [p.upper() for p in (paises_origin + paises_prod)]
+                # --- LÓGICA DE BANDERA ROBUSTA ---
+                paises_origin = [p.upper() for p in item.get('origin_country', [])]
+                paises_prod = [c['iso_3166_1'].upper() for c in det_res.get('production_countries', [])]
+                todos_paises = list(set(paises_origin + paises_prod))
+                idioma_orig = item.get('original_language', '').lower()
 
-                if 'TW' in todos_los_paises: item['flag'] = '🇹🇼'
-                elif 'HK' in todos_los_paises: item['flag'] = '🇭🇰'
-                elif 'CN' in todos_los_paises: item['flag'] = '🇨🇳'
-                elif 'KR' in todos_los_paises: item['flag'] = '🇰🇷'
-                elif 'JP' in todos_los_paises: item['flag'] = '🇯🇵'
+                mapa_banderas = {'KR':'🇰🇷','JP':'🇯🇵','CN':'🇨🇳','TW':'🇹🇼','HK':'🇭🇰','TH':'🇹🇭','VN':'🇻🇳','IN':'🇮🇳','PH':'🇵🇭','ID':'🇮🇩','MY':'🇲🇾'}
+                codigo_final = None
+                bandera_final = None
+
+                # 1. SERIES: Priorizar origin_country
+                if api_media_type == 'tv' and paises_origin:
+                    lang_to_c = {'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN','tl':'PH','id':'ID','ms':'MY'}
+                    c_sug = lang_to_c.get(idioma_orig)
+                    codigo_final = c_sug if (c_sug and c_sug in paises_origin) else paises_origin[0]
+                    bandera_final = mapa_banderas.get(codigo_final)
+
+                # 2. PELÍCULAS o fallback: idioma_orig
+                if not bandera_final:
+                    lang_map = {'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN','id':'ID','tl':'PH','fil':'PH','ms':'MY'}
+                    if idioma_orig in ['zh', 'cn', 'yue']:
+                        if 'HK' in todos_paises: codigo_final = 'HK'
+                        elif 'TW' in todos_paises: codigo_final = 'TW'
+                        else: codigo_final = 'CN'
+                    elif idioma_orig in lang_map:
+                        codigo_final = lang_map[idioma_orig]
+                    if codigo_final: bandera_final = mapa_banderas.get(codigo_final)
+
+                # 3. Fallback: Priority list
+                if not bandera_final:
+                    for code in ['KR', 'JP', 'HK', 'TW', 'CN', 'TH', 'VN', 'IN', 'PH', 'ID', 'MY']:
+                        if code in todos_paises:
+                            codigo_final = code
+                            bandera_final = mapa_banderas.get(code)
+                            break
+
+                item['flag'] = bandera_final or '🌏'
 
                 curr_title = item.get('name') if api_media_type == 'tv' else item.get('title')
                 orig_title = item.get('original_name') if api_media_type == 'tv' else item.get('original_title')
@@ -617,33 +645,43 @@ def media_detail(media_type, media_id):
         if any(g['name'] in nombres_programa for g in res['genres']):
             res['media_subtype'] = 'Programa'
 
-    # --- LÓGICA DE BANDERA ---
+    # --- LÓGICA DE BANDERA ROBUSTA ---
     paises_prod = [c['iso_3166_1'].upper() for c in res.get('production_countries', [])]
     paises_origin = [p.upper() for p in res.get('origin_country', [])]
     todos_paises = list(set(paises_prod + paises_origin))
     idioma_orig = res.get('original_language', '').lower()
 
+    mapa_banderas = {'KR':'🇰🇷','JP':'🇯🇵','CN':'🇨🇳','TW':'🇹🇼','HK':'🇭🇰','TH':'🇹🇭','VN':'🇻🇳','IN':'🇮🇳','PH':'🇵🇭','ID':'🇮🇩','MY':'🇲🇾'}
+    codigo_final = None
     bandera_final = None
-    if 'KR' in todos_paises: bandera_final = '🇰🇷'
-    elif 'JP' in todos_paises: bandera_final = '🇯🇵'
-    elif 'HK' in todos_paises: bandera_final = '🇭🇰'
-    elif 'TW' in todos_paises: bandera_final = '🇹🇼'
-    elif 'CN' in todos_paises: bandera_final = '🇨🇳'
-    elif 'TH' in todos_paises: bandera_final = '🇹🇭'
-    elif 'VN' in todos_paises: bandera_final = '🇻🇳'
-    elif 'IN' in todos_paises: bandera_final = '🇮🇳'
-    elif 'PH' in todos_paises: bandera_final = '🇵🇭'
 
+    # 1. SERIES: Priorizar origin_country
+    if media_type == 'tv' and paises_origin:
+        lang_to_c = {'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN','tl':'PH','id':'ID','ms':'MY'}
+        c_sug = lang_to_c.get(idioma_orig)
+        codigo_final = c_sug if (c_sug and c_sug in paises_origin) else paises_origin[0]
+        bandera_final = mapa_banderas.get(codigo_final)
+
+    # 2. PELÍCULAS o fallback: idioma_orig
     if not bandera_final:
-        if idioma_orig == 'ko': bandera_final = '🇰🇷'
-        elif idioma_orig == 'ja': bandera_final = '🇯🇵'
-        elif idioma_orig in ['zh', 'cn', 'yue']: bandera_final = '🇭🇰' if idioma_orig == 'yue' else '🇨🇳'
-        elif idioma_orig == 'th': bandera_final = '🇹🇭'
-        elif idioma_orig == 'vn': bandera_final = '🇻🇳'
-        elif idioma_orig == 'hi': bandera_final = '🇮🇳'
-        else: bandera_final = '🌏'
+        lang_map = {'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN','id':'ID','tl':'PH','fil':'PH','ms':'MY'}
+        if idioma_orig in ['zh', 'cn', 'yue']:
+            if 'HK' in todos_paises: codigo_final = 'HK'
+            elif 'TW' in todos_paises: codigo_final = 'TW'
+            else: codigo_final = 'CN'
+        elif idioma_orig in lang_map:
+            codigo_final = lang_map[idioma_orig]
+        if codigo_final: bandera_final = mapa_banderas.get(codigo_final)
+
+    # 3. Fallback: Priority list
+    if not bandera_final:
+        for code in ['KR', 'JP', 'HK', 'TW', 'CN', 'TH', 'VN', 'IN', 'PH', 'ID', 'MY']:
+            if code in todos_paises:
+                codigo_final = code
+                bandera_final = mapa_banderas.get(code)
+                break
     
-    res['flag'] = bandera_final
+    res['flag'] = bandera_final or '🌏'
 
     # Lógica de favoritos y status (lo que ya tenías)
     current_status = None
@@ -797,35 +835,52 @@ def api_explore():
                 except: 
                     det_res = {}
 
+                # --- LÓGICA DE BANDERA ROBUSTA ---
                 paises_origin = [p.upper() for p in item.get('origin_country', [])]
                 paises_prod = [c['iso_3166_1'].upper() for c in det_res.get('production_countries', [])]
                 todos_paises = list(set(paises_origin + paises_prod))
+                idioma_orig = item.get('original_language', '').lower()
 
+                mapa_banderas = {'KR':'🇰🇷','JP':'🇯🇵','CN':'🇨🇳','TW':'🇹🇼','HK':'🇭🇰','TH':'🇹🇭','VN':'🇻🇳','IN':'🇮🇳','PH':'🇵🇭','ID':'🇮🇩','MY':'🇲🇾'}
+                codigo_final = None
                 bandera_final = None
-                if country_code and country_code.upper() in todos_paises:
-                    mapa_filtro = {'KR':'🇰🇷','JP':'🇯🇵','CN':'🇨🇳','TW':'🇹🇼','HK':'🇭🇰','TH':'🇹🇭','VN':'🇻🇳','IN':'🇮🇳','PH':'🇵🇭','ID':'🇮🇩','MY':'🇲🇾'}
-                    bandera_final = mapa_filtro.get(country_code.upper())
 
+                # 1. SERIES: Priorizar origin_country
+                if target_type == 'tv' and paises_origin:
+                    lang_to_c = {'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN','tl':'PH','id':'ID','ms':'MY'}
+                    c_sug = lang_to_c.get(idioma_orig)
+                    codigo_final = c_sug if (c_sug and c_sug in paises_origin) else paises_origin[0]
+                    bandera_final = mapa_banderas.get(codigo_final)
+
+                # 2. PELÍCULAS o fallback: idioma_orig
                 if not bandera_final:
-                    if 'KR' in todos_paises: bandera_final = '🇰🇷'
-                    elif 'JP' in todos_paises: bandera_final = '🇯🇵'
-                    elif 'HK' in todos_paises: bandera_final = '🇭🇰'
-                    elif 'TW' in todos_paises: bandera_final = '🇹🇼'
-                    elif 'CN' in todos_paises: bandera_final = '🇨🇳'
-                    elif 'TH' in todos_paises: bandera_final = '🇹🇭'
-                    elif 'VN' in todos_paises: bandera_final = '🇻🇳'
-                    elif 'IN' in todos_paises: bandera_final = '🇮🇳'
+                    lang_map = {'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN','id':'ID','tl':'PH','fil':'PH','ms':'MY'}
+                    if idioma_orig in ['zh', 'cn', 'yue']:
+                        if 'HK' in todos_paises: codigo_final = 'HK'
+                        elif 'TW' in todos_paises: codigo_final = 'TW'
+                        else: codigo_final = 'CN'
+                    elif idioma_orig in lang_map:
+                        codigo_final = lang_map[idioma_orig]
+                    if codigo_final: bandera_final = mapa_banderas.get(codigo_final)
 
+                # 3. Fallback: Priority list
                 if not bandera_final:
-                    if idioma_orig == 'ko': bandera_final = '🇰🇷'
-                    elif idioma_orig == 'ja': bandera_final = '🇯🇵'
-                    elif idioma_orig in ['zh', 'cn', 'yue']: bandera_final = '🇭🇰' if idioma_orig == 'yue' else '🇨🇳'
-                    elif idioma_orig == 'th': bandera_final = '🇹🇭'
-                    else: bandera_final = '🌏'
+                    for code in ['KR', 'JP', 'HK', 'TW', 'CN', 'TH', 'VN', 'IN', 'PH', 'ID', 'MY']:
+                        if code in todos_paises:
+                            codigo_final = code
+                            bandera_final = mapa_banderas.get(code)
+                            break
 
-                if country_code and country_code.upper() == 'HK' and bandera_final == '🇨🇳': continue
-                
-                item['flag'] = bandera_final
+                # --- FILTRADO ESTRICTO ---
+                # Si estamos filtrando por país, el código final determinado debe coincidir
+                if country_code:
+                    c_target = country_code.upper()
+                    if c_target != codigo_final:
+                        # Excepción: No saltar si es China y el código final es HK/TW si no hay filtros específicos activos
+                        # Pero ella tiene filtros separados, así que mejor ser estrictos para evitar "colados"
+                        continue
+
+                item['flag'] = bandera_final or '🌏'
                 title_es = item.get('name') if target_type == 'tv' else item.get('title')
                 orig_title = item.get('original_name') if target_type == 'tv' else item.get('original_title')
                 if title_es == orig_title or not title_es:
