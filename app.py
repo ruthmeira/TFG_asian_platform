@@ -668,6 +668,7 @@ def explore():
     year = request.args.get('year', '')
     country_code = request.args.get('lang', '') 
     genre_id = request.args.get('genre', '')
+    without_genre_id = request.args.get('without_genre', '')
     sort_by = request.args.get('sort_by', 'popularity.desc')
     status_id = request.args.get('status', '')
 
@@ -697,7 +698,8 @@ def explore():
 
     return render_template('explore.html', items=[], media_type=media_type, 
                            current_year=year, current_lang=country_code, 
-                           current_genre=genre_id, current_sort=sort_by, current_status_id=status_id,
+                           current_genre=genre_id, current_without_genre=without_genre_id,
+                           current_sort=sort_by, current_status_id=status_id,
                            asia_langs=asia_countries, genres_by_type=genres_by_type, 
                            sort_options=sort_options, status_options=status_options)
 
@@ -710,6 +712,7 @@ def api_explore():
     year = request.args.get('year', '')
     country_code = request.args.get('lang', '') 
     genre_id = request.args.get('genre', '')
+    without_genre_id = request.args.get('without_genre', '')
     sort_by = request.args.get('sort_by', 'popularity.desc')
     status_id = request.args.get('status', '')
     page = request.args.get('page', 1, type=int) 
@@ -743,12 +746,28 @@ def api_explore():
                 url += f"&{year_param}={year}"
 
             if genre_id:
-                actual_genre = genre_id
-                if target_type == 'tv':
-                    if genre_id == '28': actual_genre = '10759'
-                    elif genre_id == '10749': actual_genre = '10766|10749|18'
-                    elif genre_id == '14' or genre_id == '878': actual_genre = '10765'
-                url += f"&with_genres={actual_genre}"
+                genre_list = genre_id.split('|')
+                processed_genres = []
+                for gid in genre_list:
+                    actual_gid = gid
+                    if target_type == 'tv':
+                        if gid == '28': actual_gid = '10759'
+                        elif gid == '10749': actual_gid = '10766|10749|18'
+                        elif gid in ['14', '878']: actual_gid = '10765'
+                    processed_genres.append(actual_gid)
+                url += f"&with_genres={','.join(processed_genres)}"
+
+            if without_genre_id:
+                without_genre_list = without_genre_id.split('|')
+                processed_without = []
+                for gid in without_genre_list:
+                    actual_gid = gid
+                    if target_type == 'tv':
+                        if gid == '28': actual_gid = '10759'
+                        elif gid == '10749': actual_gid = '10766|10749|18'
+                        elif gid in ['14', '878']: actual_gid = '10765'
+                    processed_without.append(actual_gid)
+                url += f"&without_genres={','.join(processed_without)}"
             
             if status_id and target_type == 'tv': url += f"&with_status={status_id}"
 

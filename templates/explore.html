@@ -37,13 +37,27 @@
             </div>
 
             <div class="filter-group">
-                <label>Género</label>
-                <select name="genre" id="genre-select" class="custom-select">
-                    <option value="">Todos</option>
+                <label>Incluir Géneros</label>
+                <div id="genre-chips-include" class="genre-chips">
                     {% for gid, gname in genres_by_type[media_type].items() %}
-                        <option value="{{ gid }}" {% if current_genre == gid %}selected{% endif %}>{{ gname }}</option>
+                        <div class="genre-chip {% if gid in current_genre.split('|') %}active{% endif %}" data-id="{{ gid }}">
+                            {{ gname }}
+                        </div>
                     {% endfor %}
-                </select>
+                </div>
+                <input type="hidden" name="genre" id="genre-input-include" value="{{ current_genre }}">
+            </div>
+
+            <div class="filter-group">
+                <label>Excluir Géneros</label>
+                <div id="genre-chips-exclude" class="genre-chips exclude-mode">
+                    {% for gid, gname in genres_by_type[media_type].items() %}
+                        <div class="genre-chip {% if gid in current_without_genre.split('|') %}active{% endif %}" data-id="{{ gid }}">
+                            {{ gname }}
+                        </div>
+                    {% endfor %}
+                </div>
+                <input type="hidden" name="without_genre" id="genre-input-exclude" value="{{ current_without_genre }}">
             </div>
 
             <div class="filter-group">
@@ -60,7 +74,10 @@
                 <input type="number" name="year" value="{{ current_year }}" placeholder="Ej: 2024" class="no-spin">
             </div>
 
-            <button type="submit" class="apply-filters-btn">Aplicar Filtros</button>
+            <div class="filter-actions">
+                <button type="submit" class="apply-filters-btn">Aplicar Filtros</button>
+                <a href="{{ url_for('explore') }}" class="clear-filters-btn">Borrar Filtros</a>
+            </div>
         </form>
     </aside>
 
@@ -107,7 +124,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const loadMoreBtn = document.getElementById('load-more-btn');
     const loadMoreWrapper = document.getElementById('load-more-wrapper');
     const typeSelect = document.getElementById('media-type-select');
-    const genreSelect = document.getElementById('genre-select');
+    
+    // Inputs y Contenedores de Género
+    const genreInputInclude = document.getElementById('genre-input-include');
+    const genreChipsInclude = document.getElementById('genre-chips-include');
+    const genreInputExclude = document.getElementById('genre-input-exclude');
+    const genreChipsExclude = document.getElementById('genre-chips-exclude');
+    
     const statusGroup = document.getElementById('status-filter-group');
 
     // Datos de géneros desde Python
@@ -119,25 +142,59 @@ document.addEventListener('DOMContentLoaded', function() {
         year: '{{ current_year }}',
         lang: '{{ current_lang }}',
         genre: '{{ current_genre }}',
+        without_genre: '{{ current_without_genre }}',
         sort_by: '{{ current_sort }}',
         status: '{{ current_status_id }}'
     };
 
     let currentPage = 1;
 
+    // --- LÓGICA DE CHIPS DE GÉNERO ---
+    function setupGenreChips(container, input, filterKey) {
+        const chips = container.querySelectorAll('.genre-chip');
+        chips.forEach(chip => {
+            chip.addEventListener('click', function() {
+                this.classList.toggle('active');
+                updateGenreValues(container, input, filterKey);
+            });
+        });
+    }
+
+    function updateGenreValues(container, input, filterKey) {
+        const activeChips = Array.from(container.querySelectorAll('.genre-chip.active'));
+        const selectedIds = activeChips.map(c => c.dataset.id).join('|');
+        input.value = selectedIds;
+        filters[filterKey] = selectedIds; // Sincronizar con el objeto filters
+    }
+
+    setupGenreChips(genreChipsInclude, genreInputInclude, 'genre');
+    setupGenreChips(genreChipsExclude, genreInputExclude, 'without_genre');
+
     // --- LÓGICA DE CAMBIO DINÁMICO DE GÉNEROS ---
     typeSelect.addEventListener('change', function() {
         const selectedType = this.value;
         const genres = genresByType[selectedType] || {};
         
-        // Limpiamos y rellenamos el select de géneros
-        genreSelect.innerHTML = '<option value="">Todos</option>';
-        for (const [id, name] of Object.entries(genres)) {
-            const option = document.createElement('option');
-            option.value = id;
-            option.textContent = name;
-            genreSelect.appendChild(option);
-        }
+        // Función auxiliar para repoblar contenedores
+        const repopulate = (container) => {
+            container.innerHTML = '';
+            for (const [id, name] of Object.entries(genres)) {
+                const chip = document.createElement('div');
+                chip.className = 'genre-chip';
+                chip.dataset.id = id;
+                chip.textContent = name;
+                container.appendChild(chip);
+            }
+        };
+
+        repopulate(genreChipsInclude);
+        repopulate(genreChipsExclude);
+
+        setupGenreChips(genreChipsInclude, genreInputInclude, 'genre');
+        setupGenreChips(genreChipsExclude, genreInputExclude, 'without_genre');
+        
+        updateGenreValues(genreChipsInclude, genreInputInclude, 'genre');
+        updateGenreValues(genreChipsExclude, genreInputExclude, 'without_genre');
 
         // Lógica de visibilidad del estado (solo series/shows)
         if (selectedType === 'movie') {
@@ -158,6 +215,9 @@ document.addEventListener('DOMContentLoaded', function() {
             loadMoreBtn.disabled = true;
         }
         
+        // Sincronizar filtros antes de pedir
+        filters.genre = genreInputInclude.value;
+        filters.without_genre = genreInputExclude.value;
         const params = new URLSearchParams({...filters, page: page});
 
         try {

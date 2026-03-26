@@ -1241,6 +1241,32 @@ body {
     box-shadow: 0 15px 30px rgba(255, 69, 0, 0.4);
 }
 
+.filter-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.clear-filters-btn {
+    display: block;
+    text-align: center;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px;
+    border-radius: 12px;
+    transition: var(--transition);
+    border: 1px solid transparent;
+}
+
+.clear-filters-btn:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--glass-border);
+}
+
 /* --- BOTÓN VER MÁS (Ajustado a tu estilo) --- */
 .load-more-wrapper {
     text-align: center;
@@ -1261,6 +1287,57 @@ body {
 #load-more-btn:hover {
     background: #ff4500;
     color: white;
+}
+
+/* GENRE CHIPS MULTI-SELECT */
+.genre-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.genre-chips::-webkit-scrollbar {
+    width: 4px;
+}
+
+.genre-chips::-webkit-scrollbar-thumb {
+    background: rgba(255, 69, 0, 0.3);
+    border-radius: 10px;
+}
+
+.genre-chip {
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 50px;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition);
+    user-select: none;
+}
+
+.genre-chip:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.genre-chip.active {
+    background: var(--primary-gradient);
+    color: white;
+    border-color: transparent;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(255, 69, 0, 0.3);
+}
+
+.genre-chips.exclude-mode .genre-chip.active {
+    background: linear-gradient(135deg, #ff4d6d, #c9184a);
+    box-shadow: 0 4px 12px rgba(255, 77, 109, 0.3);
 }
 
 /* ===================================================== */
