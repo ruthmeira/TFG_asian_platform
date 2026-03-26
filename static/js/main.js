@@ -100,46 +100,58 @@ document.addEventListener("DOMContentLoaded", function () {
             if (dropdown) dropdown.classList.remove("upwards");
         }
     });
-    // --- LÓGICA DE MOSTRAR CONTRASEÑA ---
-    const togglePassword = document.getElementById('togglePassword');
-    const passwordInput = document.getElementById('password');
-    const capsWarning = document.getElementById('capslock-warning');
+    // --- LÓGICA DE MOSTRAR CONTRASEÑA Y MAYÚSCULAS ---
+    let capsLockOn = false;
 
-    if (passwordInput) {
-        if (togglePassword) {
-            togglePassword.addEventListener('click', function() {
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
+    // Actualizamos el estado global de CapsLock con cualquier evento compatible
+    const updateCapsLockState = (e) => {
+        if (e.getModifierState) {
+            capsLockOn = e.getModifierState('CapsLock');
+        }
+        // Disparamos una actualización visual en los campos activos
+        document.querySelectorAll('.password-input').forEach(input => {
+            if (document.activeElement === input) {
+                const group = input.closest('.input-group');
+                const warning = group ? group.querySelector('.caps-warning') : null;
+                if (warning) {
+                    if (capsLockOn) warning.classList.add('visible');
+                    else warning.classList.remove('visible');
+                }
+                if (capsLockOn) input.classList.add('caps-on');
+                else input.classList.remove('caps-on');
+            }
+        });
+    };
+
+    window.addEventListener('keydown', updateCapsLockState);
+    window.addEventListener('keyup', updateCapsLockState);
+    window.addEventListener('mousedown', updateCapsLockState);
+
+    function setupPasswordField(inputId, toggleId) {
+        const input = document.getElementById(inputId);
+        const toggle = document.getElementById(toggleId);
+
+        if (!input) return;
+
+        if (toggle) {
+            toggle.addEventListener('click', function() {
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
                 this.classList.toggle('fa-eye');
                 this.classList.toggle('fa-eye-slash');
             });
         }
 
-        // Detectar Bloq Mayús
-        const checkCaps = (e) => {
-            if (e.getModifierState('CapsLock')) {
-                capsWarning.classList.add('visible');
-                passwordInput.classList.add('caps-on');
-            } else {
-                capsWarning.classList.remove('visible');
-                passwordInput.classList.remove('caps-on');
-            }
-        };
-
-        passwordInput.addEventListener('keyup', checkCaps);
-        passwordInput.addEventListener('keydown', checkCaps);
-        
-        // También al enfocar por si ya estaba activo
-        passwordInput.addEventListener('focus', (e) => {
-            if (e.getModifierState && e.getModifierState('CapsLock')) {
-                capsWarning.classList.add('visible');
-                passwordInput.classList.add('caps-on');
-            }
-        });
-        
-        passwordInput.addEventListener('blur', () => {
-            capsWarning.classList.remove('visible');
-            passwordInput.classList.remove('caps-on');
+        input.addEventListener('focus', updateCapsLockState);
+        input.addEventListener('blur', () => {
+            const group = input.closest('.input-group');
+            const warning = group ? group.querySelector('.caps-warning') : null;
+            if (warning) warning.classList.remove('visible');
+            input.classList.remove('caps-on');
         });
     }
+
+    setupPasswordField('password', 'togglePassword');
+    setupPasswordField('confirm_password', 'toggleConfirmPassword');
+    setupPasswordField('current_password', 'toggleCurrentPassword');
 });

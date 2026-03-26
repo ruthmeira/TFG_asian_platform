@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request, redirect, url_for, flash
+from flask import Flask, jsonify, render_template, request, redirect, url_for, flash, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_mail import Mail, Message
 from authlib.integrations.flask_client import OAuth  # Nueva importación
@@ -56,6 +56,11 @@ def register():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
+        confirm_password = request.form['confirm_password']
+
+        if password != confirm_password:
+            flash("Las contraseñas no coinciden.")
+            return redirect(url_for('register'))
 
         if User.query.filter_by(email=email).first():
             flash("El email ya está registrado.")
@@ -91,6 +96,10 @@ def login():
 # --- RUTAS GOOGLE OAUTH ---
 @app.route('/login/google')
 def login_google():
+    # Detectamos la intención (si viene de register o de login normal)
+    action = request.args.get('action', 'login')
+    session['google_auth_action'] = action
+    
     redirect_uri = url_for('google_authorize', _external=True)
     return google.authorize_redirect(redirect_uri)
 
@@ -110,20 +119,39 @@ def google_authorize():
         
         # Buscar usuario por email
         user = User.query.filter_by(email=email).first()
+        action = session.get('google_auth_action', 'login')
         
         if not user:
-            # En lugar de registrar automáticamente, pedimos registro previo
-            # (así evitamos este error genérico y damos información útil)
-            flash("No encontramos ninguna cuenta de SHIORI vinculada a este correo. Regístrate primero para poder conectar con Google.", "error")
-            return redirect(url_for('login'))
+            if action == 'register':
+                # Solo creamos el usuario si viene explícitamente de la página de registro
+                # Generar nombre de usuario único
+                base_username = name.replace(" ", "").lower()
+                username = base_username
+                counter = 1
+                while User.query.filter_by(username=username).first():
+                    username = f"{base_username}{counter}"
+                    counter += 1
+                    
+                user = User(username=username, email=email)
+                # IMPORTANTE: Como tu DB pide que no sea NULL, ponemos un marcador interno.
+                # El usuario no se logueará nunca con esta clave, entrará via Google.
+                user.set_password("OAUTH_GOOGLE_USER")
+                db.session.add(user)
+                db.session.commit()
+            else:
+                # Si viene de Login normal y no existe, mostramos el error útil de antes
+                flash("No encontramos ninguna cuenta de SHIORI vinculada a este correo. Regístrate primero para poder conectar con Google.", "error")
+                return redirect(url_for('login'))
         
         # Loguear al usuario existente con sesión persistente (por comodidad)
         login_user(user, remember=True)
         return redirect(url_for('home'))
     except Exception as e:
         print(f"❌ Error en Google Auth: {str(e)}")
-        flash("Error al iniciar sesión con Google. Asegúrate de usar localhost:5000.", "error")
-        return redirect(url_for('login'))
+        # Miramos si el usuario intentaba registrarse o entrar
+        action = session.get('google_auth_action', 'login')
+        flash("Error de autenticación con Google. Por favor, reintenta o usa login normal.", "error")
+        return redirect(url_for(action))
 
 from itsdangerous import URLSafeTimedSerializer
 
@@ -146,12 +174,13 @@ def forgot_password():
                 msg.body = f"Para reestablecer tu contraseña en SHIORI, haz clic en el siguiente enlace: {reset_url}"
                 
                 mail.send(msg)
-                flash("Se ha enviado un correo con las instrucciones a tu bandeja de entrada.", "success")
             except Exception as e:
                 print(f"❌ Error enviando email: {e}")
                 flash("Error al enviar el email de recuperación.", "error")
-        else:
-            flash("Si el email existe, se ha enviado un enlace de recuperación.", "success")
+                return redirect(url_for('forgot_password'))
+        
+        # Mensaje unificado (si existe o si no) para máxima privacidad
+        flash("Si el email existe en nuestra base de datos, recibirás un enlace de recuperación en unos minutos. Revisa tu carpeta de spam.", "success")
         return redirect(url_for('forgot_password'))
     return render_template('forgot_password.html')
 
