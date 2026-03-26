@@ -586,18 +586,18 @@ def media_detail(media_type, media_id):
             res['overview'] = "Sinopsis no disponible en este momento."
 
     # --- TRADUCCIÓN DE GÉNEROS ---
+    # Traducimos géneros específicos de series (TV) que TMDB suele dejar en inglés
     genre_map = {
-        'Action': 'Acción', 'Adventure': 'Aventura', 'Animation': 'Animación', 'Comedy': 'Comedia', 
-        'Crime': 'Crimen', 'Documentary': 'Documental', 'Drama': 'Drama', 'Family': 'Familia', 
-        'Fantasy': 'Fantasía', 'History': 'Historia', 'Horror': 'Terror', 'Music': 'Música', 
-        'Mystery': 'Misterio', 'Romance': 'Romance', 'Science Fiction': 'Ciencia Ficción', 
-        'TV Movie': 'Película de TV', 'Thriller': 'Suspense', 'War': 'Bélica', 'Western': 'Western',
-        'Action & Adventure': 'Acción y Aventura', 'Kids': 'Infantil', 'News': 'Noticias', 
-        'Reality': 'Reality', 'Sci-Fi & Fantasy': 'Ciencia Ficción y Fantasía', 
-        'Soap': 'Telenovela', 'Talk': 'Talk Show', 'War & Politics': 'Guerra y Política'
+        'Action & Adventure': 'Acción y Aventura',
+        'Kids': 'Infantil',
+        'News': 'Noticias',
+        'Sci-Fi & Fantasy': 'Ciencia Ficción y Fantasía',
+        'War & Politics': 'Guerra y Política'
     }
+
     if 'genres' in res:
         for g in res['genres']:
+            # Si el género está en nuestro mapa, lo traducimos
             if g['name'] in genre_map:
                 g['name'] = genre_map[g['name']]
 
@@ -682,7 +682,7 @@ def explore():
         'tv': {
             '10759':'Acción y Aventura', '16':'Animación', '35':'Comedia', '80':'Crimen', 
             '18':'Drama', '10751':'Familia', '10762':'Infantil', '9648':'Misterio', 
-            '10765':'Ciencia Ficción y Fantasía', '10766':'Telenovela', '10768':'Guerra y Política', '37':'Western'
+            '10765':'Ciencia Ficción y Fantasía', '10766':'Soap', '10768':'Guerra y Política', '37':'Western'
         },
         'show': {
             '10764':'Reality', '99':'Documental', '10763':'Noticias', '10767':'Talk Show'
