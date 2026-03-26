@@ -122,6 +122,10 @@
     </aside>
 
     <div class="explore-results">
+        <!-- BOTÓN SUBIR ARRIBA -->
+        <button id="scroll-top-btn" class="scroll-top-btn">
+            <i class="fas fa-chevron-up"></i>
+        </button>
         <!-- CARGADOR (VERSION 1: MATRIX RAIN) -->
         <div id="explore-loader" class="loading-overlay" style="display: none;">
             <div class="carousel-loader" style="min-height: 400px; width: 100%; max-width: 800px; margin: 0 auto;">
@@ -358,6 +362,37 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!append) container.innerHTML = "<p>Error al cargar resultados.</p>";
         }
     }
+
+    // BOTÓN SUBIR ARRIBA
+    const scrollTopBtn = document.getElementById('scroll-top-btn');
+    const footer = document.querySelector('.footer');
+    
+    window.addEventListener('scroll', function() {
+        // Toggle visibilidad
+        if (window.scrollY > 500) {
+            scrollTopBtn.classList.add('visible');
+        } else {
+            scrollTopBtn.classList.remove('visible');
+        }
+
+        // Lógica para que no pise el footer
+        const scrollBottom = window.scrollY + window.innerHeight;
+        const footerTop = footer.offsetTop;
+        
+        if (scrollBottom > footerTop) {
+            const overlap = scrollBottom - footerTop;
+            scrollTopBtn.style.bottom = (30 + overlap) + 'px';
+        } else {
+            scrollTopBtn.style.bottom = '30px';
+        }
+    });
+
+    scrollTopBtn.addEventListener('click', function() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
 
     // Carga inicial
     loadItems(1);

@@ -31,8 +31,7 @@ body {
 }
 
 .container {
-    padding: 100px 5% 40px 5%;
-    /* Top padding improved for sticky navbar */
+    padding: 85px 5% 0px 5%; /* Tightened top/bottom */
     min-height: 80vh;
 }
 
@@ -1168,7 +1167,8 @@ body {
     display: flex;
     gap: 40px;
     align-items: flex-start;
-    margin-top: 40px;
+    margin-top: 20px;
+    margin-bottom: 40px;
 }
 
 .filter-sidebar {
@@ -1448,6 +1448,50 @@ body {
 
 .explore-results {
     flex: 1;
+}
+
+/* --- SCROLL TO TOP BUTTON --- */
+.scroll-top-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px) scale(0.8);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 25px rgba(255, 69, 0, 0.4);
+    backdrop-filter: blur(10px);
+}
+
+.scroll-top-btn.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.scroll-top-btn:hover {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 0 15px 35px rgba(255, 69, 0, 0.6);
+}
+
+.scroll-top-btn i {
+    transition: transform 0.3s;
+}
+
+.scroll-top-btn:hover i {
+    transform: translateY(-2px);
 }
 
 .collection-grid {
@@ -2148,4 +2192,27 @@ body {
     color: rgba(255, 255, 255, 0.2);
     font-weight: 800;
     padding: 0 10px;
+}
+
+/* ===================================================== */
+/* FOOTER SIMPLE */
+/* ===================================================== */
+
+.footer {
+    padding: 40px 0;
+    border-top: 1px solid var(--glass-border);
+    background: var(--bg-dark);
+}
+
+.footer-simple {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.footer-simple .logo {
+    justify-content: center;
+    margin-bottom: 15px;
+    font-size: 20px;
+    opacity: 0.8;
 }
