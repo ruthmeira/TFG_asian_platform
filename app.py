@@ -350,7 +350,21 @@ def home():
     window = request.args.get('window', 'day')
     if window not in ['day', 'week']: 
         window = 'day'
-    return render_template('index.html', active_window=window)
+    
+    # MODO HÍBRIDO: 
+    # - Si el caché tiene datos, los mandamos (SSR rápido).
+    # - Si la caché está vacía, MANDAMOS LISTAS VACÍAS para no bloquear el servidor.
+    #   El JS de index.html detectará que no hay caché y lanzará el AJAX.
+    cache = api_cache[window]
+    trending_data = {
+        'series': cache.get('series', []),
+        'movies': cache.get('movies', []),
+        'shows': cache.get('shows', [])
+    }
+    
+    return render_template('index.html', 
+                           active_window=window, 
+                           trending_data=trending_data)
  
 @app.route('/api/trending')
 def api_trending():

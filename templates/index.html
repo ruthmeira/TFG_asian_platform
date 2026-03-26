@@ -15,128 +15,198 @@
     </div>
 </div>
 
+{% set type_map = {'series': 'tv', 'movies': 'movie', 'shows': 'tv'} %}
+{% set label_map = {'series': 'Serie', 'movies': 'Película', 'shows': 'Programa'} %}
+{% set loader_names = {
+    'series': 'Cargando Series...',
+    'movies': 'Cargando Películas...',
+    'shows': 'Cargando Programas...'
+} %}
+
 <div id="main-content" style="opacity: 1;">
+    {% for type_key, items in trending_data.items() %}
     <section class="content-section">
-        <h2>🔥 Top 20 Series</h2>
-        <div id="carousel-series" class="carousel">
-            <div class="carousel-loader">
-                <div class="matrix-container">
-                    <div class="matrix-column" style="animation-duration: 3s; animation-delay: 0.1s;">あ い う え お</div>
-                    <div class="matrix-column" style="animation-duration: 4.5s; animation-delay: 1.2s;">你好 龙 爱 美</div>
-                    <div class="matrix-column" style="animation-duration: 3.5s; animation-delay: 0.5s;">ㄱ ㄴ ㄷ ㄹ ㅁ</div>
-                    <div class="matrix-column" style="animation-duration: 5s; animation-delay: 2.1s;">สวัสดี ก ข ค ง</div>
-                    <div class="matrix-column" style="animation-duration: 3.2s; animation-delay: 0.8s;">カ キ ク ケ コ</div>
-                    <div class="matrix-column" style="animation-duration: 4.8s; animation-delay: 1.5s;">中 国 大 龙</div>
-                    <div class="matrix-column" style="animation-duration: 3.9s; animation-delay: 0.3s;">ㅂ ㅈ ㄷ ㄱ ㅅ</div>
-                    <div class="matrix-column" style="animation-duration: 5.2s; animation-delay: 1.8s;">ว ส ด ี</div>
-                    <div class="matrix-column" style="animation-duration: 4.1s; animation-delay: 0.9s;">さ し す せ そ</div>
-                    <div class="matrix-column" style="animation-duration: 3.6s; animation-delay: 2.5s;">永 和 龙 美</div>
-                    <div class="matrix-column" style="animation-duration: 4.4s; animation-delay: 0.2s;">み な さ ん</div>
+        <h2>
+            {% if type_key == 'series' %}🔥 Top 20 Series
+            {% elif type_key == 'movies' %}🎬 Top 20 Películas
+            {% else %}🌟 Top 20 Programas{% endif %}
+        </h2>
+        <div id="carousel-{{ type_key }}" class="carousel">
+            {% if items and items|length > 0 %}
+                {% for item in items %}
+                    <a href="/media/{{ type_map[type_key] }}/{{ item.id }}" class="card-link">
+                        <div class="card">
+                            <div class="badge">{{ label_map[type_key] }}</div>
+                            <img src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}" alt="{{ item.name or item.title }}">
+                            <div class="card-body">
+                                <h4>{{ item.name or item.title }}</h4>
+                                <h6>{{ item.original_name or item.original_title }}</h6>
+                                <div class="card-meta">
+                                    <span class="rating">⭐ {{ (item.vote_average or 0) | round(1) }}</span>
+                                    <span class="lang">{{ item.flag or '🌏' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            {% else %}
+                {# Matrix Loader Premium para carga inicial vacía #}
+                <div class="carousel-loader">
+                    <div class="matrix-container">
+                        <div class="matrix-column" style="animation-duration: 3s;">あ い う え お</div>
+                        <div class="matrix-column" style="animation-duration: 4.5s;">你好 龙 爱 美</div>
+                        <div class="matrix-column" style="animation-duration: 3.5s;">ㄱ ㄴ ㄷ ㄹ ㅁ</div>
+                    </div>
+                    <div class="loading-content">
+                        <div class="shimmer-text">{{ loader_names[type_key] }}</div>
+                        <div class="loading-dots-glow"><span>.</span><span>.</span><span>.</span></div>
+                    </div>
                 </div>
-                <div class="loading-content">
-                    <div class="shimmer-text">Sincronizando con Shiori</div>
-                    <div class="loading-dots-glow"><span>.</span><span>.</span><span>.</span></div>
-                </div>
-            </div>
+            {% endif %}
         </div>
     </section>
-
-    <section class="content-section">
-        <h2>🎬 Top 20 Películas</h2>
-        <div id="carousel-movies" class="carousel">
-            <div class="carousel-loader">
-                <div class="matrix-container">
-                    <div class="matrix-column" style="animation-duration: 4.5s; animation-delay: 0.2s;">龙 爱 美 中</div>
-                    <div class="matrix-column" style="animation-duration: 3.2s; animation-delay: 1.1s;">あ い う え お</div>
-                    <div class="matrix-column" style="animation-duration: 4.8s; animation-delay: 0.8s;">ㄱ ㄴ ㄷ ㄹ ㅁ</div>
-                    <div class="matrix-column" style="animation-duration: 3.5s; animation-delay: 1.4s;">สวัสดี ช ซ</div>
-                    <div class="matrix-column" style="animation-duration: 5.2s; animation-delay: 0.5s;">カ キ ク ケ コ</div>
-                    <div class="matrix-column" style="animation-duration: 4.1s; animation-delay: 1.9s;">永 和 龙 美</div>
-                    <div class="matrix-column" style="animation-duration: 3.8s; animation-delay: 1.2s;">ㅂ ㅈ ㄷ ㄱ ㅅ</div>
-                    <div class="matrix-column" style="animation-duration: 4.9s; animation-delay: 0.4s;">ว ส ด ี</div>
-                    <div class="matrix-column" style="animation-duration: 3.4s; animation-delay: 2.1s;">さ し す せ そ</div>
-                    <div class="matrix-column" style="animation-duration: 5.5s; animation-delay: 0.9s;">な さ ん み</div>
-                </div>
-                <div class="loading-content">
-                    <div class="shimmer-text">Buscando en Archivos</div>
-                    <div class="loading-dots-glow"><span>.</span><span>.</span><span>.</span></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="content-section">
-        <h2>🌟 Top 20 Programas</h2>
-        <div id="carousel-shows" class="carousel">
-            <div class="carousel-loader">
-                <div class="matrix-container">
-                    <div class="matrix-column" style="animation-duration: 3.8s; animation-delay: 0.5s;">สวัสดี ก ข ค ง</div>
-                    <div class="matrix-column" style="animation-duration: 5.2s; animation-delay: 1.2s;">你好 龙 爱 美</div>
-                    <div class="matrix-column" style="animation-duration: 4.1s; animation-delay: 0.4s;">あ い う え お</div>
-                    <div class="matrix-column" style="animation-duration: 3.5s; animation-delay: 1.9s;">ㄱ ㄴ ㄷ ㄹ ㅁ</div>
-                    <div class="matrix-column" style="animation-duration: 4.9s; animation-delay: 0.8s;">カ キ ク ケ コ</div>
-                    <div class="matrix-column" style="animation-duration: 3.2s; animation-delay: 1.5s;">中 国 大 龙</div>
-                    <div class="matrix-column" style="animation-duration: 4.4s; animation-delay: 0.3s;">ㅂ ㅈ ㄷ ㄱ ㅅ</div>
-                    <div class="matrix-column" style="animation-duration: 5.8s; animation-delay: 2.1s;">ว ส ด ี</div>
-                    <div class="matrix-column" style="animation-duration: 3.6s; animation-delay: 0.9s;">さ し す せ そ</div>
-                    <div class="matrix-column" style="animation-duration: 5.1s; animation-delay: 1.1s;">永 和 龙 美</div>
-                </div>
-                <div class="loading-content">
-                    <div class="shimmer-text">Abriendo Marcapáginas</div>
-                    <div class="loading-dots-glow"><span>.</span><span>.</span><span>.</span></div>
-                </div>
-            </div>
-        </div>
-    </section>
+    {% endfor %}
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const windowType = "{{ active_window }}";
+    // Inicializar caché con los datos del servidor (SSR)
+    const serverData = {{ trending_data | tojson | safe }};
+    const activeWindow = "{{ active_window }}";
     
-    // Lanzamos las 3 peticiones en paralelo
-    loadCarousel('series', 'carousel-series', 'tv', 'Serie');
-    loadCarousel('movies', 'carousel-movies', 'movie', 'Película');
-    loadCarousel('shows', 'carousel-shows', 'tv', 'Programa');
+    // Solo consideramos que los datos son "validos" si al menos uno tiene items
+    const hasData = serverData.series.length > 0 || serverData.movies.length > 0 || serverData.shows.length > 0;
+    
+    const trendingCache = {
+        'day': (activeWindow === 'day' && hasData) ? serverData : null,
+        'week': (activeWindow === 'week' && hasData) ? serverData : null
+    };
 
-    function loadCarousel(type, containerId, apiType, label) {
-        const container = document.getElementById(containerId);
-        
+    let currentWindow = activeWindow;
+    
+    // Si entramos con caché vacía, forzamos carga real
+    if (!hasData) {
+        console.log("⚠️ Datos de servidor vacíos. Iniciando carga AJAX...");
+        loadAllCarousels(currentWindow);
+    }
+
+    // Pre-carga silencia de la OTRA ventana (Background fetch)
+    const otherWindow = currentWindow === 'day' ? 'week' : 'day';
+    if (!trendingCache[otherWindow]) {
+        console.log(`📡 Pre-cargando ventana '${otherWindow}' en segundo plano...`);
+        loadAllCarousels(otherWindow, true); 
+    }
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const newWindow = new URL(this.href).searchParams.get('window') || 'day';
+            if (newWindow === currentWindow) {
+                e.preventDefault();
+                return;
+            }
+            e.preventDefault();
+            switchWindow(newWindow, this.href);
+        });
+    });
+
+    function switchWindow(windowType, url) {
+        currentWindow = windowType;
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            const btnWindow = new URL(btn.href).searchParams.get('window') || 'day';
+            btn.classList.toggle('active', btnWindow === windowType);
+        });
+        history.pushState({window: windowType}, '', url);
+
+        if (trendingCache[windowType]) {
+            renderFromCache(trendingCache[windowType]);
+        } else {
+            showLoaders();
+            loadAllCarousels(windowType);
+        }
+    }
+
+    function loadAllCarousels(windowType, silent = false) {
+        if (!trendingCache[windowType]) {
+            trendingCache[windowType] = { series: [], movies: [], shows: [] };
+        }
+        loadType(windowType, 'series', 'tv', 'Serie', silent);
+        loadType(windowType, 'movies', 'movie', 'Película', silent);
+        loadType(windowType, 'shows', 'tv', 'Programa', silent);
+    }
+
+    function loadType(windowType, type, apiType, label, silent) {
         fetch(`/api/trending?window=${windowType}&type=${type}`)
-            .then(response => response.json())
+            .then(r => r.json())
             .then(data => {
-                const items = data[type];
-                renderItems(container, items, apiType, label);
+                const items = data[type] || [];
+                if (items.length > 0) {
+                    trendingCache[windowType][type] = items;
+                    if (windowType === currentWindow && !silent) {
+                        renderItems(document.getElementById(`carousel-${type}`), items, apiType, label);
+                    }
+                } else if (!silent && windowType === currentWindow) {
+                    setTimeout(() => loadType(windowType, type, apiType, label, silent), 2000);
+                }
             })
-            .catch(err => {
-                console.error(`Error cargando ${type}:`, err);
-                container.innerHTML = "<p class='error-msg'>No se pudo contactar con Shiori.</p>";
-            });
+            .catch(err => console.error(`Error cargando ${type}:`, err));
+    }
+
+    function renderFromCache(data) {
+        if (data.series && data.series.length > 0) renderItems(document.getElementById('carousel-series'), data.series, 'tv', 'Serie');
+        if (data.movies && data.movies.length > 0) renderItems(document.getElementById('carousel-movies'), data.movies, 'movie', 'Película');
+        if (data.shows && data.shows.length > 0) renderItems(document.getElementById('carousel-shows'), data.shows, 'tv', 'Programa');
     }
 
     function renderItems(container, items, type, label) {
-        if (!items || items.length === 0) {
-            container.innerHTML = "<p>No se encontraron resultados.</p>";
-            return;
-        }
-
+        if (!items || items.length === 0) return;
+        
         container.innerHTML = items.map(item => `
-            <a href="/media/${type}/` + item.id + `" class="card-link">
+            <a href="/media/${type}/${item.id}" class="card-link">
                 <div class="card">
                     <div class="badge">${label}</div>
-                    <img src="https://image.tmdb.org/t/p/w500` + item.poster_path + `" alt="` + (item.name || item.title) + `">
+                    <img src="https://image.tmdb.org/t/p/w500${item.poster_path}" alt="${item.name || item.title}">
                     <div class="card-body">
-                        <h4>` + (item.name || item.title) + `</h4>
-                        <h6>` + (item.original_name || item.original_title) + `</h6>
+                        <h4>${item.name || item.title}</h4>
+                        <h6>${item.original_name || item.original_title}</h6>
                         <div class="card-meta">
-                            <span class="rating">⭐ ` + parseFloat(item.vote_average || 0).toFixed(1) + `</span>
-                            <span class="lang">` + (item.flag || '🌏') + `</span>
+                            <span class="rating">⭐ ${parseFloat(item.vote_average || 0).toFixed(1)}</span>
+                            <span class="lang">${item.flag || '🌏'}</span>
                         </div>
                     </div>
                 </div>
             </a>
         `).join('');
     }
+
+    function showLoaders() {
+        const loaders = {
+            'carousel-series': 'Cargando Series...',
+            'carousel-movies': 'Cargando Películas...',
+            'carousel-shows': 'Cargando Programas...'
+        };
+        ['carousel-series', 'carousel-movies', 'carousel-shows'].forEach(id => {
+            const container = document.getElementById(id);
+            if (container) {
+                container.innerHTML = `
+                    <div class="carousel-loader">
+                        <div class="matrix-container">
+                            <div class="matrix-column" style="animation-duration: 3s;">あ い う え お</div>
+                            <div class="matrix-column" style="animation-duration: 4.5s;">你好 龙 爱 美</div>
+                            <div class="matrix-column" style="animation-duration: 3.5s;">ㄱ ㄴ ㄷ ㄹ ㅁ</div>
+                        </div>
+                        <div class="loading-content">
+                            <div class="shimmer-text">${loaders[id]}</div>
+                            <div class="loading-dots-glow"><span>.</span><span>.</span><span>.</span></div>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+    }
+
+    window.addEventListener('popstate', e => {
+        if (e.state && e.state.window) switchWindow(e.state.window, location.href);
+    });
 });
 </script>
 
