@@ -2,7 +2,7 @@
 {% block title %}Mi Perfil - SHIORI{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container container-profile">
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
@@ -14,48 +14,71 @@
       {% endif %}
     {% endwith %}
 
-    <h1>Hola, {{ current_user.username }}</h1>
+    <div class="profile-user-info-clean">
+        <div class="avatar-circle-clean">
+            {{ current_user.username[0] | upper }}
+        </div>
+        <div class="user-titles">
+            <h1>Hola, {{ current_user.username }} 🏮</h1>
+            <p>Viviendo su propia crónica asiática</p>
+        </div>
+    </div>
 
-    <div class="stats-card">
-        <a href="{{ url_for('view_collection', status='favoritos') }}" class="stat-link">
-            <div class="stat">
-                <h3>{{ counts.favoritos }}</h3>
-                <p>Favoritos</p>
+    <div class="stats-grid">
+        <a href="{{ url_for('view_collection', status='favoritos') }}" class="stat-crystal-link">
+            <div class="stat-crystal">
+                <i class="fas fa-heart"></i>
+                <div class="stat-data">
+                    <h3>{{ counts.favoritos }}</h3>
+                    <p>Favoritos</p>
+                </div>
             </div>
         </a>
         
-        <a href="{{ url_for('view_collection', status='Viendo') }}" class="stat-link">
-            <div class="stat">
-                <h3>{{ counts.viendo }}</h3>
-                <p>Viendo</p>
+        <a href="{{ url_for('view_collection', status='Viendo') }}" class="stat-crystal-link">
+            <div class="stat-crystal">
+                <i class="fas fa-play"></i>
+                <div class="stat-data">
+                    <h3>{{ counts.viendo }}</h3>
+                    <p>Viendo</p>
+                </div>
             </div>
         </a>
 
-        <a href="{{ url_for('view_collection', status='Visto') }}" class="stat-link">
-            <div class="stat">
-                <h3>{{ counts.vistos }}</h3>
-                <p>Vistos</p>
+        <a href="{{ url_for('view_collection', status='Visto') }}" class="stat-crystal-link">
+            <div class="stat-crystal">
+                <i class="fas fa-check-double"></i>
+                <div class="stat-data">
+                    <h3>{{ counts.vistos }}</h3>
+                    <p>Vistos</p>
+                </div>
             </div>
         </a>
 
-        <a href="{{ url_for('view_collection', status='Pendiente') }}" class="stat-link">
-            <div class="stat">
-                <h3>{{ counts.pendientes }}</h3>
-                <p>Pendientes</p>
+        <a href="{{ url_for('view_collection', status='Pendiente') }}" class="stat-crystal-link">
+            <div class="stat-crystal">
+                <i class="fas fa-bookmark"></i>
+                <div class="stat-data">
+                    <h3>{{ counts.pendientes }}</h3>
+                    <p>Pendientes</p>
+                </div>
             </div>
         </a>
 
-        <a href="{{ url_for('view_collection', status='Abandonado') }}" class="stat-link">
-            <div class="stat">
-                <h3>{{ counts.abandonados }}</h3>
-                <p>Abandonados</p>
+        <a href="{{ url_for('view_collection', status='Abandonado') }}" class="stat-crystal-link">
+            <div class="stat-crystal">
+                <i class="fas fa-times-circle"></i>
+                <div class="stat-data">
+                    <h3>{{ counts.abandonados }}</h3>
+                    <p>Abandonados</p>
+                </div>
             </div>
         </a>
     </div>
 
-    <div class="profile-actions">
-        <a href="{{ url_for('edit_profile') }}" class="profile-btn">Editar Perfil</a>
-        <a href="{{ url_for('logout') }}" class="profile-btn">Cerrar Sesión</a>
+    <div class="profile-actions-main">
+        <a href="{{ url_for('edit_profile') }}" class="profile-btn outline"><i class="fas fa-user-edit"></i> Editar Perfil</a>
+        <a href="{{ url_for('logout') }}" class="profile-btn danger"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
     </div>
 
 </div>
