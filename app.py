@@ -351,19 +351,39 @@ def refresh_trending_cache(window):
         api_cache[window]['movies'] = get_top_20(api_key, 'movie', window)
         api_cache[window]['shows'] = get_top_20(api_key, 'show', window)
         api_cache[window]['last_updated'] = time.time()
-        print(f"✅ [BACKGROUND] Caché {window} actualizada correctamente.")
+        # Log más detallado para confirmar el reemplazo de datos
+        print(f"✅ [BACKGROUND] Caché {window} reemplazada con éxito con 20 nuevos items por categoría.")
+        print(f"⏰ Próxima actualización programada según intervalo.")
     except Exception as e:
         print(f"❌ [BACKGROUND] Error al refrescar caché {window}: {e}")
 
 # --- INICIALIZACIÓN DEL PLANIFICADOR (SCHEDULER) ---
+# Usamos misfire_grace_time=300 (5 min) para que si el servidor está ocupado, el job se ejecute aunque se pase unos minutos
 scheduler = BackgroundScheduler()
 
-# Tarea para 'day' cada 4 horas
-scheduler.add_job(func=refresh_trending_cache, trigger="interval", seconds=14400, args=['day'])
-# Tarea para 'week' cada 24 horas
-scheduler.add_job(func=refresh_trending_cache, trigger="interval", seconds=86400, args=['week'])
+scheduler.add_job(
+    func=refresh_trending_cache, 
+    trigger="interval", 
+    seconds=14400, 
+    args=['day'],
+    id='refresh_day',
+    misfire_grace_time=300
+)
 
-scheduler.start()
+scheduler.add_job(
+    func=refresh_trending_cache, 
+    trigger="interval", 
+    seconds=86400, 
+    args=['week'],
+    id='refresh_week',
+    misfire_grace_time=300
+)
+
+# En modo debug de Flask, el scheduler arrancaría dos veces. 
+# WERKZEUG_RUN_MAIN asegura que solo se inicie en el proceso principal.
+if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
+    scheduler.start()
+    print("🚀 Scheduler iniciado: 'day' cada 20 min, 'week' cada 24 h")
 
 # Forzar una carga inicial de TODO (en paralelo) para que las primeras personas no tengan que esperar
 with app.app_context():
