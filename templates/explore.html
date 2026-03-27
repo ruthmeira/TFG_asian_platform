@@ -372,8 +372,16 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     async function prefetchPage(page) {
-        if (page > totalPages || (pageCache[page] && pageCache[page].done) || fetchingPages.has(page)) return;
+        if (page > totalPages || fetchingPages.has(page)) return;
         
+        // Si esta página ya está completa en caché, saltamos a buscar el siguiente "hueco" de la ventana
+        if (pageCache[page] && pageCache[page].done) {
+            if (page < (currentPage + 20)) {
+                prefetchPage(page + 1);
+            }
+            return;
+        }
+
         fetchingPages.add(page);
         const controller = new AbortController();
         abortControllers[page] = controller;
@@ -407,9 +415,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                         if (data.done) {
                             pageCache[page].done = true;
-                            if (currentPage === page) {
-                                totalPages = Math.min(data.total_pages || 500, 500);
-                                updatePaginationUI();
+                            
+                            // Siempre actualizamos el total_pages e info UI para que sea coherente
+                            if (data.total_pages) {
+                                let newTotal = Math.min(data.total_pages, 500);
+                                if (newTotal !== totalPages) {
+                                    totalPages = newTotal;
+                                    updatePaginationUI();
+                                }
+                            }
+
+                            // SEGUIR CARGANDO POR ADELANTADO (Hasta 20 páginas por delante del usuario)
+                            if (page < totalPages && page < (currentPage + 20)) {
                                 prefetchPage(page + 1);
                             }
                         }
