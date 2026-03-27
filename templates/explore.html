@@ -116,12 +116,19 @@
 
             <div class="filter-actions">
                 <button type="submit" class="apply-filters-btn">Aplicar Filtros</button>
-                <a href="{{ url_for('explore') }}" class="clear-filters-btn">Borrar Filtros</a>
+                <a href="{{ url_for('explore') }}" id="clear-filters-btn" class="clear-filters-btn">
+                    <i class="fas fa-undo"></i> Borrar Filtros
+                </a>
             </div>
         </form>
     </aside>
 
     <div class="explore-results">
+        <div class="results-meta">
+            <div id="results-count-wrapper" class="results-count-text" style="display: none;">
+                <span id="results-count-num" class="count-highlight">0</span> resultados encontrados
+            </div>
+        </div>
         <!-- BOTÓN SUBIR ARRIBA -->
         <button id="scroll-top-btn" class="scroll-top-btn">
             <i class="fas fa-chevron-up"></i>
@@ -200,10 +207,12 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     let currentPage = 1;
-    let totalPages = 50; // Inicializamos con un valor estimado para mostrar la UI
+    let totalPages = 500; 
     let pageCache = {}; // { 1: { html: '...', done: false } }
-    let fetchingPages = new Set(); // Bloqueo por página
-    let abortControllers = {};     // { page: AbortController }
+    let apiPageMap = { 1: { page: 1, skip: 0 } }; // Sincronización PROFUNDA (Evita duplicados y saltos)
+    let fetchingPages = new Set(); 
+    let abortControllers = {};     
+// { page: AbortController }
 
     function clearCacheAndLoad(page = 1) {
         // Abortar todas las peticiones activas
@@ -211,6 +220,7 @@ document.addEventListener('DOMContentLoaded', function() {
         abortControllers = {};
         fetchingPages.clear();
         pageCache = {};
+        apiPageMap = { 1: { page: 1, skip: 0 } }; // Resetear sincronización
         loadItems(page);
     }
 
@@ -387,6 +397,11 @@ document.addEventListener('DOMContentLoaded', function() {
         abortControllers[page] = controller;
 
         const params = new URLSearchParams({...filters, page: page});
+        // Sincronización PROFUNDA: Página y Skip
+        if (apiPageMap[page]) {
+            params.set('api_page', apiPageMap[page].page);
+            params.set('api_skip', apiPageMap[page].skip);
+        }
         if (!pageCache[page]) pageCache[page] = { html: '', done: false };
 
         try {
@@ -413,16 +428,23 @@ document.addEventListener('DOMContentLoaded', function() {
                                 container.insertAdjacentHTML('beforeend', data.item_html);
                             }
                         }
+                        if (data.total_pages !== undefined) {
+                            let newTotal = Math.min(data.total_pages, 500);
+                            if (newTotal !== totalPages) {
+                                totalPages = newTotal;
+                                updatePaginationUI();
+                            }
+                        }
+
                         if (data.done) {
                             pageCache[page].done = true;
                             
-                            // Siempre actualizamos el total_pages e info UI para que sea coherente
-                            if (data.total_pages) {
-                                let newTotal = Math.min(data.total_pages, 500);
-                                if (newTotal !== totalPages) {
-                                    totalPages = newTotal;
-                                    updatePaginationUI();
-                                }
+                            // Guardamos EXACTAMENTE dónde debe arrancar la siguiente (Página y Skip)
+                            if (data.next_api_page !== undefined) {
+                                apiPageMap[page + 1] = { 
+                                    page: data.next_api_page, 
+                                    skip: data.next_api_skip || 0 
+                                };
                             }
 
                             // SEGUIR CARGANDO POR ADELANTADO (Hasta 20 páginas por delante del usuario)
@@ -481,6 +503,11 @@ document.addEventListener('DOMContentLoaded', function() {
         filters.genre = genreInputInclude.value;
         filters.without_genre = genreInputExclude.value;
         const params = new URLSearchParams({...filters, page: page});
+        // Sincronización PROFUNDA: Página y Skip
+        if (apiPageMap[page]) {
+            params.set('api_page', apiPageMap[page].page);
+            params.set('api_skip', apiPageMap[page].skip);
+        }
 
         try {
             const response = await fetch(`/api/explore?${params.toString()}`, { signal: controller.signal });
@@ -505,6 +532,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     try {
                         const data = JSON.parse(line);
                         
+                        // Recibir metadatos (Total Results y Total Pages) ASAP
+                        if (data.total_results !== undefined) {
+                            const countWrapper = document.getElementById('results-count-wrapper');
+                            const countNum = document.getElementById('results-count-num');
+                            if (countWrapper) {
+                                countWrapper.style.display = 'block';
+                                animateValue(countNum, parseInt(countNum.innerText.replace(/,/g, '') || '0'), data.total_results, 1000);
+                            }
+                        }
+                        
+                        if (data.total_pages !== undefined) {
+                            totalPages = Math.min(data.total_pages || 500, 500);
+                            updatePaginationUI();
+                        }
+
                         if (data.item_html) {
                             currentStreamItemIndex++;
                             pageCache[page].html += data.item_html;
@@ -518,8 +560,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         if (data.done) {
                             pageCache[page].done = true;
-                            totalPages = Math.min(data.total_pages || 500, 500);
-                            updatePaginationUI();
+                            // Sincronización para la siguiente
+                            if (data.next_api_page !== undefined) {
+                                apiPageMap[page + 1] = { 
+                                    page: data.next_api_page, 
+                                    skip: data.next_api_skip || 0 
+                                };
+                            }
                             prefetchPage(page + 1);
                         }
                     } catch (e) {
@@ -570,6 +617,33 @@ document.addEventListener('DOMContentLoaded', function() {
             behavior: 'smooth'
         });
     });
+
+    // Animación de números (Mejora 2)
+    function animateValue(obj, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            obj.innerText = Math.floor(progress * (end - start) + start).toLocaleString();
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // Animación de limpieza (Mejora 4)
+    const clearBtnEle = document.getElementById('clear-filters-btn');
+    if (clearBtnEle) {
+        clearBtnEle.addEventListener('click', function(e) {
+            e.preventDefault();
+            const resultsArea = document.querySelector('.explore-results');
+            resultsArea.classList.add('dissolve-out');
+            setTimeout(() => {
+                window.location.href = this.href;
+            }, 500);
+        });
+    }
 
     // Carga inicial
     loadItems(1);

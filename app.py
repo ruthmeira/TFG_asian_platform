@@ -774,16 +774,27 @@ def api_explore():
     sort_by = request.args.get('sort_by', 'popularity.desc')
     status_id = request.args.get('status', '')
     page = request.args.get('page', 1, type=int) 
+    # Punto de inicio real y cuántos saltar (Sync para no repetir ni saltar series)
+    api_start_page = request.args.get('api_page', page, type=int) 
+    api_skip = request.args.get('api_skip', 0, type=int) 
     
     today = datetime.now().strftime('%Y-%m-%d')
     target_type = 'movie' if media_type == 'movie' else 'tv'
     idiomas_asiaticos = ['ko', 'ja', 'zh', 'cn', 'yue', 'th', 'vi', 'hi', 'tl', 'fil', 'id', 'ms']
-    genres_no_ficcion = "10764|99|10763|10767"
+    # Filtro de programas: Reality(10764), Docu(99), Noticias(10763), Talk(10767)
+    genres_programas_or = "10764|99|10763|10767"
+    genres_programas_and = "10764,99,10763,10767"
 
     def generate():
         final_items_count = 0
-        current_api_page = page
+        current_api_page = api_start_page
+        to_skip = api_skip # Ítems de la primera página a ignorar (ya vistos)
         max_pages_to_scan = current_api_page + 10 
+        
+        last_api_page = current_api_page
+        last_api_skip = 0
+        total_pages = 500
+        total_metadata_sent = False
         
         while final_items_count < 20 and current_api_page < max_pages_to_scan:
             url = f"https://api.themoviedb.org/3/discover/{target_type}?api_key={api_key}&language=es-ES&page={current_api_page}&sort_by={sort_by}"
@@ -791,8 +802,7 @@ def api_explore():
             
             if target_type == 'tv':
                 url += f"&first_air_date.lte={today}"
-                if media_type == 'show': url += f"&with_genres={genres_no_ficcion}"
-                else: url += f"&without_genres={genres_no_ficcion}"
+                if status_id: url += f"&with_status={status_id}"
             else:
                 url += f"&primary_release_date.lte={today}"
 
@@ -803,6 +813,18 @@ def api_explore():
                 year_param = 'first_air_date_year' if target_type == 'tv' else 'primary_release_year'
                 url += f"&{year_param}={year}"
 
+            # --- GESTIÓN UNIFICADA DE GÉNEROS (Para que el contador sea exacto) ---
+            with_ids = []
+            without_ids = []
+
+            # 1. Programas vs Series (Lógica fija)
+            if target_type == 'tv':
+                if media_type == 'show': 
+                    with_ids.append(genres_programas_or) # Usamos OR '|' para incluir alguno
+                elif media_type == 'tv': 
+                    without_ids.append(genres_programas_and) # Usamos AND ',' para excluir cualquier
+
+            # 2. Géneros a INCLUIR (Si el usuario los elige)
             if genre_id:
                 genre_list = genre_id.split('|')
                 processed_genres = []
@@ -813,8 +835,9 @@ def api_explore():
                         elif gid == '10749': actual_gid = '10766|10749|18'
                         elif gid in ['14', '878']: actual_gid = '10765'
                     processed_genres.append(actual_gid)
-                url += f"&with_genres={','.join(processed_genres)}"
+                with_ids.append('|'.join(processed_genres)) # Siempre OR para incluir varios
 
+            # 3. Géneros a EXCLUIR (Si el usuario los elige)
             if without_genre_id:
                 without_genre_list = without_genre_id.split('|')
                 processed_without = []
@@ -825,14 +848,30 @@ def api_explore():
                         elif gid == '10749': actual_gid = '10766|10749|18'
                         elif gid in ['14', '878']: actual_gid = '10765'
                     processed_without.append(actual_gid)
-                url += f"&without_genres={','.join(processed_without)}"
-            
-            if status_id and target_type == 'tv': url += f"&with_status={status_id}"
+                without_ids.append(','.join(processed_without)) # Siempre AND ',' para excluir cualquier
+
+            # --- CONSTRUCCIÓN FINAL DE PARÁMETROS (Sin duplicados) ---
+            if with_ids: 
+                # Unimos con comas o barras según convenga, pero aquí buscamos añadir filtros
+                url += f"&with_genres={','.join(with_ids)}"
+            if without_ids:
+                url += f"&without_genres={','.join(without_ids)}"
 
             try:
                 res = requests.get(url).json()
                 results = res.get('results', [])
                 total_pages = res.get('total_pages', 1)
+                total_results = res.get('total_results', 0)
+                
+                # Reportar metadata inicial (Solo en el primer yield de este bloque)
+                if not total_metadata_sent:
+                    yield json.dumps({
+                        'total_results': total_results, 
+                        'total_pages': total_pages
+                    }) + '\n'
+                    total_metadata_sent = True
+
+                items_processed_in_this_page = 0
             except: 
                 break
                 
@@ -840,15 +879,36 @@ def api_explore():
                 break 
 
             for item in results:
+                items_processed_in_this_page += 1
+                
+                # 1. Lógica de salto (PRECISIÓN: No repetir ni saltar series)
+                if current_api_page == api_start_page and to_skip > 0:
+                    to_skip -= 1
+                    continue
+
+                # --- SISTEMA DE FILTRADO MANUAL (Garantiza Pureza Total) ---
+                genre_ids = item.get('genre_ids', [])
+                # Reality(10764), Docu(99), Noticias(10763), Talk(10767)
+                ids_programas = [10764, 99, 10763, 10767]
+                es_programa = any(gid in ids_programas for gid in genre_ids)
+
+                if media_type == 'tv' and es_programa: continue # Fuera intrusos en Series
+                if media_type == 'show' and not es_programa: continue # Fuera intrusos en Programas
+
                 idioma_orig = item.get('original_language', '').lower()
                 if idioma_orig not in idiomas_asiaticos: continue
 
                 item_id = item.get('id')
                 item['media_type_fixed'] = target_type
                 
-                if target_type == 'movie': item['tipo_label'] = 'Película'
-                elif media_type == 'show': item['tipo_label'] = 'Programa'
-                else: item['tipo_label'] = 'Serie'
+                # Detectar tipo_label correctamente (Igual que en Home)
+                if target_type == 'movie':
+                    item['tipo_label'] = 'Película'
+                else:
+                    if es_programa:
+                         item['tipo_label'] = 'Programa'
+                    else:
+                         item['tipo_label'] = 'Serie'
                 
                 det_url = f"https://api.themoviedb.org/3/{target_type}/{item_id}?api_key={api_key}&language=en-US"
                 try: 
@@ -918,14 +978,22 @@ def api_explore():
                 
                 final_items_count += 1
                 if final_items_count >= 20: 
+                    # GUARDAMOS EL PUNTO EXACTO DE SALIDA (Para no repetir ni saltar)
+                    last_api_page = current_api_page
+                    last_api_skip = items_processed_in_this_page
                     break
             
-            current_api_page += 1
+            if final_items_count >= 20: 
+                break 
 
-        # Al terminar, enviar información de paginación
+            current_api_page += 1
+            to_skip = 0 # En las siguientes páginas de este bloque arrancamos de cero
+
+        # Al terminar enviamos el estado para que la siguiente UI Page sepa donde seguir
         yield json.dumps({
             'done': True, 
-            'next_api_page': current_api_page,
+            'next_api_page': last_api_page,
+            'next_api_skip': last_api_skip,
             'total_found': final_items_count,
             'total_pages': total_pages
         }) + '\n'

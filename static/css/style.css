@@ -2215,4 +2215,80 @@ body {
     margin-bottom: 15px;
     font-size: 20px;
     opacity: 0.8;
-}
+}
+/* ===================================================== */
+/* IMPROVED EXPLORE UI (Counter & Reset) */
+/* ===================================================== */
+
+.results-meta {
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 69, 0, 0.15);
+    padding-bottom: 12px;
+}
+
+.results-count-text {
+    font-size: 15px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.count-highlight {
+    color: #ff4500;
+    font-size: 22px;
+    font-weight: 800;
+    margin-right: 5px;
+    text-shadow: 0 0 10px rgba(255, 69, 0, 0.4);
+}
+
+.filter-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.apply-filters-btn {
+    width: 100%;
+    background: var(--primary-gradient);
+    color: white;
+    padding: 14px;
+    border: none;
+    border-radius: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.apply-filters-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(255, 69, 0, 0.3);
+}
+
+.clear-filters-btn {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-muted);
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.clear-filters-btn:hover {
+    background: rgba(255, 68, 68, 0.08);
+    color: #ff4d6d;
+    border-color: rgba(255, 77, 109, 0.3);
+}
+
+.dissolve-out {
+    opacity: 0 !important;
+    transform: scale(0.98) translateY(10px);
+    transition: all 0.5s ease;
+}
