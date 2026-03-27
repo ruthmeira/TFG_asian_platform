@@ -832,6 +832,7 @@ def api_explore():
             try:
                 res = requests.get(url).json()
                 results = res.get('results', [])
+                total_pages = res.get('total_pages', 1)
             except: 
                 break
                 
@@ -925,7 +926,8 @@ def api_explore():
         yield json.dumps({
             'done': True, 
             'next_api_page': current_api_page,
-            'total_found': final_items_count
+            'total_found': final_items_count,
+            'total_pages': total_pages
         }) + '\n'
 
     return Response(stream_with_context(generate()), mimetype='application/x-ndjson')
