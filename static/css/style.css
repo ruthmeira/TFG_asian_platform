@@ -1540,57 +1540,70 @@ body {
 /* LOADING ANIMATION (LANTERN) */
 /* ===================================================== */
 
-.loading-overlay {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 500px;
+/* --- SKELETON LOADING --- */
+.skeleton-card {
     width: 100%;
-}
-
-.lantern-animation {
-    text-align: center;
-}
-
-.lantern {
+    max-width: 220px;
+    height: 425px;
+    background: var(--bg-card);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--glass-border);
     position: relative;
-    width: 60px;
-    height: 80px;
-    margin: 0 auto 30px;
-    background: #ff4500;
-    border-radius: 20px;
-    box-shadow: 0 0 50px rgba(255, 69, 0, 0.5);
-    animation: swing 3s ease-in-out infinite alternate;
-    transform-origin: top center;
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.5s ease;
 }
 
-.lantern::before {
-    content: '';
-    position: absolute;
-    top: -20px;
-    left: 48%;
-    width: 2px;
-    height: 20px;
-    background: #ffd700;
+.skeleton-img {
+    width: 100%;
+    height: 310px;
+    background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s infinite linear;
 }
 
-.lantern-top,
-.lantern-bottom {
-    position: absolute;
-    width: 44px;
-    height: 8px;
-    background: #ffd700;
-    left: 50%;
-    transform: translateX(-50%);
+.skeleton-body {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.skeleton-title {
+    width: 80%;
+    height: 18px;
+    background: linear-gradient(90deg, #222 25%, #333 50%, #222 75%);
+    background-size: 200% 100%;
+    border-radius: 4px;
+    animation: skeleton-shimmer 1.5s infinite linear;
+}
+
+.skeleton-subtitle {
+    width: 50%;
+    height: 14px;
+    background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%);
+    background-size: 200% 100%;
+    border-radius: 4px;
+    animation: skeleton-shimmer 2s infinite linear;
+}
+
+.skeleton-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+}
+
+.skeleton-rating, .skeleton-lang {
+    width: 40px;
+    height: 14px;
+    background: #1a1a1a;
     border-radius: 4px;
 }
 
-.lantern-top {
-    top: -4px;
-}
-
-.lantern-bottom {
-    bottom: -4px;
+@keyframes skeleton-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
 }
 
 .lantern-body {
