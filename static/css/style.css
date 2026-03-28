@@ -499,6 +499,52 @@ body {
     flex: 0 0 340px;
     position: sticky;
     top: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.poster-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 0;
+    margin-top: 15px;
+}
+
+.fav-btn-action {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px 28px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50px;
+    color: white;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.fav-btn-action:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.fav-btn-action.active {
+    background: rgba(255, 77, 109, 0.15);
+    border-color: #ff4d6d;
+    color: #ff4d6d;
+    box-shadow: 0 0 15px rgba(255, 77, 109, 0.3);
+}
+
+.fav-btn-action i {
+    font-size: 1.1rem;
 }
 
 .media-poster img {
@@ -523,7 +569,7 @@ body {
     margin-bottom: 25px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     letter-spacing: -1px;
 }
 
@@ -579,37 +625,6 @@ body {
 
 /* FAVORITE HEART */
 
-.favorite-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-size: 14px;
-}
-
-.favorite-btn {
-    cursor: pointer;
-    font-size: 32px;
-    transition: var(--transition);
-    color: #444;
-}
-
-.favorite-btn:hover {
-    transform: scale(1.2) rotate(15deg);
-    color: #ff4d6d;
-}
-
-.favorite-btn.active {
-    color: #ff4d6d;
-    text-shadow: 0 0 15px rgba(255, 77, 109, 0.5);
-}
-
-.favorite-label {
-    margin-top: 5px;
-    font-size: 11px;
-    color: var(--text-muted);
-    font-weight: 600;
-    text-transform: uppercase;
-}
 
 /* ============================= */
 /* COLLECTION DROPDOWN - MEJORADO */
@@ -617,11 +632,11 @@ body {
 
 .collection-dropdown {
     position: relative;
-    display: inline-block;
-    margin-top: 10px;
+    width: 100%;
 }
 
 #collection-toggle {
+    width: 100%;
     padding: 14px 28px;
     background: var(--primary-gradient);
     border: none;
@@ -633,6 +648,7 @@ body {
     transition: var(--transition);
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 12px;
     box-shadow: 0 10px 20px rgba(255, 69, 0, 0.3);
 }

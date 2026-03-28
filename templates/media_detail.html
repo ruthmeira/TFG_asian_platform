@@ -12,6 +12,37 @@
         {% else %}
             <div class="no-poster">Sin Imagen</div>
         {% endif %}
+
+        <div class="poster-actions">
+            <button id="favorite-btn"
+                class="fav-btn-action {% if is_favorite %}active{% endif %}"
+                data-id="{{ media.id }}"
+                data-type="{{ 'tv' if media.name else 'movie' }}"
+                data-media-subtype="{{ media.media_subtype }}"
+                data-title="{{ media.title or media.name }}"
+                data-original-title="{{ media.original_title or media.original_name }}"
+                data-vote_average="{{ media.vote_average }}"
+                data-flag="{{ media.flag or '🌏' }}"
+                data-poster="{{ media.poster_path }}">
+                <i class="fas fa-heart"></i>
+                <span>Favoritos</span>
+            </button>
+
+            <div class="collection-dropdown">
+                <button id="collection-toggle" class="btn-main">
+                    <i class="fas fa-plus"></i>
+                    Añadir a Colección
+                </button>
+                <div id="collection-options" class="hidden">
+                    {% for s in ["Viendo","Visto","Pendiente","Abandonado"] %}
+                        <button class="collection-option {% if current_status == s %}active{% endif %}"
+                                data-status="{{ s }}">
+                            {{ s }}
+                        </button>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="media-info">
@@ -25,22 +56,6 @@
             {% if release_date %}
                 <span class="detail-year">({{ release_date[:4] }})</span>
             {% endif %}
-
-            <div class="favorite-container">
-                <span id="favorite-btn"
-                    class="favorite-btn {% if is_favorite %}active{% endif %}"
-                    data-id="{{ media.id }}"
-                    data-type="{{ 'tv' if media.name else 'movie' }}"
-                    data-media-subtype="{{ media.media_subtype }}"
-                    data-title="{{ media.title or media.name }}"
-                    data-original-title="{{ media.original_title or media.original_name }}"
-                    data-vote_average="{{ media.vote_average }}"
-                    data-flag="{{ media.flag or '🌏' }}"
-                    data-poster="{{ media.poster_path }}">
-                    ♥
-                </span>
-                <span class="favorite-label">Favoritos</span>
-            </div>
         </h1>
 
         <div class="detail-meta">
@@ -130,18 +145,6 @@
             {% endif %}
         </div>
 
-        <div class="collection-dropdown">
-            <button id="collection-toggle" class="btn-main">Añadir a Colección ▼</button>
-
-            <div id="collection-options" class="hidden">
-                {% for s in ["Viendo","Visto","Pendiente","Abandonado"] %}
-                    <button class="collection-option {% if current_status == s %}active{% endif %}"
-                            data-status="{{ s }}">
-                        {{ s }}
-                    </button>
-                {% endfor %}
-            </div>
-        </div>
 
         <div class="detail-keywords">
             <p><strong>Palabras clave:</strong></p>
