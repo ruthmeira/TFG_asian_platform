@@ -789,7 +789,8 @@ def media_detail(media_type, media_id):
         watch_providers=watch_providers,
         has_region=has_region,
         user_region=user_region,
-        keywords=keywords[:15]
+        keywords=keywords[:15],
+        real_media_type='movie' if media_type == 'movie' else ('show' if res.get('media_subtype') == 'Programa' else 'tv')
     )
 
 

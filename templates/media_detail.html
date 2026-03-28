@@ -143,16 +143,23 @@
             </div>
         </div>
 
-        {% if keywords %}
         <div class="detail-keywords">
             <p><strong>Palabras clave:</strong></p>
             <div class="keywords-list-wrapper">
-                {% for kw in keywords %}
-                    <span class="keyword-tag">{{ kw.name }}</span>
-                {% endfor %}
+                {% if keywords %}
+                    {% for kw in keywords %}
+                        <a href="{{ url_for('explore', keywords=kw.id ~ '_' ~ kw.name, type=real_media_type) }}" class="keyword-tag">
+                            {{ kw.name }}
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-platforms">
+                        <i class="fas fa-info-circle"></i>
+                        <p style="margin:0; text-transform: none;">No tiene palabras clave</p>
+                    </div>
+                {% endif %}
             </div>
         </div>
-        {% endif %}
 
     </div>
 
