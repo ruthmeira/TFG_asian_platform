@@ -729,6 +729,8 @@ def explore():
     without_genre_id = request.args.get('without_genre', '')
     sort_by = request.args.get('sort_by', 'popularity.desc')
     status_id = request.args.get('status', '')
+    watch_providers = request.args.get('watch_providers', '')
+    watch_region = request.args.get('watch_region', 'ES') # España por defecto
 
     asia_countries = {'KR': 'Corea del Sur', 'JP': 'Japón', 'CN': 'China', 'TW': 'Taiwán', 'HK': 'Hong Kong', 'TH': 'Tailandia', 'VN': 'Vietnam', 'IN': 'India', 'PH': 'Filipinas', 'ID': 'Indonesia', 'MY': 'Malasia'}
     
@@ -758,6 +760,7 @@ def explore():
                            current_year=year, current_lang=country_code, 
                            current_genre=genre_id, current_without_genre=without_genre_id,
                            current_sort=sort_by, current_status_id=status_id,
+                           current_providers=watch_providers, current_region=watch_region,
                            asia_langs=asia_countries, genres_by_type=genres_by_type, 
                            sort_options=sort_options, status_options=status_options)
 
@@ -773,6 +776,8 @@ def api_explore():
     without_genre_id = request.args.get('without_genre', '')
     sort_by = request.args.get('sort_by', 'popularity.desc')
     status_id = request.args.get('status', '')
+    watch_providers = request.args.get('watch_providers', '')
+    watch_region = request.args.get('watch_region', 'ES')
     page = request.args.get('page', 1, type=int) 
     # Punto de inicio real y cuántos saltar (Sync para no repetir ni saltar series)
     api_start_page = request.args.get('api_page', page, type=int) 
@@ -812,6 +817,9 @@ def api_explore():
             if year:
                 year_param = 'first_air_date_year' if target_type == 'tv' else 'primary_release_year'
                 url += f"&{year_param}={year}"
+
+            if watch_providers:
+                url += f"&with_watch_providers={watch_providers}&watch_region={watch_region}&with_watch_monetization_types=flatrate|free"
 
             # --- GESTIÓN UNIFICADA DE GÉNEROS (Para que el contador sea exacto) ---
             with_ids = []

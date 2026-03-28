@@ -109,6 +109,58 @@
                 <input type="hidden" name="sort_by" id="sort-input" value="{{ current_sort }}">
             </div>
 
+            <!-- PLATAFORMAS (Rediseño Premium - Iconos Oficiales) -->
+            <div class="filter-group streaming-group">
+                <label><i class="fas fa-play-circle"></i> ¿Dónde quieres ver?</label>
+                
+                <div class="region-selector-wrapper">
+                    <i class="fas fa-map-marker-alt location-icon"></i>
+                    <select name="watch_region" id="watch-region-input" class="filter-select region-select">
+                        <option value="ES" {% if current_region == 'ES' %}selected{% endif %}>España 🇪🇸</option>
+                        <option value="MX" {% if current_region == 'MX' %}selected{% endif %}>México 🇲🇽</option>
+                        <option value="AR" {% if current_region == 'AR' %}selected{% endif %}>Argentina 🇦🇷</option>
+                        <option value="CO" {% if current_region == 'CO' %}selected{% endif %}>Colombia 🇨🇴</option>
+                        <option value="CL" {% if current_region == 'CL' %}selected{% endif %}>Chile 🇨🇱</option>
+                        <option value="PE" {% if current_region == 'PE' %}selected{% endif %}>Perú 🇵🇪</option>
+                        <option value="UY" {% if current_region == 'UY' %}selected{% endif %}>Uruguay 🇺🇾</option>
+                        <option value="EC" {% if current_region == 'EC' %}selected{% endif %}>Ecuador 🇪🇨</option>
+                        <option value="PY" {% if current_region == 'PY' %}selected{% endif %}>Paraguay 🇵🇾</option>
+                        <option value="BO" {% if current_region == 'BO' %}selected{% endif %}>Bolivia 🇧🇴</option>
+                        <option value="VE" {% if current_region == 'VE' %}selected{% endif %}>Venezuela 🇻🇪</option>
+                        <option value="DO" {% if current_region == 'DO' %}selected{% endif %}>Rep. Dominicana 🇩🇴</option>
+                        <option value="GT" {% if current_region == 'GT' %}selected{% endif %}>Guatemala 🇬🇹</option>
+                        <option value="CR" {% if current_region == 'CR' %}selected{% endif %}>Costa Rica 🇨🇷</option>
+                        <option value="PA" {% if current_region == 'PA' %}selected{% endif %}>Panamá 🇵🇦</option>
+                        <option value="BR" {% if current_region == 'BR' %}selected{% endif %}>Brasil 🇧🇷</option>
+                        <option value="US" {% if current_region == 'US' %}selected{% endif %}>EE.UU 🇺🇸</option>
+                        <option value="GB" {% if current_region == 'GB' %}selected{% endif %}>R. Unido 🇬🇧</option>
+                    </select>
+                </div>
+
+                <div class="platform-circles-row" id="chips-providers">
+                    <input type="hidden" name="watch_providers" id="watch-providers-input" value="{{ current_providers }}">
+                    
+                    <div class="platform-circle" data-id="8" title="Netflix" style="--brand-color: #E50914;">
+                        <span class="brand-logo-n">N</span>
+                    </div>
+                    <div class="platform-circle" data-id="344" title="Rakuten Viki" style="--brand-color: #00A1FF;">
+                        <span class="brand-logo-v">V</span>
+                    </div>
+                    <div class="platform-circle" data-id="119" title="Amazon Prime" style="--brand-color: #00A8E1;">
+                        <i class="fab fa-amazon"></i>
+                    </div>
+                    <div class="platform-circle" data-id="337" title="Disney+" style="--brand-color: #0063E5;">
+                        <span class="brand-logo-plus">+</span>
+                    </div>
+                    <div class="platform-circle" data-id="350" title="Apple TV+" style="--brand-color: #FFFFFF;">
+                        <i class="fab fa-apple"></i>
+                    </div>
+                    <div class="platform-circle" data-id="283" title="Crunchyroll" style="--brand-color: #F47521;">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                </div>
+            </div>
+
             <div class="filter-group">
                 <label><i class="fas fa-calendar-alt"></i> Año</label>
                 <input type="number" name="year" value="{{ current_year }}" placeholder="Ej: 2024" class="no-spin">
@@ -251,6 +303,130 @@
     50% { opacity: 1; }
     100% { opacity: 0.5; }
 }
+
+.filter-select {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 12px;
+    outline: none;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.filter-select:focus {
+    border-color: var(--primary);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.filter-select option {
+    background: #111;
+    color: #fff;
+}
+
+/* Estilos Mejora Streaming Premium */
+.streaming-group {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 15px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.region-selector-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.location-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary);
+    font-size: 0.9rem;
+    pointer-events: none;
+}
+
+.region-select {
+    padding-left: 35px !important;
+    background: rgba(0,0,0,0.2) !important;
+    border-color: rgba(255,255,255,0.1) !important;
+}
+
+.platform-circles-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.platform-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.2rem;
+}
+
+.platform-circle:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.platform-circle.active {
+    background: var(--brand-color);
+    border-color: #fff;
+    color: #fff;
+    box-shadow: 0 0 15px var(--brand-color);
+    transform: scale(1.1);
+}
+
+.platform-circle i {
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.viki-logo {
+    font-weight: 900;
+    font-size: 1.1rem;
+    font-family: 'Outfit', sans-serif;
+}
+
+/* Logos Específicos */
+.brand-logo-n {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    font-size: 1.4rem;
+    color: #E50914;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.brand-logo-v {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    font-size: 1.3rem;
+    color: #fff;
+    font-style: italic;
+}
+
+.brand-logo-plus {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+.platform-circle.active .brand-logo-n {
+    color: #fff;
+}
 </style>
 
 <script>
@@ -273,8 +449,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const chipsSort = document.getElementById('chips-sort');
     const genreChipsInclude = document.getElementById('genre-chips-include');
     const genreChipsExclude = document.getElementById('genre-chips-exclude');
+    const chipsProviders = document.getElementById('chips-providers');
     
     const statusGroup = document.getElementById('status-filter-group');
+    const providersInput = document.getElementById('watch-providers-input');
+    const regionInput = document.getElementById('watch-region-input');
 
     // Datos de géneros desde Python
     const genresByType = {{ genres_by_type | tojson }};
@@ -287,7 +466,9 @@ document.addEventListener('DOMContentLoaded', function() {
         genre: '{{ current_genre }}',
         without_genre: '{{ current_without_genre }}',
         sort_by: '{{ current_sort }}',
-        status: '{{ current_status_id }}'
+        status: '{{ current_status_id }}',
+        watch_providers: '{{ current_providers }}',
+        watch_region: '{{ current_region or "ES" }}'
     };
 
     let currentPage = 1;
@@ -371,7 +552,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const toggleSort = document.getElementById('toggle-sort');
     const toggleInclude = document.getElementById('toggle-include');
     const toggleExclude = document.getElementById('toggle-exclude');
-
+    
     setupFilterChips(chipsType, typeInput, 'type', toggleType, { 
         multi: false, 
         onChange: (val) => {
@@ -397,6 +578,38 @@ document.addEventListener('DOMContentLoaded', function() {
         defaultText: 'Ninguno'
     });
 
+    // --- LÓGICA DE PLATAFORMAS (Sin dropdown) ---
+    const platformIcons = chipsProviders.querySelectorAll('.platform-circle');
+    platformIcons.forEach(icon => {
+        icon.addEventListener('click', function() {
+            this.classList.toggle('active');
+            
+            // Actualizar input oculto
+            const activeOnes = Array.from(chipsProviders.querySelectorAll('.platform-circle.active'));
+            const ids = activeOnes.map(i => i.dataset.id).join('|');
+            providersInput.value = ids;
+            filters.watch_providers = ids;
+            
+        });
+    });
+
+    // --- RELLENAR ESTADO INicial DE PLATAFORMAS (PERSISTENCIA) ---
+    const initialProviders = filters.watch_providers.split('|');
+    platformIcons.forEach(icon => {
+        if (initialProviders.includes(icon.dataset.id)) {
+            icon.classList.add('active');
+        }
+    });
+
+    // Sincronizar Región
+    if (regionInput) {
+        regionInput.addEventListener('change', function() {
+            filters.watch_region = this.value;
+        });
+    }
+
+    // --- REACCIÓN AL SISTEMA DE FILTROS ---
+    // (Hemos eliminado la recarga automática para que el usuario use el botón de Aplicar)
     // --- LÓGICA DE CAMBIO DINÁMICO DE GÉNEROS ---
     function refreshGenreChips(selectedType) {
         const genres = genresByType[selectedType] || {};
