@@ -790,7 +790,9 @@ def explore():
     sort_by = request.args.get('sort_by', 'popularity.desc')
     status_id = request.args.get('status', '')
     watch_providers = request.args.get('watch_providers', '')
-    watch_region = request.args.get('watch_region', 'ES') # España por defecto
+    # Priorizar la región del usuario si está identificado, si no usar España (ES) como reserva
+    default_region = current_user.region if (current_user.is_authenticated and current_user.region) else 'ES'
+    watch_region = request.args.get('watch_region', default_region)
     keywords = request.args.get('keywords', '')
 
     asia_countries = {'KR': 'Corea del Sur', 'JP': 'Japón', 'CN': 'China', 'TW': 'Taiwán', 'HK': 'Hong Kong', 'TH': 'Tailandia', 'VN': 'Vietnam', 'IN': 'India', 'PH': 'Filipinas', 'ID': 'Indonesia', 'MY': 'Malasia'}
