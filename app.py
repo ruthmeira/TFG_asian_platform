@@ -622,6 +622,18 @@ def toggle_status():
 def media_detail(media_type, media_id):
     api_key = os.getenv("TMDB_API_KEY")
     
+    # --- PALABRAS CLAVE (KEYWORDS) ---
+    kw_url = f"https://api.themoviedb.org/3/{media_type}/{media_id}/keywords?api_key={api_key}"
+    keywords = []
+    try:
+        kw_res = requests.get(kw_url).json()
+        if media_type == 'tv':
+            keywords = kw_res.get('results', [])
+        else:
+            keywords = kw_res.get('keywords', [])
+    except:
+        pass
+
     # 1. Intentamos primero en Español
     url_es = f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-ES"
     res = requests.get(url_es).json()
@@ -776,7 +788,8 @@ def media_detail(media_type, media_id):
         current_status=current_status,
         watch_providers=watch_providers,
         has_region=has_region,
-        user_region=user_region
+        user_region=user_region,
+        keywords=keywords[:15]
     )
 
 

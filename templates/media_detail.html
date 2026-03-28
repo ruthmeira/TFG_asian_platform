@@ -143,6 +143,17 @@
             </div>
         </div>
 
+        {% if keywords %}
+        <div class="detail-keywords">
+            <p><strong>Palabras clave:</strong></p>
+            <div class="keywords-list-wrapper">
+                {% for kw in keywords %}
+                    <span class="keyword-tag">{{ kw.name }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
     </div>
 
 </div>
