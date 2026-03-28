@@ -58,6 +58,7 @@ def register():
         email = request.form['email']
         password = request.form['password']
         confirm_password = request.form['confirm_password']
+        region = request.form.get('region')
 
         if password != confirm_password:
             flash("Las contraseñas no coinciden.")
@@ -70,15 +71,38 @@ def register():
             flash("El nombre de usuario ya está en uso.")
             return redirect(url_for('register'))
 
-        new_user = User(username=username, email=email)
+        new_user = User(username=username, email=email, region=region)
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
-        # Loguear con sesión persistente tras el registro
-        login_user(new_user, remember=True)
-        return redirect(url_for('home'))
-
-    return render_template('register.html')
+        login_user(new_user)
+        flash("Cuenta creada correctamente. ¡Bienvenido!", "success")
+        return redirect(url_for('explore'))
+    
+    countries_list = [
+        {"code": "AR", "name": "Argentina", "emoji": "🇦🇷"},
+        {"code": "BO", "name": "Bolivia", "emoji": "🇧🇴"},
+        {"code": "BR", "name": "Brasil", "emoji": "🇧🇷"},
+        {"code": "CL", "name": "Chile", "emoji": "🇨🇱"},
+        {"code": "CO", "name": "Colombia", "emoji": "🇨🇴"},
+        {"code": "CR", "name": "Costa Rica", "emoji": "🇨🇷"},
+        {"code": "CU", "name": "Cuba", "emoji": "🇨🇺"},
+        {"code": "EC", "name": "Ecuador", "emoji": "🇪🇨"},
+        {"code": "SV", "name": "El Salvador", "emoji": "🇸🇻"},
+        {"code": "ES", "name": "España", "emoji": "🇪🇸"},
+        {"code": "US", "name": "Estados Unidos", "emoji": "🇺🇸"},
+        {"code": "GT", "name": "Guatemala", "emoji": "🇬🇹"},
+        {"code": "HN", "name": "Honduras", "emoji": "🇭🇳"},
+        {"code": "MX", "name": "México", "emoji": "🇲🇽"},
+        {"code": "NI", "name": "Nicaragua", "emoji": "🇳🇮"},
+        {"code": "PA", "name": "Panamá", "emoji": "🇵🇦"},
+        {"code": "PY", "name": "Paraguay", "emoji": "🇵🇾"},
+        {"code": "PE", "name": "Perú", "emoji": "🇵🇪"},
+        {"code": "DO", "name": "República Dominicana", "emoji": "🇩🇴"},
+        {"code": "UY", "name": "Uruguay", "emoji": "🇺🇾"},
+        {"code": "VE", "name": "Venezuela", "emoji": "🇻🇪"},
+    ]
+    return render_template('register.html', countries_list=countries_list)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -466,6 +490,7 @@ def edit_profile():
         username = request.form['username']
         email = request.form['email']
         password = request.form.get('password')
+        region = request.form.get('region')
 
         if User.query.filter(User.id != current_user.id, User.username == username).first():
             flash("Ese nombre de usuario ya está en uso.")
@@ -476,11 +501,36 @@ def edit_profile():
 
         current_user.username = username
         current_user.email = email
+        current_user.region = region
         if password: current_user.set_password(password)
         db.session.commit()
         flash("Perfil actualizado correctamente.", "success")
         return redirect(url_for('edit_profile'))
-    return render_template('edit_profile.html')
+    
+    countries_list = [
+        {"code": "AR", "name": "Argentina", "emoji": "🇦🇷"},
+        {"code": "BO", "name": "Bolivia", "emoji": "🇧🇴"},
+        {"code": "BR", "name": "Brasil", "emoji": "🇧🇷"},
+        {"code": "CL", "name": "Chile", "emoji": "🇨🇱"},
+        {"code": "CO", "name": "Colombia", "emoji": "🇨🇴"},
+        {"code": "CR", "name": "Costa Rica", "emoji": "🇨🇷"},
+        {"code": "CU", "name": "Cuba", "emoji": "🇨🇺"},
+        {"code": "EC", "name": "Ecuador", "emoji": "🇪🇨"},
+        {"code": "SV", "name": "El Salvador", "emoji": "🇸🇻"},
+        {"code": "ES", "name": "España", "emoji": "🇪🇸"},
+        {"code": "US", "name": "Estados Unidos", "emoji": "🇺🇸"},
+        {"code": "GT", "name": "Guatemala", "emoji": "🇬🇹"},
+        {"code": "HN", "name": "Honduras", "emoji": "🇭🇳"},
+        {"code": "MX", "name": "México", "emoji": "🇲🇽"},
+        {"code": "NI", "name": "Nicaragua", "emoji": "🇳🇮"},
+        {"code": "PA", "name": "Panamá", "emoji": "🇵🇦"},
+        {"code": "PY", "name": "Paraguay", "emoji": "🇵🇾"},
+        {"code": "PE", "name": "Perú", "emoji": "🇵🇪"},
+        {"code": "DO", "name": "República Dominicana", "emoji": "🇩🇴"},
+        {"code": "UY", "name": "Uruguay", "emoji": "🇺🇾"},
+        {"code": "VE", "name": "Venezuela", "emoji": "🇻🇪"},
+    ]
+    return render_template('edit_profile.html', countries_list=countries_list)
 
 # --- COLLECTIONS ---
 @app.route('/collections')
@@ -712,6 +762,43 @@ def media_detail(media_type, media_id):
     }
     res['original_language_name'] = lang_names.get(idioma_orig, idioma_orig.upper())
 
+    # --- LÓGICA DE PROVEEDORES DE STREAMING ---
+    user_region = None
+    if current_user.is_authenticated:
+        user_region = current_user.region
+    
+    # Si no hay región, podemos intentar detectarla o dejarla vacía para el aviso
+    watch_providers = []
+    has_region = True if user_region else False
+    
+    if has_region:
+        wp_url = f"https://api.themoviedb.org/3/{media_type}/{media_id}/watch/providers?api_key={api_key}"
+        try:
+            wp_res = requests.get(wp_url).json()
+            results = wp_res.get('results', {})
+            region_data = results.get(user_region, {})
+            # Buscamos en suscripción plana (flatrate)
+            flatrate = region_data.get('flatrate', [])
+            
+            # IDs de los canales "Elite" que tenemos en el explorador
+            elite_ids = [8, 337, 283, 119, 9, 149, 115, 1899, 384, 350, 344, 1773, 188]
+            for p in flatrate:
+                pid = p['provider_id']
+                if pid in elite_ids:
+                    # Normalización simple para agrupar (HBO/Max, Amazon, Movistar)
+                    if pid == 9: pid = 119
+                    if pid == 115: pid = 149
+                    if pid == 1899: pid = 384
+                    
+                    if pid not in [wp['id'] for wp in watch_providers]:
+                        watch_providers.append({
+                            'id': pid,
+                            'name': p['provider_name']
+                        })
+        except Exception as e:
+            print(f"Error fetching providers: {e}")
+            pass
+
     # Lógica de favoritos y status (lo que ya tenías)
     current_status = None
     is_favorite = False
@@ -725,7 +812,10 @@ def media_detail(media_type, media_id):
         'media_detail.html',
         media=res,
         is_favorite=is_favorite,
-        current_status=current_status
+        current_status=current_status,
+        watch_providers=watch_providers,
+        has_region=has_region,
+        user_region=user_region
     )
 
 
