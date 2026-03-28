@@ -703,6 +703,15 @@ def media_detail(media_type, media_id):
     
     res['flag'] = bandera_final or '🌏'
 
+    # --- NOMBRE DEL IDIOMA ---
+    lang_names = {
+        'ko': 'Coreano', 'ja': 'Japonés', 'zh': 'Chino', 'cn': 'Chino', 'yue': 'Cantonés',
+        'th': 'Tailandés', 'vi': 'Vietnamita', 'hi': 'Hindi', 'tl': 'Filipino', 
+        'fil': 'Filipino', 'id': 'Indonesio', 'ms': 'Malayo', 'en': 'Inglés',
+        'ta': 'Tamil', 'te': 'Telugu'
+    }
+    res['original_language_name'] = lang_names.get(idioma_orig, idioma_orig.upper())
+
     # Lógica de favoritos y status (lo que ya tenías)
     current_status = None
     is_favorite = False
