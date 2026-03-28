@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Reparto y Equipo - {{ media.title or media.name }} - SHIORI{% endblock %}
+
+{% block content %}
+<div class="cast-page-container">
+    <div class="cast-header-wrapper">
+        <a href="{{ url_for('media_detail', media_type=media_type, media_id=media_id) }}" class="back-link-premium">
+            <i class="fas fa-arrow-left"></i> Volver a la ficha
+        </a>
+        
+        <header class="cast-main-header">
+            <div class="header-text">
+                <h1>{{ media.title or media.name }}</h1>
+                {% set release_date = media.release_date or media.first_air_date %}
+                {% if release_date %}
+                    <span class="cast-year">({{ release_date[:4] }})</span>
+                {% endif %}
+            </div>
+            <div class="badge-cast">Full Credits</div>
+        </header>
+    </div>
+
+    {# REPARTO #}
+    {% if cast %}
+    <section class="cast-full-section">
+        <h2 class="section-title"><i class="fas fa-users"></i> Reparto <span>({{ cast|length }})</span></h2>
+        <div class="credits-grid">
+            {% for actor in cast %}
+                <div class="credit-item">
+                    <div class="credit-photo">
+                        {% if actor.profile_path %}
+                            <img src="https://image.tmdb.org/t/p/w300{{ actor.profile_path }}" alt="{{ actor.name }}">
+                        {% else %}
+                            <div class="no-photo" style="height: 100%; display: flex; align-items: center; justify-content: center; background: #222; color: #555;">
+                                <i class="fas fa-user-circle" style="font-size: 5rem;"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="credit-info">
+                        <span class="name">{{ actor.name }}</span>
+                        <span class="role">{{ actor.character }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {# EQUIPO TÉCNICO #}
+    {% if crew %}
+    <section class="crew-full-section">
+        <h2 class="section-title"><i class="fas fa-video"></i> Equipo Técnico <span>({{ crew|length }})</span></h2>
+        <div class="credits-grid">
+            {% for member in crew %}
+                <div class="credit-item">
+                    <div class="credit-photo">
+                        {% if member.profile_path %}
+                            <img src="https://image.tmdb.org/t/p/w300{{ member.profile_path }}" alt="{{ member.name }}">
+                        {% else %}
+                            <div class="no-photo" style="height: 100%; display: flex; align-items: center; justify-content: center; background: #222; color: #555;">
+                                <i class="fas fa-user-circle" style="font-size: 5rem;"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="credit-info">
+                        <span class="name">{{ member.name }}</span>
+                        <span class="role">{{ member.job }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+
+<style>
+/* Estilos extra para la página de reparto */
+.back-link-premium {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition);
+    margin-bottom: 25px;
+}
+
+.back-link-premium:hover {
+    color: var(--primary);
+    transform: translateX(-5px);
+}
+
+.cast-main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 50px;
+}
+
+.header-text {
+    display: flex;
+    align-items: baseline;
+    gap: 15px;
+}
+
+.cast-year {
+    font-size: 1.8rem;
+    color: rgba(255,255,255,0.3);
+    font-weight: 300;
+}
+
+.badge-cast {
+    background: rgba(255, 69, 0, 0.1);
+    color: var(--primary);
+    padding: 8px 20px;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 69, 0, 0.3);
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.section-title {
+    font-size: 2rem;
+    margin-bottom: 35px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: #fff;
+}
+
+.section-title span {
+    color: rgba(255,255,255,0.3);
+    font-size: 1.2rem;
+}
+
+.section-title i {
+    color: var(--primary);
+}
+</style>
+
+{% endblock %}

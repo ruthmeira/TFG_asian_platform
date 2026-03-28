@@ -146,6 +146,37 @@
         </div>
 
 
+        <div class="detail-cast">
+            <div class="cast-header">
+                <h2>Reparto Principal {% if cast %}<a href="{{ url_for('media_cast', media_type=('tv' if media.name else 'movie'), media_id=media.id) }}" class="view-all-link"><span>Ver mas</span> <i class="fas fa-chevron-right"></i></a>{% endif %}</h2>
+            </div>
+            
+            {% if cast %}
+            <div class="cast-scroll-container">
+                {% for actor in cast %}
+                <div class="cast-card">
+                    <div class="cast-avatar">
+                        {% if actor.profile_path %}
+                            <img src="https://image.tmdb.org/t/p/w185{{ actor.profile_path }}" alt="{{ actor.name }}">
+                        {% else %}
+                            <div class="no-avatar" style="height: 100%; display: flex; align-items: center; justify-content: center; background: #222; color: #555;">
+                                <i class="fas fa-user-circle" style="font-size: 3rem;"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <span class="name">{{ actor.name }}</span>
+                    <span class="character">{{ actor.character }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+                <div class="no-platforms">
+                    <i class="fas fa-info-circle"></i>
+                    <p style="margin:0; text-transform: none;">No se ha añadido información del reparto de momento.</p>
+                </div>
+            {% endif %}
+        </div>
+
         <div class="detail-keywords">
             <p><strong>Palabras clave:</strong></p>
             <div class="keywords-list-wrapper">

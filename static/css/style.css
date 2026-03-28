@@ -2646,3 +2646,181 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
+
+/* ===================================================== */
+/* CAST & CREW SECTION */
+/* ===================================================== */
+
+.detail-cast {
+    margin-top: 40px;
+}
+
+.detail-cast .cast-header {
+    margin-bottom: 20px;
+}
+
+.detail-cast h2 {
+    font-size: 1.5rem;
+    color: var(--primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.view-all-link {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.view-all-link:hover {
+    color: var(--primary);
+}
+
+.cast-scroll-container {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding-bottom: 15px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 69, 0, 0.3) transparent;
+}
+
+.cast-scroll-container::-webkit-scrollbar {
+    height: 4px;
+}
+
+.cast-scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 69, 0, 0.3);
+    border-radius: 10px;
+}
+
+.cast-card {
+    flex: 0 0 120px;
+    text-align: center;
+}
+
+.cast-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 10px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: #222;
+}
+
+.cast-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cast-card .name {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.cast-card .character {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* FULL CAST PAGE */
+.cast-page-container {
+    max-width: 1200px;
+    margin: 100px auto 40px;
+    padding: 0 20px;
+}
+
+.cast-header-wrapper {
+    margin-bottom: 40px;
+}
+
+.cast-main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-text {
+    display: flex;
+    align-items: baseline;
+    gap: 15px;
+}
+
+.cast-year {
+    font-size: 1.8rem;
+    color: rgba(255,255,255,0.3);
+    font-weight: 300;
+}
+
+.badge-cast {
+    background: rgba(255, 69, 0, 0.1);
+    color: var(--primary);
+    padding: 8px 20px;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 69, 0, 0.3);
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.credits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 30px;
+    margin-bottom: 60px;
+}
+
+.credit-item {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.credit-photo {
+    aspect-ratio: 2/3;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #1a1a1a;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.credit-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.credit-info .name {
+    font-weight: 700;
+    font-size: 1rem;
+    display: block;
+    color: #fff;
+}
+
+.credit-info .role {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.section-title {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+    color: #fff;
+}

@@ -622,6 +622,24 @@ def toggle_status():
 def media_detail(media_type, media_id):
     api_key = os.getenv("TMDB_API_KEY")
     
+    # --- CRÉDITOS (REPARTO Y EQUIPO) ---
+    is_tv = media_type == 'tv' or ('show' in request.path)
+    if is_tv:
+        credits_url = f"https://api.themoviedb.org/3/tv/{media_id}/aggregate_credits?api_key={api_key}"
+    else:
+        credits_url = f"https://api.themoviedb.org/3/{media_type}/{media_id}/credits?api_key={api_key}"
+        
+    credits = {}
+    try:
+        credits = requests.get(credits_url).json()
+        # Normalizar character para TV en la preview
+        if is_tv:
+            for a in credits.get('cast', []):
+                if 'roles' in a and a['roles']:
+                    a['character'] = a['roles'][0].get('character', '')
+    except:
+        pass
+
     # --- PALABRAS CLAVE (KEYWORDS) ---
     kw_url = f"https://api.themoviedb.org/3/{media_type}/{media_id}/keywords?api_key={api_key}"
     keywords = []
@@ -790,7 +808,44 @@ def media_detail(media_type, media_id):
         has_region=has_region,
         user_region=user_region,
         keywords=keywords[:15],
-        real_media_type='movie' if media_type == 'movie' else ('show' if res.get('media_subtype') == 'Programa' else 'tv')
+        real_media_type='movie' if media_type == 'movie' else ('show' if res.get('media_subtype') == 'Programa' else 'tv'),
+        cast=credits.get('cast', [])[:7],
+        crew=credits.get('crew', [])
+    )
+
+
+@app.route('/media/<media_type>/<media_id>/cast')
+def media_cast(media_type, media_id):
+    api_key = os.getenv("TMDB_API_KEY")
+    
+    # 1. Datos básicos
+    detail_url = f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-ES"
+    res = requests.get(detail_url).json()
+    
+    # 2. Créditos (Agregados para TV, normales para Movie)
+    if media_type == 'tv' or (res.get('media_type') == 'tv' or 'first_air_date' in res):
+        credits_url = f"https://api.themoviedb.org/3/tv/{media_id}/aggregate_credits?api_key={api_key}"
+    else:
+        credits_url = f"https://api.themoviedb.org/3/movie/{media_id}/credits?api_key={api_key}"
+        
+    credits = requests.get(credits_url).json()
+    
+    # Normalizar "roles" de TV a "character" para que el template no falle
+    final_cast = credits.get('cast', [])
+    for actor in final_cast:
+        if 'roles' in actor and actor['roles']:
+            # Tomamos el primer rol y opcionalmente el contador de episodios
+            actor['character'] = actor['roles'][0].get('character', '')
+            if len(actor['roles']) > 1:
+                actor['character'] += f" y otros {len(actor['roles'])-1}"
+    
+    return render_template(
+        'cast.html',
+        media=res,
+        cast=final_cast,
+        crew=credits.get('crew', []),
+        media_type=media_type,
+        media_id=media_id
     )
 
 
