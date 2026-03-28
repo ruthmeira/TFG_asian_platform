@@ -970,12 +970,10 @@ def api_explore():
                             break
 
                 # --- FILTRADO ESTRICTO ---
-                # Si estamos filtrando por país, el código final determinado debe coincidir
+                # Si estamos filtrando por país, el código determinado debe estar en la lista seleccionada
                 if country_code:
-                    c_target = country_code.upper()
-                    if c_target != codigo_final:
-                        # Excepción: No saltar si es China y el código final es HK/TW si no hay filtros específicos activos
-                        # Pero ella tiene filtros separados, así que mejor ser estrictos para evitar "colados"
+                    selected_countries = country_code.upper().split('|')
+                    if codigo_final not in selected_countries:
                         continue
 
                 item['flag'] = bandera_final or '🌏'

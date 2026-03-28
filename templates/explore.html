@@ -56,7 +56,7 @@
             <div class="filter-group">
                 <label><i class="fas fa-globe"></i> País</label>
                 <div class="genre-collapsible-btn" id="toggle-country">
-                    <span class="selected-text">{{ asia_langs.get(current_lang, 'Todos') }}</span>
+                    <span class="selected-text">Todos</span>
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="genre-collapsible-content">
@@ -64,8 +64,9 @@
                         <div class="genre-chip {% if not current_lang %}active{% endif %}" data-id="">Todos</div>
                         {% if asia_langs %}
                         {% for code, name in asia_langs.items() %}
-                        <div class="genre-chip {% if current_lang == code %}active{% endif %}" data-id="{{ code }}">{{
-                            name }}</div>
+                        <div class="genre-chip {% if code in current_lang.split('|') %}active{% endif %}" data-id="{{ code }}">
+                            {{ name }}
+                        </div>
                         {% endfor %}
                         {% endif %}
                     </div>
@@ -924,15 +925,29 @@
         const chips = container.querySelectorAll('.genre-chip');
         chips.forEach(chip => {
             chip.addEventListener('click', function () {
-                if (!isMulti) {
-                    // Si es único, quitamos active de los demás
-                    container.querySelectorAll('.genre-chip').forEach(c => c.classList.remove('active'));
-                }
-                this.classList.toggle('active');
+                const isAllButton = this.dataset.id === "" || this.textContent.trim() === 'Todos';
 
-                // Si es único y se deselecciona, marcar el primero (Todos/Serie)
-                if (!isMulti && !container.querySelector('.genre-chip.active')) {
-                    chips[0].classList.add('active');
+                if (!isMulti) {
+                    container.querySelectorAll('.genre-chip').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                } else {
+                    if (isAllButton) {
+                        // Si pulsamos "Todos", limpiamos el resto
+                        container.querySelectorAll('.genre-chip').forEach(c => c.classList.remove('active'));
+                        this.classList.add('active');
+                    } else {
+                        // Si pulsamos cualquier otro, quitamos el "Todos"
+                        const allBtn = Array.from(chips).find(c => c.dataset.id === "" || c.textContent.trim() === 'Todos');
+                        if (allBtn) allBtn.classList.remove('active');
+                        this.classList.toggle('active');
+                    }
+
+                    // Si al final no hay nada activo, marcar "Todos"
+                    if (!container.querySelector('.genre-chip.active')) {
+                        const allBtn = Array.from(chips).find(c => c.dataset.id === "" || c.textContent.trim() === 'Todos');
+                        if (allBtn) allBtn.classList.add('active');
+                        else chips[0].classList.add('active');
+                    }
                 }
 
                 updateFilterValues(container, input, filterKey, toggleBtn, defaultText, isMulti);
@@ -980,7 +995,7 @@
         multi: false
     });
     setupFilterChips(chipsCountry, countryInput, 'lang', toggleCountry, {
-        multi: false
+        multi: true
     });
     setupFilterChips(chipsSort, sortInput, 'sort_by', toggleSort, {
         multi: false
