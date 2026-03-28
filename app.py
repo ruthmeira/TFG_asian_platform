@@ -113,7 +113,8 @@ def login():
         if user and user.check_password(password):
             remember = True if request.form.get('remember') else False
             login_user(user, remember=remember)
-            return redirect(url_for('home'))
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('home'))
         else:
             flash("Credenciales incorrectas")
     return render_template('login.html')
@@ -124,6 +125,7 @@ def login_google():
     # Detectamos la intención (si viene de register o de login normal)
     action = request.args.get('action', 'login')
     session['google_auth_action'] = action
+    session['google_auth_next'] = request.args.get('next')
     
     redirect_uri = url_for('google_authorize', _external=True)
     return google.authorize_redirect(redirect_uri)
@@ -170,7 +172,8 @@ def google_authorize():
         
         # Loguear al usuario existente con sesión persistente (por comodidad)
         login_user(user, remember=True)
-        return redirect(url_for('home'))
+        next_page = session.pop('google_auth_next', None)
+        return redirect(next_page or url_for('home'))
     except Exception as e:
         print(f"❌ Error en Google Auth: {str(e)}")
         # Miramos si el usuario intentaba registrarse o entrar
@@ -504,8 +507,10 @@ def edit_profile():
         current_user.region = region
         if password: current_user.set_password(password)
         db.session.commit()
-        flash("Perfil actualizado correctamente.", "success")
-        return redirect(url_for('edit_profile'))
+        next_page = request.args.get('next')
+        if not next_page:
+            flash("Perfil actualizado correctamente.", "success")
+        return redirect(next_page or url_for('edit_profile'))
     
     countries_list = [
         {"code": "AR", "name": "Argentina", "emoji": "🇦🇷"},
