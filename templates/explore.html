@@ -259,20 +259,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const loadMoreBtn = document.getElementById('load-more-btn');
     const loadMoreWrapper = document.getElementById('load-more-wrapper');
 
-    const skeletonHTML = `
-        <div class="skeleton-card">
-            <div class="skeleton-img"></div>
-            <div class="skeleton-body">
-                <div class="skeleton-title"></div>
-                <div class="skeleton-subtitle"></div>
-                <div class="skeleton-meta">
-                    <div class="skeleton-rating"></div>
-                    <div class="skeleton-lang"></div>
-                </div>
-            </div>
-        </div>
-    `;
-    
     // Inputs y Contenedores
     const typeInput = document.getElementById('media-type-input');
     const statusInput = document.getElementById('status-input');
@@ -514,45 +500,17 @@ document.addEventListener('DOMContentLoaded', function() {
         
         currentPage = page; 
         isLoadingMore = true;
-        
-        let skeletons = [];
-        let skeletonsReplaced = 0;
 
-        if (pageCache[page]) {
-            let partialItemsCount = (pageCache[page].html.match(/class="card-link"/g) || []).length;
-            if (!pageCache[page].done && partialItemsCount < 20) {
-                const inner = pageCache[page].html + Array(20 - partialItemsCount).fill(skeletonHTML).join('');
-                if (page === 1) {
-                    container.innerHTML = inner;
-                } else {
-                    container.insertAdjacentHTML('beforeend', inner);
-                }
-                skeletons = Array.from(container.querySelectorAll('.skeleton-card'));
-            } else {
-                if (page === 1) {
-                    container.innerHTML = pageCache[page].html || '';
-                } else {
-                    container.insertAdjacentHTML('beforeend', pageCache[page].html || '');
-                }
-            }
-            
-            if (page === 1) window.scrollTo({ top: 0, behavior: 'smooth' });
-            
-            if (pageCache[page].done) {
-                isLoadingMore = false;
-                prefetchPage(page + 1);
-                return;
-            }
-        } else {
-            // Inyectar 20 esqueletos
-            const inner = Array(20).fill(skeletonHTML).join('');
-            if (page === 1) {
-                container.innerHTML = inner;
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-                container.insertAdjacentHTML('beforeend', inner);
-            }
-            skeletons = Array.from(container.querySelectorAll('.skeleton-card'));
+        if (page === 1) {
+            container.innerHTML = ''; // Limpiar cuadrícula inicial para nuevos filtros
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        if (pageCache[page] && pageCache[page].done) {
+            container.insertAdjacentHTML('beforeend', pageCache[page].html || '');
+            isLoadingMore = false;
+            prefetchPage(page + 1);
+            return;
         }
 
         fetchingPages.add(page);
@@ -605,24 +563,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
 
                         if (data.item_html) {
-                            currentStreamItemIndex++;
                             pageCache[page].html += data.item_html;
-
-                            if (currentStreamItemIndex > itemsAlreadyInView) {
-                                if (skeletonsReplaced < skeletons.length) {
-                                    skeletons[skeletonsReplaced].outerHTML = data.item_html;
-                                    skeletonsReplaced++;
-                                } else {
-                                    container.insertAdjacentHTML('beforeend', data.item_html);
-                                }
-                            }
+                            container.insertAdjacentHTML('beforeend', data.item_html);
                         }
                         
                         if (data.done) {
-                            // Limpiar esqueletos restantes si hay menos de 20 items
-                            const remainingSkeletons = container.querySelectorAll('.skeleton-card');
-                            remainingSkeletons.forEach(sk => sk.remove());
-
                             pageCache[page].done = true;
                             if (data.next_api_page !== undefined) {
                                 apiPageMap[page + 1] = { 
