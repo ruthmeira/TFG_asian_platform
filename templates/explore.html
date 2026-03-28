@@ -139,11 +139,119 @@
             <!-- Los items se cargarán por AJAX -->
         </div>
 
-        <div id="pagination-wrapper" class="pagination-controls-numbers">
-            <!-- Se generará dinámicamente -->
+        <div id="infinite-scroll-trigger" style="height: 50px; margin-bottom: 100px;"></div>
+
+        <div id="pagination-wrapper" class="pagination-controls-numbers" style="display: none;">
+            <!-- Desactivado por scroll infinito -->
         </div>
     </div>
 </div>
+
+<!-- CAPA DE DETALLE SPA -->
+<div id="spa-detail-layer" class="spa-detail-layer">
+    <div class="spa-nav-bar">
+        <button onclick="window.closeDetail()" class="spa-back-btn">
+            <i class="fas fa-arrow-left"></i> Volver a Explorar
+        </button>
+    </div>
+    <div id="spa-detail-content" class="spa-detail-content">
+        <!-- Contenido dinámico -->
+    </div>
+</div>
+
+<style>
+/* Estilos para Capa Detalle SPA con impresión de página real */
+.spa-detail-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 9999;
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    display: none;
+}
+
+.spa-detail-layer.visible {
+    display: block;
+    transform: translateX(0);
+}
+
+.spa-nav-bar {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    padding: 20px 40px;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(20px);
+    z-index: 100;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.spa-back-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Outfit', sans-serif;
+    transition: color 0.3s;
+}
+
+.spa-back-btn:hover {
+    color: var(--accent-light, #ff4d4d);
+}
+
+.spa-detail-content {
+    padding: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Esqueltoy para el detalle */
+.detail-skeleton {
+    display: flex;
+    gap: 40px;
+    animation: fadePulse 1.5s infinite;
+}
+
+.detail-skeleton-img {
+    width: 300px;
+    height: 450px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+}
+
+.detail-skeleton-text {
+    flex: 1;
+}
+
+.detail-skeleton-title {
+    height: 40px;
+    width: 60%;
+    background: rgba(255, 255, 255, 0.05);
+    margin-bottom: 20px;
+}
+
+.detail-skeleton-para {
+    height: 20px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    margin-bottom: 10px;
+}
+
+@keyframes fadePulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -199,10 +307,15 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentPage = 1;
     let totalPages = 500; 
     let pageCache = {}; // { 1: { html: '...', done: false } }
-    let apiPageMap = { 1: { page: 1, skip: 0 } }; // Sincronización PROFUNDA (Evita duplicados y saltos)
+    let apiPageMap = { 1: { page: 1, skip: 0 } }; // Sincronización PROFUNDA
     let fetchingPages = new Set(); 
     let abortControllers = {};     
-// { page: AbortController }
+    let isLoadingMore = false;
+
+    // --- LÓGICA DE CASCADA ININTERRUMPIDA ---
+    // El IntersectionObserver ha sido eliminado para permitir una carga proactiva.
+    const trigger = document.getElementById('infinite-scroll-trigger');
+    if (trigger) trigger.style.display = 'none'; // No necesario para cascada
 
     function clearCacheAndLoad(page = 1) {
         // Abortar todas las peticiones activas
@@ -265,10 +378,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function clearCacheAndLoad(page = 1) {
-        pageCache = {};
-        loadItems(page);
-    }
 
     const toggleType = document.getElementById('toggle-type');
     const toggleStatus = document.getElementById('toggle-status');
@@ -325,44 +434,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updatePaginationUI() {
-        const wrapper = document.getElementById('pagination-wrapper');
-        if (totalPages <= 1) {
-            wrapper.innerHTML = '';
-            return;
-        }
-
-        let html = '';
-        
-        // Botón Anterior
-        if (currentPage > 1) {
-            html += `<button class="page-btn-nav" onclick="window.goToPage(${currentPage - 1})"><i class="fas fa-chevron-left"></i></button>`;
-        }
-
-        // Lógica de números (mostramos un rango de 5 páginas)
-        let startPage = Math.max(1, currentPage - 2);
-        let endPage = Math.min(totalPages, startPage + 4);
-        if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
-
-        if (startPage > 1) {
-            html += `<button class="page-number" onclick="window.goToPage(1)">1</button>`;
-            if (startPage > 2) html += `<span class="page-ellipsis">...</span>`;
-        }
-
-        for (let i = startPage; i <= endPage; i++) {
-            html += `<button class="page-number ${i === currentPage ? 'active' : ''}" onclick="window.goToPage(${i})">${i}</button>`;
-        }
-
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) html += `<span class="page-ellipsis">...</span>`;
-            html += `<button class="page-number" onclick="window.goToPage(${totalPages})">${totalPages}</button>`;
-        }
-
-        // Botón Siguiente
-        if (currentPage < totalPages) {
-            html += `<button class="page-btn-nav" onclick="window.goToPage(${currentPage + 1})"><i class="fas fa-chevron-right"></i></button>`;
-        }
-
-        wrapper.innerHTML = html;
+        // Desactivado para scroll infinito
     }
 
     // Exponer función de navegación globalmente para los onclick
@@ -374,20 +446,11 @@ document.addEventListener('DOMContentLoaded', function() {
     async function prefetchPage(page) {
         if (page > totalPages || fetchingPages.has(page)) return;
         
-        // Si esta página ya está completa en caché, saltamos a buscar el siguiente "hueco" de la ventana
-        if (pageCache[page] && pageCache[page].done) {
-            if (page < (currentPage + 20)) {
-                prefetchPage(page + 1);
-            }
-            return;
-        }
-
         fetchingPages.add(page);
         const controller = new AbortController();
         abortControllers[page] = controller;
 
         const params = new URLSearchParams({...filters, page: page});
-        // Sincronización PROFUNDA: Página y Skip
         if (apiPageMap[page]) {
             params.set('api_page', apiPageMap[page].page);
             params.set('api_skip', apiPageMap[page].skip);
@@ -412,48 +475,34 @@ document.addEventListener('DOMContentLoaded', function() {
                         const data = JSON.parse(line);
                         if (data.item_html) {
                             pageCache[page].html += data.item_html;
-                            // Si el usuario cambia a esta página mientras el prefetch corre, inyectar en vivo
-                            if (currentPage === page) {
-                                const skeletons = container.querySelectorAll('.skeleton-card');
-                                if (skeletons.length > 0) {
-                                    skeletons[0].outerHTML = data.item_html;
-                                } else {
-                                    container.insertAdjacentHTML('beforeend', data.item_html);
-                                }
-                            }
+                            // DIBUJO PROACTIVO: Inyectamos inmediatamente en la cuadrícula
+                            container.insertAdjacentHTML('beforeend', data.item_html);
                         }
                         if (data.total_pages !== undefined) {
-                            let newTotal = Math.min(data.total_pages, 500);
-                            if (newTotal !== totalPages) {
-                                totalPages = newTotal;
-                                updatePaginationUI();
-                            }
+                            totalPages = Math.min(data.total_pages, 500);
                         }
 
                         if (data.done) {
                             pageCache[page].done = true;
-                            
-                            // Guardamos EXACTAMENTE dónde debe arrancar la siguiente (Página y Skip)
                             if (data.next_api_page !== undefined) {
                                 apiPageMap[page + 1] = { 
                                     page: data.next_api_page, 
                                     skip: data.next_api_skip || 0 
                                 };
                             }
-
-                            // SEGUIR CARGANDO POR ADELANTADO (Hasta 20 páginas por delante del usuario)
-                            if (page < totalPages && page < (currentPage + 20)) {
+                            // CASCADA: Cargar la siguiente página inmediatamente sin límites
+                            if (page < totalPages) {
                                 prefetchPage(page + 1);
                             }
                         }
                     } catch (e) {
-                        if (e.name !== 'AbortError') console.error("Error pre-fetching line:", e);
+                        if (e.name !== 'AbortError') console.error("Error drawing cascade line:", e);
                     }
                 }
                 if (done) break;
             }
         } catch (e) {
-            if (e.name !== 'AbortError') console.error("Prefetch error:", e);
+            if (e.name !== 'AbortError') console.error("Cascade error:", e);
         } finally {
             fetchingPages.delete(page);
             delete abortControllers[page];
@@ -461,7 +510,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function loadItems(page = 1) {
+        if (fetchingPages.has(page)) return;
+        
         currentPage = page; 
+        isLoadingMore = true;
         
         let skeletons = [];
         let skeletonsReplaced = 0;
@@ -469,27 +521,38 @@ document.addEventListener('DOMContentLoaded', function() {
         if (pageCache[page]) {
             let partialItemsCount = (pageCache[page].html.match(/class="card-link"/g) || []).length;
             if (!pageCache[page].done && partialItemsCount < 20) {
-                container.innerHTML = pageCache[page].html + Array(20 - partialItemsCount).fill(skeletonHTML).join('');
+                const inner = pageCache[page].html + Array(20 - partialItemsCount).fill(skeletonHTML).join('');
+                if (page === 1) {
+                    container.innerHTML = inner;
+                } else {
+                    container.insertAdjacentHTML('beforeend', inner);
+                }
                 skeletons = Array.from(container.querySelectorAll('.skeleton-card'));
             } else {
-                container.innerHTML = pageCache[page].html || '';
+                if (page === 1) {
+                    container.innerHTML = pageCache[page].html || '';
+                } else {
+                    container.insertAdjacentHTML('beforeend', pageCache[page].html || '');
+                }
             }
-            updatePaginationUI();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            if (page === 1) window.scrollTo({ top: 0, behavior: 'smooth' });
             
             if (pageCache[page].done) {
+                isLoadingMore = false;
                 prefetchPage(page + 1);
                 return;
             }
-            
-            if (fetchingPages.has(page)) {
-                return; 
-            }
         } else {
-            // Inyectar 20 esqueletos inicialmente
-            container.innerHTML = Array(20).fill(skeletonHTML).join('');
+            // Inyectar 20 esqueletos
+            const inner = Array(20).fill(skeletonHTML).join('');
+            if (page === 1) {
+                container.innerHTML = inner;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                container.insertAdjacentHTML('beforeend', inner);
+            }
             skeletons = Array.from(container.querySelectorAll('.skeleton-card'));
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         fetchingPages.add(page);
@@ -585,6 +648,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } finally {
             fetchingPages.delete(page);
             delete abortControllers[page];
+            isLoadingMore = false;
         }
     }
 
@@ -643,6 +707,149 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
                 window.location.href = this.href;
             }, 500);
+        });
+    }
+
+    // --- LÓGICA SPA DETAIL ---
+    const detailLayer = document.getElementById('spa-detail-layer');
+    const detailContent = document.getElementById('spa-detail-content');
+    const body = document.body;
+
+    // Sincronizar el historial del navegador
+    window.addEventListener('popstate', function(event) {
+        if (event.state && event.state.isDetail) {
+            openDetail(window.location.pathname, false);
+        } else {
+            closeDetail(false);
+        }
+    });
+
+    // Interceptar clicks en tarjetas
+    container.addEventListener('click', function(e) {
+        const link = e.target.closest('.card-link');
+        if (link && !e.ctrlKey && !e.metaKey) {
+            e.preventDefault();
+            const url = link.getAttribute('href');
+            openDetail(url, true);
+        }
+    });
+
+    window.openDetail = async function(url, push = true) {
+        detailLayer.classList.add('visible');
+        body.style.overflow = 'hidden'; // Evitar scroll de fondo
+        
+        detailContent.innerHTML = `
+            <div class="detail-skeleton">
+                <div class="detail-skeleton-img"></div>
+                <div class="detail-skeleton-text">
+                    <div class="detail-skeleton-title"></div>
+                    <div class="detail-skeleton-para"></div>
+                    <div class="detail-skeleton-para"></div>
+                    <div class="detail-skeleton-para"></div>
+                </div>
+            </div>
+        `;
+
+        if (push) {
+            history.pushState({ isDetail: true, url: url }, '', url);
+        }
+
+        try {
+            const res = await fetch(url);
+            const html = await res.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const mainContent = doc.querySelector('.media-detail-container');
+            
+            if (mainContent) {
+                detailContent.innerHTML = mainContent.outerHTML;
+                // Re-inicializar scripts para el nuevo contenido (Favoritos, Colección)
+                initDetailScripts(detailContent);
+            } else {
+                detailContent.innerHTML = "<p>Error al cargar el detalle.</p>";
+            }
+        } catch (err) {
+            console.error(err);
+            detailContent.innerHTML = "<p>No se pudo conectar con el servidor.</p>";
+        }
+    };
+
+    window.closeDetail = function(pop = true) {
+        detailLayer.classList.remove('visible');
+        body.style.overflow = ''; // Restaurar scroll
+        if (pop && history.state && history.state.isDetail) {
+            history.back();
+        } else if (!pop) {
+           // Si viene de popstate, ya estamos en la URL correcta
+        }
+    };
+
+    function initDetailScripts(container) {
+        const favBtn = container.querySelector("#favorite-btn");
+        const toggleBtn = container.querySelector("#collection-toggle");
+        const options = container.querySelector("#collection-options");
+
+        if (favBtn) {
+            const getAttr = (name) => favBtn.dataset[name];
+            favBtn.addEventListener("click", async function () {
+                const res = await fetch("/toggle_favorite", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        media_id: getAttr('id'), 
+                        media_type: getAttr('type'),
+                        media_subtype: getAttr('mediaSubtype'),
+                        title: getAttr('title'),
+                        original_title: getAttr('originalTitle'),
+                        vote_average: getAttr('vote_average'),
+                        flag: getAttr('flag'),
+                        poster: getAttr('poster') 
+                    })
+                });
+                const data = await res.json();
+                favBtn.classList.toggle("active", data.favorite);
+            });
+
+            container.querySelectorAll(".collection-option").forEach(btn => {
+                btn.addEventListener("click", async function () {
+                    const status = btn.dataset.status;
+                    const res = await fetch("/toggle_status", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ 
+                            media_id: getAttr('id'), 
+                            media_type: getAttr('type'), 
+                            media_subtype: getAttr('mediaSubtype'),
+                            status: status,
+                            title: getAttr('title'),
+                            original_title: getAttr('originalTitle'),
+                            vote_average: getAttr('vote_average'),
+                            flag: getAttr('flag'),
+                            poster: getAttr('poster')
+                        })
+                    });
+                    const data = await res.json();
+                    container.querySelectorAll(".collection-option").forEach(b => b.classList.remove("active"));
+                    if (data.current_status) {
+                        const activeBtn = container.querySelector(`[data-status="${data.current_status}"]`);
+                        if (activeBtn) activeBtn.classList.add("active");
+                    }
+                    options.classList.add("hidden");
+                });
+            });
+        }
+
+        if (toggleBtn) {
+            toggleBtn.addEventListener("click", function (e) {
+                e.stopPropagation();
+                options.classList.toggle("hidden");
+            });
+        }
+        
+        document.addEventListener("click", (e) => {
+            if (options && !options.classList.contains("hidden") && !e.target.closest('.collection-dropdown')) {
+                options.classList.add("hidden");
+            }
         });
     }
 
