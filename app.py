@@ -731,6 +731,7 @@ def explore():
     status_id = request.args.get('status', '')
     watch_providers = request.args.get('watch_providers', '')
     watch_region = request.args.get('watch_region', 'ES') # España por defecto
+    keywords = request.args.get('keywords', '')
 
     asia_countries = {'KR': 'Corea del Sur', 'JP': 'Japón', 'CN': 'China', 'TW': 'Taiwán', 'HK': 'Hong Kong', 'TH': 'Tailandia', 'VN': 'Vietnam', 'IN': 'India', 'PH': 'Filipinas', 'ID': 'Indonesia', 'MY': 'Malasia'}
     
@@ -761,6 +762,7 @@ def explore():
                            current_genre=genre_id, current_without_genre=without_genre_id,
                            current_sort=sort_by, current_status_id=status_id,
                            current_providers=watch_providers, current_region=watch_region,
+                           current_keywords=keywords,
                            asia_langs=asia_countries, genres_by_type=genres_by_type, 
                            sort_options=sort_options, status_options=status_options)
 
@@ -778,6 +780,7 @@ def api_explore():
     status_id = request.args.get('status', '')
     watch_providers = request.args.get('watch_providers', '')
     watch_region = request.args.get('watch_region', 'ES')
+    keywords = request.args.get('keywords', '')
     page = request.args.get('page', 1, type=int) 
     # Punto de inicio real y cuántos saltar (Sync para no repetir ni saltar series)
     api_start_page = request.args.get('api_page', page, type=int) 
@@ -820,6 +823,12 @@ def api_explore():
 
             if watch_providers:
                 url += f"&with_watch_providers={watch_providers}&watch_region={watch_region}&with_watch_monetization_types=flatrate|free"
+
+            if keywords:
+                # El formato ahora es ID_Nombre|ID_Nombre... para persistencia
+                keyword_ids = [k.split('_')[0] for k in keywords.split('|') if k]
+                if keyword_ids:
+                    url += f"&with_keywords={'|'.join(keyword_ids)}"
 
             # --- GESTIÓN UNIFICADA DE GÉNEROS (Para que el contador sea exacto) ---
             with_ids = []
@@ -1007,6 +1016,21 @@ def api_explore():
         }) + '\n'
 
     return Response(stream_with_context(generate()), mimetype='application/x-ndjson')
+
+
+@app.route('/api/keywords/search')
+def api_keywords_search():
+    api_key = os.getenv("TMDB_API_KEY")
+    query = request.args.get('q', '')
+    if not query:
+        return jsonify({'results': []})
+    
+    url = f"https://api.themoviedb.org/3/search/keyword?api_key={api_key}&query={query}"
+    try:
+        res = requests.get(url).json()
+        return jsonify(res)
+    except:
+        return jsonify({'results': []})
 
 
 if __name__ == '__main__':

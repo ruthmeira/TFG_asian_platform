@@ -5,6 +5,16 @@
     <aside class="filter-sidebar">
         <h3><i class="fas fa-sliders-h"></i> Filtros</h3>
         <form action="{{ url_for('explore') }}" method="GET">
+            <div class="filter-group keyword-tagging-group">
+                <label><i class="fas fa-search"></i> Palabras clave</label>
+                <div class="keyword-tags-container" id="keyword-tags-list">
+                    <!-- Los chips se insertarán aquí dinámicamente -->
+                    <input type="text" id="keyword-search-input" placeholder="Ej: vampiros, escolar..." autocomplete="off">
+                </div>
+                <div id="keyword-suggestions" class="keyword-suggestions-dropdown" style="display: none;"></div>
+                <input type="hidden" name="keywords" id="keywords-input" value="{{ current_keywords }}">
+            </div>
+
             <div class="filter-group">
                 <label><i class="fas fa-tv"></i> Tipo</label>
                 <div class="genre-collapsible-btn" id="toggle-type">
@@ -757,6 +767,79 @@
     .platform-circle.active .brand-logo-n {
         color: #fff;
     }
+    /* KEYWORD TAGGING PREMIUM */
+    .keyword-tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 8px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        min-height: 48px;
+        transition: var(--transition);
+    }
+    .keyword-tags-container:focus-within {
+        border-color: var(--primary);
+        background: rgba(255, 255, 255, 0.06);
+    }
+    .keyword-tag-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 4px 10px;
+        border-radius: 8px;
+        font-size: 13px;
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .keyword-tag-chip i {
+        cursor: pointer;
+        font-size: 11px;
+        opacity: 0.6;
+        transition: 0.2s;
+    }
+    .keyword-tag-chip i:hover {
+        opacity: 1;
+        color: #ff4d4d;
+    }
+    #keyword-search-input {
+        flex: 1;
+        min-width: 80px;
+        background: transparent !important;
+        border: none !important;
+        padding: 4px !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        font-size: 14px;
+    }
+    .keyword-suggestions-dropdown {
+        position: absolute;
+        z-index: 1000;
+        background: #1A1A1A;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        width: calc(100% - 10px);
+        max-height: 200px;
+        overflow-y: auto;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        margin-top: 5px;
+    }
+    .keyword-suggestion-item {
+        padding: 10px 15px;
+        cursor: pointer;
+        font-size: 13px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        transition: background 0.2s;
+    }
+    .keyword-suggestion-item:last-child {
+        border-bottom: none;
+    }
+    .keyword-suggestion-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--primary);
+    }
 </style>
 
 
@@ -800,7 +883,8 @@
         sort_by: '{{ current_sort }}',
         status: '{{ current_status_id }}',
         watch_providers: '{{ current_providers }}',
-        watch_region: '{{ current_region or "ES" }}'
+        watch_region: '{{ current_region or "ES" }}',
+        keywords: '{{ current_keywords }}'
     };
 
     let currentPage = 1;
@@ -1088,6 +1172,8 @@
 
         filters.genre = genreInputInclude.value;
         filters.without_genre = genreInputExclude.value;
+        const kwInput = document.getElementById('keywords-input');
+        if (kwInput) filters.keywords = kwInput.value;
         const params = new URLSearchParams({ ...filters, page: page });
 
         if (apiPageMap[page]) {
@@ -1370,5 +1456,108 @@
     // Carga inicial
     loadItems(1);
 });
+    // --- MOTOR DE TAGGING DE PALABRAS CLAVE ---
+    const kwSearchInput = document.getElementById('keyword-search-input');
+    const kwSuggestions = document.getElementById('keyword-suggestions');
+    const kwTagsList = document.getElementById('keyword-tags-list');
+    const kwHiddenInput = document.getElementById('keywords-input');
+    let selectedKeywords = []; 
+
+    // Inicializar desde el input oculto (para persistencia al recargar)
+    if (kwHiddenInput.value) {
+        selectedKeywords = kwHiddenInput.value.split('|').filter(Boolean).map(item => {
+            const [id, name] = item.split('_');
+            return { id, name };
+        });
+        renderKeywordTags();
+    }
+
+    function renderKeywordTags() {
+        // Limpiamos todo excepto el input
+        const chips = kwTagsList.querySelectorAll('.keyword-tag-chip');
+        chips.forEach(c => c.remove());
+        
+        selectedKeywords.forEach(kw => {
+            const chip = document.createElement('div');
+            chip.className = 'keyword-tag-chip animate__animated animate__fadeIn';
+            chip.innerHTML = `${kw.name} <i class="fas fa-times" onclick="removeKeywordTag('${kw.id}')"></i>`;
+            kwTagsList.insertBefore(chip, kwSearchInput);
+        });
+
+        // Ocultar placeholder si hay tags
+        if (selectedKeywords.length > 0) {
+            kwSearchInput.placeholder = '';
+        } else {
+            kwSearchInput.placeholder = 'Ej: vampiros, escolar...';
+        }
+
+        // Guardamos en formato ID_NOMBRE|ID_NOMBRE...
+        kwHiddenInput.value = selectedKeywords.map(k => `${k.id}_${k.name}`).join('|');
+    }
+
+    window.removeKeywordTag = function(id) {
+        selectedKeywords = selectedKeywords.filter(k => k.id !== id);
+        renderKeywordTags();
+    };
+
+    let kwTimeout = null;
+    kwSearchInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim();
+        clearTimeout(kwTimeout);
+        if (query.length < 2) {
+            kwSuggestions.style.display = 'none';
+            return;
+        }
+
+        kwTimeout = setTimeout(async () => {
+            try {
+                const response = await fetch(`/api/keywords/search?q=${query}`);
+                const data = await response.json();
+                showKeywordSuggestions(data.results || []);
+            } catch (err) {
+                console.error("Error fetching keywords:", err);
+            }
+        }, 300);
+    });
+
+    function showKeywordSuggestions(results) {
+        if (results.length === 0) {
+            kwSuggestions.style.display = 'none';
+            return;
+        }
+
+        kwSuggestions.innerHTML = '';
+        results.slice(0, 8).forEach(res => {
+            const div = document.createElement('div');
+            div.className = 'keyword-suggestion-item';
+            div.textContent = res.name;
+            div.onclick = () => {
+                if (!selectedKeywords.find(k => k.id === res.id.toString())) {
+                    selectedKeywords.push({ id: res.id.toString(), name: res.name });
+                    renderKeywordTags();
+                }
+                kwSearchInput.value = '';
+                kwSuggestions.style.display = 'none';
+            };
+            kwSuggestions.appendChild(div);
+        });
+        kwSuggestions.style.display = 'block';
+    }
+
+    // Cerrar sugerencias al hacer clic fuera
+    document.addEventListener('click', (e) => {
+        if (!kwSearchInput.contains(e.target) && !kwSuggestions.contains(e.target)) {
+            kwSuggestions.style.display = 'none';
+        }
+    });
+
+    // Permitir borrar con Backspace si el input está vacío
+    kwSearchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && kwSearchInput.value === '' && selectedKeywords.length > 0) {
+            selectedKeywords.pop();
+            renderKeywordTags();
+        }
+    });
+
 </script>
 {% endblock %}
