@@ -21,6 +21,19 @@
 <body>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
+    <!-- TRAILER MODAL (Global) -->
+    <div id="trailer-modal" class="trailer-modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <button id="close-modal" class="close-modal">&times;</button>
+            <div class="video-wrapper">
+                <iframe id="trailer-iframe" src="" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
     <!-- NAVBAR -->
     <header class="navbar">
         <div class="navbar-wrapper">

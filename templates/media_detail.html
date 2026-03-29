@@ -50,7 +50,7 @@
 
         <div class="poster-actions">
             {% if media.trailer_key %}
-                <button id="trailer-btn" class="btn-trailer">
+                <button id="trailer-btn" class="btn-trailer" data-key="{{ media.trailer_key }}">
                     <i class="fas fa-play"></i>
                     <span>Ver Tráiler</span>
                 </button>
@@ -301,45 +301,13 @@
 </div>
 
 {% if media.trailer_key %}
-<div id="trailer-modal" class="trailer-modal hidden">
-    <div class="modal-overlay"></div>
-    <div class="modal-content">
-        <button id="close-modal" class="close-modal">&times;</button>
-        <div class="video-wrapper">
-            <iframe id="trailer-iframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
-    </div>
-</div>
 
+
+<script src="{{ url_for('static', filename='js/media_detail.js') }}"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const trailerBtn = document.getElementById('trailer-btn');
-    const trailerModal = document.getElementById('trailer-modal');
-    if (trailerBtn && trailerModal) {
-        const iframe = document.getElementById('trailer-iframe');
-        const closeModal = document.getElementById('close-modal');
-        const overlay = trailerModal.querySelector('.modal-overlay');
-        const key = "{{ media.trailer_key }}";
-
-        const open = () => {
-            iframe.src = `https://www.youtube.com/embed/${key}?autoplay=1`;
-            trailerModal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        };
-        const close = () => {
-            trailerModal.classList.add('hidden');
-            iframe.src = '';
-            document.body.style.overflow = '';
-        };
-
-        trailerBtn.addEventListener('click', open);
-        if (closeModal) closeModal.addEventListener('click', close);
-        if (overlay) overlay.addEventListener('click', close);
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !trailerModal.classList.contains('hidden')) close();
-        });
-    }
-});
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.MediaDetail) window.MediaDetail.init();
+    });
 </script>
 {% endif %}
 
