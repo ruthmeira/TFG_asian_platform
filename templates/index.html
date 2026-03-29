@@ -2,6 +2,11 @@
 
 {% block title %}Inicio - SHIORI{% endblock %}
 
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+
 {% block content %}
 
 <div class="home-header">
@@ -18,12 +23,12 @@
 {% set type_map = {'series': 'tv', 'movies': 'movie', 'shows': 'tv'} %}
 {% set label_map = {'series': 'Serie', 'movies': 'Película', 'shows': 'Programa'} %}
 {% set loader_names = {
-    'series': 'Cargando Series...',
-    'movies': 'Cargando Películas...',
-    'shows': 'Cargando Programas...'
+    'series': 'Cargando Series',
+    'movies': 'Cargando Películas',
+    'shows': 'Cargando Programas'
 } %}
 
-<div id="main-content" style="opacity: 1;">
+<div id="main-content">
     {% for type_key, items in trending_data.items() %}
     <section class="content-section">
         <h2>
@@ -50,7 +55,7 @@
                     </a>
                 {% endfor %}
             {% else %}
-                {# Matrix Loader Premium para carga inicial vacía #}
+                {# SSR Loader #}
                 <div class="carousel-loader">
                     <div class="matrix-container">
                         <div class="matrix-column" style="animation-duration: 3s;">あ い う え お</div>
@@ -68,146 +73,16 @@
     {% endfor %}
 </div>
 
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    // Inicializar caché con los datos del servidor (SSR)
-    const serverData = {{ trending_data | tojson | safe }};
-    const activeWindow = "{{ active_window }}";
-    
-    // Solo consideramos que los datos son "validos" si al menos uno tiene items
-    const hasData = serverData.series.length > 0 || serverData.movies.length > 0 || serverData.shows.length > 0;
-    
-    const trendingCache = {
-        'day': (activeWindow === 'day' && hasData) ? serverData : null,
-        'week': (activeWindow === 'week' && hasData) ? serverData : null
-    };
-
-    let currentWindow = activeWindow;
-    
-    // Si entramos con caché vacía, forzamos carga real
-    if (!hasData) {
-        console.log("⚠️ Datos de servidor vacíos. Iniciando carga AJAX...");
-        loadAllCarousels(currentWindow);
-    }
-
-    // Pre-carga silencia de la OTRA ventana (Background fetch)
-    const otherWindow = currentWindow === 'day' ? 'week' : 'day';
-    if (!trendingCache[otherWindow]) {
-        console.log(`📡 Pre-cargando ventana '${otherWindow}' en segundo plano...`);
-        loadAllCarousels(otherWindow, true); 
-    }
-
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            const newWindow = new URL(this.href).searchParams.get('window') || 'day';
-            if (newWindow === currentWindow) {
-                e.preventDefault();
-                return;
-            }
-            e.preventDefault();
-            switchWindow(newWindow, this.href);
-        });
-    });
-
-    function switchWindow(windowType, url) {
-        currentWindow = windowType;
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            const btnWindow = new URL(btn.href).searchParams.get('window') || 'day';
-            btn.classList.toggle('active', btnWindow === windowType);
-        });
-        history.pushState({window: windowType}, '', url);
-
-        if (trendingCache[windowType]) {
-            renderFromCache(trendingCache[windowType]);
-        } else {
-            showLoaders();
-            loadAllCarousels(windowType);
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.HomeApp) {
+            window.HomeApp.init({
+                activeWindow: '{{ active_window }}',
+                serverData: {{ trending_data | tojson | safe }}
+            });
         }
-    }
-
-    function loadAllCarousels(windowType, silent = false) {
-        if (!trendingCache[windowType]) {
-            trendingCache[windowType] = { series: [], movies: [], shows: [] };
-        }
-        loadType(windowType, 'series', 'tv', 'Serie', silent);
-        loadType(windowType, 'movies', 'movie', 'Película', silent);
-        loadType(windowType, 'shows', 'tv', 'Programa', silent);
-    }
-
-    function loadType(windowType, type, apiType, label, silent) {
-        fetch(`/api/trending?window=${windowType}&type=${type}`)
-            .then(r => r.json())
-            .then(data => {
-                const items = data[type] || [];
-                if (items.length > 0) {
-                    trendingCache[windowType][type] = items;
-                    if (windowType === currentWindow && !silent) {
-                        renderItems(document.getElementById(`carousel-${type}`), items, apiType, label);
-                    }
-                } else if (!silent && windowType === currentWindow) {
-                    setTimeout(() => loadType(windowType, type, apiType, label, silent), 2000);
-                }
-            })
-            .catch(err => console.error(`Error cargando ${type}:`, err));
-    }
-
-    function renderFromCache(data) {
-        if (data.series && data.series.length > 0) renderItems(document.getElementById('carousel-series'), data.series, 'tv', 'Serie');
-        if (data.movies && data.movies.length > 0) renderItems(document.getElementById('carousel-movies'), data.movies, 'movie', 'Película');
-        if (data.shows && data.shows.length > 0) renderItems(document.getElementById('carousel-shows'), data.shows, 'tv', 'Programa');
-    }
-
-    function renderItems(container, items, type, label) {
-        if (!items || items.length === 0) return;
-        
-        container.innerHTML = items.map(item => `
-            <a href="/media/${type}/${item.id}" class="card-link">
-                <div class="card">
-                    <div class="badge">${label}</div>
-                    <img src="https://image.tmdb.org/t/p/w500${item.poster_path}" alt="${item.name || item.title}">
-                    <div class="card-body">
-                        <h4>${item.name || item.title}</h4>
-                        <h6>${item.original_name || item.original_title}</h6>
-                        <div class="card-meta">
-                            <span class="rating">⭐ ${parseFloat(item.vote_average || 0).toFixed(1)}</span>
-                            <span class="lang">${item.flag || '🌏'}</span>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        `).join('');
-    }
-
-    function showLoaders() {
-        const loaders = {
-            'carousel-series': 'Cargando Series...',
-            'carousel-movies': 'Cargando Películas...',
-            'carousel-shows': 'Cargando Programas...'
-        };
-        ['carousel-series', 'carousel-movies', 'carousel-shows'].forEach(id => {
-            const container = document.getElementById(id);
-            if (container) {
-                container.innerHTML = `
-                    <div class="carousel-loader">
-                        <div class="matrix-container">
-                            <div class="matrix-column" style="animation-duration: 3s;">あ い う え お</div>
-                            <div class="matrix-column" style="animation-duration: 4.5s;">你好 龙 爱 美</div>
-                            <div class="matrix-column" style="animation-duration: 3.5s;">ㄱ ㄴ ㄷ ㄹ ㅁ</div>
-                        </div>
-                        <div class="loading-content">
-                            <div class="shimmer-text">${loaders[id]}</div>
-                            <div class="loading-dots-glow"><span>.</span><span>.</span><span>.</span></div>
-                        </div>
-                    </div>
-                `;
-            }
-        });
-    }
-
-    window.addEventListener('popstate', e => {
-        if (e.state && e.state.window) switchWindow(e.state.window, location.href);
     });
-});
 </script>
 
 {% endblock %}

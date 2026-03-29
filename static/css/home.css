@@ -1,0 +1,172 @@
+/* ===================================================== */
+/* HOME PAGE - ESTILOS MODULARES */
+/* ===================================================== */
+
+.home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 50px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.title-section h1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
+}
+
+.title-section p {
+    margin-top: 10px;
+    color: var(--text-muted);
+    font-size: 16px;
+}
+
+/* FILTER BUTTONS (Home only) */
+.filter-controls {
+    display: flex;
+    gap: 15px;
+}
+
+.filter-btn {
+    text-decoration: none;
+    color: var(--text-muted);
+    background: #111;
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: var(--transition);
+    border: 1px solid #222;
+}
+
+.filter-btn:hover {
+    background: #1a1a1a;
+    color: var(--text-main);
+    border-color: #333;
+}
+
+.filter-btn.active {
+    background: var(--primary-gradient);
+    border-color: transparent;
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 5px 15px rgba(255, 69, 0, 0.3);
+}
+
+/* CAROUSEL */
+.carousel {
+    display: flex;
+    overflow-x: auto;
+    gap: 25px;
+    padding: 15px 0 30px 0;
+    scroll-behavior: smooth;
+}
+
+.carousel::-webkit-scrollbar {
+    height: 6px;
+}
+
+.carousel::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
+}
+
+/* HOME CARDS */
+.card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    animation: zoomInBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+@keyframes zoomInBounce {
+    0% { opacity: 0; transform: scale(0.3); }
+    70% { opacity: 0.8; transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.carousel .card-link:nth-child(1) { animation-delay: 0.05s; }
+.carousel .card-link:nth-child(2) { animation-delay: 0.1s; }
+.carousel .card-link:nth-child(3) { animation-delay: 0.15s; }
+.carousel .card-link:nth-child(4) { animation-delay: 0.2s; }
+.carousel .card-link:nth-child(5) { animation-delay: 0.25s; }
+.carousel .card-link:nth-child(n+6) { animation-delay: 0.3s; }
+
+/* CAROUSEL LOADER (Matrix) */
+.carousel-loader {
+    width: 100%;
+    height: 300px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed rgba(255, 69, 0, 0.2);
+}
+
+.matrix-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-around;
+    opacity: 0.15;
+    pointer-events: none;
+}
+
+.matrix-column {
+    font-family: monospace;
+    font-size: 1.2rem;
+    color: var(--primary);
+    writing-mode: vertical-rl;
+    animation: matrixDrop linear infinite;
+}
+
+@keyframes matrixDrop {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+}
+
+.loading-content {
+    z-index: 1;
+    text-align: center;
+}
+
+.shimmer-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: linear-gradient(90deg, #555 25%, #fff 50%, #555 75%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 2s infinite linear;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.loading-dots-glow span {
+    color: var(--primary);
+    font-size: 2rem;
+    animation: glowDots 1.5s infinite;
+}
+
+@keyframes glowDots {
+    0%, 100% { opacity: 0.3; text-shadow: none; }
+    50% { opacity: 1; text-shadow: 0 0 10px var(--primary); }
+}
