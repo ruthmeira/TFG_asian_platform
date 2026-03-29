@@ -65,9 +65,10 @@
 
             <div class="known-for-section">
                 <h2>Conocido por</h2>
-                <div class="known-for-grid">
+                <div class="known-for-grid" id="works-grid">
                     {% for work in known_for %}
-                    <a href="{{ url_for('media_detail', media_type=work.media_type_fixed, media_id=work.id) }}" class="card-link">
+                    <a href="{{ url_for('media_detail', media_type=work.media_type_fixed, media_id=work.id) }}" 
+                       class="card-link {% if loop.index > 8 %}hidden-work{% endif %}">
                         <div class="card">
                             <div class="badge">{{ work.tipo_label }}</div>
                             <img src="https://image.tmdb.org/t/p/w500{{ work.poster_path }}" alt="{{ work.display_title }}">
@@ -83,6 +84,14 @@
                     </a>
                     {% endfor %}
                 </div>
+                
+                {% if known_for|length > 8 %}
+                <div class="show-more-container">
+                    <button id="show-more-btn" class="btn-more">
+                        <i class="fas fa-plus"></i> Ver filmografía completa (+{{ known_for|length - 8 }})
+                    </button>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -201,16 +210,69 @@
     text-overflow: ellipsis;
 }
 
-@media (max-width: 768px) {
-    .person-header {
-        flex-direction: column;
+    .hidden-work {
+        display: none !important;
     }
-    .person-poster-side {
-        flex: none;
-        width: 100%;
-        max-width: 300px;
-        margin: 0 auto;
+
+    .show-more-container {
+        display: flex;
+        justify-content: center;
+        margin: 40px 0;
     }
-}
+
+    .btn-more {
+        background: rgba(255, 69, 0, 0.1);
+        border: 1px solid var(--primary);
+        color: var(--primary);
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1rem;
+    }
+
+    .btn-more:hover {
+        background: var(--primary);
+        color: #fff;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(255, 69, 0, 0.3);
+    }
+
+    .btn-more i {
+        font-size: 0.8rem;
+    }
+
+    @media (max-width: 768px) {
+        .person-header {
+            flex-direction: column;
+        }
+        .person-poster-side {
+            flex: none;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+    }
 </style>
+
+<script>
+document.getElementById('show-more-btn')?.addEventListener('click', function() {
+    const hiddenItems = document.querySelectorAll('.hidden-work');
+    const button = this;
+    
+    hiddenItems.forEach((item, index) => {
+        setTimeout(() => {
+            item.style.display = 'block';
+            item.classList.remove('hidden-work');
+            // Forzar reflow para animación si fuera necesario
+        }, index * 50); // Efecto cascada suave
+    });
+    
+    button.parentElement.style.display = 'none'; // Ocultar el contenedor del botón
+});
+</script>
 {% endblock %}

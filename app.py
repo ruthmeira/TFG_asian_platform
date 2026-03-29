@@ -1523,7 +1523,7 @@ def person_detail(person_id):
         # 2. Relevancia: Votos (indica legado) > Popularidad (indica tendencia actual)
         return (not is_program, item.get('vote_count', 0), item.get('popularity', 0))
 
-    raw_works = sorted(filtered_credits, key=calculate_relevance, reverse=True)[:8]
+    raw_works = sorted(filtered_credits, key=calculate_relevance, reverse=True)
     
     known_for = []
     for work in raw_works:
