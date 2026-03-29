@@ -496,7 +496,7 @@
                     <h2 style="font-size: 1.5rem; color: var(--primary); display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                         Última Temporada 
                         {% if media.has_multiple_seasons %}
-                            <a href="#" class="view-all-link"><span>Ver todas</span> <i class="fas fa-chevron-right"></i></a>
+                            <a href="{{ url_for('seasons', media_id=media.id) }}" class="view-all-link"><span>Ver todas</span> <i class="fas fa-chevron-right"></i></a>
                         {% endif %}
                     </h2>
                 </div>

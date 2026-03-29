@@ -979,7 +979,81 @@ def media_detail(media_type, media_id):
     )
 
 
-@app.route('/media/<media_type>/<media_id>/cast')
+@app.route('/media/tv/<int:media_id>/seasons')
+def seasons(media_id):
+    api_key = os.getenv('TMDB_API_KEY')
+    # Intentamos primero en español de España
+    url = f"https://api.themoviedb.org/3/tv/{media_id}?api_key={api_key}&language=es-ES&append_to_response=external_ids"
+    response = requests.get(url).json()
+
+    # Si no hay sinopsis o el nombre es muy pobre, probamos con México
+    if not response.get('overview') or len(response.get('overview', '')) < 10:
+        url_mx = f"https://api.themoviedb.org/3/tv/{media_id}?api_key={api_key}&language=es-MX&append_to_response=external_ids"
+        response_mx = requests.get(url_mx).json()
+        if response_mx.get('overview') and len(response_mx.get('overview', '')) > len(response.get('overview', '')):
+            response = response_mx
+
+    # Fallback final a inglés si sigue vacío
+    if not response.get('overview'):
+        url_en = f"https://api.themoviedb.org/3/tv/{media_id}?api_key={api_key}&language=en-US&append_to_response=external_ids"
+        response_en = requests.get(url_en).json()
+        response['overview'] = response_en.get('overview', 'Sin descripción')
+
+    # --- TÍTULO: TIERED FALLBACK (Misma lógica que media_detail) ---
+    title_es = response.get('name')
+    orig_title = response.get('original_name')
+    
+    if not title_es or title_es == orig_title:
+        # Nivel 2: México
+        mx_url_t = f"https://api.themoviedb.org/3/tv/{media_id}?api_key={api_key}&language=es-MX"
+        try:
+            mx_res_t = requests.get(mx_url_t).json()
+            mx_title = mx_res_t.get('name')
+            if mx_title and mx_title != orig_title:
+                response['display_title'] = mx_title
+            else:
+                # Nivel 3: Inglés
+                url_en_t = f"https://api.themoviedb.org/3/tv/{media_id}?api_key={api_key}&language=en-US"
+                res_en_t = requests.get(url_en_t).json()
+                en_title = res_en_t.get('name')
+                response['display_title'] = en_title if en_title else orig_title
+        except:
+            response['display_title'] = orig_title
+    else:
+        response['display_title'] = title_es
+
+    # También necesitamos formatear la fecha del último capítulo si existe para la última temporada
+    last_episode_date = None
+    if response.get('last_episode_to_air'):
+        le = response['last_episode_to_air']
+        if le.get('air_date'):
+            try:
+                meses = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.']
+                dt_le = datetime.strptime(le['air_date'], '%Y-%m-%d')
+                last_episode_date = f"{dt_le.day} {meses[dt_le.month-1]} {dt_le.year}"
+            except:
+                last_episode_date = le['air_date']
+    response['last_episode_date_formatted'] = last_episode_date
+
+    # Filtrar temporadas y formatear fechas
+    meses_f = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.']
+    all_seasons = []
+    
+    # TMDB las suele dar ordenadas, pero garantizamos que 0 (Especiales) vaya al final o no esté
+    raw_seasons = sorted(response.get('seasons', []), key=lambda x: x.get('season_number', 0))
+    
+    for s in raw_seasons:
+        if s.get('air_date'):
+            try:
+                dt = datetime.strptime(s['air_date'], '%Y-%m-%d')
+                s['air_date_formatted'] = f"{dt.day} {meses[dt.month-1]} {dt.year}"
+            except:
+                s['air_date_formatted'] = s['air_date']
+        all_seasons.append(s)
+
+    return render_template('seasons.html', series=response, seasons=all_seasons)
+
+@app.route('/media/<media_type>/<int:media_id>/cast')
 def media_cast(media_type, media_id):
     api_key = os.getenv("TMDB_API_KEY")
     
