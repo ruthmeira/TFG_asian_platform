@@ -159,16 +159,18 @@
                 {% for actor in cast %}
                 <div class="cast-card">
                     <div class="cast-avatar">
-                        {% if actor.profile_path %}
-                            <img src="https://image.tmdb.org/t/p/w185{{ actor.profile_path }}" alt="{{ actor.name }}">
-                        {% else %}
-                            <div class="no-avatar" style="height: 100%; display: flex; align-items: center; justify-content: center; background: #222; color: #555;">
-                                <i class="fas fa-user-circle" style="font-size: 3rem;"></i>
-                            </div>
-                        {% endif %}
+                        <a href="{{ url_for('person_detail', person_id=actor.id) }}">
+                            {% if actor.profile_path %}
+                                <img src="https://image.tmdb.org/t/p/w185{{ actor.profile_path }}" alt="{{ actor.name }}">
+                            {% else %}
+                                <div class="no-avatar" style="height: 100%; display: flex; align-items: center; justify-content: center; background: #222; color: #555;">
+                                    <i class="fas fa-user-circle" style="font-size: 3rem;"></i>
+                                </div>
+                            {% endif %}
+                        </a>
                     </div>
                     <div class="credit-info">
-                        <span class="name">{{ actor.name }}</span>
+                        <a href="{{ url_for('person_detail', person_id=actor.id) }}" class="name">{{ actor.name }}</a>
                         <span class="role">{{ actor.character | safe }}</span>
                     </div>
                 </div>

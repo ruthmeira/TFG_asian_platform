@@ -2823,3 +2823,33 @@ body {
     margin-bottom: 30px;
     color: #fff;
 }
+
+/* Person links styling - Sin subrayado y centrados */
+.cast-avatar a, .credit-photo-small a {
+    text-decoration: none !important;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.cast-avatar a img, .credit-photo-small a img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.work-card {
+    text-decoration: none !important;
+    display: block;
+}
+
+.credit-info a.name, .credit-info-row a.name, .work-card span {
+    text-decoration: none !important;
+    color: #fff;
+    transition: var(--transition);
+}
+
+.credit-info a.name:hover, .credit-info-row a.name:hover, .work-card:hover .work-title {
+    color: var(--primary);
+    text-decoration: none !important;
+}

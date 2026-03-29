@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}{{ person.name }} - SHIORI{% endblock %}
+
+{% block content %}
+<div class="person-detail-container">
+    <div class="person-header">
+        <div class="person-poster-side">
+            <div class="person-photo">
+                {% if person.profile_path %}
+                    <img src="https://image.tmdb.org/t/p/h632{{ person.profile_path }}" alt="{{ person.name }}">
+                {% else %}
+                    <div class="no-photo-person">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="person-info-sidebar">
+                <h3>Información Personal</h3>
+                <div class="info-item">
+                    <strong>Nacimiento:</strong>
+                    <span>{{ person.birthday or 'N/A' }}</span>
+                </div>
+                {% if person.deathday %}
+                <div class="info-item">
+                    <strong>Fallecimiento:</strong>
+                    <span>{{ person.deathday }}</span>
+                </div>
+                {% endif %}
+                <div class="info-item">
+                    <strong>Lugar de nacimiento:</strong>
+                    <span>{{ person.place_of_birth or 'N/A' }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>Género:</strong>
+                    <span>{{ 'Masculino' if person.gender == 2 else ('Femenino' if person.gender == 1 else 'No binario') }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="person-content-side">
+            <h1 class="person-name">{{ person.name }}</h1>
+            
+            {% if person.biography %}
+            <div class="biography-section">
+                <h2>Biografía</h2>
+                <p class="bio-text">{{ person.biography }}</p>
+            </div>
+            {% endif %}
+
+            <div class="known-for-section">
+                <h2>Conocido por</h2>
+                <div class="known-for-grid">
+                    {% for work in known_for %}
+                    <a href="{{ url_for('media_detail', media_type=work.media_type, media_id=work.id) }}" class="work-card">
+                        <div class="work-poster">
+                            {% if work.poster_path %}
+                                <img src="https://image.tmdb.org/t/p/w342{{ work.poster_path }}" alt="{{ work.title or work.name }}">
+                            {% else %}
+                                <div class="no-poster-small">No image</div>
+                            {% endif %}
+                        </div>
+                        <span class="work-title">{{ work.title or work.name }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.person-detail-container {
+    max-width: 1200px;
+    margin: 100px auto 50px;
+    padding: 0 20px;
+}
+
+.person-header {
+    display: flex;
+    gap: 40px;
+}
+
+.person-poster-side {
+    flex: 0 0 300px;
+}
+
+.person-photo {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+    border: 1px solid rgba(255,255,255,0.1);
+    background: #1a1a1a;
+    aspect-ratio: 2/3;
+    margin-bottom: 30px;
+}
+
+.person-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.person-info-sidebar h3 {
+    font-size: 1.2rem;
+    color: var(--primary);
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255,69,0,0.2);
+    padding-bottom: 10px;
+}
+
+.info-item {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.info-item strong {
+    font-size: 0.9rem;
+    color: #fff;
+}
+
+.info-item span {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.person-content-side {
+    flex-grow: 1;
+}
+
+.person-name {
+    font-size: 3rem;
+    margin-bottom: 30px;
+    color: #fff;
+}
+
+.biography-section h2, .known-for-section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.bio-text {
+    line-height: 1.8;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    margin-bottom: 40px;
+    text-align: justify;
+}
+
+.known-for-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 20px;
+}
+
+.work-card {
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.work-card:hover {
+    transform: translateY(-5px);
+}
+
+.work-poster {
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 2/3;
+    background: #111;
+    margin-bottom: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.work-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.work-title {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+    .person-header {
+        flex-direction: column;
+    }
+    .person-poster-side {
+        flex: none;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+}
+</style>
+{% endblock %}

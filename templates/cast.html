@@ -30,16 +30,18 @@
                     {% for actor in cast %}
                         <div class="credit-item-row">
                             <div class="credit-photo-small">
-                                {% if actor.profile_path %}
-                                    <img src="https://image.tmdb.org/t/p/w185{{ actor.profile_path }}" alt="{{ actor.name }}">
-                                {% else %}
-                                    <div class="no-photo-small">
-                                        <i class="fas fa-user-circle"></i>
-                                    </div>
-                                {% endif %}
+                                <a href="{{ url_for('person_detail', person_id=actor.id) }}">
+                                    {% if actor.profile_path %}
+                                        <img src="https://image.tmdb.org/t/p/w185{{ actor.profile_path }}" alt="{{ actor.name }}">
+                                    {% else %}
+                                        <div class="no-photo-small">
+                                            <i class="fas fa-user-circle"></i>
+                                        </div>
+                                    {% endif %}
+                                </a>
                             </div>
                             <div class="credit-info-row">
-                                <span class="name">{{ actor.name }}</span>
+                                <a href="{{ url_for('person_detail', person_id=actor.id) }}" class="name">{{ actor.name }}</a>
                                 <span class="role">{{ actor.character | safe }}</span>
                             </div>
                         </div>
@@ -58,16 +60,18 @@
                     {% for member in crew %}
                         <div class="credit-item-row">
                             <div class="credit-photo-small">
-                                {% if member.profile_path %}
-                                    <img src="https://image.tmdb.org/t/p/w185{{ member.profile_path }}" alt="{{ member.name }}">
-                                {% else %}
-                                    <div class="no-photo-small">
-                                        <i class="fas fa-user-circle"></i>
-                                    </div>
-                                {% endif %}
+                                <a href="{{ url_for('person_detail', person_id=member.id) }}">
+                                    {% if member.profile_path %}
+                                        <img src="https://image.tmdb.org/t/p/w185{{ member.profile_path }}" alt="{{ member.name }}">
+                                    {% else %}
+                                        <div class="no-photo-small">
+                                            <i class="fas fa-user-circle"></i>
+                                        </div>
+                                    {% endif %}
+                                </a>
                             </div>
                             <div class="credit-info-row">
-                                <span class="name">{{ member.name }}</span>
+                                <a href="{{ url_for('person_detail', person_id=member.id) }}" class="name">{{ member.name }}</a>
                                 <span class="role">{{ member.job | safe }}</span>
                             </div>
                         </div>
@@ -116,7 +120,7 @@
     border-radius: 50%;
     overflow: hidden;
     flex-shrink: 0;
-    border: 2px solid rgba(255, 69, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .credit-photo-small img {

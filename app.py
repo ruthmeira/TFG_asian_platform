@@ -1200,6 +1200,22 @@ def api_keywords_search():
         return jsonify({'results': []})
 
 
+@app.route('/person/<person_id>')
+def person_detail(person_id):
+    api_key = os.getenv("TMDB_API_KEY")
+    url = f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=es-ES"
+    res = requests.get(url).json()
+    
+    # También traemos los trabajos de esa persona (películas y series)
+    credits_url = f"https://api.themoviedb.org/3/person/{person_id}/combined_credits?api_key={api_key}&language=es-ES"
+    credits = requests.get(credits_url).json()
+    
+    # Ordenar por popularidad para mostrar lo mejor primero
+    known_for = sorted(credits.get('cast', []) + credits.get('crew', []), key=lambda x: x.get('popularity', 0), reverse=True)[:10]
+    
+    return render_template('person_detail.html', person=res, known_for=known_for)
+
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
