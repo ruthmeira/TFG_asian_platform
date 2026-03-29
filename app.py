@@ -840,6 +840,13 @@ def media_detail(media_type, media_id):
     
     res['flag'] = bandera_final or '🌏'
 
+    # --- FORMATO DE DURACIÓN ---
+    runtime = res.get('runtime') or (res.get('episode_run_time', [0])[0] if media_type == 'tv' and res.get('episode_run_time') else 0)
+    if runtime > 0:
+        hours = runtime // 60
+        minutes = runtime % 60
+        res['runtime_formatted'] = f"{hours}h {minutes}m" if hours > 0 else f"{minutes}m"
+
     # --- NOMBRE DEL IDIOMA ---
     lang_names = {
         'ko': 'Coreano', 'ja': 'Japonés', 'zh': 'Chino', 'cn': 'Chino', 'yue': 'Cantonés',

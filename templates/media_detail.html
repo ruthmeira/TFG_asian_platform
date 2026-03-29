@@ -65,6 +65,8 @@
             <p><strong>Estado:</strong> {{ media.status }}</p>
             {% if media.number_of_episodes %}
                 <p><strong>Episodios:</strong> {{ media.number_of_episodes }}</p>
+            {% elif media.runtime_formatted %}
+                <p><strong>Duración:</strong> {{ media.runtime_formatted }}</p>
             {% endif %}
 
             <p><strong>Géneros:</strong>
