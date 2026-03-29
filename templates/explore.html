@@ -304,13 +304,5 @@
             }
         }
     </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.ExploreApp) {
-                const config = JSON.parse(document.getElementById('explore-data').textContent);
-                window.ExploreApp.init(config);
-            }
-        });
-    </script>
 
 {% endblock %}

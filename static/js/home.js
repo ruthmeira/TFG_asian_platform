@@ -151,3 +151,16 @@ window.HomeApp = (() => {
 
     return { init };
 })();
+
+// Auto-initialization if data element is present
+document.addEventListener('DOMContentLoaded', () => {
+    const dataEl = document.getElementById('home-data');
+    if (dataEl && window.HomeApp) {
+        try {
+            const config = JSON.parse(dataEl.textContent);
+            window.HomeApp.init(config);
+        } catch (e) {
+            console.error("Error initializing HomeApp:", e);
+        }
+    }
+});

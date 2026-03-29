@@ -80,14 +80,5 @@
     }
 </script>
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const dataEl = document.getElementById('home-data');
-        if (dataEl && window.HomeApp) {
-            const config = JSON.parse(dataEl.textContent);
-            window.HomeApp.init(config);
-        }
-    });
-</script>
 
 {% endblock %}

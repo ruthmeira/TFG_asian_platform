@@ -300,15 +300,6 @@
 
 </div>
 
-{% if media.trailer_key %}
-
-
 <script src="{{ url_for('static', filename='js/media_detail.js') }}"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        if (window.MediaDetail) window.MediaDetail.init();
-    });
-</script>
-{% endif %}
 
 {% endblock %}

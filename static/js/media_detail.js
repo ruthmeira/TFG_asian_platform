@@ -113,3 +113,11 @@ window.MediaDetail = (() => {
 
     return { init };
 })();
+
+// Auto-initialization if media-detail-container is present
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.querySelector('.media-detail-container');
+    if (container && window.MediaDetail) {
+        window.MediaDetail.init(container);
+    }
+});

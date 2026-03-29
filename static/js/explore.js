@@ -549,3 +549,16 @@ window.ExploreApp = (() => {
 
     return { init, openDetail, closeDetail };
 })();
+
+// Auto-initialization if data element is present
+document.addEventListener('DOMContentLoaded', () => {
+    const dataEl = document.getElementById('explore-data');
+    if (dataEl && window.ExploreApp) {
+        try {
+            const config = JSON.parse(dataEl.textContent);
+            window.ExploreApp.init(config);
+        } catch (e) {
+            console.error("Error initializing ExploreApp:", e);
+        }
+    }
+});
