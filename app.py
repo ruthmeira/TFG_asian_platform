@@ -1448,18 +1448,45 @@ def person_detail(person_id):
     gender_map = {1: "Femenino", 2: "Masculino", 3: "No Binario"}
     res['gender_name'] = gender_map.get(res.get('gender'), "-")
 
-    # También conocido como (AKA) - Limpiamos la lista
-    # Buscamos si alguno de los alias está en caracteres asiáticos para ponerlo como "Nombre Artístico"
+    # --- BÚSQUEDA DEL NOMBRE NATIVO (Simular lógica de TMDB) ---
     import re
-    asian_re = re.compile(r'[\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\uac00-\ud7af]')
-    res['artistic_name'] = "-"
+    re_any_asian = re.compile(r'[\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\uac00-\ud7af]')
     
+    res['artistic_name'] = "-"
+    place = res.get('place_of_birth', '').lower()
+    
+    # Mapeo de región a idioma nativo
+    native_lang_map = {
+        'china': 'zh-CN', 'taiwan': 'zh-TW', 'hong kong': 'zh-HK',
+        'japan': 'ja-JP', 'korea': 'ko-KR'
+    }
+    
+    # 1. Intentar obtener el nombre nativo directamente de la traducción oficial de TMDB
+    target_native_lang = None
+    for region, lang_code in native_lang_map.items():
+        if region in place:
+            target_native_lang = lang_code
+            break
+            
+    if target_native_lang:
+        try:
+            native_url = f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language={target_native_lang}"
+            native_res = requests.get(native_url).json()
+            native_name = native_res.get('name')
+            if native_name and re_any_asian.search(native_name):
+                res['artistic_name'] = native_name
+        except: pass
+
+    # 2. Paso 2 (Alias): Si aún no tenemos nombre nativo, buscar en los ALIAS (AKA) como fallback
     aka_list = res.get('also_known_as', [])
     clean_aka = []
+    
     for aka in aka_list:
-        if asian_re.search(aka) and res['artistic_name'] == "-":
-            res['artistic_name'] = aka # El primero que encontremos en japonés/coreano/chino
-        else:
+        # Si no tenemos nombre artístico y el alias es asiático, lo guardamos
+        if res['artistic_name'] == "-" and re_any_asian.search(aka):
+            res['artistic_name'] = aka
+        elif aka != res['artistic_name']:
+            # Evitamos duplicar el nombre artístico en la lista de alias
             clean_aka.append(aka)
     
     res['aka_list'] = clean_aka if clean_aka else ["-"]
