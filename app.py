@@ -1397,8 +1397,8 @@ def person_detail(person_id):
     import re
     asian_re = re.compile(r'[\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\uac00-\ud7af]')
     
-    # --- NIVEL 1: ESPAÑA (es-ES) ---
-    url_es = f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=es-ES"
+    # --- NIVEL 1: ESPAÑA (es-ES) + REDES SOCIALES ---
+    url_es = f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=es-ES&append_to_response=external_ids"
     res = requests.get(url_es).json()
     
     # --- NIVEL 2: MÉXICO (es-MX) ---
@@ -1442,11 +1442,43 @@ def person_detail(person_id):
     if not res.get('name'): res['name'] = "-"
     if not res.get('biography'): res['biography'] = "No tenemos una biografía."
     if not res.get('place_of_birth'): res['place_of_birth'] = "-"
-    if not res.get('birthday'): res['birthday'] = "-"
+    # --- CÁLCULO DE EDAD Y FORMATEO DE FECHAS (DD/MM/YYYY) ---
+    birthday = res.get('birthday')
+    deathday = res.get('deathday')
+    today = datetime.today()
+    
+    if birthday:
+        try:
+            b_date = datetime.strptime(birthday, "%Y-%m-%d")
+            # Si ha fallecido, calculamos edad al morir; si no, edad actual
+            ref_date = datetime.strptime(deathday, "%Y-%m-%d") if deathday else today
+            age = ref_date.year - b_date.year - ((ref_date.month, ref_date.day) < (b_date.month, b_date.day))
+            res['birthday'] = f"{b_date.strftime('%d/%m/%Y')} ({age} años)"
+        except:
+            res['birthday'] = birthday  # Fallback a original si falla
+    else:
+        res['birthday'] = "-"
+
+    if deathday:
+        try:
+            d_date = datetime.strptime(deathday, "%Y-%m-%d")
+            res['deathday'] = d_date.strftime("%d/%m/%Y")
+        except:
+            pass
     
     # Mapeo de Género
     gender_map = {1: "Femenino", 2: "Masculino", 3: "No Binario"}
     res['gender_name'] = gender_map.get(res.get('gender'), "-")
+
+    # --- EXTRACCIÓN DE REDES SOCIALES ---
+    ext_ids = res.get('external_ids', {})
+    socials = {}
+    if ext_ids.get('instagram_id'): socials['instagram'] = f"https://instagram.com/{ext_ids['instagram_id']}"
+    if ext_ids.get('twitter_id'): socials['twitter'] = f"https://twitter.com/{ext_ids['twitter_id']}"
+    if ext_ids.get('tiktok_id'): socials['tiktok'] = f"https://tiktok.com/@{ext_ids['tiktok_id']}"
+    if ext_ids.get('facebook_id'): socials['facebook'] = f"https://facebook.com/{ext_ids['facebook_id']}"
+    
+    res['socials'] = socials
 
     # --- BÚSQUEDA DEL NOMBRE NATIVO (Simular lógica de TMDB) ---
     import re
