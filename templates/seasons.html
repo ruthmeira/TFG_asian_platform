@@ -212,16 +212,19 @@
                         {% endif %}
                     </div>
                     <div class="season-meta-mini">
+                        {% set meta_exists = false %}
                         {% if s.air_date_formatted %}
                             <span class="season-year-text">Estreno: {{ s.air_date_formatted }}</span>
+                            {% set meta_exists = true %}
                         {% endif %}
                         
                         {% if loop.last and series.last_episode_date_formatted %}
-                            {% if s.air_date_formatted %}<span class="season-dot">•</span>{% endif %}
+                            {% if meta_exists %}<span class="season-dot">•</span>{% endif %}
                             <span class="season-year-text">Último: {{ series.last_episode_date_formatted }}</span>
+                            {% set meta_exists = true %}
                         {% endif %}
                         
-                        <span class="season-dot">•</span>
+                        {% if meta_exists %}<span class="season-dot">•</span>{% endif %}
                         <span class="season-ep-count">{{ s.episode_count }} episodios</span>
                     </div>
                     <p class="season-overview-mini">

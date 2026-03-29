@@ -15,7 +15,7 @@
     justify-content: center !important;
     align-items: center !important;
     gap: 12px !important;
-    padding: 20px 0 10px 0 !important;
+    padding: 0 !important; /* Espaciado unificado por el gap del padre */
     width: 100% !important;
 }
 
@@ -91,7 +91,7 @@
 .poster-actions {
     display: flex;
     flex-direction: column;
-    gap: 15px !important; /* Distancia idéntica entre todos */
+    gap: 10px !important; /* Reducido de 15px */
 }
 
 /* Modal del Tráiler */
@@ -281,6 +281,7 @@
             <div class="no-poster">Sin Imagen</div>
         {% endif %}
 
+        {% if media.social_links.instagram or media.social_links.twitter or media.social_links.facebook or media.social_links.homepage %}
         <div class="media-links-row">
             {# Grupo 1: Redes Sociales #}
             {% if media.social_links.instagram or media.social_links.twitter or media.social_links.facebook %}
@@ -309,6 +310,7 @@
                 </div>
             {% endif %}
         </div>
+        {% endif %}
 
         <div class="poster-actions">
             {% if media.trailer_key %}
@@ -517,16 +519,19 @@
                             {% endif %}
                         </div>
                         <div class="season-meta-mini">
+                            {% set s_meta_exists = false %}
                             {% if media.last_season.air_date_formatted %}
                                 <span class="season-year">Estreno: {{ media.last_season.air_date_formatted }}</span>
+                                {% set s_meta_exists = true %}
                             {% endif %}
                             
                             {% if media.last_episode_date_formatted %}
-                                {% if media.last_season.air_date_formatted %}<span class="season-dot">•</span>{% endif %}
+                                {% if s_meta_exists %}<span class="season-dot">•</span>{% endif %}
                                 <span class="season-year">Último: {{ media.last_episode_date_formatted }}</span>
+                                {% set s_meta_exists = true %}
                             {% endif %}
                             
-                            <span class="season-dot">•</span>
+                            {% if s_meta_exists %}<span class="season-dot">•</span>{% endif %}
                             <span class="season-ep-count">{{ media.last_season.episode_count }} episodios</span>
                         </div>
                         <p class="season-overview-mini">
