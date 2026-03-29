@@ -38,10 +38,14 @@
     <header class="navbar">
         <div class="navbar-wrapper">
             <div class="logo">
-                SHIORI
+                <a href="{{ url_for('home') }}">SHIORI</a>
             </div>
 
-            <nav class="nav-links">
+            <button class="menu-toggle" id="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <nav class="nav-links" id="nav-links">
                 <a href="{{ url_for('home') }}" class="{{ 'active' if request.endpoint == 'home' }}"><i
                         class="fas fa-home"></i> Inicio</a>
                 <a href="{{ url_for('explore') }}" class="{{ 'active' if request.endpoint == 'explore' }}"><i
