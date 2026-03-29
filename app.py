@@ -720,8 +720,8 @@ def media_detail(media_type, media_id):
     except:
         pass
 
-    # 1. Intentamos primero en Español de España + External IDs
-    url_es = f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-ES&append_to_response=external_ids"
+    # 1. Intentamos primero en Español de España + External IDs + Videos
+    url_es = f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-ES&append_to_response=external_ids,videos"
     res = requests.get(url_es).json()
     
     # --- SOCIAL MEDIA ---
@@ -732,6 +732,21 @@ def media_detail(media_type, media_id):
     if ext_ids.get('facebook_id'): socials['facebook'] = f"https://facebook.com/{ext_ids['facebook_id']}"
     if res.get('homepage'): socials['homepage'] = res.get('homepage')
     res['social_links'] = socials
+
+    # --- TRAILER: TIERED FALLBACK (ES > EN) ---
+    videos_es = res.get('videos', {}).get('results', [])
+    trailer_key = next((v['key'] for v in videos_es if v['type'] == 'Trailer' and v['site'] == 'YouTube'), None)
+    
+    if not trailer_key:
+        # Nivel 2: Intentar en Inglés (suele haber más tráilers disponibles)
+        try:
+            url_v_en = f"https://api.themoviedb.org/3/{media_type}/{media_id}/videos?api_key={api_key}&language=en-US"
+            v_en_res = requests.get(url_v_en).json()
+            trailer_key = next((v['key'] for v in v_en_res.get('results', []) if v['type'] == 'Trailer' and v['site'] == 'YouTube'), None)
+        except:
+            pass
+            
+    res['trailer_key'] = trailer_key
     
     # --- TÍTULO: TIERED FALLBACK (ES-ES > ES-MX > EN-US) ---
     title_es = res.get('title') if media_type == 'movie' else res.get('name')
