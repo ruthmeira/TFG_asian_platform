@@ -2,6 +2,10 @@
 
 {% block title %}Login{% endblock %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+
 {% block content %}
 
 <div class="matrix-container" style="justify-content: space-between; padding: 0 1%;">
