@@ -92,13 +92,18 @@
         <button type="submit">Crear Cuenta</button>
     </form>
 
+    <script id="register-data" type="application/json">{{ countries_list | tojson }}</script>
     <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            AuthApp.initRegionDropdown({
-                countries: {{ countries_list | tojson }},
-                containerId: 'region-dropdown-container'
-            });
+            const dataEl = document.getElementById('register-data');
+            if (dataEl && window.AuthApp) {
+                const countries = JSON.parse(dataEl.textContent);
+                AuthApp.initRegionDropdown({
+                    countries: countries,
+                    containerId: 'region-dropdown-container'
+                });
+            }
         });
     </script>
 

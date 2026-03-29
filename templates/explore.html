@@ -286,28 +286,31 @@
 <!-- Scripts moved to static/js/explore.js and media_detail.js -->
 <script src="{{ url_for('static', filename='js/media_detail.js') }}"></script>
 <script src="{{ url_for('static', filename='js/explore.js') }}"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // Initialize Explore page with data from Jinja
-        if (window.ExploreApp) {
-            window.ExploreApp.init({
-                availableCountries: {{ available_countries | tojson | safe }},
-                genresByType: {{ genres_by_type | tojson | safe }},
-                filters: {
-                    type: '{{ media_type }}',
-                    year: '{{ current_year }}',
-                    lang: '{{ current_lang }}',
-                    genre: '{{ current_genre }}',
-                    without_genre: '{{ current_without_genre }}',
-                    sort_by: '{{ current_sort }}',
-                    status: '{{ current_status_id }}',
-                    watch_providers: '{{ current_providers }}',
-                    watch_region: '{{ current_region or "ES" }}',
-                    keywords: '{{ current_keywords }}'
-                }
-            });
+    <script id="explore-data" type="application/json">
+        {
+            "availableCountries": {{ available_countries | tojson | safe }},
+            "genresByType": {{ genres_by_type | tojson | safe }},
+            "filters": {
+                "type": "{{ media_type }}",
+                "year": "{{ current_year }}",
+                "lang": "{{ current_lang }}",
+                "genre": "{{ current_genre }}",
+                "without_genre": "{{ current_without_genre }}",
+                "sort_by": "{{ current_sort }}",
+                "status": "{{ current_status_id }}",
+                "watch_providers": "{{ current_providers }}",
+                "watch_region": "{{ current_region or "ES" }}",
+                "keywords": "{{ current_keywords }}"
+            }
         }
-    });
-</script>
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.ExploreApp) {
+                const config = JSON.parse(document.getElementById('explore-data').textContent);
+                window.ExploreApp.init(config);
+            }
+        });
+    </script>
 
 {% endblock %}

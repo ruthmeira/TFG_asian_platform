@@ -73,14 +73,19 @@
     {% endfor %}
 </div>
 
+<script id="home-data" type="application/json">
+    {
+        "activeWindow": "{{ active_window }}",
+        "serverData": {{ trending_data | tojson | safe }}
+    }
+</script>
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        if (window.HomeApp) {
-            window.HomeApp.init({
-                activeWindow: '{{ active_window }}',
-                serverData: {{ trending_data | tojson | safe }}
-            });
+        const dataEl = document.getElementById('home-data');
+        if (dataEl && window.HomeApp) {
+            const config = JSON.parse(dataEl.textContent);
+            window.HomeApp.init(config);
         }
     });
 </script>
