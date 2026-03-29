@@ -2,7 +2,60 @@
 
 {% block title %}{{ media.display_title }} - SHIORI{% endblock %}
 
+{% block extra_css %}
+{% endblock %}
+
 {% block content %}
+
+<style>
+/* Estilos para redes sociales en Media Detail (Columna lateral) - RESCATE */
+.media-links-row {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 20px 0 10px 0 !important;
+    width: 100% !important;
+}
+
+.links-group {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 10px !important;
+    align-items: center !important;
+}
+
+.media-links-row a {
+    color: var(--text-muted) !important;
+    text-decoration: none !important;
+    font-size: 1.2rem !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    background: rgba(255,255,255,0.05) !important;
+    width: 42px !important;
+    height: 42px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+.media-links-row a:hover {
+    color: var(--primary) !important;
+    background: rgba(255,69,0,0.1) !important;
+    border-color: rgba(255,69,0,0.3) !important;
+    transform: translateY(-3px);
+}
+
+.link-divider {
+    color: rgba(255,255,255,0.15) !important;
+    font-size: 1.2rem !important;
+    font-weight: 300 !important;
+    margin: 0 5px !important;
+    user-select: none !important;
+}
+</style>
 
 <div class="media-detail-container">
 
@@ -12,6 +65,35 @@
         {% else %}
             <div class="no-poster">Sin Imagen</div>
         {% endif %}
+
+        <div class="media-links-row">
+            {# Grupo 1: Redes Sociales #}
+            {% if media.social_links.instagram or media.social_links.twitter or media.social_links.facebook %}
+                <div class="links-group">
+                    {% if media.social_links.instagram %}
+                        <a href="{{ media.social_links.instagram }}" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    {% endif %}
+                    {% if media.social_links.twitter %}
+                        <a href="{{ media.social_links.twitter }}" target="_blank" title="Twitter/X"><i class="fab fa-twitter"></i></a>
+                    {% endif %}
+                    {% if media.social_links.facebook %}
+                        <a href="{{ media.social_links.facebook }}" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {# Separador 1 #}
+            {% if (media.social_links.instagram or media.social_links.twitter or media.social_links.facebook) and media.social_links.homepage %}
+                <span class="link-divider">|</span>
+            {% endif %}
+
+            {# Grupo 2: Sitio Oficial #}
+            {% if media.social_links.homepage %}
+                <div class="links-group">
+                    <a href="{{ media.social_links.homepage }}" target="_blank" title="Sitio Web Oficial"><i class="fas fa-globe"></i></a>
+                </div>
+            {% endif %}
+        </div>
 
         <div class="poster-actions">
             <button id="favorite-btn"
