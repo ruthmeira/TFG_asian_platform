@@ -77,7 +77,10 @@
             
             <div class="biography-section">
                 <h2>Biografía</h2>
-                <p class="bio-text">{{ person.biography | safe }}</p>
+                <div class="bio-wrapper">
+                    <p class="bio-text" id="bio-text">{{ person.biography | safe }}</p>
+                </div>
+                <button id="bio-toggle" class="btn-read-more" style="display: none;">Leer más <i class="fas fa-chevron-down"></i></button>
             </div>
 
             <div class="known-for-section">
@@ -225,12 +228,39 @@
     margin-bottom: 20px;
 }
 
+.bio-wrapper {
+    position: relative;
+}
+
 .bio-text {
     line-height: 1.8;
     color: var(--text-muted);
     font-size: 1.05rem;
-    margin-bottom: 40px;
+    margin-bottom: 10px;
     text-align: justify;
+    overflow: hidden;
+    max-height: 150px; /* Altura inicial */
+    transition: max-height 0.4s ease; /* Transición dinámica real */
+}
+
+/* Eliminamos la clase .expanded en el CSS porque lo controlaremos por JS para que sea fluido */
+
+.btn-read-more {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 40px;
+}
+
+.btn-read-more:hover {
+    opacity: 0.8;
 }
 
 .known-for-grid {
@@ -319,6 +349,31 @@ document.getElementById('show-more-btn')?.addEventListener('click', function() {
     });
     
     button.parentElement.style.display = 'none'; // Ocultar el contenedor del botón
+});
+
+// Lógica "Leer más" Biografía
+document.addEventListener('DOMContentLoaded', function() {
+    const bioText = document.getElementById('bio-text');
+    const toggleBtn = document.getElementById('bio-toggle');
+    
+    // Si la biografía es más alta que el contenedor inicial, mostramos el botón
+    if (bioText.scrollHeight > bioText.clientHeight + 20) {
+        toggleBtn.style.display = 'flex';
+    }
+    
+    toggleBtn.addEventListener('click', function() {
+        if (bioText.classList.contains('expanded')) {
+            // CERRAR: Volvemos a los 150px
+            bioText.style.maxHeight = '150px';
+            bioText.classList.remove('expanded');
+            toggleBtn.innerHTML = 'Leer más <i class="fas fa-chevron-down"></i>';
+        } else {
+            // ABRIR: Ponemos su altura REAL exacta (scrollHeight)
+            bioText.style.maxHeight = bioText.scrollHeight + 'px';
+            bioText.classList.add('expanded');
+            toggleBtn.innerHTML = 'Leer menos <i class="fas fa-chevron-up"></i>';
+        }
+    });
 });
 </script>
 {% endblock %}
