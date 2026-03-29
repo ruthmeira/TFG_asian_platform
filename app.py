@@ -635,9 +635,11 @@ def media_detail(media_type, media_id):
         if is_tv:
             for a in credits.get('cast', []):
                 if 'roles' in a and a['roles']:
+                    # Ordenar roles por número de episodios (más episodios primero)
+                    sorted_roles = sorted(a['roles'], key=lambda x: x.get('episode_count', 0), reverse=True)
                     # Unimos cada personaje con su contador de episodios individual
                     role_strings = []
-                    for r in a['roles']:
+                    for r in sorted_roles:
                         char = r.get('character', '')
                         if char:
                             count = r.get('episode_count', 0)
@@ -646,9 +648,10 @@ def media_detail(media_type, media_id):
                     a['character'] = "<br>".join(role_strings)
             for m in credits.get('crew', []):
                 if 'jobs' in m and m['jobs']:
-                    # Lo mismo para el equipo técnico
+                    # Ordenar trabajos por número de episodios
+                    sorted_jobs = sorted(m['jobs'], key=lambda x: x.get('episode_count', 0), reverse=True)
                     job_strings = []
-                    for j in m['jobs']:
+                    for j in sorted_jobs:
                         job_name = j.get('job', '')
                         if job_name:
                             count = j.get('episode_count', 0)
@@ -853,11 +856,12 @@ def media_cast(media_type, media_id):
     final_crew = credits.get('crew', [])
     
     if media_type == 'tv' or (res.get('media_type') == 'tv' or 'first_air_date' in res):
-        # Para TV unimos cada rol de aggregate_credits con sus episodios propios
+        # Para TV unimos cada rol de aggregate_credits con sus episodios propios (ordenado por importancia)
         for actor in final_cast:
             if 'roles' in actor and actor['roles']:
+                sorted_roles = sorted(actor['roles'], key=lambda x: x.get('episode_count', 0), reverse=True)
                 role_strings = []
-                for r in actor['roles']:
+                for r in sorted_roles:
                     char = r.get('character', '')
                     if char:
                         count = r.get('episode_count', 0)
@@ -867,8 +871,9 @@ def media_cast(media_type, media_id):
                 
         for member in final_crew:
             if 'jobs' in member and member['jobs']:
+                sorted_jobs = sorted(member['jobs'], key=lambda x: x.get('episode_count', 0), reverse=True)
                 job_strings = []
-                for j in member['jobs']:
+                for j in sorted_jobs:
                     job_name = j.get('job', '')
                     if job_name:
                         count = j.get('episode_count', 0)
@@ -876,11 +881,45 @@ def media_cast(media_type, media_id):
                         job_strings.append(f"{job_name} <small style='opacity:0.6'>({count} {label})</small>")
                 member['job'] = "<br>".join(job_strings)
     
+    # Agrupar equipo por departamento
+    crew_by_dept = {}
+    dept_translations = {
+        "Directing": "Dirección",
+        "Writing": "Guion",
+        "Production": "Producción",
+        "Art": "Arte",
+        "Camera": "Cámara",
+        "Costume & Make-Up": "Vestuario y Maquillaje",
+        "Visual Effects": "Efectos Visuales",
+        "Sound": "Sonido",
+        "Editing": "Edición",
+        "Crew": "Equipo",
+        "Lighting": "Iluminación",
+        "Actors": "Actores"
+    }
+
+    for member in final_crew:
+        # Normalización de roles/jobs ya hecha arriba
+        dept_en = member.get('department', 'Others')
+        dept_es = dept_translations.get(dept_en, dept_en)
+        if dept_es not in crew_by_dept:
+            crew_by_dept[dept_es] = []
+        crew_by_dept[dept_es].append(member)
+
+    # Ordenar departamentos alfabéticamente y sus miembros también
+    sorted_depts = sorted(crew_by_dept.keys())
+    sorted_crew = {}
+    for dept in sorted_depts:
+        # Ordenar miembros por cargo (job) alfabéticamente
+        members = sorted(crew_by_dept[dept], key=lambda x: x.get('job', ''))
+        sorted_crew[dept] = members
+
     return render_template(
         'cast.html',
         media=res,
         cast=final_cast,
-        crew=final_crew,
+        crew_by_dept=sorted_crew,
+        crew_total=len(final_crew),
         media_type=media_type,
         media_id=media_id
     )

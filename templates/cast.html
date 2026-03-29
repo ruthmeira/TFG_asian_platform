@@ -53,30 +53,36 @@
 
         {# COLUMNA DERECHA: EQUIPO #}
         <div class="cast-column">
-            {% if crew %}
+            {% if crew_by_dept %}
             <section class="crew-full-section">
-                <h2 class="section-title"><i class="fas fa-video"></i> Equipo Técnico <span>({{ crew|length }})</span></h2>
-                <div class="credits-list-vertical">
-                    {% for member in crew %}
-                        <div class="credit-item-row">
-                            <div class="credit-photo-small">
-                                <a href="{{ url_for('person_detail', person_id=member.id) }}">
-                                    {% if member.profile_path %}
-                                        <img src="https://image.tmdb.org/t/p/w185{{ member.profile_path }}" alt="{{ member.name }}">
-                                    {% else %}
-                                        <div class="no-photo-small">
-                                            <i class="fas fa-user-circle"></i>
-                                        </div>
-                                    {% endif %}
-                                </a>
+                <h2 class="section-title"><i class="fas fa-video"></i> Equipo Técnico <span>({{ crew_total }})</span></h2>
+                
+                {% for dept, members in crew_by_dept.items() %}
+                <div class="department-group">
+                    <h3 class="dept-subtitle">{{ dept }} <span>({{ members|length }})</span></h3>
+                    <div class="credits-list-vertical">
+                        {% for member in members %}
+                            <div class="credit-item-row">
+                                <div class="credit-photo-small">
+                                    <a href="{{ url_for('person_detail', person_id=member.id) }}">
+                                        {% if member.profile_path %}
+                                            <img src="https://image.tmdb.org/t/p/w185{{ member.profile_path }}" alt="{{ member.name }}">
+                                        {% else %}
+                                            <div class="no-photo-small">
+                                                <i class="fas fa-user-circle"></i>
+                                            </div>
+                                        {% endif %}
+                                    </a>
+                                </div>
+                                <div class="credit-info-row">
+                                    <a href="{{ url_for('person_detail', person_id=member.id) }}" class="name">{{ member.name }}</a>
+                                    <span class="role">{{ (member.job or member.job_es) | safe }}</span>
+                                </div>
                             </div>
-                            <div class="credit-info-row">
-                                <a href="{{ url_for('person_detail', person_id=member.id) }}" class="name">{{ member.name }}</a>
-                                <span class="role">{{ member.job | safe }}</span>
-                            </div>
-                        </div>
-                    {% endfor %}
+                        {% endfor %}
+                    </div>
                 </div>
+                {% endfor %}
             </section>
             {% endif %}
         </div>
@@ -158,6 +164,27 @@
     line-height: 1.4;
 }
 
+.department-group {
+    margin-bottom: 40px;
+}
+
+.dept-subtitle {
+    font-size: 1.2rem;
+    color: #fff;
+    margin-bottom: 15px;
+    padding: 8px 15px;
+    border-left: 4px solid var(--primary);
+    background: linear-gradient(90deg, rgba(255,69,0,0.1) 0%, transparent 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dept-subtitle span {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.3);
+    font-weight: 300;
+}
 
 /* Estilos previos mantenidos o adaptados */
 .back-link-premium {
@@ -193,18 +220,6 @@
     font-size: 1.8rem;
     color: rgba(255,255,255,0.3);
     font-weight: 300;
-}
-
-.badge-cast {
-    background: rgba(255, 69, 0, 0.1);
-    color: var(--primary);
-    padding: 8px 20px;
-    border-radius: 50px;
-    border: 1px solid rgba(255, 69, 0, 0.3);
-    font-weight: 700;
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
 }
 
 .section-title {
