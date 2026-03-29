@@ -694,8 +694,8 @@ def media_detail(media_type, media_id):
                     a['character'] = "<br>".join(role_strings)
             for m in credits.get('crew', []):
                 if 'jobs' in m and m['jobs']:
-                    # Ordenar trabajos por número de episodios
-                    sorted_jobs = sorted(m['jobs'], key=lambda x: x.get('episode_count', 0), reverse=True)
+                    # Ordenar trabajos alfabéticamente por nombre de cargo (A-Z)
+                    sorted_jobs = sorted(m['jobs'], key=lambda x: x.get('job', '').lower())
                     job_strings = []
                     for j in sorted_jobs:
                         job_name = j.get('job', '')
@@ -970,7 +970,8 @@ def media_cast(media_type, media_id):
                 
         for member in final_crew:
             if 'jobs' in member and member['jobs']:
-                sorted_jobs = sorted(member['jobs'], key=lambda x: x.get('episode_count', 0), reverse=True)
+                # Ordenar trabajos alfabéticamente por nombre de cargo (A-Z)
+                sorted_jobs = sorted(member['jobs'], key=lambda x: x.get('job', '').lower())
                 job_strings = []
                 for j in sorted_jobs:
                     job_name = j.get('job', '')
