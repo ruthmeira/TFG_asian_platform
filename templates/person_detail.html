@@ -67,17 +67,19 @@
                 <h2>Conocido por</h2>
                 <div class="known-for-grid">
                     {% for work in known_for %}
-                    <a href="{{ url_for('media_detail', media_type=work.media_type, media_id=work.id) }}" class="work-card">
-                        <div class="work-poster">
-                            {% if work.poster_path %}
-                                <img src="https://image.tmdb.org/t/p/w342{{ work.poster_path }}" alt="{{ work.display_title }}">
-                            {% else %}
-                                <div class="no-poster-small">
-                                    <i class="fas fa-image" style="opacity: 0.2; font-size: 2rem;"></i>
+                    <a href="{{ url_for('media_detail', media_type=work.media_type_fixed, media_id=work.id) }}" class="card-link">
+                        <div class="card">
+                            <div class="badge">{{ work.tipo_label }}</div>
+                            <img src="https://image.tmdb.org/t/p/w500{{ work.poster_path }}" alt="{{ work.display_title }}">
+                            <div class="card-body">
+                                <h4>{{ work.display_title }}</h4>
+                                <h6>{{ work.original_title_h6 }}</h6>
+                                <div class="card-meta">
+                                    <span class="rating">⭐ {{ (work.vote_average or 0)|round(1) }}</span>
+                                    <span class="lang">{{ work.flag }}</span>
                                 </div>
-                            {% endif %}
+                            </div>
                         </div>
-                        <span class="work-title">{{ work.display_title }}</span>
                     </a>
                     {% endfor %}
                 </div>
@@ -178,32 +180,14 @@
 
 .known-for-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 30px;
 }
 
-.work-card {
+.card-link {
     text-decoration: none;
-    transition: var(--transition);
-}
-
-.work-card:hover {
-    transform: translateY(-5px);
-}
-
-.work-poster {
-    border-radius: 12px;
-    overflow: hidden;
-    aspect-ratio: 2/3;
-    background: #111;
-    margin-bottom: 8px;
-    border: 1px solid rgba(255,255,255,0.1);
-}
-
-.work-poster img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    color: inherit;
+    display: block;
 }
 
 .work-title {

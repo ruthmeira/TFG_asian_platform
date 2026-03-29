@@ -11,8 +11,29 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import requests
 import os
 import time
+GLOBAL_COUNTRIES_LIST = [{"code": "AL", "name": "Albania", "emoji": "🇦🇱"}, {"code": "DE", "name": "Alemania", "emoji": "🇩🇪"}, {"code": "AD", "name": "Andorra", "emoji": "🇦🇩"}, {"code": "AO", "name": "Angola", "emoji": "🇦🇴"}, {"code": "AG", "name": "Antigua y Barbuda", "emoji": "🇦🇬"}, {"code": "SA", "name": "Arabia Saudí", "emoji": "🇸🇦"}, {"code": "DZ", "name": "Argelia", "emoji": "🇩🇿"}, {"code": "AR", "name": "Argentina", "emoji": "🇦🇷"}, {"code": "AU", "name": "Australia", "emoji": "🇦🇺"}, {"code": "AT", "name": "Austria", "emoji": "🇦🇹"}, {"code": "AZ", "name": "Azerbaiyán", "emoji": "🇦🇿"}, {"code": "BS", "name": "Bahamas", "emoji": "🇧🇸"}, {"code": "BB", "name": "Barbados", "emoji": "🇧🇧"}, {"code": "BH", "name": "Baréin", "emoji": "🇧🇭"}, {"code": "BZ", "name": "Belice", "emoji": "🇧🇿"}, {"code": "BM", "name": "Bermudas", "emoji": "🇧🇲"}, {"code": "BY", "name": "Bielorrusia", "emoji": "🇧🇾"}, {"code": "BO", "name": "Bolivia", "emoji": "🇧🇴"}, {"code": "BA", "name": "Bosnia-Herzegovina", "emoji": "🇧🇦"}, {"code": "BR", "name": "Brasil", "emoji": "🇧🇷"}, {"code": "BG", "name": "Bulgaria", "emoji": "🇧🇬"}, {"code": "BF", "name": "Burkina Faso", "emoji": "🇧🇫"}, {"code": "BE", "name": "Bélgica", "emoji": "🇧🇪"}, {"code": "CV", "name": "Cabo Verde", "emoji": "🇨🇻"}, {"code": "CM", "name": "Camerún", "emoji": "🇨🇲"}, {"code": "CA", "name": "Canadá", "emoji": "🇨🇦"}, {"code": "CN", "name": "China", "emoji": "🇨🇳"}, {"code": "QA", "name": "Catar", "emoji": "🇶🇦"}, {"code": "TD", "name": "Chad", "emoji": "🇹🇩"}, {"code": "CL", "name": "Chile", "emoji": "🇨🇱"}, {"code": "CY", "name": "Chipre", "emoji": "🇨🇾"}, {"code": "VA", "name": "Ciudad del Vaticano", "emoji": "🇻🇦"}, {"code": "CO", "name": "Colombia", "emoji": "🇨🇴"}, {"code": "KR", "name": "Corea del Sur", "emoji": "🇰🇷"}, {"code": "CR", "name": "Costa Rica", "emoji": "🇨🇷"}, {"code": "CI", "name": "Costa de Marfil", "emoji": "🇨🇮"}, {"code": "HR", "name": "Croacia", "emoji": "🇭🇷"}, {"code": "CU", "name": "Cuba", "emoji": "🇨🇺"}, {"code": "DK", "name": "Dinamarca", "emoji": "🇩🇰"}, {"code": "EC", "name": "Ecuador", "emoji": "🇪🇨"}, {"code": "EG", "name": "Egipto", "emoji": "🇪🇬"}, {"code": "SV", "name": "El Salvador", "emoji": "🇸🇻"}, {"code": "AE", "name": "Emiratos Árabes Unidos", "emoji": "🇦🇪"}, {"code": "SK", "name": "Eslovaquia", "emoji": "🇸🇰"}, {"code": "SI", "name": "Eslovenia", "emoji": "🇸🇮"}, {"code": "ES", "name": "España", "emoji": "🇪🇸"}, {"code": "US", "name": "Estados Unidos", "emoji": "🇺🇸"}, {"code": "EE", "name": "Estonia", "emoji": "🇪🇪"}, {"code": "PH", "name": "Filipinas", "emoji": "🇵🇭"}, {"code": "FI", "name": "Finlandia", "emoji": "🇫🇮"}, {"code": "FJ", "name": "Fiyi", "emoji": "🇫🇯"}, {"code": "FR", "name": "Francia", "emoji": "🇫🇷"}, {"code": "GH", "name": "Ghana", "emoji": "🇬🇭"}, {"code": "GI", "name": "Gibraltar", "emoji": "🇬🇮"}, {"code": "GR", "name": "Grecia", "emoji": "🇬🇷"}, {"code": "GP", "name": "Guadalupe", "emoji": "🇬🇵"}, {"code": "GT", "name": "Guatemala", "emoji": "🇬🇹"}, {"code": "GF", "name": "Guayana Francesa", "emoji": "🇬🇫"}, {"code": "GQ", "name": "Guinea Ecuatorial", "emoji": "🇬🇶"}, {"code": "GY", "name": "Guyana", "emoji": "🇬🇾"}, {"code": "HN", "name": "Honduras", "emoji": "🇭🇳"}, {"code": "HU", "name": "Hungría", "emoji": "🇭🇺"}, {"code": "IN", "name": "India", "emoji": "🇮🇳"}, {"code": "ID", "name": "Indonesia", "emoji": "🇮🇩"}, {"code": "IQ", "name": "Iraq", "emoji": "🇮🇶"}, {"code": "IE", "name": "Irlanda", "emoji": "🇮🇪"}, {"code": "IS", "name": "Islandia", "emoji": "🇮🇸"}, {"code": "TC", "name": "Islas Turcas y Caicos", "emoji": "🇹🇨"}, {"code": "IL", "name": "Israel", "emoji": "🇮🇱"}, {"code": "IT", "name": "Italia", "emoji": "🇮🇹"}, {"code": "JM", "name": "Jamaica", "emoji": "🇯🇲"}, {"code": "JP", "name": "Japón", "emoji": "🇯🇵"}, {"code": "JO", "name": "Jordania", "emoji": "🇯🇴"}, {"code": "KE", "name": "Kenia", "emoji": "🇰🇪"}, {"code": "XK", "name": "Kosovo", "emoji": "🇽🇰"}, {"code": "KW", "name": "Kuwait", "emoji": "🇰🇼"}, {"code": "LV", "name": "Letonia", "emoji": "🇱🇻"}, {"code": "LY", "name": "Libia", "emoji": "🇱🇾"}, {"code": "LI", "name": "Liechtenstein", "emoji": "🇱🇮"}, {"code": "LT", "name": "Lituania", "emoji": "🇱🇹"}, {"code": "LU", "name": "Luxemburgo", "emoji": "🇱🇺"}, {"code": "LB", "name": "Líbano", "emoji": "🇱🇧"}, {"code": "MO", "name": "Macao", "emoji": "🇲🇴"}, {"code": "MK", "name": "Macedonia", "emoji": "🇲🇰"}, {"code": "MG", "name": "Madagascar", "emoji": "🇲🇬"}, {"code": "MY", "name": "Malasía", "emoji": "🇲🇾"}, {"code": "MW", "name": "Malaui", "emoji": "🇲🇼"}, {"code": "ML", "name": "Mali", "emoji": "🇲🇱"}, {"code": "MT", "name": "Malta", "emoji": "🇲🇹"}, {"code": "MA", "name": "Marruecos", "emoji": "🇲🇦"}, {"code": "MU", "name": "Mauricio", "emoji": "🇲🇺"}, {"code": "MD", "name": "Moldavia", "emoji": "🇲🇩"}, {"code": "ME", "name": "Montenegro", "emoji": "🇲🇪"}, {"code": "MZ", "name": "Mozambique", "emoji": "🇲🇿"}, {"code": "MX", "name": "México", "emoji": "🇲🇽"}, {"code": "MC", "name": "Mónaco", "emoji": "🇲🇨"}, {"code": "NI", "name": "Nicaragua", "emoji": "🇳🇮"}, {"code": "NG", "name": "Nigeria", "emoji": "🇳🇬"}, {"code": "NO", "name": "Noruega", "emoji": "🇳🇴"}, {"code": "NZ", "name": "Nueva Zelanda", "emoji": "🇳🇿"}, {"code": "NE", "name": "Níger", "emoji": "🇳🇪"}, {"code": "OM", "name": "Omán", "emoji": "🇴🇲"}, {"code": "PK", "name": "Pakistán", "emoji": "🇵🇰"}, {"code": "PA", "name": "Panamá", "emoji": "🇵🇦"}, {"code": "PG", "name": "Papúa Nueva Guinea", "emoji": "🇵🇬"}, {"code": "PY", "name": "Paraguay", "emoji": "🇵🇾"}, {"code": "NL", "name": "Países Bajos", "emoji": "🇳🇱"}, {"code": "PE", "name": "Perú", "emoji": "🇵🇪"}, {"code": "PF", "name": "Polinesia Francesa", "emoji": "🇵🇫"}, {"code": "PL", "name": "Polonia", "emoji": "🇵🇱"}, {"code": "PT", "name": "Portugal", "emoji": "🇵🇹"}, {"code": "HK", "name": "RAE de Hong Kong (China)", "emoji": "🇭🇰"}, {"code": "GB", "name": "Reino Unido", "emoji": "🇬🇧"}, {"code": "CZ", "name": "República Checa", "emoji": "🇨🇿"}, {"code": "CD", "name": "República Democrática del Congo", "emoji": "🇨🇩"}, {"code": "DO", "name": "República Dominicana", "emoji": "🇩🇴"}, {"code": "RO", "name": "Rumanía", "emoji": "🇷🇴"}, {"code": "RU", "name": "Rusia", "emoji": "🇷🇺"}, {"code": "SM", "name": "San Marino", "emoji": "🇸🇲"}, {"code": "LC", "name": "Santa Lucía", "emoji": "🇱🇨"}, {"code": "SN", "name": "Senegal", "emoji": "🇸🇳"}, {"code": "RS", "name": "Serbia", "emoji": "🇷🇸"}, {"code": "SC", "name": "Seychelles", "emoji": "🇸🇨"}, {"code": "SG", "name": "Singapur", "emoji": "🇸🇬"}, {"code": "ZA", "name": "Sudáfrica", "emoji": "🇿🇦"}, {"code": "SE", "name": "Suecia", "emoji": "🇸🇪"}, {"code": "CH", "name": "Suiza", "emoji": "🇨🇭"}, {"code": "TH", "name": "Tailandia", "emoji": "🇹🇭"}, {"code": "TW", "name": "Taiwán", "emoji": "🇹🇼"}, {"code": "TZ", "name": "Tanzania", "emoji": "🇹🇿"}, {"code": "PS", "name": "Territorios Palestinos", "emoji": "🇵🇸"}, {"code": "TT", "name": "Trinidad y Tobago", "emoji": "🇹🇹"}, {"code": "TR", "name": "Turquía", "emoji": "🇹🇷"}, {"code": "TN", "name": "Túnez", "emoji": "🇹🇳"}, {"code": "UA", "name": "Ucrania", "emoji": "🇺🇦"}, {"code": "UG", "name": "Uganda", "emoji": "🇺🇬"}, {"code": "UY", "name": "Uruguay", "emoji": "🇺🇾"}, {"code": "VE", "name": "Venezuela", "emoji": "🇻🇪"}, {"code": "YE", "name": "Yemen", "emoji": "🇾🇪"}, {"code": "ZM", "name": "Zambia", "emoji": "🇿🇲"}, {"code": "ZW", "name": "Zimbabue", "emoji": "🇿🇼"}]
 
-GLOBAL_COUNTRIES_LIST = [{"code": "AL", "name": "Albania", "emoji": "🇦🇱"}, {"code": "DE", "name": "Alemania", "emoji": "🇩🇪"}, {"code": "AD", "name": "Andorra", "emoji": "🇦🇩"}, {"code": "AO", "name": "Angola", "emoji": "🇦🇴"}, {"code": "AG", "name": "Antigua y Barbuda", "emoji": "🇦🇬"}, {"code": "SA", "name": "Arabia Saudí", "emoji": "🇸🇦"}, {"code": "DZ", "name": "Argelia", "emoji": "🇩🇿"}, {"code": "AR", "name": "Argentina", "emoji": "🇦🇷"}, {"code": "AU", "name": "Australia", "emoji": "🇦🇺"}, {"code": "AT", "name": "Austria", "emoji": "🇦🇹"}, {"code": "AZ", "name": "Azerbaiyán", "emoji": "🇦🇿"}, {"code": "BS", "name": "Bahamas", "emoji": "🇧🇸"}, {"code": "BB", "name": "Barbados", "emoji": "🇧🇧"}, {"code": "BH", "name": "Baréin", "emoji": "🇧🇭"}, {"code": "BZ", "name": "Belice", "emoji": "🇧🇿"}, {"code": "BM", "name": "Bermudas", "emoji": "🇧🇲"}, {"code": "BY", "name": "Bielorrusia", "emoji": "🇧🇾"}, {"code": "BO", "name": "Bolivia", "emoji": "🇧🇴"}, {"code": "BA", "name": "Bosnia-Herzegovina", "emoji": "🇧🇦"}, {"code": "BR", "name": "Brasil", "emoji": "🇧🇷"}, {"code": "BG", "name": "Bulgaria", "emoji": "🇧🇬"}, {"code": "BF", "name": "Burkina Faso", "emoji": "🇧🇫"}, {"code": "BE", "name": "Bélgica", "emoji": "🇧🇪"}, {"code": "CV", "name": "Cabo Verde", "emoji": "🇨🇻"}, {"code": "CM", "name": "Camerún", "emoji": "🇨🇲"}, {"code": "CA", "name": "Canadá", "emoji": "🇨🇦"}, {"code": "QA", "name": "Catar", "emoji": "🇶🇦"}, {"code": "TD", "name": "Chad", "emoji": "🇹🇩"}, {"code": "CL", "name": "Chile", "emoji": "🇨🇱"}, {"code": "CY", "name": "Chipre", "emoji": "🇨🇾"}, {"code": "VA", "name": "Ciudad del Vaticano", "emoji": "🇻🇦"}, {"code": "CO", "name": "Colombia", "emoji": "🇨🇴"}, {"code": "KR", "name": "Corea del Sur", "emoji": "🇰🇷"}, {"code": "CR", "name": "Costa Rica", "emoji": "🇨🇷"}, {"code": "CI", "name": "Costa de Marfil", "emoji": "🇨🇮"}, {"code": "HR", "name": "Croacia", "emoji": "🇭🇷"}, {"code": "CU", "name": "Cuba", "emoji": "🇨🇺"}, {"code": "DK", "name": "Dinamarca", "emoji": "🇩🇰"}, {"code": "EC", "name": "Ecuador", "emoji": "🇪🇨"}, {"code": "EG", "name": "Egipto", "emoji": "🇪🇬"}, {"code": "SV", "name": "El Salvador", "emoji": "🇸🇻"}, {"code": "AE", "name": "Emiratos Árabes Unidos", "emoji": "🇦🇪"}, {"code": "SK", "name": "Eslovaquia", "emoji": "🇸🇰"}, {"code": "SI", "name": "Eslovenia", "emoji": "🇸🇮"}, {"code": "ES", "name": "España", "emoji": "🇪🇸"}, {"code": "US", "name": "Estados Unidos", "emoji": "🇺🇸"}, {"code": "EE", "name": "Estonia", "emoji": "🇪🇪"}, {"code": "PH", "name": "Filipinas", "emoji": "🇵🇭"}, {"code": "FI", "name": "Finlandia", "emoji": "🇫🇮"}, {"code": "FJ", "name": "Fiyi", "emoji": "🇫🇯"}, {"code": "FR", "name": "Francia", "emoji": "🇫🇷"}, {"code": "GH", "name": "Ghana", "emoji": "🇬🇭"}, {"code": "GI", "name": "Gibraltar", "emoji": "🇬🇮"}, {"code": "GR", "name": "Grecia", "emoji": "🇬🇷"}, {"code": "GP", "name": "Guadalupe", "emoji": "🇬🇵"}, {"code": "GT", "name": "Guatemala", "emoji": "🇬🇹"}, {"code": "GF", "name": "Guayana Francesa", "emoji": "🇬🇫"}, {"code": "GQ", "name": "Guinea Ecuatorial", "emoji": "🇬🇶"}, {"code": "GY", "name": "Guyana", "emoji": "🇬🇾"}, {"code": "HN", "name": "Honduras", "emoji": "🇭🇳"}, {"code": "HU", "name": "Hungría", "emoji": "🇭🇺"}, {"code": "IN", "name": "India", "emoji": "🇮🇳"}, {"code": "ID", "name": "Indonesia", "emoji": "🇮🇩"}, {"code": "IQ", "name": "Iraq", "emoji": "🇮🇶"}, {"code": "IE", "name": "Irlanda", "emoji": "🇮🇪"}, {"code": "IS", "name": "Islandia", "emoji": "🇮🇸"}, {"code": "TC", "name": "Islas Turcas y Caicos", "emoji": "🇹🇨"}, {"code": "IL", "name": "Israel", "emoji": "🇮🇱"}, {"code": "IT", "name": "Italia", "emoji": "🇮🇹"}, {"code": "JM", "name": "Jamaica", "emoji": "🇯🇲"}, {"code": "JP", "name": "Japón", "emoji": "🇯🇵"}, {"code": "JO", "name": "Jordania", "emoji": "🇯🇴"}, {"code": "KE", "name": "Kenia", "emoji": "🇰🇪"}, {"code": "XK", "name": "Kosovo", "emoji": "🇽🇰"}, {"code": "KW", "name": "Kuwait", "emoji": "🇰🇼"}, {"code": "LV", "name": "Letonia", "emoji": "🇱🇻"}, {"code": "LY", "name": "Libia", "emoji": "🇱🇾"}, {"code": "LI", "name": "Liechtenstein", "emoji": "🇱🇮"}, {"code": "LT", "name": "Lituania", "emoji": "🇱🇹"}, {"code": "LU", "name": "Luxemburgo", "emoji": "🇱🇺"}, {"code": "LB", "name": "Líbano", "emoji": "🇱🇧"}, {"code": "MK", "name": "Macedonia", "emoji": "🇲🇰"}, {"code": "MG", "name": "Madagascar", "emoji": "🇲🇬"}, {"code": "MY", "name": "Malasia", "emoji": "🇲🇾"}, {"code": "MW", "name": "Malaui", "emoji": "🇲🇼"}, {"code": "ML", "name": "Mali", "emoji": "🇲🇱"}, {"code": "MT", "name": "Malta", "emoji": "🇲🇹"}, {"code": "MA", "name": "Marruecos", "emoji": "🇲🇦"}, {"code": "MU", "name": "Mauricio", "emoji": "🇲🇺"}, {"code": "MD", "name": "Moldavia", "emoji": "🇲🇩"}, {"code": "ME", "name": "Montenegro", "emoji": "🇲🇪"}, {"code": "MZ", "name": "Mozambique", "emoji": "🇲🇿"}, {"code": "MX", "name": "México", "emoji": "🇲🇽"}, {"code": "MC", "name": "Mónaco", "emoji": "🇲🇨"}, {"code": "NI", "name": "Nicaragua", "emoji": "🇳🇮"}, {"code": "NG", "name": "Nigeria", "emoji": "🇳🇬"}, {"code": "NO", "name": "Noruega", "emoji": "🇳🇴"}, {"code": "NZ", "name": "Nueva Zelanda", "emoji": "🇳🇿"}, {"code": "NE", "name": "Níger", "emoji": "🇳🇪"}, {"code": "OM", "name": "Omán", "emoji": "🇴🇲"}, {"code": "PK", "name": "Pakistán", "emoji": "🇵🇰"}, {"code": "PA", "name": "Panamá", "emoji": "🇵🇦"}, {"code": "PG", "name": "Papúa Nueva Guinea", "emoji": "🇵🇬"}, {"code": "PY", "name": "Paraguay", "emoji": "🇵🇾"}, {"code": "NL", "name": "Países Bajos", "emoji": "🇳🇱"}, {"code": "PE", "name": "Perú", "emoji": "🇵🇪"}, {"code": "PF", "name": "Polinesia Francesa", "emoji": "🇵🇫"}, {"code": "PL", "name": "Polonia", "emoji": "🇵🇱"}, {"code": "PT", "name": "Portugal", "emoji": "🇵🇹"}, {"code": "HK", "name": "RAE de Hong Kong (China)", "emoji": "🇭🇰"}, {"code": "GB", "name": "Reino Unido", "emoji": "🇬🇧"}, {"code": "CZ", "name": "República Checa", "emoji": "🇨🇿"}, {"code": "CD", "name": "República Democrática del Congo", "emoji": "🇨🇩"}, {"code": "DO", "name": "República Dominicana", "emoji": "🇩🇴"}, {"code": "RO", "name": "Rumanía", "emoji": "🇷🇴"}, {"code": "RU", "name": "Rusia", "emoji": "🇷🇺"}, {"code": "SM", "name": "San Marino", "emoji": "🇸🇲"}, {"code": "LC", "name": "Santa Lucía", "emoji": "🇱🇨"}, {"code": "SN", "name": "Senegal", "emoji": "🇸🇳"}, {"code": "RS", "name": "Serbia", "emoji": "🇷🇸"}, {"code": "SC", "name": "Seychelles", "emoji": "🇸🇨"}, {"code": "SG", "name": "Singapur", "emoji": "🇸🇬"}, {"code": "ZA", "name": "Sudáfrica", "emoji": "🇿🇦"}, {"code": "SE", "name": "Suecia", "emoji": "🇸🇪"}, {"code": "CH", "name": "Suiza", "emoji": "🇨🇭"}, {"code": "TH", "name": "Tailandia", "emoji": "🇹🇭"}, {"code": "TW", "name": "Taiwán", "emoji": "🇹🇼"}, {"code": "TZ", "name": "Tanzania", "emoji": "🇹🇿"}, {"code": "PS", "name": "Territorios Palestinos", "emoji": "🇵🇸"}, {"code": "TT", "name": "Trinidad y Tobago", "emoji": "🇹🇹"}, {"code": "TR", "name": "Turquía", "emoji": "🇹🇷"}, {"code": "TN", "name": "Túnez", "emoji": "🇹🇳"}, {"code": "UA", "name": "Ucrania", "emoji": "🇺🇦"}, {"code": "UG", "name": "Uganda", "emoji": "🇺🇬"}, {"code": "UY", "name": "Uruguay", "emoji": "🇺🇾"}, {"code": "VE", "name": "Venezuela", "emoji": "🇻🇪"}, {"code": "YE", "name": "Yemen", "emoji": "🇾🇪"}, {"code": "ZM", "name": "Zambia", "emoji": "🇿🇲"}, {"code": "ZW", "name": "Zimbabue", "emoji": "🇿🇼"}]
+GLOBAL_COUNTRIES_LIST = [{"code": "AL", "name": "Albania", "emoji": "🇦🇱"}, {"code": "DE", "name": "Alemania", "emoji": "🇩🇪"}, {"code": "AD", "name": "Andorra", "emoji": "🇦🇩"}, {"code": "AO", "name": "Angola", "emoji": "🇦🇴"}, {"code": "AG", "name": "Antigua y Barbuda", "emoji": "🇦🇬"}, {"code": "SA", "name": "Arabia Saudí", "emoji": "🇸🇦"}, {"code": "DZ", "name": "Argelia", "emoji": "🇩🇿"}, {"code": "AR", "name": "Argentina", "emoji": "🇦🇷"}, {"code": "AU", "name": "Australia", "emoji": "🇦🇺"}, {"code": "AT", "name": "Austria", "emoji": "🇦🇹"}, {"code": "AZ", "name": "Azerbaiyán", "emoji": "🇦🇿"}, {"code": "BS", "name": "Bahamas", "emoji": "🇧🇸"}, {"code": "BB", "name": "Barbados", "emoji": "🇧🇧"}, {"code": "BH", "name": "Baréin", "emoji": "🇧🇭"}, {"code": "BZ", "name": "Belice", "emoji": "🇧🇿"}, {"code": "BM", "name": "Bermudas", "emoji": "🇧🇲"}, {"code": "BY", "name": "Bielorrusia", "emoji": "🇧🇾"}, {"code": "BO", "name": "Bolivia", "emoji": "🇧🇴"}, {"code": "BA", "name": "Bosnia-Herzegovina", "emoji": "🇧🇦"}, {"code": "BR", "name": "Brasil", "emoji": "🇧🇷"}, {"code": "BG", "name": "Bulgaria", "emoji": "🇧🇬"}, {"code": "BF", "name": "Burkina Faso", "emoji": "🇧🇫"}, {"code": "BE", "name": "Bélgica", "emoji": "🇧🇪"}, {"code": "CV", "name": "Cabo Verde", "emoji": "🇨🇻"}, {"code": "KH", "name": "Camboya", "emoji": "🇰🇭"}, {"code": "CM", "name": "Camerún", "emoji": "🇨🇲"}, {"code": "CA", "name": "Canadá", "emoji": "🇨🇦"}, {"code": "CN", "name": "China", "emoji": "🇨🇳"}, {"code": "QA", "name": "Catar", "emoji": "🇶🇦"}, {"code": "TD", "name": "Chad", "emoji": "🇹🇩"}, {"code": "CL", "name": "Chile", "emoji": "🇨🇱"}, {"code": "CY", "name": "Chipre", "emoji": "🇨🇾"}, {"code": "VA", "name": "Ciudad del Vaticano", "emoji": "🇻🇦"}, {"code": "CO", "name": "Colombia", "emoji": "🇨🇴"}, {"code": "KR", "name": "Corea del Sur", "emoji": "🇰🇷"}, {"code": "CR", "name": "Costa Rica", "emoji": "🇨🇷"}, {"code": "CI", "name": "Costa de Marfil", "emoji": "🇨🇮"}, {"code": "HR", "name": "Croacia", "emoji": "🇭🇷"}, {"code": "CU", "name": "Cuba", "emoji": "🇨🇺"}, {"code": "DK", "name": "Dinamarca", "emoji": "🇩🇰"}, {"code": "EC", "name": "Ecuador", "emoji": "🇪🇨"}, {"code": "EG", "name": "Egipto", "emoji": "🇪🇬"}, {"code": "SV", "name": "El Salvador", "emoji": "🇸🇻"}, {"code": "AE", "name": "Emiratos Árabes Unidos", "emoji": "🇦🇪"}, {"code": "SK", "name": "Eslovaquia", "emoji": "🇸🇰"}, {"code": "SI", "name": "Eslovenia", "emoji": "🇸🇮"}, {"code": "ES", "name": "España", "emoji": "🇪🇸"}, {"code": "US", "name": "Estados Unidos", "emoji": "🇺🇸"}, {"code": "EE", "name": "Estonia", "emoji": "🇪🇪"}, {"code": "PH", "name": "Filipinas", "emoji": "🇵🇭"}, {"code": "FI", "name": "Finlandia", "emoji": "🇫🇮"}, {"code": "FJ", "name": "Fiyi", "emoji": "🇫🇯"}, {"code": "FR", "name": "Francia", "emoji": "🇫🇷"}, {"code": "GH", "name": "Ghana", "emoji": "🇬🇭"}, {"code": "GI", "name": "Gibraltar", "emoji": "🇬🇮"}, {"code": "GR", "name": "Grecia", "emoji": "🇬🇷"}, {"code": "GP", "name": "Guadalupe", "emoji": "🇬🇵"}, {"code": "GT", "name": "Guatemala", "emoji": "🇬🇹"}, {"code": "GF", "name": "Guayana Francesa", "emoji": "🇬🇫"}, {"code": "GQ", "name": "Guinea Ecuatorial", "emoji": "🇬🇶"}, {"code": "GY", "name": "Guyana", "emoji": "🇬🇾"}, {"code": "HN", "name": "Honduras", "emoji": "🇭🇳"}, {"code": "HU", "name": "Hungría", "emoji": "🇭🇺"}, {"code": "IN", "name": "India", "emoji": "🇮🇳"}, {"code": "ID", "name": "Indonesia", "emoji": "🇮🇩"}, {"code": "IQ", "name": "Iraq", "emoji": "🇮🇶"}, {"code": "IE", "name": "Irlanda", "emoji": "🇮🇪"}, {"code": "IS", "name": "Islandia", "emoji": "🇮🇸"}, {"code": "TC", "name": "Islas Turcas y Caicos", "emoji": "🇹🇨"}, {"code": "IL", "name": "Israel", "emoji": "🇮🇱"}, {"code": "IT", "name": "Italia", "emoji": "🇮🇹"}, {"code": "JM", "name": "Jamaica", "emoji": "🇯🇲"}, {"code": "JP", "name": "Japón", "emoji": "🇯🇵"}, {"code": "JO", "name": "Jordania", "emoji": "🇯🇴"}, {"code": "KE", "name": "Kenia", "emoji": "🇰🇪"}, {"code": "XK", "name": "Kosovo", "emoji": "🇽🇰"}, {"code": "KW", "name": "Kuwait", "emoji": "🇰🇼"}, {"code": "LA", "name": "Laos", "emoji": "🇱🇦"}, {"code": "LV", "name": "Letonia", "emoji": "🇱🇻"}, {"code": "LY", "name": "Libia", "emoji": "🇱🇾"}, {"code": "LI", "name": "Liechtenstein", "emoji": "🇱🇮"}, {"code": "LT", "name": "Lituania", "emoji": "🇱🇹"}, {"code": "LU", "name": "Luxemburgo", "emoji": "🇱🇺"}, {"code": "LB", "name": "Líbano", "emoji": "🇱🇧"}, {"code": "MO", "name": "Macao", "emoji": "🇲🇴"}, {"code": "MK", "name": "Macedonia", "emoji": "🇲🇰"}, {"code": "MG", "name": "Madagascar", "emoji": "🇲🇬"}, {"code": "MY", "name": "Malasia", "emoji": "🇲🇾"}, {"code": "MW", "name": "Malaui", "emoji": "🇲🇼"}, {"code": "ML", "name": "Mali", "emoji": "🇲🇱"}, {"code": "MT", "name": "Malta", "emoji": "🇲🇹"}, {"code": "MA", "name": "Marruecos", "emoji": "🇲🇦"}, {"code": "MU", "name": "Mauricio", "emoji": "🇲🇺"}, {"code": "MD", "name": "Moldavia", "emoji": "🇲🇩"}, {"code": "MN", "name": "Mongolia", "emoji": "🇲🇳"}, {"code": "ME", "name": "Montenegro", "emoji": "🇲🇪"}, {"code": "MZ", "name": "Mozambique", "emoji": "🇲🇿"}, {"code": "MM", "name": "Myanmar", "emoji": "🇲🇲"}, {"code": "MX", "name": "México", "emoji": "🇲🇽"}, {"code": "MC", "name": "Mónaco", "emoji": "🇲🇨"}, {"code": "NP", "name": "Nepal", "emoji": "🇳🇵"}, {"code": "NI", "name": "Nicaragua", "emoji": "🇳🇮"}, {"code": "NG", "name": "Nigeria", "emoji": "🇳🇬"}, {"code": "NO", "name": "Noruega", "emoji": "🇳🇴"}, {"code": "NZ", "name": "Nueva Zelanda", "emoji": "🇳🇿"}, {"code": "NE", "name": "Níger", "emoji": "🇳🇪"}, {"code": "OM", "name": "Omán", "emoji": "🇴🇲"}, {"code": "PK", "name": "Pakistán", "emoji": "🇵🇰"}, {"code": "PA", "name": "Panamá", "emoji": "🇵🇦"}, {"code": "PG", "name": "Papúa Nueva Guinea", "emoji": "🇵🇬"}, {"code": "PY", "name": "Paraguay", "emoji": "🇵🇾"}, {"code": "NL", "name": "Países Bajos", "emoji": "🇳🇱"}, {"code": "PE", "name": "Perú", "emoji": "🇵🇪"}, {"code": "PF", "name": "Polinesia Francesa", "emoji": "🇵🇫"}, {"code": "PL", "name": "Polonia", "emoji": "🇵🇱"}, {"code": "PT", "name": "Portugal", "emoji": "🇵🇹"}, {"code": "HK", "name": "RAE de Hong Kong (China)", "emoji": "🇭🇰"}, {"code": "GB", "name": "Reino Unido", "emoji": "🇬🇧"}, {"code": "CZ", "name": "República Checa", "emoji": "🇨🇿"}, {"code": "CD", "name": "República Democrática del Congo", "emoji": "🇨🇩"}, {"code": "DO", "name": "República Dominicana", "emoji": "🇩🇴"}, {"code": "RO", "name": "Rumanía", "emoji": "🇷🇴"}, {"code": "RU", "name": "Rusia", "emoji": "🇷🇺"}, {"code": "SM", "name": "San Marino", "emoji": "🇸🇲"}, {"code": "LC", "name": "Santa Lucía", "emoji": "🇱🇨"}, {"code": "SN", "name": "Senegal", "emoji": "🇸🇳"}, {"code": "RS", "name": "Serbia", "emoji": "🇷🇸"}, {"code": "SC", "name": "Seychelles", "emoji": "🇸🇨"}, {"code": "SG", "name": "Singapur", "emoji": "🇸🇬"}, {"code": "ZA", "name": "Sudáfrica", "emoji": "🇿🇦"}, {"code": "SE", "name": "Suecia", "emoji": "🇸🇪"}, {"code": "CH", "name": "Suiza", "emoji": "🇨🇭"}, {"code": "TH", "name": "Tailandia", "emoji": "🇹🇭"}, {"code": "TW", "name": "Taiwán", "emoji": "🇹🇼"}, {"code": "TZ", "name": "Tanzania", "emoji": "🇹🇿"}, {"code": "PS", "name": "Territorios Palestinos", "emoji": "🇵🇸"}, {"code": "TT", "name": "Trinidad y Tobago", "emoji": "🇹🇹"}, {"code": "TR", "name": "Turquía", "emoji": "🇹🇷"}, {"code": "TN", "name": "Túnez", "emoji": "🇹🇳"}, {"code": "UA", "name": "Ucrania", "emoji": "🇺🇦"}, {"code": "UG", "name": "Uganda", "emoji": "🇺🇬"}, {"code": "UY", "name": "Uruguay", "emoji": "🇺🇾"}, {"code": "VE", "name": "Venezuela", "emoji": "🇻🇪"}, {"code": "YE", "name": "Yemen", "emoji": "🇾🇪"}, {"code": "ZM", "name": "Zambia", "emoji": "🇿🇲"}, {"code": "ZW", "name": "Zimbabue", "emoji": "🇿🇼"}]
+
+# --- CONSTANTES MAESTRAS ASIÁTICAS ---
+ASIA_LANGUAGES = [
+    # Corea, Japón, China y regiones
+    'ko', 'ja', 'zh', 'cn', 'yue', 'bo', 'ug', 'mn',
+    # Sudeste Asiático (Países ASEAN)
+    'th', 'vi', 'tl', 'fil', 'id', 'ms', 'km', 'my', 'lo',
+    # Sur de Asia (India, Nepal, etc.)
+    'hi', 'ne', 'ta', 'te', 'ml', 'kn', 'bn', 'mr', 'gu', 'pa', 'ur', 'or', 'as', 'sd', 'si', 'dz', 'ks'
+]
+ASIA_COUNTRIES = [
+    'KR', 'JP', 'CN', 'TW', 'HK', 'TH', 'VN', 'IN', 'PH', 'ID', 'MY', 'SG', 'MO',
+    'MN', 'KH', 'MM', 'LA', 'NP'
+]
+ASIA_FLAGS_MAP = {
+    'KR':'🇰🇷','JP':'🇯🇵','CN':'🇨🇳','TW':'🇹🇼','HK':'🇭🇰','TH':'🇹🇭','VN':'🇻🇳','IN':'🇮🇳',
+    'PH':'🇵🇭','ID':'🇮🇩','MY':'🇲🇾','SG':'🇸🇬','MO':'🇲🇴','MN':'🇲🇳','KH':'🇰🇭','MM':'🇲🇲',
+    'LA':'🇱🇦','NP':'🇳🇵'
+}
+GENRES_PROGRAMAS = [10764, 99, 10763, 10767] # Reality, Docu, Noticias, Talk Show
 
 app = Flask(__name__)
 load_dotenv()
@@ -226,13 +247,7 @@ api_cache = {'day': {'series': [], 'movies': [], 'shows': [], 'last_updated': 0,
              'week': {'series': [], 'movies': [], 'shows': [], 'last_updated': 0, 'expire': 86400}}
 
 def get_top_20(api_key, media_type, time_window):
-    # Filtro de idiomas asiáticos
-    asia_languages = ['ko', 'ja', 'zh', 'cn', 'th', 'hi', 'te', 'ta', 'vi', 'id', 'tl']
-    
-    # IDs de no-ficción: Reality (10764), Documental (99), Noticias (10763), Talk Show (10767)
-    generos_no_ficcion = [10764, 99, 10763, 10767]
-    
-    # Para TMDB, tanto 'series' como 'programas' usan el endpoint 'tv'
+    # Usamos api_media_type para la consulta real a la API
     api_media_type = 'tv' if media_type in ['tv', 'show'] else 'movie'
 
     banderas_base = {
@@ -266,54 +281,59 @@ def get_top_20(api_key, media_type, time_window):
             # --- LÓGICA DE FILTRADO POR GÉNERO ---
             if api_media_type == 'tv':
                 item_genres = item.get('genre_ids', [])
-                es_no_ficcion = any(g in item_genres for g in generos_no_ficcion)
+                es_no_ficcion = any(g in item_genres for g in GENRES_PROGRAMAS)
                 
                 if media_type == 'tv' and es_no_ficcion:
                     continue  # Si buscamos Series, saltamos Programas
                 elif media_type == 'show' and not es_no_ficcion:
                     continue  # Si buscamos Programas, saltamos Series
             
-            if lang in asia_languages and item_id not in seen_ids and item.get('poster_path'):
-                item['flag'] = banderas_base.get(lang, '🌏')
-
+            if lang in ASIA_LANGUAGES and item_id not in seen_ids and item.get('poster_path'):
                 # Detalles (usamos api_media_type para la ruta correcta)
                 det_url = f"https://api.themoviedb.org/3/{api_media_type}/{item_id}?api_key={api_key}&language=en-US"
                 det_res = requests.get(det_url).json()
 
-                # --- LÓGICA DE BANDERA ROBUSTA ---
+                # --- LÓGICA DE BANDERA ROBUSTA (UNIFICADA) ---
                 paises_origin = [p.upper() for p in item.get('origin_country', [])]
                 paises_prod = [c['iso_3166_1'].upper() for c in det_res.get('production_countries', [])]
                 todos_paises = list(set(paises_origin + paises_prod))
                 idioma_orig = item.get('original_language', '').lower()
 
-                mapa_banderas = {'KR':'🇰🇷','JP':'🇯🇵','CN':'🇨🇳','TW':'🇹🇼','HK':'🇭🇰','TH':'🇹🇭','VN':'🇻🇳','IN':'🇮🇳','PH':'🇵🇭','ID':'🇮🇩','MY':'🇲🇾'}
                 codigo_final = None
                 bandera_final = None
 
                 # 1. SERIES: Priorizar origin_country
                 if api_media_type == 'tv' and paises_origin:
-                    lang_to_c = {'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN','tl':'PH','id':'ID','ms':'MY'}
+                    lang_to_c = {'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN','tl':'PH','id':'ID','ms':'MY','zh':'CN'}
                     c_sug = lang_to_c.get(idioma_orig)
                     codigo_final = c_sug if (c_sug and c_sug in paises_origin) else paises_origin[0]
-                    bandera_final = mapa_banderas.get(codigo_final)
+                    bandera_final = ASIA_FLAGS_MAP.get(codigo_final)
 
-                # 2. PELÍCULAS o fallback: idioma_orig
+                # 2. PELÍCULAS o fallback: idioma_orig + producción inteligente
                 if not bandera_final:
-                    lang_map = {'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN','id':'ID','tl':'PH','fil':'PH','ms':'MY'}
+                    lang_map = {
+                        'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN',
+                        'id':'ID','tl':'PH','fil':'PH','ms':'MY','mn':'MN',
+                        'km':'KH','my':'MM','lo':'LA','ne':'NP',
+                        'ta':'IN','te':'IN','ml':'IN','kn':'IN','bn':'IN',
+                        'mr':'IN','gu':'IN','pa':'IN','ur':'IN','or':'IN',
+                        'as':'IN','sd':'IN','ks':'IN',
+                        'bo':'CN','ug':'CN'
+                    }
                     if idioma_orig in ['zh', 'cn', 'yue']:
                         if 'HK' in todos_paises: codigo_final = 'HK'
                         elif 'TW' in todos_paises: codigo_final = 'TW'
+                        elif 'MO' in todos_paises: codigo_final = 'MO'
                         else: codigo_final = 'CN'
                     elif idioma_orig in lang_map:
                         codigo_final = lang_map[idioma_orig]
-                    if codigo_final: bandera_final = mapa_banderas.get(codigo_final)
+                    if codigo_final: bandera_final = ASIA_FLAGS_MAP.get(codigo_final)
 
                 # 3. Fallback: Priority list
                 if not bandera_final:
-                    for code in ['KR', 'JP', 'HK', 'TW', 'CN', 'TH', 'VN', 'IN', 'PH', 'ID', 'MY']:
+                    for code in ASIA_COUNTRIES:
                         if code in todos_paises:
-                            codigo_final = code
-                            bandera_final = mapa_banderas.get(code)
+                            bandera_final = ASIA_FLAGS_MAP.get(code)
                             break
 
                 item['flag'] = bandera_final or '🌏'
@@ -1019,7 +1039,13 @@ def explore():
     watch_region = request.args.get('watch_region', default_region)
     keywords = request.args.get('keywords', '')
 
-    asia_countries = {'KR': 'Corea del Sur', 'JP': 'Japón', 'CN': 'China', 'TW': 'Taiwán', 'HK': 'Hong Kong', 'TH': 'Tailandia', 'VN': 'Vietnam', 'IN': 'India', 'PH': 'Filipinas', 'ID': 'Indonesia', 'MY': 'Malasia'}
+    asia_countries = {
+        'KR': 'Corea del Sur', 'JP': 'Japón', 'CN': 'China', 'TW': 'Taiwán', 
+        'HK': 'Hong Kong', 'MO': 'Macao', 'MN': 'Mongolia', 'TH': 'Tailandia', 
+        'VN': 'Vietnam', 'IN': 'India', 'NP': 'Nepal', 'PH': 'Filipinas', 
+        'ID': 'Indonesia', 'MY': 'Malasia', 'SG': 'Singapur', 'KH': 'Camboya', 
+        'MM': 'Myanmar', 'LA': 'Laos'
+    }
     
     genres_by_type = {
         'movie': {
@@ -1075,10 +1101,9 @@ def api_explore():
     
     today = datetime.now().strftime('%Y-%m-%d')
     target_type = 'movie' if media_type == 'movie' else 'tv'
-    idiomas_asiaticos = ['ko', 'ja', 'zh', 'cn', 'yue', 'th', 'vi', 'hi', 'tl', 'fil', 'id', 'ms']
     # Filtro de programas: Reality(10764), Docu(99), Noticias(10763), Talk(10767)
-    genres_programas_or = "10764|99|10763|10767"
-    genres_programas_and = "10764,99,10763,10767"
+    genres_programas_or = "|".join(map(str, GENRES_PROGRAMAS))
+    genres_programas_and = ",".join(map(str, GENRES_PROGRAMAS))
 
     def generate():
         final_items_count = 0
@@ -1102,7 +1127,10 @@ def api_explore():
                 url += f"&primary_release_date.lte={today}"
 
             if country_code: url += f"&with_origin_country={country_code}"
-            else: url += "&with_origin_country=KR|JP|CN|TW|HK|TH|VN|IN|PH|ID|MY"
+            else: url += f"&with_origin_country={'|'.join(ASIA_COUNTRIES)}"
+
+            # --- FILTRADO DE ORIGEN: Solo idiomas asiáticos (Corrige el contador) ---
+            url += f"&with_original_language={'|'.join(ASIA_LANGUAGES)}"
 
             if year:
                 year_param = 'first_air_date_year' if target_type == 'tv' else 'primary_release_year'
@@ -1183,6 +1211,8 @@ def api_explore():
                 break 
 
             for item in results:
+                mx_res = None
+                det_res = None
                 items_processed_in_this_page += 1
                 
                 # 1. Lógica de salto (PRECISIÓN: No repetir ni saltar series)
@@ -1192,15 +1222,13 @@ def api_explore():
 
                 # --- SISTEMA DE FILTRADO MANUAL (Garantiza Pureza Total) ---
                 genre_ids = item.get('genre_ids', [])
-                # Reality(10764), Docu(99), Noticias(10763), Talk(10767)
-                ids_programas = [10764, 99, 10763, 10767]
-                es_programa = any(gid in ids_programas for gid in genre_ids)
+                es_programa = any(gid in GENRES_PROGRAMAS for gid in genre_ids)
 
                 if media_type == 'tv' and es_programa: continue # Fuera intrusos en Series
                 if media_type == 'show' and not es_programa: continue # Fuera intrusos en Programas
 
                 idioma_orig = item.get('original_language', '').lower()
-                if idioma_orig not in idiomas_asiaticos: continue
+                if idioma_orig not in ASIA_LANGUAGES: continue
 
                 item_id = item.get('id')
                 item['media_type_fixed'] = target_type
@@ -1220,40 +1248,47 @@ def api_explore():
                 except: 
                     det_res = {}
 
-                # --- LÓGICA DE BANDERA ROBUSTA ---
+                # --- LÓGICA DE BANDERA ROBUSTA (UNIFICADA) ---
                 paises_origin = [p.upper() for p in item.get('origin_country', [])]
                 paises_prod = [c['iso_3166_1'].upper() for c in det_res.get('production_countries', [])]
                 todos_paises = list(set(paises_origin + paises_prod))
                 idioma_orig = item.get('original_language', '').lower()
 
-                mapa_banderas = {'KR':'🇰🇷','JP':'🇯🇵','CN':'🇨🇳','TW':'🇹🇼','HK':'🇭🇰','TH':'🇹🇭','VN':'🇻🇳','IN':'🇮🇳','PH':'🇵🇭','ID':'🇮🇩','MY':'🇲🇾'}
                 codigo_final = None
                 bandera_final = None
 
                 # 1. SERIES: Priorizar origin_country
                 if target_type == 'tv' and paises_origin:
-                    lang_to_c = {'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN','tl':'PH','id':'ID','ms':'MY'}
+                    lang_to_c = {'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN','tl':'PH','id':'ID','ms':'MY','zh':'CN'}
                     c_sug = lang_to_c.get(idioma_orig)
                     codigo_final = c_sug if (c_sug and c_sug in paises_origin) else paises_origin[0]
-                    bandera_final = mapa_banderas.get(codigo_final)
+                    bandera_final = ASIA_FLAGS_MAP.get(codigo_final)
 
                 # 2. PELÍCULAS o fallback: idioma_orig
                 if not bandera_final:
-                    lang_map = {'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN','id':'ID','tl':'PH','fil':'PH','ms':'MY'}
+                    lang_map = {
+                        'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN',
+                        'id':'ID','tl':'PH','fil':'PH','ms':'MY','mn':'MN',
+                        'km':'KH','my':'MM','lo':'LA','ne':'NP',
+                        'ta':'IN','te':'IN','ml':'IN','kn':'IN','bn':'IN',
+                        'mr':'IN','gu':'IN','pa':'IN','ur':'IN','or':'IN',
+                        'as':'IN','sd':'IN','ks':'IN',
+                        'bo':'CN','ug':'CN'
+                    }
                     if idioma_orig in ['zh', 'cn', 'yue']:
                         if 'HK' in todos_paises: codigo_final = 'HK'
                         elif 'TW' in todos_paises: codigo_final = 'TW'
+                        elif 'MO' in todos_paises: codigo_final = 'MO'
                         else: codigo_final = 'CN'
                     elif idioma_orig in lang_map:
                         codigo_final = lang_map[idioma_orig]
-                    if codigo_final: bandera_final = mapa_banderas.get(codigo_final)
+                    if codigo_final: bandera_final = ASIA_FLAGS_MAP.get(codigo_final)
 
                 # 3. Fallback: Priority list
                 if not bandera_final:
-                    for code in ['KR', 'JP', 'HK', 'TW', 'CN', 'TH', 'VN', 'IN', 'PH', 'ID', 'MY']:
+                    for code in ASIA_COUNTRIES:
                         if code in todos_paises:
-                            codigo_final = code
-                            bandera_final = mapa_banderas.get(code)
+                            bandera_final = ASIA_FLAGS_MAP.get(code)
                             break
 
                 # --- FILTRADO ESTRICTO ---
@@ -1267,17 +1302,23 @@ def api_explore():
                 title_es = item.get('name') if target_type == 'tv' else item.get('title')
                 orig_title = item.get('original_name') if target_type == 'tv' else item.get('original_title')
                 
+                item['original_title_h6'] = orig_title
+                item['media_type_fixed'] = target_type
+                item['tipo_label'] = 'Película' if target_type == 'movie' else ('Programa' if es_programa else 'Serie')
+                
                 # --- TÍTULO: TIERED FALLBACK (ES-ES > ES-MX > EN-US) ---
                 if not title_es or title_es == orig_title:
                     # Nivel 2: México
-                    mx_url = f"https://api.themoviedb.org/3/{target_type}/{item_id}?api_key={api_key}&language=es-MX"
                     try:
-                        mx_res = requests.get(mx_url).json()
+                        if not mx_res:
+                            mx_url = f"https://api.themoviedb.org/3/{target_type}/{item_id}?api_key={api_key}&language=es-MX"
+                            mx_res = requests.get(mx_url).json()
+                        
                         mx_title = mx_res.get('title') if target_type == 'movie' else mx_res.get('name')
                         if mx_title and mx_title != orig_title:
                             item['display_title'] = mx_title
                         else:
-                            # Nivel 3: Inglés
+                            # Nivel 3: Inglés (Usamos el det_res ya cargado arriba)
                             eng_title = det_res.get('name') if target_type == 'tv' else det_res.get('title')
                             item['display_title'] = eng_title if eng_title else orig_title
                     except:
@@ -1289,7 +1330,9 @@ def api_explore():
                 if not item.get('overview'):
                     # Nivel 2: México
                     try:
-                        mx_res = mx_res if 'mx_res' in locals() else requests.get(f"https://api.themoviedb.org/3/{target_type}/{item_id}?api_key={api_key}&language=es-MX").json()
+                        if not mx_res:
+                            mx_res = requests.get(f"https://api.themoviedb.org/3/{target_type}/{item_id}?api_key={api_key}&language=es-MX").json()
+                        
                         mx_overview = mx_res.get('overview')
                         if mx_overview:
                             item['overview'] = mx_overview
@@ -1303,8 +1346,6 @@ def api_explore():
                                     item['overview'] = en_overview
                     except: pass
 
-                item['original_title_h6'] = orig_title
-                
                 # Renderizar HTML para este item solo
                 html = render_template('explore_items.html', items=[item])
                 yield json.dumps({'item_html': html}) + '\n'
@@ -1423,33 +1464,96 @@ def person_detail(person_id):
     
     res['aka_list'] = clean_aka if clean_aka else ["-"]
 
-    # --- CONOCIDO POR (Triple Escudo en Títulos) ---
+    # --- CONOCIDO POR (Triple Escudo + Filtro Asia + Estilo Premium) ---
     credits_url = f"https://api.themoviedb.org/3/person/{person_id}/combined_credits?api_key={api_key}&language=es-ES"
     credits = requests.get(credits_url).json()
     
-    # Tomamos los 12 más populares
-    raw_works = sorted(credits.get('cast', []) + credits.get('crew', []), key=lambda x: x.get('popularity', 0), reverse=True)[:12]
+    all_credits = credits.get('cast', []) + credits.get('crew', [])
+    filtered_credits = []
+    
+    seen_ids = set()
+    for credit in all_credits:
+        # Evitar duplicados
+        cid = credit.get('id')
+        if cid in seen_ids: continue
+        
+        idioma_orig = credit.get('original_language', '').lower()
+        
+        # Filtro OPCIÓN A: Solo si el idioma original es asiático
+        if idioma_orig in ASIA_LANGUAGES:
+            filtered_credits.append(credit)
+            seen_ids.add(cid)
+
+    # Ordenamos por popularidad y nos quedamos con el TOP 8
+    raw_works = sorted(filtered_credits, key=lambda x: x.get('popularity', 0), reverse=True)[:8]
     
     known_for = []
-    seen_ids = set()
     for work in raw_works:
         wid = work.get('id')
-        if wid in seen_ids: continue
-        seen_ids.add(wid)
-        
         w_type = work.get('media_type', 'movie')
+        
+        # Guardamos el tipo real para los labels
+        work['media_type_fixed'] = w_type
+        
+        if w_type == 'movie':
+            work['tipo_label'] = 'Película'
+        else:
+            # Determinamos si es Serie o Programa
+            item_genres = work.get('genre_ids', [])
+            es_no_ficcion = any(g in item_genres for g in GENRES_PROGRAMAS)
+            work['tipo_label'] = 'Programa' if es_no_ficcion else 'Serie'
+        
+        # Sacar bandera (Lógica Maestra Unificada)
+        paises_origin = [p.upper() for p in work.get('origin_country', [])]
+        idioma_orig = work.get('original_language', '').lower()
+        
+        bandera_final = '🌏'
+        if paises_origin:
+            lang_to_c = {
+                'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN','tl':'PH',
+                'id':'ID','ms':'MY','zh':'CN','mn':'MN','km':'KH','my':'MM',
+                'lo':'LA','ne':'NP',
+                'ta':'IN','te':'IN','ml':'IN','kn':'IN','bn':'IN',
+                'mr':'IN','gu':'IN','pa':'IN','ur':'IN','or':'IN',
+                'as':'IN','sd':'IN','ks':'IN',
+                'bo':'CN','ug':'CN'
+            }
+            c_sug = lang_to_c.get(idioma_orig)
+            # Prioridad de regiones chinas en Person Detail (si existiera origin_country múltiple)
+            if idioma_orig in ['zh', 'cn', 'yue']:
+                if 'HK' in paises_origin: codigo_final = 'HK'
+                elif 'TW' in paises_origin: codigo_final = 'TW'
+                elif 'MO' in paises_origin: codigo_final = 'MO'
+                else: codigo_final = 'CN'
+            else:
+                codigo_final = c_sug if (c_sug and c_sug in paises_origin) else paises_origin[0]
+            bandera_final = ASIA_FLAGS_MAP.get(codigo_final, '🌏')
+        else:
+            lang_to_c_fallback = {
+                'ko':'KR','ja':'JP','zh':'CN','th':'TH','vi':'VN','hi':'IN',
+                'tl':'PH','id':'ID','mn':'MN','km':'KH','my':'MM','lo':'LA','ne':'NP',
+                'ta':'IN','te':'IN','ml':'IN','kn':'IN','bn':'IN',
+                'mr':'IN','gu':'IN','pa':'IN','ur':'IN','or':'IN',
+                'as':'IN','sd':'IN','ks':'IN',
+                'bo':'CN','ug':'CN'
+            }
+            c_f = lang_to_c_fallback.get(idioma_orig)
+            bandera_final = ASIA_FLAGS_MAP.get(c_f, '🌏')
+
+        work['flag'] = bandera_final
+
         title_es = work.get('title') or work.get('name')
         orig_title = work.get('original_title') or work.get('original_name')
+        work['original_title_h6'] = orig_title
 
+        # Triple Escudo para el título del trabajo
         if not title_es or title_es == orig_title:
-            # Nivel 2: México
             try:
                 mx_res = requests.get(f"https://api.themoviedb.org/3/{w_type}/{wid}?api_key={api_key}&language=es-MX").json()
                 mx_t = mx_res.get('title') or mx_res.get('name')
                 if mx_t and mx_t != orig_title:
                     work['display_title'] = mx_t
                 else:
-                    # Nivel 3: Inglés
                     en_res = requests.get(f"https://api.themoviedb.org/3/{w_type}/{wid}?api_key={api_key}&language=en-US").json()
                     en_t = en_res.get('title') or en_res.get('name')
                     work['display_title'] = en_t if en_t else orig_title

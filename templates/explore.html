@@ -308,7 +308,7 @@
 
                 <script>
                 document.addEventListener('DOMContentLoaded', () => {
-                    const countries = {{ available_countries | tojson | safe }};
+                    const countries = JSON.parse('{{ available_countries | tojson | safe }}');
                     const container = document.getElementById('region-dropdown-container');
                     const btn = document.getElementById('region-dropdown-btn');
                     const display = document.getElementById('region-selected-display');
