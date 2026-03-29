@@ -865,6 +865,29 @@ def media_detail(media_type, media_id):
     
     res['flag'] = bandera_final or '🌏'
 
+    # --- ÚLTIMA TEMPORADA (SÓLO TV) ---
+    last_season = None
+    has_multiple_seasons = False
+    if media_type == 'tv' and res.get('seasons'):
+        # Filtramos la temporada 0 (Especiales) y cogemos la última
+        seasons_list = [s for s in res['seasons'] if s.get('season_number', 0) > 0]
+        if seasons_list:
+            last_season = seasons_list[-1]
+            has_multiple_seasons = len(seasons_list) > 1
+            
+            # Formatear la fecha para que sea elegante
+            if last_season.get('air_date'):
+                try:
+                    dt = datetime.strptime(last_season['air_date'], '%Y-%m-%d')
+                    # Meses en español (abreviado)
+                    meses = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.']
+                    last_season['air_date_formatted'] = f"{dt.day} {meses[dt.month-1]} {dt.year}"
+                except:
+                    last_season['air_date_formatted'] = last_season['air_date']
+                    
+    res['last_season'] = last_season
+    res['has_multiple_seasons'] = has_multiple_seasons
+
     # --- FORMATO DE DURACIÓN ---
     runtime = res.get('runtime') or (res.get('episode_run_time', [0])[0] if media_type == 'tv' and res.get('episode_run_time') else 0)
     if runtime > 0:

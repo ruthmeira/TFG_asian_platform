@@ -179,6 +179,97 @@
     width: 100%;
     height: 100%;
 }
+
+/* --- TARJETA DE TEMPORADA PREMIUM --- */
+.detail-season-preview {
+    margin-top: 50px;
+    animation: fadeIn 0.8s ease;
+}
+
+/* Tarjeta estática sin hover */
+.season-card-full {
+    display: flex;
+    gap: 25px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 25px;
+    margin-top: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.season-poster-mini {
+    flex: 0 0 130px;
+    height: 190px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.season-poster-mini img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.season-info-mini {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.season-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.season-title-row h3 {
+    font-size: 1.4rem;
+    color: #fff;
+    font-weight: 700;
+}
+
+.season-rating {
+    background: rgba(255, 69, 0, 0.15);
+    color: var(--primary);
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    border: 1px solid rgba(255, 69, 0, 0.3);
+    box-shadow: 0 0 10px rgba(255, 69, 0, 0.2);
+}
+
+.season-meta-mini {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.season-dot {
+    color: rgba(255,255,255,0.2);
+    font-size: 1.2rem;
+}
+
+.season-year {
+    color: #fff;
+    opacity: 0.9;
+}
+
+.season-overview-mini {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin-top: 5px;
+}
 </style>
 
 <div class="media-detail-container">
@@ -397,6 +488,46 @@
                 </div>
             {% endif %}
         </div>
+
+        {# SECCIÓN ÚLTIMA TEMPORADA (SÓLO TV) #}
+        {% if media.last_season %}
+            <div class="detail-season-preview">
+                <div class="season-header">
+                    <h2 style="font-size: 1.5rem; color: var(--primary); display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        Última Temporada 
+                        {% if media.has_multiple_seasons %}
+                            <a href="#" class="view-all-link"><span>Ver todas</span> <i class="fas fa-chevron-right"></i></a>
+                        {% endif %}
+                    </h2>
+                </div>
+                
+                <div class="season-card-full">
+                    <div class="season-poster-mini">
+                        {% if media.last_season.poster_path %}
+                            <img src="https://image.tmdb.org/t/p/w185{{ media.last_season.poster_path }}" alt="{{ media.last_season.name }}">
+                        {% else %}
+                            <div class="no-avatar" style="height: 100%; display: flex; align-items: center; justify-content: center; background: #222; color: #555;">?</div>
+                        {% endif %}
+                    </div>
+                    <div class="season-info-mini">
+                        <div class="season-title-row">
+                            <h3>{{ media.last_season.name }}</h3>
+                            {% if (media.last_season.vote_average or 0) > 0 %}
+                                <span class="season-rating"><i class="fas fa-star"></i> {{ (media.last_season.vote_average * 10)|round|int }}%</span>
+                            {% endif %}
+                        </div>
+                        <div class="season-meta-mini">
+                            <span class="season-year">{{ media.last_season.air_date_formatted }}</span>
+                            <span class="season-dot">•</span>
+                            <span class="season-ep-count">{{ media.last_season.episode_count }} episodios</span>
+                        </div>
+                        <p class="season-overview-mini">
+                            {{ media.last_season.overview or "No hay sinopsis disponible para esta temporada." }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
 
         <div class="detail-keywords">
             <p><strong>Palabras clave:</strong></p>
