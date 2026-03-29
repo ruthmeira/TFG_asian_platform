@@ -18,23 +18,39 @@
             
             <div class="person-info-sidebar">
                 <h3>Información Personal</h3>
+                
+                <div class="info-item">
+                    <strong>Nombre Artístico:</strong>
+                    <span>{{ person.artistic_name }}</span>
+                </div>
+
+                <div class="info-item">
+                    <strong>Sexo:</strong>
+                    <span>{{ person.gender_name }}</span>
+                </div>
+
                 <div class="info-item">
                     <strong>Nacimiento:</strong>
-                    <span>{{ person.birthday or 'N/A' }}</span>
+                    <span>{{ person.birthday }}</span>
                 </div>
+
                 {% if person.deathday %}
                 <div class="info-item">
                     <strong>Fallecimiento:</strong>
                     <span>{{ person.deathday }}</span>
                 </div>
                 {% endif %}
+
                 <div class="info-item">
                     <strong>Lugar de nacimiento:</strong>
-                    <span>{{ person.place_of_birth or 'N/A' }}</span>
+                    <span>{{ person.place_of_birth }}</span>
                 </div>
+
                 <div class="info-item">
-                    <strong>Género:</strong>
-                    <span>{{ 'Masculino' if person.gender == 2 else ('Femenino' if person.gender == 1 else 'No binario') }}</span>
+                    <strong>También conocido como:</strong>
+                    {% for aka in person.aka_list %}
+                        <span class="aka-tag">{{ aka }}</span>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -42,12 +58,10 @@
         <div class="person-content-side">
             <h1 class="person-name">{{ person.name }}</h1>
             
-            {% if person.biography %}
             <div class="biography-section">
                 <h2>Biografía</h2>
-                <p class="bio-text">{{ person.biography }}</p>
+                <p class="bio-text">{{ person.biography | safe }}</p>
             </div>
-            {% endif %}
 
             <div class="known-for-section">
                 <h2>Conocido por</h2>
@@ -56,12 +70,14 @@
                     <a href="{{ url_for('media_detail', media_type=work.media_type, media_id=work.id) }}" class="work-card">
                         <div class="work-poster">
                             {% if work.poster_path %}
-                                <img src="https://image.tmdb.org/t/p/w342{{ work.poster_path }}" alt="{{ work.title or work.name }}">
+                                <img src="https://image.tmdb.org/t/p/w342{{ work.poster_path }}" alt="{{ work.display_title }}">
                             {% else %}
-                                <div class="no-poster-small">No image</div>
+                                <div class="no-poster-small">
+                                    <i class="fas fa-image" style="opacity: 0.2; font-size: 2rem;"></i>
+                                </div>
                             {% endif %}
                         </div>
-                        <span class="work-title">{{ work.title or work.name }}</span>
+                        <span class="work-title">{{ work.display_title }}</span>
                     </a>
                     {% endfor %}
                 </div>
@@ -124,6 +140,17 @@
 .info-item span {
     font-size: 0.9rem;
     color: var(--text-muted);
+}
+
+.aka-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.05);
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-top: 5px;
+    margin-right: 5px;
+    font-size: 0.8rem !important;
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
 .person-content-side {

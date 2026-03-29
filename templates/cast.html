@@ -3,92 +3,6 @@
 {% block title %}Reparto y Equipo - {{ media.display_title }}{% endblock %}
 
 {% block content %}
-<div class="cast-page-container">
-    <div class="cast-header-wrapper">
-        <a href="{{ url_for('media_detail', media_type=media_type, media_id=media_id) }}" class="back-link-premium">
-            <i class="fas fa-arrow-left"></i> Volver a la ficha
-        </a>
-        
-        <header class="cast-main-header">
-            <div class="header-text">
-                <h1 class="cast-title">{{ media.display_title }}</h1>
-                {% set release_date = media.release_date or media.first_air_date %}
-                {% if release_date %}
-                    <span class="cast-year">({{ release_date[:4] }})</span>
-                {% endif %}
-            </div>
-        </header>
-    </div>
-
-    <div class="cast-columns-container">
-        {# COLUMNA IZQUIERDA: REPARTO #}
-        <div class="cast-column">
-            {% if cast %}
-            <section class="cast-full-section">
-                <h2 class="section-title"><i class="fas fa-users"></i> Reparto <span>({{ cast|length }})</span></h2>
-                <div class="credits-list-vertical">
-                    {% for actor in cast %}
-                        <div class="credit-item-row">
-                            <div class="credit-photo-small">
-                                <a href="{{ url_for('person_detail', person_id=actor.id) }}">
-                                    {% if actor.profile_path %}
-                                        <img src="https://image.tmdb.org/t/p/w185{{ actor.profile_path }}" alt="{{ actor.name }}">
-                                    {% else %}
-                                        <div class="no-photo-small">
-                                            <i class="fas fa-user-circle"></i>
-                                        </div>
-                                    {% endif %}
-                                </a>
-                            </div>
-                            <div class="credit-info-row">
-                                <a href="{{ url_for('person_detail', person_id=actor.id) }}" class="name">{{ actor.name }}</a>
-                                <span class="role">{{ actor.character | safe }}</span>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            </section>
-            {% endif %}
-        </div>
-
-        {# COLUMNA DERECHA: EQUIPO #}
-        <div class="cast-column">
-            {% if crew_by_dept %}
-            <section class="crew-full-section">
-                <h2 class="section-title"><i class="fas fa-video"></i> Equipo Técnico <span>({{ crew_total }})</span></h2>
-                
-                {% for dept, members in crew_by_dept.items() %}
-                <div class="department-group">
-                    <h3 class="dept-subtitle">{{ dept }} <span>({{ members|length }})</span></h3>
-                    <div class="credits-list-vertical">
-                        {% for member in members %}
-                            <div class="credit-item-row">
-                                <div class="credit-photo-small">
-                                    <a href="{{ url_for('person_detail', person_id=member.id) }}">
-                                        {% if member.profile_path %}
-                                            <img src="https://image.tmdb.org/t/p/w185{{ member.profile_path }}" alt="{{ member.name }}">
-                                        {% else %}
-                                            <div class="no-photo-small">
-                                                <i class="fas fa-user-circle"></i>
-                                            </div>
-                                        {% endif %}
-                                    </a>
-                                </div>
-                                <div class="credit-info-row">
-                                    <a href="{{ url_for('person_detail', person_id=member.id) }}" class="name">{{ member.name }}</a>
-                                    <span class="role">{{ (member.job or member.job_es) | safe }}</span>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endfor %}
-            </section>
-            {% endif %}
-        </div>
-    </div>
-</div>
-
 <style>
 /* Estilos para la nueva disposición en columnas */
 .cast-columns-container {
@@ -259,4 +173,90 @@
     color: var(--primary);
 }
 </style>
+
+<div class="cast-page-container">
+    <div class="cast-header-wrapper">
+        <a href="{{ url_for('media_detail', media_type=media_type, media_id=media_id) }}" class="back-link-premium">
+            <i class="fas fa-arrow-left"></i> Volver a la ficha
+        </a>
+        
+        <header class="cast-main-header">
+            <div class="header-text">
+                <h1 class="cast-title">{{ media.display_title }}</h1>
+                {% set release_date = media.release_date or media.first_air_date %}
+                {% if release_date %}
+                    <span class="cast-year">({{ release_date[:4] }})</span>
+                {% endif %}
+            </div>
+        </header>
+    </div>
+
+    <div class="cast-columns-container">
+        {# COLUMNA IZQUIERDA: REPARTO #}
+        <div class="cast-column">
+            {% if cast %}
+            <section class="cast-full-section">
+                <h2 class="section-title"><i class="fas fa-users"></i> Reparto <span>({{ cast|length }})</span></h2>
+                <div class="credits-list-vertical">
+                    {% for actor in cast %}
+                        <div class="credit-item-row">
+                            <div class="credit-photo-small">
+                                <a href="{{ url_for('person_detail', person_id=actor.id) }}">
+                                    {% if actor.profile_path %}
+                                        <img src="https://image.tmdb.org/t/p/w185{{ actor.profile_path }}" alt="{{ actor.name }}">
+                                    {% else %}
+                                        <div class="no-photo-small">
+                                            <i class="fas fa-user-circle"></i>
+                                        </div>
+                                    {% endif %}
+                                </a>
+                            </div>
+                            <div class="credit-info-row">
+                                <a href="{{ url_for('person_detail', person_id=actor.id) }}" class="name">{{ actor.name }}</a>
+                                <span class="role">{{ actor.character | safe }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+        </div>
+
+        {# COLUMNA DERECHA: EQUIPO #}
+        <div class="cast-column">
+            {% if crew_by_dept %}
+            <section class="crew-full-section">
+                <h2 class="section-title"><i class="fas fa-video"></i> Equipo Técnico <span>({{ crew_total }})</span></h2>
+                
+                {% for dept, members in crew_by_dept.items() %}
+                <div class="department-group">
+                    <h3 class="dept-subtitle">{{ dept }} <span>({{ members|length }})</span></h3>
+                    <div class="credits-list-vertical">
+                        {% for member in members %}
+                            <div class="credit-item-row">
+                                <div class="credit-photo-small">
+                                    <a href="{{ url_for('person_detail', person_id=member.id) }}">
+                                        {% if member.profile_path %}
+                                            <img src="https://image.tmdb.org/t/p/w185{{ member.profile_path }}" alt="{{ member.name }}">
+                                        {% else %}
+                                            <div class="no-photo-small">
+                                                <i class="fas fa-user-circle"></i>
+                                            </div>
+                                        {% endif %}
+                                    </a>
+                                </div>
+                                <div class="credit-info-row">
+                                    <a href="{{ url_for('person_detail', person_id=member.id) }}" class="name">{{ member.name }}</a>
+                                    <span class="role">{{ (member.job or member.job_es) | safe }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </section>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}

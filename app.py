@@ -1352,24 +1352,112 @@ def api_keywords_search():
 @app.route('/person/<person_id>')
 def person_detail(person_id):
     api_key = os.getenv("TMDB_API_KEY")
-    url = f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=es-ES"
-    res = requests.get(url).json()
     
-    # También traemos los trabajos de esa persona (películas y series)
+    import re
+    asian_re = re.compile(r'[\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\uac00-\ud7af]')
+    
+    # --- NIVEL 1: ESPAÑA (es-ES) ---
+    url_es = f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=es-ES"
+    res = requests.get(url_es).json()
+    
+    # --- NIVEL 2: MÉXICO (es-MX) ---
+    # Trigger si no hay bio, no hay lugar de nacimiento, NO HAY NOMBRE o el nombre está en japonés/chino/coreano
+    if not res.get('biography') or not res.get('place_of_birth') or not res.get('name') or asian_re.search(res.get('name', '')):
+        try:
+            url_mx = f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=es-MX"
+            res_mx = requests.get(url_mx).json()
+            if not res.get('biography'): res['biography'] = res_mx.get('biography')
+            if not res.get('place_of_birth'): res['place_of_birth'] = res_mx.get('place_of_birth')
+            
+            # Solo actualizamos el nombre si el de mx es "mejor" (no tiene símbolos asiáticos o el original sí los tenía)
+            mx_name = res_mx.get('name')
+            if mx_name:
+                if not res.get('name') or (asian_re.search(res.get('name', '')) and not asian_re.search(mx_name)):
+                    res['name'] = mx_name
+        except: pass
+
+    # --- NIVEL 3: INGLÉS (en-US) + TRADUCCIÓN ---
+    if not res.get('biography') or not res.get('name') or asian_re.search(res.get('name', '')):
+        try:
+            url_en = f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=en-US"
+            res_en = requests.get(url_en).json()
+            
+            en_name = res_en.get('name')
+            if en_name:
+                 if not res.get('name') or (asian_re.search(res.get('name', '')) and not asian_re.search(en_name)):
+                    res['name'] = en_name
+
+            en_bio = res_en.get('biography')
+            if en_bio and not res.get('biography'):
+                try:
+                    res['biography'] = GoogleTranslator(source='en', target='es').translate(en_bio)
+                except:
+                    res['biography'] = en_bio
+            if not res.get('place_of_birth') or res.get('place_of_birth') == "-": 
+                res['place_of_birth'] = res_en.get('place_of_birth')
+        except: pass
+
+    # --- FALLBACK FINAL A '-' ---
+    if not res.get('name'): res['name'] = "-"
+    if not res.get('biography'): res['biography'] = "No tenemos una biografía."
+    if not res.get('place_of_birth'): res['place_of_birth'] = "-"
+    if not res.get('birthday'): res['birthday'] = "-"
+    
+    # Mapeo de Género
+    gender_map = {1: "Femenino", 2: "Masculino", 3: "No Binario"}
+    res['gender_name'] = gender_map.get(res.get('gender'), "-")
+
+    # También conocido como (AKA) - Limpiamos la lista
+    # Buscamos si alguno de los alias está en caracteres asiáticos para ponerlo como "Nombre Artístico"
+    import re
+    asian_re = re.compile(r'[\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\uac00-\ud7af]')
+    res['artistic_name'] = "-"
+    
+    aka_list = res.get('also_known_as', [])
+    clean_aka = []
+    for aka in aka_list:
+        if asian_re.search(aka) and res['artistic_name'] == "-":
+            res['artistic_name'] = aka # El primero que encontremos en japonés/coreano/chino
+        else:
+            clean_aka.append(aka)
+    
+    res['aka_list'] = clean_aka if clean_aka else ["-"]
+
+    # --- CONOCIDO POR (Triple Escudo en Títulos) ---
     credits_url = f"https://api.themoviedb.org/3/person/{person_id}/combined_credits?api_key={api_key}&language=es-ES"
     credits = requests.get(credits_url).json()
     
-    # Ordenar por popularidad para mostrar lo mejor primero
-    raw_works = sorted(credits.get('cast', []) + credits.get('crew', []), key=lambda x: x.get('popularity', 0), reverse=True)[:10]
+    # Tomamos los 12 más populares
+    raw_works = sorted(credits.get('cast', []) + credits.get('crew', []), key=lambda x: x.get('popularity', 0), reverse=True)[:12]
     
     known_for = []
+    seen_ids = set()
     for work in raw_works:
+        wid = work.get('id')
+        if wid in seen_ids: continue
+        seen_ids.add(wid)
+        
+        w_type = work.get('media_type', 'movie')
         title_es = work.get('title') or work.get('name')
         orig_title = work.get('original_title') or work.get('original_name')
+
         if not title_es or title_es == orig_title:
-            work['display_title'] = work.get('title') or work.get('name') # Si no hay más, el que tenemos
+            # Nivel 2: México
+            try:
+                mx_res = requests.get(f"https://api.themoviedb.org/3/{w_type}/{wid}?api_key={api_key}&language=es-MX").json()
+                mx_t = mx_res.get('title') or mx_res.get('name')
+                if mx_t and mx_t != orig_title:
+                    work['display_title'] = mx_t
+                else:
+                    # Nivel 3: Inglés
+                    en_res = requests.get(f"https://api.themoviedb.org/3/{w_type}/{wid}?api_key={api_key}&language=en-US").json()
+                    en_t = en_res.get('title') or en_res.get('name')
+                    work['display_title'] = en_t if en_t else orig_title
+            except:
+                work['display_title'] = orig_title
         else:
             work['display_title'] = title_es
+            
         known_for.append(work)
     
     return render_template('person_detail.html', person=res, known_for=known_for)
