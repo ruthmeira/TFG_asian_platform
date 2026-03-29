@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ media.title or media.name }} - SHIORI{% endblock %}
+{% block title %}{{ media.display_title }} - SHIORI{% endblock %}
 
 {% block content %}
 
@@ -49,7 +49,7 @@
 
         <h1>
             {# Usamos el título que ya viene procesado (ES o EN) desde app.py #}
-            {{ media.title or media.name }}
+            {{ media.display_title }}
 
             {# Mostramos el año de lanzamiento #}
             {% set release_date = media.release_date or media.first_air_date %}

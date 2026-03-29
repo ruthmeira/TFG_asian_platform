@@ -2811,11 +2811,15 @@ body {
     font-size: 1rem;
     display: block;
     color: #fff;
+    line-height: 1.2;
 }
 
 .credit-info .role {
     font-size: 0.85rem;
     color: var(--text-muted);
+    display: block;
+    margin-top: 0px;
+    line-height: 1.2;
 }
 
 .section-title {
@@ -2847,9 +2851,19 @@ body {
     text-decoration: none !important;
     color: #fff;
     transition: var(--transition);
+    display: inline-block;
+    width: fit-content;
 }
 
 .credit-info a.name:hover, .credit-info-row a.name:hover, .work-card:hover .work-title {
     color: var(--primary);
     text-decoration: none !important;
+}
+
+.cast-avatar a:hover, .credit-photo-small a:hover {
+    transform: scale(1.05);
+}
+
+.cast-avatar a, .credit-photo-small a {
+    transition: var(--transition);
 }

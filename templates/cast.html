@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Reparto y Equipo - {{ media.title or media.name }} - SHIORI{% endblock %}
+{% block title %}Reparto y Equipo - {{ media.display_title }}{% endblock %}
 
 {% block content %}
 <div class="cast-page-container">
@@ -11,7 +11,7 @@
         
         <header class="cast-main-header">
             <div class="header-text">
-                <h1>{{ media.title or media.name }}</h1>
+                <h1 class="cast-title">{{ media.display_title }}</h1>
                 {% set release_date = media.release_date or media.first_air_date %}
                 {% if release_date %}
                     <span class="cast-year">({{ release_date[:4] }})</span>
@@ -112,12 +112,7 @@
     background: rgba(255,255,255,0.03);
     border-radius: 12px;
     border: 1px solid rgba(255,255,255,0.05);
-    transition: var(--transition);
-}
-
-.credit-item-row:hover {
-    background: rgba(255,255,255,0.06);
-    transform: translateX(5px);
+    cursor: default;
 }
 
 .credit-photo-small {
@@ -201,6 +196,28 @@
 .back-link-premium:hover {
     color: var(--primary);
     transform: translateX(-5px);
+}
+
+.credit-info a.name, .credit-info-row a.name, .work-card span {
+    text-decoration: none !important;
+    color: #fff;
+    transition: var(--transition);
+    display: inline-block;
+    width: fit-content;
+}
+
+.credit-info a.name:hover, .credit-info-row a.name:hover, .work-card:hover .work-title {
+    color: var(--primary);
+    text-decoration: none !important;
+}
+
+.cast-avatar a:hover, .credit-photo-small a:hover {
+    transform: scale(1.05);
+    border-color: var(--primary);
+}
+
+.cast-avatar a, .credit-photo-small a {
+    transition: var(--transition);
 }
 
 .cast-main-header {

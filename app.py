@@ -321,14 +321,40 @@ def get_top_20(api_key, media_type, time_window):
                 curr_title = item.get('name') if api_media_type == 'tv' else item.get('title')
                 orig_title = item.get('original_name') if api_media_type == 'tv' else item.get('original_title')
 
-                if curr_title == orig_title:
-                    new_name = det_res.get('name') if api_media_type == 'tv' else det_res.get('title')
-                    if new_name:
-                        if api_media_type == 'tv': item['name'] = new_name
-                        else: item['title'] = new_name
-                    
-                    if not item.get('overview'):
-                        item['overview'] = det_res.get('overview')
+                # --- TÍTULO: TIERED FALLBACK (ES-ES > ES-MX > EN-US) ---
+                if not curr_title or curr_title == orig_title:
+                    # Nivel 2: México
+                    try:
+                        mx_res = requests.get(f"https://api.themoviedb.org/3/{api_media_type}/{item_id}?api_key={api_key}&language=es-MX").json()
+                        mx_title = mx_res.get('title') if api_media_type == 'movie' else mx_res.get('name')
+                        if mx_title and mx_title != orig_title:
+                            if api_media_type == 'tv': item['name'] = mx_title
+                            else: item['title'] = mx_title
+                        else:
+                            # Nivel 3: Inglés
+                            en_title = det_res.get('title') if api_media_type == 'movie' else det_res.get('name')
+                            if en_title:
+                                if api_media_type == 'tv': item['name'] = en_title
+                                else: item['title'] = en_title
+                    except: pass
+
+                # --- SINOPSIS: TIERED FALLBACK (ES-ES > ES-MX > EN-US + TRAD) ---
+                if not item.get('overview'):
+                    # Nivel 2: México
+                    try:
+                        mx_res = mx_res if 'mx_res' in locals() else requests.get(f"https://api.themoviedb.org/3/{api_media_type}/{item_id}?api_key={api_key}&language=es-MX").json()
+                        mx_overview = mx_res.get('overview')
+                        if mx_overview:
+                            item['overview'] = mx_overview
+                        else:
+                            # Nivel 3: Inglés + Traducción
+                            en_overview = det_res.get('overview')
+                            if en_overview:
+                                try:
+                                    item['overview'] = GoogleTranslator(source='en', target='es').translate(en_overview)
+                                except:
+                                    item['overview'] = en_overview
+                    except: pass
 
                 final_list.append(item)
                 seen_ids.add(item_id)
@@ -673,28 +699,57 @@ def media_detail(media_type, media_id):
     except:
         pass
 
-    # 1. Intentamos primero en Español
+    # 1. Intentamos primero en Español de España
     url_es = f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-ES"
     res = requests.get(url_es).json()
     
-    # 2. Comprobamos si falta la sinopsis (overview) o el título
-    # Si la sinopsis está vacía, pedimos los datos en Inglés
+    # --- TÍTULO: TIERED FALLBACK (ES-ES > ES-MX > EN-US) ---
+    title_es = res.get('title') if media_type == 'movie' else res.get('name')
+    orig_title = res.get('original_title') if media_type == 'movie' else res.get('original_name')
+    
+    if not title_es or title_es == orig_title:
+        # Nivel 2: México
+        mx_url = f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-MX"
+        try:
+            mx_res = requests.get(mx_url).json()
+            mx_title = mx_res.get('title') if media_type == 'movie' else mx_res.get('name')
+            if mx_title and mx_title != orig_title:
+                res['display_title'] = mx_title
+            else:
+                # Nivel 3: Inglés
+                url_en = f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=en-US"
+                res_en = requests.get(url_en).json()
+                en_title = res_en.get('title') if media_type == 'movie' else res_en.get('name')
+                res['display_title'] = en_title if en_title else orig_title
+        except:
+            res['display_title'] = orig_title
+    else:
+        res['display_title'] = title_es
+
+    # --- SINOPSIS: TIERED FALLBACK (ES-ES > ES-MX > EN-US + TRAD) ---
     if not res.get('overview') or res.get('overview') == "":
-        url_en = f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=en-US"
-        res_en = requests.get(url_en).json()
-        
-        # Usamos el título en inglés si el español no existe (para evitar caracteres asiáticos)
-        res['title'] = res_en.get('title') or res_en.get('name')
-        
-        # Traducimos la sinopsis del inglés al español
-        en_overview = res_en.get('overview')
-        if en_overview:
-            try:
-                res['overview'] = GoogleTranslator(source='en', target='es').translate(en_overview)
-            except:
-                res['overview'] = en_overview # Si falla el traductor, dejamos la inglesa
-        else:
-            res['overview'] = "Sinopsis no disponible en este momento."
+        # Nivel 2: México
+        mx_ov_url = f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-MX"
+        try:
+            mx_res = mx_res if 'mx_res' in locals() else requests.get(mx_ov_url).json()
+            mx_overview = mx_res.get('overview')
+            if mx_overview:
+                res['overview'] = mx_overview
+            else:
+                # Nivel 3: Inglés + Traducción
+                url_en = f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=en-US"
+                res_en = res_en if 'res_en' in locals() else requests.get(url_en).json()
+                en_overview = res_en.get('overview')
+                if en_overview:
+                    try:
+                        res['overview'] = GoogleTranslator(source='en', target='es').translate(en_overview)
+                    except:
+                        res['overview'] = en_overview 
+                else:
+                    res['overview'] = "Sinopsis no disponible en este momento."
+        except:
+            res['overview'] = "Sinopsis no disponible."
+    # -----------------------------------------------------------
 
     # --- TRADUCCIÓN DE GÉNEROS ---
     # Traducimos géneros específicos de series (TV) que TMDB suele dejar en inglés
@@ -839,10 +894,34 @@ def media_detail(media_type, media_id):
 def media_cast(media_type, media_id):
     api_key = os.getenv("TMDB_API_KEY")
     
-    # 1. Datos básicos
+    # 1. Datos básicos (Cast)
     detail_url = f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-ES"
     res = requests.get(detail_url).json()
+
+    # --- TÍTULO: TIERED FALLBACK (ES-ES > ES-MX > EN-US) ---
+    title_es = res.get('title') if media_type == 'movie' else res.get('name')
+    orig_title = res.get('original_title') if media_type == 'movie' else res.get('original_name')
     
+    if not title_es or title_es == orig_title:
+        # Nivel 2: México
+        mx_url = f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-MX"
+        try:
+            mx_res = requests.get(mx_url).json()
+            mx_title = mx_res.get('title') if media_type == 'movie' else mx_res.get('name')
+            if mx_title and mx_title != orig_title:
+                res['display_title'] = mx_title
+            else:
+                # Nivel 3: Inglés
+                url_en = f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=en-US"
+                res_en = requests.get(url_en).json()
+                en_title = res_en.get('title') if media_type == 'movie' else res_en.get('name')
+                res['display_title'] = en_title if en_title else orig_title
+        except:
+            res['display_title'] = orig_title
+    else:
+        res['display_title'] = title_es
+    # -----------------------------------------------------------
+    # -----------------------------------------------------------
     # 2. Créditos (Agregados para TV, normales para Movie)
     if media_type == 'tv' or (res.get('media_type') == 'tv' or 'first_air_date' in res):
         credits_url = f"https://api.themoviedb.org/3/tv/{media_id}/aggregate_credits?api_key={api_key}"
@@ -1187,11 +1266,42 @@ def api_explore():
                 item['flag'] = bandera_final or '🌏'
                 title_es = item.get('name') if target_type == 'tv' else item.get('title')
                 orig_title = item.get('original_name') if target_type == 'tv' else item.get('original_title')
-                if title_es == orig_title or not title_es:
-                    eng_title = det_res.get('name') if target_type == 'tv' else det_res.get('title')
-                    item['display_title'] = eng_title if eng_title else orig_title
+                
+                # --- TÍTULO: TIERED FALLBACK (ES-ES > ES-MX > EN-US) ---
+                if not title_es or title_es == orig_title:
+                    # Nivel 2: México
+                    mx_url = f"https://api.themoviedb.org/3/{target_type}/{item_id}?api_key={api_key}&language=es-MX"
+                    try:
+                        mx_res = requests.get(mx_url).json()
+                        mx_title = mx_res.get('title') if target_type == 'movie' else mx_res.get('name')
+                        if mx_title and mx_title != orig_title:
+                            item['display_title'] = mx_title
+                        else:
+                            # Nivel 3: Inglés
+                            eng_title = det_res.get('name') if target_type == 'tv' else det_res.get('title')
+                            item['display_title'] = eng_title if eng_title else orig_title
+                    except:
+                        item['display_title'] = orig_title
                 else: 
                     item['display_title'] = title_es
+
+                # --- SINOPSIS: TIERED FALLBACK (ES-ES > ES-MX > EN-US + TRAD) ---
+                if not item.get('overview'):
+                    # Nivel 2: México
+                    try:
+                        mx_res = mx_res if 'mx_res' in locals() else requests.get(f"https://api.themoviedb.org/3/{target_type}/{item_id}?api_key={api_key}&language=es-MX").json()
+                        mx_overview = mx_res.get('overview')
+                        if mx_overview:
+                            item['overview'] = mx_overview
+                        else:
+                            # Nivel 3: Inglés + Traducción
+                            en_overview = det_res.get('overview')
+                            if en_overview:
+                                try:
+                                    item['overview'] = GoogleTranslator(source='en', target='es').translate(en_overview)
+                                except:
+                                    item['overview'] = en_overview
+                    except: pass
 
                 item['original_title_h6'] = orig_title
                 
@@ -1250,7 +1360,17 @@ def person_detail(person_id):
     credits = requests.get(credits_url).json()
     
     # Ordenar por popularidad para mostrar lo mejor primero
-    known_for = sorted(credits.get('cast', []) + credits.get('crew', []), key=lambda x: x.get('popularity', 0), reverse=True)[:10]
+    raw_works = sorted(credits.get('cast', []) + credits.get('crew', []), key=lambda x: x.get('popularity', 0), reverse=True)[:10]
+    
+    known_for = []
+    for work in raw_works:
+        title_es = work.get('title') or work.get('name')
+        orig_title = work.get('original_title') or work.get('original_name')
+        if not title_es or title_es == orig_title:
+            work['display_title'] = work.get('title') or work.get('name') # Si no hay más, el que tenemos
+        else:
+            work['display_title'] = title_es
+        known_for.append(work)
     
     return render_template('person_detail.html', person=res, known_for=known_for)
 
