@@ -426,24 +426,13 @@ body {
 }
 
 
-    z-index: 2;
-    pointer-events: none;
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 1rem;
-}
-
-.custom-region-dropdown.open .location-icon {
-    color: var(--primary);
-}
-
-
 /* ===================================================== */
 /* CARD LINKS */
 /* ===================================================== */
 .card-link {
     text-decoration: none;
     color: inherit;
-}
+}
 /* ===================================================== */
 /* CARDS BOUNCE ENTRANCE (Global) */
 /* ===================================================== */
