@@ -98,27 +98,5 @@
         </div>
     </div>
 </div>
-<script>
-function toggleDept(header) {
-    const group = header.parentElement;
-    const list = header.nextElementSibling;
-    
-    if (group.classList.contains('collapsed')) {
-        // ABRIR
-        list.style.maxHeight = list.scrollHeight + 100 + "px"; // +100 por seguridad de padding
-        group.classList.remove('collapsed');
-        // Quitar max-height fijo tras animación para que sea responsive
-        setTimeout(() => {
-            if(!group.classList.contains('collapsed')) list.style.maxHeight = "4000px";
-        }, 400);
-    } else {
-        // CERRAR
-        list.style.maxHeight = list.scrollHeight + "px"; // Fijamos antes de cerrar
-        setTimeout(() => {
-            group.classList.add('collapsed');
-            list.style.maxHeight = "0";
-        }, 10);
-    }
-}
-</script>
+<script src="{{ url_for('static', filename='js/cast.js') }}"></script>
 {% endblock %}

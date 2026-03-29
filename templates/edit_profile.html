@@ -84,82 +84,14 @@
         </div>
     </form>
 
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const countries = {{ countries_list | tojson }};
-        const container = document.getElementById('region-dropdown-container');
-        const btn = document.getElementById('region-dropdown-btn');
-        const display = document.getElementById('region-selected-display');
-        const menu = document.getElementById('region-dropdown-menu');
-        const listContainer = document.getElementById('region-list');
-        const searchInput = document.getElementById('region-search-input');
-        const hiddenInput = document.getElementById('region-input');
-        
-        function renderDisplay(code) {
-            const country = countries.find(c => c.code === code);
-            if (country) {
-                display.innerHTML = `<span class="flag">${country.emoji}</span><span class="name">${country.name}</span><span class="code">${country.code}</span>`;
-                hiddenInput.value = country.code;
-            } else {
-                display.innerHTML = "Selecciona tu país (Opcional)";
-                hiddenInput.value = "";
-            }
-        }
-        
-        function renderList(query = "") {
-            listContainer.innerHTML = '';
-            const q = query.toLowerCase().trim();
-            const filtered = countries.filter(c => 
-                c.name.toLowerCase().includes(q) || 
-                c.code.toLowerCase().includes(q)
-            );
-            
-            if (filtered.length === 0) {
-                listContainer.innerHTML = `<li style="padding: 15px; color: rgba(255,255,255,0.4); text-align: center; font-size: 0.9rem;">No se encontraron países</li>`;
-                return;
-            }
-            
-            filtered.forEach(country => {
-                const li = document.createElement('li');
-                li.className = `region-item ${country.code === hiddenInput.value ? 'selected' : ''}`;
-                li.innerHTML = `<span class="flag">${country.emoji}</span><span class="name">${country.name}</span><span class="code">${country.code}</span>`;
-                
-                li.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    renderDisplay(country.code);
-                    closeDropdown();
-                });
-                listContainer.appendChild(li);
+        document.addEventListener('DOMContentLoaded', () => {
+            AuthApp.initRegionDropdown({
+                countries: {{ countries_list | tojson }},
+                containerId: 'region-dropdown-container'
             });
-        }
-        
-        function toggleDropdown(e) {
-            e.stopPropagation();
-            const isOpen = container.classList.toggle('open');
-            if (isOpen) {
-                searchInput.value = "";
-                renderList();
-                setTimeout(() => searchInput.focus(), 100);
-            }
-        }
-        
-        function closeDropdown() {
-            container.classList.remove('open');
-        }
-        
-        btn.addEventListener('click', toggleDropdown);
-        searchInput.addEventListener('click', e => e.stopPropagation());
-        menu.addEventListener('click', e => e.stopPropagation());
-        searchInput.addEventListener('input', (e) => renderList(e.target.value));
-        
-        document.addEventListener('click', (e) => {
-            if (!container.contains(e.target)) closeDropdown();
         });
-
-        // Inicializar con el valor actual
-        if (hiddenInput.value) renderDisplay(hiddenInput.value);
-        renderList();
-    });
     </script>
 </div>
 {% endblock %}
