@@ -17,65 +17,145 @@
                     <span class="cast-year">({{ release_date[:4] }})</span>
                 {% endif %}
             </div>
-            <div class="badge-cast">Full Credits</div>
         </header>
     </div>
 
-    {# REPARTO #}
-    {% if cast %}
-    <section class="cast-full-section">
-        <h2 class="section-title"><i class="fas fa-users"></i> Reparto <span>({{ cast|length }})</span></h2>
-        <div class="credits-grid">
-            {% for actor in cast %}
-                <div class="credit-item">
-                    <div class="credit-photo">
-                        {% if actor.profile_path %}
-                            <img src="https://image.tmdb.org/t/p/w300{{ actor.profile_path }}" alt="{{ actor.name }}">
-                        {% else %}
-                            <div class="no-photo" style="height: 100%; display: flex; align-items: center; justify-content: center; background: #222; color: #555;">
-                                <i class="fas fa-user-circle" style="font-size: 5rem;"></i>
+    <div class="cast-columns-container">
+        {# COLUMNA IZQUIERDA: REPARTO #}
+        <div class="cast-column">
+            {% if cast %}
+            <section class="cast-full-section">
+                <h2 class="section-title"><i class="fas fa-users"></i> Reparto <span>({{ cast|length }})</span></h2>
+                <div class="credits-list-vertical">
+                    {% for actor in cast %}
+                        <div class="credit-item-row">
+                            <div class="credit-photo-small">
+                                {% if actor.profile_path %}
+                                    <img src="https://image.tmdb.org/t/p/w185{{ actor.profile_path }}" alt="{{ actor.name }}">
+                                {% else %}
+                                    <div class="no-photo-small">
+                                        <i class="fas fa-user-circle"></i>
+                                    </div>
+                                {% endif %}
                             </div>
-                        {% endif %}
-                    </div>
-                    <div class="credit-info">
-                        <span class="name">{{ actor.name }}</span>
-                        <span class="role">{{ actor.character }}</span>
-                    </div>
+                            <div class="credit-info-row">
+                                <span class="name">{{ actor.name }}</span>
+                                <span class="role">{{ actor.character | safe }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
-            {% endfor %}
+            </section>
+            {% endif %}
         </div>
-    </section>
-    {% endif %}
 
-    {# EQUIPO TÉCNICO #}
-    {% if crew %}
-    <section class="crew-full-section">
-        <h2 class="section-title"><i class="fas fa-video"></i> Equipo Técnico <span>({{ crew|length }})</span></h2>
-        <div class="credits-grid">
-            {% for member in crew %}
-                <div class="credit-item">
-                    <div class="credit-photo">
-                        {% if member.profile_path %}
-                            <img src="https://image.tmdb.org/t/p/w300{{ member.profile_path }}" alt="{{ member.name }}">
-                        {% else %}
-                            <div class="no-photo" style="height: 100%; display: flex; align-items: center; justify-content: center; background: #222; color: #555;">
-                                <i class="fas fa-user-circle" style="font-size: 5rem;"></i>
+        {# COLUMNA DERECHA: EQUIPO #}
+        <div class="cast-column">
+            {% if crew %}
+            <section class="crew-full-section">
+                <h2 class="section-title"><i class="fas fa-video"></i> Equipo Técnico <span>({{ crew|length }})</span></h2>
+                <div class="credits-list-vertical">
+                    {% for member in crew %}
+                        <div class="credit-item-row">
+                            <div class="credit-photo-small">
+                                {% if member.profile_path %}
+                                    <img src="https://image.tmdb.org/t/p/w185{{ member.profile_path }}" alt="{{ member.name }}">
+                                {% else %}
+                                    <div class="no-photo-small">
+                                        <i class="fas fa-user-circle"></i>
+                                    </div>
+                                {% endif %}
                             </div>
-                        {% endif %}
-                    </div>
-                    <div class="credit-info">
-                        <span class="name">{{ member.name }}</span>
-                        <span class="role">{{ member.job }}</span>
-                    </div>
+                            <div class="credit-info-row">
+                                <span class="name">{{ member.name }}</span>
+                                <span class="role">{{ member.job | safe }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
-            {% endfor %}
+            </section>
+            {% endif %}
         </div>
-    </section>
-    {% endif %}
+    </div>
 </div>
 
 <style>
-/* Estilos extra para la página de reparto */
+/* Estilos para la nueva disposición en columnas */
+.cast-columns-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: flex-start;
+}
+
+.credits-list-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.credit-item-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 10px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: var(--transition);
+}
+
+.credit-item-row:hover {
+    background: rgba(255,255,255,0.06);
+    transform: translateX(5px);
+}
+
+.credit-photo-small {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid rgba(255, 69, 0, 0.2);
+}
+
+.credit-photo-small img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.no-photo-small {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #222;
+    color: #555;
+    font-size: 1.5rem;
+}
+
+.credit-info-row {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.credit-info-row .name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #fff;
+}
+
+.credit-info-row .role {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+
+/* Estilos previos mantenidos o adaptados */
 .back-link-premium {
     display: inline-flex;
     align-items: center;
@@ -124,22 +204,23 @@
 }
 
 .section-title {
-    font-size: 2rem;
-    margin-bottom: 35px;
+    font-size: 1.8rem;
+    margin-bottom: 25px;
     display: flex;
     align-items: center;
     gap: 15px;
     color: #fff;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 15px;
 }
 
 .section-title span {
     color: rgba(255,255,255,0.3);
-    font-size: 1.2rem;
+    font-size: 1rem;
 }
 
 .section-title i {
     color: var(--primary);
 }
 </style>
-
 {% endblock %}

@@ -632,11 +632,29 @@ def media_detail(media_type, media_id):
     credits = {}
     try:
         credits = requests.get(credits_url).json()
-        # Normalizar character para TV en la preview
         if is_tv:
             for a in credits.get('cast', []):
                 if 'roles' in a and a['roles']:
-                    a['character'] = a['roles'][0].get('character', '')
+                    # Unimos cada personaje con su contador de episodios individual
+                    role_strings = []
+                    for r in a['roles']:
+                        char = r.get('character', '')
+                        if char:
+                            count = r.get('episode_count', 0)
+                            label = "episodio" if count == 1 else "episodios"
+                            role_strings.append(f"{char} <small style='opacity:0.6'>({count} {label})</small>")
+                    a['character'] = "<br>".join(role_strings)
+            for m in credits.get('crew', []):
+                if 'jobs' in m and m['jobs']:
+                    # Lo mismo para el equipo técnico
+                    job_strings = []
+                    for j in m['jobs']:
+                        job_name = j.get('job', '')
+                        if job_name:
+                            count = j.get('episode_count', 0)
+                            label = "episodio" if count == 1 else "episodios"
+                            job_strings.append(f"{job_name} <small style='opacity:0.6'>({count} {label})</small>")
+                    m['job'] = "<br>".join(job_strings)
     except:
         pass
 
@@ -809,7 +827,7 @@ def media_detail(media_type, media_id):
         user_region=user_region,
         keywords=keywords[:15],
         real_media_type='movie' if media_type == 'movie' else ('show' if res.get('media_subtype') == 'Programa' else 'tv'),
-        cast=credits.get('cast', [])[:7],
+        cast=credits.get('cast', [])[:5],
         crew=credits.get('crew', [])
     )
 
@@ -830,20 +848,39 @@ def media_cast(media_type, media_id):
         
     credits = requests.get(credits_url).json()
     
-    # Normalizar "roles" de TV a "character" para que el template no falle
+    # Normalizar personas para que el template no falle
     final_cast = credits.get('cast', [])
-    for actor in final_cast:
-        if 'roles' in actor and actor['roles']:
-            # Tomamos el primer rol y opcionalmente el contador de episodios
-            actor['character'] = actor['roles'][0].get('character', '')
-            if len(actor['roles']) > 1:
-                actor['character'] += f" y otros {len(actor['roles'])-1}"
+    final_crew = credits.get('crew', [])
+    
+    if media_type == 'tv' or (res.get('media_type') == 'tv' or 'first_air_date' in res):
+        # Para TV unimos cada rol de aggregate_credits con sus episodios propios
+        for actor in final_cast:
+            if 'roles' in actor and actor['roles']:
+                role_strings = []
+                for r in actor['roles']:
+                    char = r.get('character', '')
+                    if char:
+                        count = r.get('episode_count', 0)
+                        label = "episodio" if count == 1 else "episodios"
+                        role_strings.append(f"{char} <small style='opacity:0.6'>({count} {label})</small>")
+                actor['character'] = "<br>".join(role_strings)
+                
+        for member in final_crew:
+            if 'jobs' in member and member['jobs']:
+                job_strings = []
+                for j in member['jobs']:
+                    job_name = j.get('job', '')
+                    if job_name:
+                        count = j.get('episode_count', 0)
+                        label = "episodio" if count == 1 else "episodios"
+                        job_strings.append(f"{job_name} <small style='opacity:0.6'>({count} {label})</small>")
+                member['job'] = "<br>".join(job_strings)
     
     return render_template(
         'cast.html',
         media=res,
         cast=final_cast,
-        crew=credits.get('crew', []),
+        crew=final_crew,
         media_type=media_type,
         media_id=media_id
     )

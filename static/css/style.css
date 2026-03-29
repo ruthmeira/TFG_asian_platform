@@ -2734,9 +2734,8 @@ body {
     display: block;
     font-size: 0.75rem;
     color: var(--text-muted);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    line-height: 1.2;
+    margin-top: 2px;
 }
 
 /* FULL CAST PAGE */

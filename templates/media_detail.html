@@ -63,6 +63,9 @@
             <p><strong>Título original:</strong> {{ media.original_title or media.original_name }}</p>
             <p><strong>Idioma original:</strong> {{ media.original_language_name }}</p>
             <p><strong>Estado:</strong> {{ media.status }}</p>
+            {% if media.number_of_episodes %}
+                <p><strong>Episodios:</strong> {{ media.number_of_episodes }}</p>
+            {% endif %}
 
             <p><strong>Géneros:</strong>
                 {% for genre in media.genres %}
@@ -164,8 +167,10 @@
                             </div>
                         {% endif %}
                     </div>
-                    <span class="name">{{ actor.name }}</span>
-                    <span class="character">{{ actor.character }}</span>
+                    <div class="credit-info">
+                        <span class="name">{{ actor.name }}</span>
+                        <span class="role">{{ actor.character | safe }}</span>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
