@@ -1511,8 +1511,19 @@ def person_detail(person_id):
             filtered_credits.append(credit)
             seen_ids.add(cid)
 
-    # Ordenamos por popularidad y nos quedamos con el TOP 8
-    raw_works = sorted(filtered_credits, key=lambda x: x.get('popularity', 0), reverse=True)[:8]
+    # --- LÓGICA DE ORDENACIÓN "CONOCIDO POR" (Simular TMDB) ---
+    # Priorizamos Ficción (Series/Pelis) sobre Programas (Realities/Música)
+    # y ordenamos por Relevancia (Votos + Popularidad)
+    def calculate_relevance(item):
+        genre_ids = item.get('genre_ids', [])
+        is_program = any(gid in genre_ids for gid in GENRES_PROGRAMAS)
+        
+        # Penaltis y Pesos:
+        # 1. Prioridad: 1 para Ficción, 0 para Programas
+        # 2. Relevancia: Votos (indica legado) > Popularidad (indica tendencia actual)
+        return (not is_program, item.get('vote_count', 0), item.get('popularity', 0))
+
+    raw_works = sorted(filtered_credits, key=calculate_relevance, reverse=True)[:8]
     
     known_for = []
     for work in raw_works:
