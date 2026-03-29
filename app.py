@@ -865,36 +865,72 @@ def media_detail(media_type, media_id):
     
     res['flag'] = bandera_final or '🌏'
 
-    # --- ÚLTIMA TEMPORADA (SÓLO TV) ---
+    # --- ÚLTIMA TEMPORADA (SÓLO TV) CON MERGE ÁTOMO A ÁTOMO ---
     last_season = None
     has_multiple_seasons = False
     last_episode_date = None
     
     if media_type == 'tv':
-        # Buscamos el último episodio emitido para el "visto el..."
+        # Buscamos el último episodio emitido
         if res.get('last_episode_to_air'):
             le = res['last_episode_to_air']
             if le.get('air_date'):
                 try:
-                    meses = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.']
+                    meses_f = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.']
                     dt_le = datetime.strptime(le['air_date'], '%Y-%m-%d')
-                    last_episode_date = f"{dt_le.day} {meses[dt_le.month-1]} {dt_le.year}"
+                    last_episode_date = f"{dt_le.day} {meses_f[dt_le.month-1]} {dt_le.year}"
                 except:
                     last_episode_date = le['air_date']
 
         if res.get('seasons'):
-            # Filtramos la temporada 0 (Especiales) y cogemos la última
             seasons_list = [s for s in res['seasons'] if s.get('season_number', 0) > 0]
             if seasons_list:
                 last_season = seasons_list[-1]
                 has_multiple_seasons = len(seasons_list) > 1
+                s_num = last_season.get('season_number')
                 
-                # Formatear la fecha para que sea elegante
+                # --- FUSIÓN ÁTOMO A ÁTOMO (ES-ES > ES-MX > EN-US) ---
+                try:
+                    url_mx_s = f"https://api.themoviedb.org/3/tv/{media_id}/season/{s_num}?api_key={api_key}&language=es-MX"
+                    url_en_s = f"https://api.themoviedb.org/3/tv/{media_id}/season/{s_num}?api_key={api_key}&language=en-US"
+                    data_mx_s = requests.get(url_mx_s).json()
+                    data_en_s = requests.get(url_en_s).json()
+
+                    # 1. PÓSTER
+                    if not last_season.get('poster_path'):
+                        last_season['poster_path'] = data_mx_s.get('poster_path') or data_en_s.get('poster_path')
+                    
+                    # 2. NOMBRE
+                    if not last_season.get('name') or "Temporada" in last_season.get('name', ''):
+                        alt_name = data_mx_s.get('name')
+                        if alt_name and "Temporada" not in alt_name:
+                            last_season['name'] = alt_name
+                        else:
+                            alt_name_en = data_en_s.get('name')
+                            if alt_name_en and "Season" not in alt_name_en:
+                                last_season['name'] = alt_name_en
+
+                    # 3. SINOPSIS (+ Traducción)
+                    if not last_season.get('overview'):
+                        if data_mx_s.get('overview'):
+                            last_season['overview'] = data_mx_s['overview']
+                        elif data_en_s.get('overview'):
+                            try:
+                                last_season['overview'] = GoogleTranslator(source='en', target='es').translate(data_en_s['overview'])
+                            except:
+                                last_season['overview'] = data_en_s['overview']
+
+                    # 4. FECHA
+                    if not last_season.get('air_date'):
+                        last_season['air_date'] = data_mx_s.get('air_date') or data_en_s.get('air_date')
+                except: pass
+
+                # Formatear la fecha final si existe
                 if last_season.get('air_date'):
                     try:
-                        meses = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.']
+                        meses_f = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.']
                         dt = datetime.strptime(last_season['air_date'], '%Y-%m-%d')
-                        last_season['air_date_formatted'] = f"{dt.day} {meses[dt.month-1]} {dt.year}"
+                        last_season['air_date_formatted'] = f"{dt.day} {meses_f[dt.month-1]} {dt.year}"
                     except:
                         last_season['air_date_formatted'] = last_season['air_date']
                     
@@ -1022,7 +1058,7 @@ def seasons(media_id):
     else:
         response['display_title'] = title_es
 
-    # También necesitamos formatear la fecha del último capítulo si existe para la última temporada
+    # También necesitamos formatear la fecha del último capítulo
     last_episode_date = None
     if response.get('last_episode_to_air'):
         le = response['last_episode_to_air']
@@ -1035,18 +1071,64 @@ def seasons(media_id):
                 last_episode_date = le['air_date']
     response['last_episode_date_formatted'] = last_episode_date
 
-    # Filtrar temporadas y formatear fechas
+    # --- SMART MERGE PARA TODAS LAS TEMPORADAS (ES-ES > ES-MX > EN-US) ---
     meses_f = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.']
     all_seasons = []
-    
-    # TMDB las suele dar ordenadas, pero garantizamos que 0 (Especiales) vaya al final o no esté
     raw_seasons = sorted(response.get('seasons', []), key=lambda x: x.get('season_number', 0))
     
+    needs_merge = any(not s.get('overview') or not s.get('poster_path') or "Temporada" in s.get('name', '') for s in raw_seasons)
+    data_mx = None
+    data_en = None
+    
+    if needs_merge:
+        try:
+            url_mx_full = f"https://api.themoviedb.org/3/tv/{media_id}?api_key={api_key}&language=es-MX"
+            data_mx = requests.get(url_mx_full).json()
+            url_en_full = f"https://api.themoviedb.org/3/tv/{media_id}?api_key={api_key}&language=en-US"
+            data_en = requests.get(url_en_full).json()
+        except: pass
+
     for s in raw_seasons:
+        s_num = s.get('season_number')
+        # 1. PÓSTER
+        if not s.get('poster_path'):
+            s_mx = next((x for x in data_mx.get('seasons', []) if x.get('season_number') == s_num), {}) if data_mx else {}
+            s_en = next((x for x in data_en.get('seasons', []) if x.get('season_number') == s_num), {}) if data_en else {}
+            s['poster_path'] = s_mx.get('poster_path') or s_en.get('poster_path')
+        # 2. NOMBRE
+        if not s.get('name') or "Temporada" in s.get('name', ''):
+            s_mx = next((x for x in data_mx.get('seasons', []) if x.get('season_number') == s_num), {}) if data_mx else {}
+            alt_name = s_mx.get('name')
+            if alt_name and "Temporada" not in alt_name:
+                s['name'] = alt_name
+            else:
+                s_en = next((x for x in data_en.get('seasons', []) if x.get('season_number') == s_num), {}) if data_en else {}
+                alt_name_en = s_en.get('name')
+                if alt_name_en and "Season" not in alt_name_en:
+                    s['name'] = alt_name_en
+        # 3. SINOPSIS (+ Traducción)
+        if not s.get('overview'):
+            s_mx = next((x for x in data_mx.get('seasons', []) if x.get('season_number') == s_num), {}) if data_mx else {}
+            if s_mx.get('overview'):
+                s['overview'] = s_mx['overview']
+            else:
+                s_en = next((x for x in data_en.get('seasons', []) if x.get('season_number') == s_num), {}) if data_en else {}
+                if s_en.get('overview'):
+                    try:
+                        s['overview'] = GoogleTranslator(source='en', target='es').translate(s_en['overview'])
+                    except:
+                        s['overview'] = s_en['overview']
+        # 4. FECHA
+        if not s.get('air_date'):
+            s_mx = next((x for x in data_mx.get('seasons', []) if x.get('season_number') == s_num), {}) if data_mx else {}
+            s_en = next((x for x in data_en.get('seasons', []) if x.get('season_number') == s_num), {}) if data_en else {}
+            s['air_date'] = s_mx.get('air_date') or s_en.get('air_date')
+
+        # Formatear fechas para el frontend
         if s.get('air_date'):
             try:
                 dt = datetime.strptime(s['air_date'], '%Y-%m-%d')
-                s['air_date_formatted'] = f"{dt.day} {meses[dt.month-1]} {dt.year}"
+                s['air_date_formatted'] = f"{dt.day} {meses_f[dt.month-1]} {dt.year}"
             except:
                 s['air_date_formatted'] = s['air_date']
         all_seasons.append(s)
