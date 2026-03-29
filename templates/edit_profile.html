@@ -2,6 +2,10 @@
 
 {% block title %}Editar Perfil - SHIORI{% endblock %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="matrix-container" style="justify-content: space-between; padding: 0 1%;">
     <div class="matrix-column" style="animation-duration: 4.5s; animation-delay: 0.5s;">永 和 龙 美</div>

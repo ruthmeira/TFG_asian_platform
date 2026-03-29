@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Mi Perfil - SHIORI{% endblock %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="container container-profile">
     {% with messages = get_flashed_messages(with_categories=true) %}
