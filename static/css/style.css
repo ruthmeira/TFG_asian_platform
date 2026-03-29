@@ -430,12 +430,8 @@ body {
 }
 
 /* ===================================================== */
-/* COLLECTION PAGE & SHARED HEADERS */
+/* GLOBAL COMPONENTS (Shared across pages) */
 /* ===================================================== */
-
-.collection-section {
-    margin-bottom: 50px;
-}
 
 .section-header {
     display: flex;
@@ -457,79 +453,21 @@ body {
 }
 
 .view-all-link {
-    font-size: 0.95rem !important;
-    color: var(--text-muted) !important;
-    text-decoration: none !important;
-    font-weight: 600 !important;
-    transition: var(--transition) !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .view-all-link:hover {
-    color: var(--primary) !important;
-    transform: translateX(5px) !important;
+    color: var(--primary);
+    transform: translateX(5px);
 }
 
-.empty-msg-collection {
-    color: var(--text-muted);
-    font-style: italic;
-    padding: 20px;
-}
-
-.carouselCollection {
-    display: flex;
-    overflow-x: auto;
-    gap: 25px;
-    padding: 10px 0 25px 0;
-    scroll-behavior: smooth;
-}
-
-.carouselCollection::-webkit-scrollbar {
-    height: 6px;
-}
-
-.carouselCollection::-webkit-scrollbar-thumb {
-    background: var(--primary);
-    border-radius: 10px;
-}
-
-.cardColeccion {
-    flex: 0 0 auto;
-    width: 170px;
-    border-radius: 14px;
-    overflow: hidden;
-    background: var(--bg-card);
-    transition: var(--transition);
-    border: 1px solid var(--glass-border);
-    display: flex;
-    flex-direction: column;
-}
-
-.cardColeccion:hover {
-    transform: translateY(-6px);
-    box-shadow: var(--shadow-main);
-    border-color: rgba(255, 69, 0, 0.3);
-}
-
-.cardColeccion img {
-    width: 100%;
-    height: 240px;
-    object-fit: cover;
-}
-
-.cardCollection-body {
-    padding: 12px;
-    text-align: center;
-}
-
-.cardCollection-body h4 {
-    font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
 
 /* ===================================================== */
 /* ===================================================== */

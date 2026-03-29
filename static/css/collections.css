@@ -1,0 +1,66 @@
+/* ===================================================== */
+/* COLLECTIONS PAGE - ESTILOS MODULARES */
+/* ===================================================== */
+
+.collection-section {
+    margin-bottom: 60px;
+    animation: fadeInSlide 0.8s ease backwards;
+}
+
+@keyframes fadeInSlide {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.collection-section:nth-child(2) { animation-delay: 0.1s; }
+.collection-section:nth-child(3) { animation-delay: 0.2s; }
+.collection-section:nth-child(4) { animation-delay: 0.3s; }
+
+/* Empty state styling */
+.empty-msg-collection {
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 16px;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    text-align: center;
+    margin: 10px 0;
+}
+
+/* Specific carousel spacing for Collections */
+.carouselCollection {
+    display: flex;
+    overflow-x: auto;
+    gap: 25px;
+    padding: 15px 0 30px 0;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) transparent;
+}
+
+.carouselCollection::-webkit-scrollbar {
+    height: 6px;
+}
+
+.carouselCollection::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
+}
+
+/* Entrance animation for cards in collections */
+.collection-section .card-link {
+    animation: cardEntrance 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+@keyframes cardEntrance {
+    0% { opacity: 0; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.carouselCollection .card-link:nth-child(1) { animation-delay: 0.1s; }
+.carouselCollection .card-link:nth-child(2) { animation-delay: 0.15s; }
+.carouselCollection .card-link:nth-child(3) { animation-delay: 0.2s; }
+.carouselCollection .card-link:nth-child(4) { animation-delay: 0.25s; }
+.carouselCollection .card-link:nth-child(5) { animation-delay: 0.3s; }
+.carouselCollection .card-link:nth-child(n+6) { animation-delay: 0.35s; }

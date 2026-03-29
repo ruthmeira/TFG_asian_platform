@@ -1,10 +1,14 @@
 {% extends "base.html" %}
 {% block title %}Mis Colecciones - SHIORI{% endblock %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/collections.css') }}">
+{% endblock %}
+
 {% block content %}
 
 <div class="container">
-    <div class="home-header">
+    <div class="page-header">
         <div class="title-section">
             <h1>Mis Colecciones</h1>
             <p>Toda tu crónica asiática en un solo lugar 🏮</p>
