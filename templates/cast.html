@@ -74,19 +74,62 @@
 }
 
 .department-group {
-    margin-bottom: 40px;
+    margin-bottom: 25px;
 }
 
 .dept-subtitle {
     font-size: 1.2rem;
     color: #fff;
-    margin-bottom: 15px;
-    padding: 8px 15px;
+    margin-bottom: 0;
+    padding: 12px 18px;
     border-left: 4px solid var(--primary);
     background: linear-gradient(90deg, rgba(255,69,0,0.1) 0%, transparent 100%);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+    border-radius: 4px 12px 0 0;
+}
+
+.dept-subtitle:hover {
+    background: linear-gradient(90deg, rgba(255,69,0,0.2) 0%, transparent 100%);
+}
+
+.dept-subtitle .dept-info {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.dept-subtitle i {
+    transition: transform 0.3s ease;
+    color: var(--primary);
+    font-size: 0.9rem;
+}
+
+.credits-list-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+    background: rgba(255,255,255,0.01);
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
+    max-height: 5000px; /* Abierto por defecto */
+    transition: max-height 0.4s cubic-bezier(0, 1, 0, 1), padding 0.3s ease;
+}
+
+.department-group.collapsed .credits-list-vertical {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    pointer-events: none;
+}
+
+.department-group.collapsed .dept-subtitle i {
+    transform: rotate(-180deg);
 }
 
 .dept-subtitle span {
@@ -230,7 +273,13 @@
                 
                 {% for dept, members in crew_by_dept.items() %}
                 <div class="department-group">
-                    <h3 class="dept-subtitle">{{ dept }} <span>({{ members|length }})</span></h3>
+                    <div class="dept-subtitle" onclick="toggleDept(this)">
+                        <div class="dept-info">
+                            <strong>{{ dept }}</strong>
+                            <span>{{ members|length }}</span>
+                        </div>
+                        <i class="fas fa-chevron-up"></i>
+                    </div>
                     <div class="credits-list-vertical">
                         {% for member in members %}
                             <div class="credit-item-row">
@@ -259,4 +308,27 @@
         </div>
     </div>
 </div>
+<script>
+function toggleDept(header) {
+    const group = header.parentElement;
+    const list = header.nextElementSibling;
+    
+    if (group.classList.contains('collapsed')) {
+        // ABRIR
+        list.style.maxHeight = list.scrollHeight + 100 + "px"; // +100 por seguridad de padding
+        group.classList.remove('collapsed');
+        // Quitar max-height fijo tras animación para que sea responsive
+        setTimeout(() => {
+            if(!group.classList.contains('collapsed')) list.style.maxHeight = "4000px";
+        }, 400);
+    } else {
+        // CERRAR
+        list.style.maxHeight = list.scrollHeight + "px"; // Fijamos antes de cerrar
+        setTimeout(() => {
+            group.classList.add('collapsed');
+            list.style.maxHeight = "0";
+        }, 10);
+    }
+}
+</script>
 {% endblock %}
