@@ -868,25 +868,39 @@ def media_detail(media_type, media_id):
     # --- ÚLTIMA TEMPORADA (SÓLO TV) ---
     last_season = None
     has_multiple_seasons = False
-    if media_type == 'tv' and res.get('seasons'):
-        # Filtramos la temporada 0 (Especiales) y cogemos la última
-        seasons_list = [s for s in res['seasons'] if s.get('season_number', 0) > 0]
-        if seasons_list:
-            last_season = seasons_list[-1]
-            has_multiple_seasons = len(seasons_list) > 1
-            
-            # Formatear la fecha para que sea elegante
-            if last_season.get('air_date'):
+    last_episode_date = None
+    
+    if media_type == 'tv':
+        # Buscamos el último episodio emitido para el "visto el..."
+        if res.get('last_episode_to_air'):
+            le = res['last_episode_to_air']
+            if le.get('air_date'):
                 try:
-                    dt = datetime.strptime(last_season['air_date'], '%Y-%m-%d')
-                    # Meses en español (abreviado)
                     meses = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.']
-                    last_season['air_date_formatted'] = f"{dt.day} {meses[dt.month-1]} {dt.year}"
+                    dt_le = datetime.strptime(le['air_date'], '%Y-%m-%d')
+                    last_episode_date = f"{dt_le.day} {meses[dt_le.month-1]} {dt_le.year}"
                 except:
-                    last_season['air_date_formatted'] = last_season['air_date']
+                    last_episode_date = le['air_date']
+
+        if res.get('seasons'):
+            # Filtramos la temporada 0 (Especiales) y cogemos la última
+            seasons_list = [s for s in res['seasons'] if s.get('season_number', 0) > 0]
+            if seasons_list:
+                last_season = seasons_list[-1]
+                has_multiple_seasons = len(seasons_list) > 1
+                
+                # Formatear la fecha para que sea elegante
+                if last_season.get('air_date'):
+                    try:
+                        meses = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.']
+                        dt = datetime.strptime(last_season['air_date'], '%Y-%m-%d')
+                        last_season['air_date_formatted'] = f"{dt.day} {meses[dt.month-1]} {dt.year}"
+                    except:
+                        last_season['air_date_formatted'] = last_season['air_date']
                     
     res['last_season'] = last_season
     res['has_multiple_seasons'] = has_multiple_seasons
+    res['last_episode_date_formatted'] = last_episode_date
 
     # --- FORMATO DE DURACIÓN ---
     runtime = res.get('runtime') or (res.get('episode_run_time', [0])[0] if media_type == 'tv' and res.get('episode_run_time') else 0)

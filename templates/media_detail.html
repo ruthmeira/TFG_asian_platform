@@ -517,7 +517,15 @@
                             {% endif %}
                         </div>
                         <div class="season-meta-mini">
-                            <span class="season-year">{{ media.last_season.air_date_formatted }}</span>
+                            {% if media.last_season.air_date_formatted %}
+                                <span class="season-year">Estreno: {{ media.last_season.air_date_formatted }}</span>
+                            {% endif %}
+                            
+                            {% if media.last_episode_date_formatted %}
+                                {% if media.last_season.air_date_formatted %}<span class="season-dot">•</span>{% endif %}
+                                <span class="season-year">Último: {{ media.last_episode_date_formatted }}</span>
+                            {% endif %}
+                            
                             <span class="season-dot">•</span>
                             <span class="season-ep-count">{{ media.last_season.episode_count }} episodios</span>
                         </div>
