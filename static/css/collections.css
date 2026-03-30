@@ -1,42 +1,95 @@
-/* ===================================================== */
-/* COLLECTIONS PAGE - ESTILOS MODULARES */
-/* ===================================================== */
-
-.collection-section {
-    margin-bottom: 60px;
-    animation: fadeInSlide 0.8s ease backwards;
+.cast-page-container {
+    margin-bottom: 20px;
+    width: 100%;
+    animation: fadeIn 0.8s ease-out;
 }
 
-@keyframes fadeInSlide {
-    from { opacity: 0; transform: translateY(30px); }
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-.collection-section:nth-child(2) { animation-delay: 0.1s; }
-.collection-section:nth-child(3) { animation-delay: 0.2s; }
-.collection-section:nth-child(4) { animation-delay: 0.3s; }
+.cast-main-header {
+    margin-bottom: clamp(30px, 4vw, 50px);
+}
 
-/* Empty state styling */
+.cast-title {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    margin-bottom: 8px;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.subtitle-premium {
+    color: var(--text-muted);
+    font-size: clamp(14px, 1.2vw, 17px);
+    margin: 0;
+    opacity: 0.8;
+}
+
+.collection-section {
+    margin-bottom: clamp(40px, 6vw, 65px);
+}
+
+.section-title {
+    font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
+}
+
+.title-main-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.title-main-info i {
+    color: var(--primary);
+}
+
+.title-main-info span {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 1.1rem;
+    font-weight: 400;
+}
+
+/* Empty state premium */
 .empty-msg-collection {
     color: var(--text-muted);
-    font-style: italic;
-    padding: 30px;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 16px;
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 20px;
     border: 1px dashed rgba(255, 255, 255, 0.1);
     text-align: center;
     margin: 10px 0;
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    font-size: 1.1rem;
+}
+
+.empty-msg-collection i {
+    font-size: 2.5rem;
+    opacity: 0.2;
 }
 
 /* Specific carousel spacing for Collections */
 .carouselCollection {
     display: flex;
     overflow-x: auto;
-    gap: 25px;
-    padding: 15px 0 30px 0;
+    gap: 20px;
+    padding: 20px 0 15px 5px; /* Aligned with cards */
     scroll-behavior: smooth;
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary) transparent;
+    /* Removed static mask-image to keep last cards sharp */
 }
 
 .carouselCollection::-webkit-scrollbar {
@@ -51,16 +104,96 @@
 /* Entrance animation for cards in collections */
 .collection-section .card-link {
     animation: cardEntrance 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+    flex: 0 0 auto;
 }
 
 @keyframes cardEntrance {
-    0% { opacity: 0; transform: scale(0.8); }
+    0% { opacity: 0; transform: scale(0.9); }
     100% { opacity: 1; transform: scale(1); }
 }
 
 .carouselCollection .card-link:nth-child(1) { animation-delay: 0.1s; }
-.carouselCollection .card-link:nth-child(2) { animation-delay: 0.15s; }
-.carouselCollection .card-link:nth-child(3) { animation-delay: 0.2s; }
-.carouselCollection .card-link:nth-child(4) { animation-delay: 0.25s; }
-.carouselCollection .card-link:nth-child(5) { animation-delay: 0.3s; }
-.carouselCollection .card-link:nth-child(n+6) { animation-delay: 0.35s; }
+.carouselCollection .card-link:nth-child(2) { animation-delay: 0.18s; }
+.carouselCollection .card-link:nth-child(3) { animation-delay: 0.26s; }
+.carouselCollection .card-link:nth-child(4) { animation-delay: 0.34s; }
+.carouselCollection .card-link:nth-child(5) { animation-delay: 0.42s; }
+.carouselCollection .card-link:nth-child(n+6) { animation-delay: 0.5s; }
+
+/* REPARTO / SEASON LINK HARMONIZATION */
+.view-all-link {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+@media (max-width: 600px) {
+    .cast-main-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .header-text {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* MATCHING HOME SECTION TITLE LOGIC */
+    .section-title {
+        font-size: clamp(1rem, 6vw, 1.25rem) !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding-bottom: 10px;
+    }
+
+    .title-main-info {
+        gap: 8px;
+    }
+
+    .title-main-info span {
+        font-size: 0.9rem;
+    }
+
+    /* MATCHING HOME CARD LOGIC (140px width) */
+    .collection-section .card {
+        width: 140px !important;
+        min-width: 140px !important;
+    }
+
+    .collection-section .card img {
+        height: 197px !important; /* Perfect 1.41 ratio */
+    }
+
+    .collection-section .card-body {
+        padding: 10px !important;
+    }
+
+    .collection-section .card-body h4 {
+        font-size: 10px !important;
+        margin-bottom: 2px !important;
+    }
+
+    .collection-section .card-body h6 {
+        font-size: 8px !important;
+        margin-bottom: 6px !important;
+    }
+
+    .collection-section .card-meta {
+        font-size: 9px !important;
+    }
+
+    .collection-section .badge {
+        top: 10px !important;
+        left: 10px !important;
+        padding: 3px 9px !important;
+        font-size: 7px !important;
+    }
+
+    .empty-msg-collection {
+        padding: 25px;
+        font-size: 0.9rem;
+    }
+    
+    .empty-msg-collection i {
+        font-size: 1.8rem;
+    }
+}

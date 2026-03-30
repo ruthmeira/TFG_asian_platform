@@ -7,20 +7,24 @@
 
 {% block content %}
 
-<div class="container">
-    <div class="page-header">
-        <div class="title-section">
-            <h1>Mis Colecciones</h1>
-            <p>Toda tu crónica asiática en un solo lugar 🏮</p>
-        </div>
+<div class="cast-page-container">
+    <div class="cast-header-wrapper">
+        <header class="cast-main-header">
+            <div class="header-text">
+                <h1 class="cast-title">Mis Colecciones</h1>
+                <p class="subtitle-premium">Toda tu crónica asiática en un solo lugar 🏮</p>
+            </div>
+        </header>
     </div>
 
     {% if favorites %}
     <section class="collection-section">
-        <div class="section-header">
-            <h2>Favoritos</h2>
-            <a href="{{ url_for('view_collection', status='favoritos') }}" class="view-all-link">Ver todo >></a>
-        </div>
+        <h2 class="section-title">
+            <div class="title-main-info">
+                <i class="fas fa-heart"></i> Favoritos <span>({{ favorites|length }})</span>
+            </div>
+            <a href="{{ url_for('view_collection', status='favoritos') }}" class="view-all-link">Ver todo ></a>
+        </h2>
         
         <div class="carouselCollection">
             {% for item in favorites %}
@@ -44,13 +48,25 @@
     {% endif %}
 
     {% for status, items in collections.items() %}
+    {% set icon_map = {
+        'viendo': 'fa-play',
+        'planificada': 'fa-bookmark',
+        'pendiente': 'fa-bookmark',
+        'vistas': 'fa-check-double',
+        'visto': 'fa-check-double',
+        'en_espera': 'fa-pause-circle',
+        'abandonada': 'fa-times-circle',
+        'abandonado': 'fa-times-circle'
+    } %}
     <section class="collection-section">
-        <div class="section-header">
-            <h2>{{ status }}</h2>
+        <h2 class="section-title">
+            <div class="title-main-info">
+                <i class="fas {{ icon_map.get(status.lower(), 'fa-th-list') }}"></i> {{ status|title }} <span>({{ items|length }})</span>
+            </div>
             {% if items %}
-                <a href="{{ url_for('view_collection', status=status) }}" class="view-all-link">Ver todo >></a>
+                <a href="{{ url_for('view_collection', status=status) }}" class="view-all-link">Ver todo ></a>
             {% endif %}
-        </div>
+        </h2>
 
         {% if items %}
         <div class="carouselCollection">
@@ -72,7 +88,9 @@
             {% endfor %}
         </div>
         {% else %}
-            <p class="empty-msg-collection">No hay elementos en esta categoría.</p>
+            <div class="empty-msg-collection">
+                <i class="fas fa-ghost"></i> No hay elementos en esta categoría.
+            </div>
         {% endif %}
     </section>
     {% endfor %}

@@ -95,14 +95,11 @@
 .carousel {
     display: flex;
     overflow-x: auto;
-    padding: 20px 40px 15px 5px;
-    /* Increased top padding to avoid clipping on bounce */
-    margin-right: -40px;
+    padding: 20px 0 15px 5px; /* Aligned with cards */
+    margin-right: 0; 
     gap: 20px;
-    /* Increased gap to avoid collision */
     scroll-behavior: smooth;
-    mask-image: linear-gradient(to right, black calc(100% - 40px), transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, black calc(100% - 40px), transparent 100%);
+    /* Removed static mask-image to keep last cards 100% sharp */
 }
 
 .carousel::-webkit-scrollbar {
