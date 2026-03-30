@@ -377,7 +377,6 @@ body {
 .card-link:hover .card {
     transform: translateY(-8px);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-    border-color: var(--primary);
 }
 
 .card-link:hover img {
