@@ -88,4 +88,40 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+
+    // --- LÓGICA DE BOTÓN "VOLVER ARRIBA" (Con tope en el footer) ---
+    const scrollTopBtn = document.getElementById('scroll-to-top');
+    const footer = document.querySelector('.footer');
+
+    if (scrollTopBtn) {
+        window.addEventListener('scroll', () => {
+            // Mostrar/Ocultar por distancia mínima
+            if (window.scrollY > 400) {
+                scrollTopBtn.classList.add('visible');
+            } else {
+                scrollTopBtn.classList.remove('visible');
+            }
+
+            // Evitar que entre en el footer
+            if (footer) {
+                const footerRect = footer.getBoundingClientRect();
+                const windowHeight = window.innerHeight;
+                
+                // Si el footer entra en pantalla
+                if (footerRect.top < windowHeight) {
+                    const offset = windowHeight - footerRect.top + 30; // 30px extra de margen
+                    scrollTopBtn.style.bottom = offset + 'px';
+                } else {
+                    scrollTopBtn.style.bottom = '30px'; // Posición fija original
+                }
+            }
+        });
+
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
 });
