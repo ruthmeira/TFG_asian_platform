@@ -435,7 +435,6 @@ body {
 
 .view-all-link:hover {
     color: var(--primary);
-    transform: translateX(5px);
 }
 
 
