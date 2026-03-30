@@ -550,9 +550,9 @@ def collections():
     for status in statuses:
         user_collections[status] = CollectionItem.query.filter_by(
             user_id=current_user.id, status=status
-        ).order_by(CollectionItem.created_at.desc()).limit(15).all()
+        ).order_by(CollectionItem.created_at.desc()).limit(10).all()
 
-    favorites = CollectionItem.query.filter_by(user_id=current_user.id, is_favorite=True).order_by(CollectionItem.created_at.desc()).limit(15).all()
+    favorites = CollectionItem.query.filter_by(user_id=current_user.id, is_favorite=True).order_by(CollectionItem.created_at.desc()).limit(10).all()
     return render_template('collections.html', collections=user_collections, favorites=favorites)
 
 
@@ -561,7 +561,8 @@ def collections():
 @login_required
 def view_collection(status):
     page = request.args.get('page', 1, type=int)
-    per_page = 20
+    per_page = request.args.get('per_page', 18, type=int)
+    ajax = request.args.get('ajax', 0, type=int)
     
     query = CollectionItem.query.filter_by(user_id=current_user.id).order_by(CollectionItem.created_at.desc())
 
@@ -575,11 +576,20 @@ def view_collection(status):
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     items = pagination.items
 
+    # SI ES AJAX, ENVIAMOS SOLO LA REJILLA (Sin cabecera ni navbar)
+    if ajax:
+        return render_template('partials/collection_grid.html', 
+                             items=items, 
+                             pagination=pagination, 
+                             status=status,
+                             per_page=per_page)
+
     return render_template('collection_view.html', 
                           items=items, 
                           display_name=display_name, 
                           pagination=pagination, 
-                          status=status)
+                          status=status,
+                          per_page=per_page)
 
 
 # --- AJAX FAVORITE / COLLECTION ---

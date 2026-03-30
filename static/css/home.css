@@ -335,14 +335,11 @@
 
     .filter-btn {
         width: clamp(95px, 30vw, 130px) !important;
-        /* Gemelos con escala inteligente */
         min-width: 0 !important;
         padding: clamp(6px, 1.5vw, 10px) 0 !important;
-        /* Más finos y a proporción */
         font-size: clamp(12px, 3vw, 14px) !important;
         text-align: center;
         display: flex;
-        /* Para centrado perfecto */
         justify-content: center;
         align-items: center;
     }
@@ -357,67 +354,21 @@
     .content-section h2 {
         font-size: clamp(1rem, 6vw, 1.25rem) !important;
         white-space: nowrap;
-        /* Force one line */
         overflow: hidden;
         text-overflow: ellipsis;
-        /* ... if it still overflows */
     }
 
     .carousel {
         gap: 20px;
-        /* Consistencia de separación */
     }
 
     .card {
         width: 140px !important;
-        /* Fixed width for mobile as requested */
         min-width: 140px !important;
     }
 
     .card-link {
         flex: 0 0 auto;
         width: auto;
-    }
-
-    .card img {
-        height: 197px !important;
-        /* Mantiene exactamente la misma proporción que en escritorio (1.41) */
-    }
-
-    /* Scaling internal card data proportionally from 220px to 140px (~0.64x) */
-    .card-body {
-        padding: 10px !important;
-    }
-
-    .card-body h4 {
-        font-size: 10px !important;
-        margin-bottom: 2px !important;
-    }
-
-    .card-body h6 {
-        font-size: 8px !important;
-        margin-bottom: 6px !important;
-    }
-
-    .card-meta {
-        font-size: 9px !important;
-    }
-
-    .rating {
-        gap: 2px !important;
-    }
-
-    .lang {
-        font-size: 0.8rem !important;
-        padding: 1px 4px !important;
-        border-radius: 4px !important;
-    }
-
-    .badge {
-        top: 10px !important;
-        left: 10px !important;
-        padding: 3px 9px !important;
-        font-size: 7px !important;
-        /* Slightly rounded to maintain readability */
     }
 }

@@ -22,11 +22,13 @@
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     width: 100%;
     margin: 0;
     padding: 0;
-    overflow-x: hidden; /* Evitar scroll horizontal */
+    overflow-x: hidden;
+    /* Evitar scroll horizontal */
     -webkit-text-size-adjust: 100%;
 }
 
@@ -84,7 +86,7 @@ body {
     aspect-ratio: 16/9;
     background: #000;
     border-radius: 15px;
-    box-shadow: 0 0 50px rgba(0,0,0,0.5);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
     transform: scale(0.9);
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -97,7 +99,7 @@ body {
     position: absolute;
     top: -55px;
     right: 0;
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
     border: none;
     color: white;
     font-size: 2.2rem;
@@ -111,7 +113,7 @@ body {
     justify-content: center;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .close-modal:hover {
@@ -146,7 +148,8 @@ body {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--glass-border);
-    padding: 12px 40px; /* Cambiado de 5% a 40px */
+    padding: 12px 40px;
+    /* Cambiado de 5% a 40px */
     transition: all 0.3s ease;
     margin: 0;
 }
@@ -155,7 +158,8 @@ body {
     max-width: 1400px;
     margin: 0 auto;
     display: flex;
-    justify-content: space-between; /* Enlaces a la derecha en escritorio */
+    justify-content: space-between;
+    /* Enlaces a la derecha en escritorio */
     align-items: center;
     gap: 40px;
 }
@@ -235,7 +239,8 @@ body {
 
 
 /* Alerts (Flash Messages) - Clean version */
-.alert-success, .alert-error {
+.alert-success,
+.alert-error {
     padding: 12px 18px;
     border-radius: 12px;
     margin-bottom: 25px;
@@ -263,13 +268,15 @@ body {
 /* PAGE HEADER (Global) */
 /* ===================================================== */
 
-.page-header, .home-header {
+.page-header,
+.home-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
     margin-bottom: 50px;
     padding-bottom: 25px;
-    border-bottom: 1px solid var(--glass-border);}
+    border-bottom: 1px solid var(--glass-border);
+}
 
 .title-section h1 {
     font-size: 2.8rem;
@@ -304,11 +311,13 @@ body {
 /* ===================================================== */
 /* HOME CARDS */
 /* ===================================================== */
-
 .card {
     position: relative;
     flex: 0 0 auto;
-    width: 175px; /* Unified Desktop/Tablet size for better density */
+    /* No permite que se encojan en carruseles */
+    width: 175px;
+    /* Ancho base estable */
+    max-width: 100%;
     background: var(--bg-card);
     border-radius: 12px;
     overflow: hidden;
@@ -319,7 +328,8 @@ body {
 
 .card img {
     width: 100%;
-    height: 247px; /* Proportional 1.41 height for 175px width */
+    aspect-ratio: 2 / 3;
+    /* Proporción PERFECTA y constante */
     object-fit: cover;
     transition: var(--transition);
     border-radius: 12px 12px 0 0;
@@ -332,39 +342,54 @@ body {
 
 .card:hover img {
     transform: scale(1.05);
-    /* Softer scale */
 }
 
-
 .card-body {
-    padding: 12px; /* Proportional to 175px card */
+    padding: clamp(10px, 1.2vw, 12px);
     background: var(--bg-card);
+    display: flex;
+    flex-direction: column;
 }
 
 .card-body h4 {
-    font-size: 13.5px; /* Scaled text for high-density design */
+    margin: 0 0 6px 0;
+    font-size: clamp(12px, 1.1vw, 15px);
+    /* Fuente fluida adaptativa */
     font-weight: 600;
-    margin-bottom: 4px;
-    white-space: nowrap;
+    line-height: 1.3;
+    color: #fff;
+    /* UNA SOLA LÍNEA REGLAMENTARIA */
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: normal !important;
 }
 
 .card-body h6 {
-    font-size: 10px;
+    margin: 0 0 10px 0;
+    font-size: clamp(10px, 0.9vw, 11px);
     color: var(--text-muted);
     font-weight: 400;
-    margin-bottom: 10px;
-    white-space: nowrap;
+    line-height: 1.2;
+    /* UNA SOLA LÍNEA REGLAMENTARIA */
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: normal !important;
 }
 
 .card-meta {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 13px;
+    font-size: clamp(11px, 1vw, 13px);
+    margin-top: auto;
 }
 
 .rating {
@@ -377,7 +402,6 @@ body {
 
 .lang {
     font-family: 'Noto Color Emoji', sans-serif;
-    font-size: 1.2rem;
     background: rgba(255, 255, 255, 0.1);
     padding: 2px 6px;
     border-radius: 6px;
@@ -385,18 +409,17 @@ body {
 
 .card .badge {
     position: absolute;
-    top: 12px; /* Position refined for 175px width */
-    left: 12px;
+    top: 10px;
+    left: 10px;
     background: var(--primary-gradient);
     color: #fff;
-    padding: 4px 12px;
+    padding: 3px 9px;
     border-radius: 8px;
-    font-size: 9px;
+    font-size: clamp(8px, 0.8vw, 10px);
     font-weight: 700;
     z-index: 2;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
 /* ===================================================== */
@@ -439,23 +462,66 @@ body {
 
 
 /* ===================================================== */
+/* NAVIGATION LINKS (Shared) */
+/* ===================================================== */
+.back-link-premium {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    gap: 10px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition);
+    margin-bottom: 25px;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.back-link-premium:hover {
+    color: var(--primary);
+}
+
+.back-link-premium i {
+    font-size: 14px;
+}
+
+/* ===================================================== */
 /* CARD LINKS */
 /* ===================================================== */
 .card-link {
     text-decoration: none;
     color: inherit;
 }
+
 /* ===================================================== */
 /* CARDS BOUNCE ENTRANCE (Global) */
 /* ===================================================== */
 .card-link {
-    animation: zoomInBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+    animation: zoomInBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* CERO EFECTOS PARA ACTUALIZACIONES AJAX (Instantáneo) */
+.ajax-update .card-link {
+    animation: none !important;
 }
 
 @keyframes zoomInBounce {
-    0% { opacity: 0; transform: scale(0.3); }
-    70% { opacity: 0.8; transform: scale(1.05); }
-    100% { opacity: 1; transform: scale(1); }
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+
+    70% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 
@@ -509,8 +575,10 @@ body {
 /* ===================================================== */
 .footer {
     width: 100%;
-    margin-top: 0px; /* Margen eliminado */
-    padding: 40px 40px; /* Cambiado de 5% a 40px fixed */
+    margin-top: 0px;
+    /* Margen eliminado */
+    padding: 40px 40px;
+    /* Cambiado de 5% a 40px fixed */
     border-top: 1px solid var(--glass-border);
 }
 
@@ -542,7 +610,8 @@ body {
 
 @media (max-width: 600px) {
     .navbar {
-        padding: 15px 15px; /* Consistent alignment with container */
+        padding: 15px 15px;
+        /* Consistent alignment with container */
     }
 
     .navbar-wrapper {
@@ -554,7 +623,8 @@ body {
     }
 
     .nav-links {
-        display: none; /* Oculto por defecto en móvil */
+        display: none;
+        /* Oculto por defecto en móvil */
         width: 100%;
         background: transparent;
         backdrop-filter: none;
@@ -572,12 +642,14 @@ body {
     }
 
     .nav-links.active {
-        display: flex; /* Se muestra y ocupa espacio físico */
+        display: flex;
+        /* Se muestra y ocupa espacio físico */
         opacity: 1;
     }
 
     .navbar-wrapper {
-        flex-wrap: wrap; /* Permite que el menú baje a la siguiente línea */
+        flex-wrap: wrap;
+        /* Permite que el menú baje a la siguiente línea */
     }
 
     .nav-links a {
@@ -604,7 +676,9 @@ body {
     display: block;
 }
 
-.credit-info a.name, .credit-info-row a.name, .work-card span {
+.credit-info a.name,
+.credit-info-row a.name,
+.work-card span {
     text-decoration: none !important;
     color: #fff;
     transition: var(--transition);
@@ -612,16 +686,20 @@ body {
     width: fit-content;
 }
 
-.credit-info a.name:hover, .credit-info-row a.name:hover, .work-card:hover .work-title {
+.credit-info a.name:hover,
+.credit-info-row a.name:hover,
+.work-card:hover .work-title {
     color: var(--primary);
     text-decoration: none !important;
 }
 
-.cast-avatar a:hover, .credit-photo-small a:hover {
+.cast-avatar a:hover,
+.credit-photo-small a:hover {
     transform: scale(1.05);
 }
 
-.cast-avatar a, .credit-photo-small a {
+.cast-avatar a,
+.credit-photo-small a {
     transition: var(--transition);
 }
 

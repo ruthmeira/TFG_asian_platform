@@ -2,70 +2,30 @@
 {% block title %}{{ display_name }} - SHIORI{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/collection_view.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/collection_view.css') }}">
 {% endblock %}
 
 {% block content %}
 
-<div class="view-all-container">
-    <div class="header-back">
-        <a href="{{ url_for('collections') }}" class="back-link">← Volver a Colecciones</a>
-        <h1>{{ display_name }}</h1>
+<div class="cast-page-container">
+    <a href="{{ url_for('collections') }}" class="back-link-premium">
+        <i class="fas fa-arrow-left"></i>
+        <span>Volver a Colecciones</span>
+    </a>
+
+    <div class="cast-header-wrapper">
+        <header class="cast-main-header">
+            <div class="header-text">
+                <h1 class="cast-title">{{ display_name }}</h1>
+                <p class="subtitle-premium">Listado completo de tu selección personal 🏮</p>
+            </div>
+        </header>
     </div>
-
-    {% if items %}
-    <div class="collection-grid">
-        {% for item in items %}
-            <a href="{{ url_for('media_detail', media_type=item.media_type, media_id=item.media_id) }}" class="card-link">
-                <div class="card full-card">
-                    <div class="badge">{{ item.media_subtype or ('Serie' if item.media_type == 'tv' else 'Película') }}</div>
-                    <img src="https://image.tmdb.org/t/p/w500{{ item.poster_path }}" alt="{{ item.title }}">
-                    <div class="card-body">
-                        <h4>{{ item.title }}</h4>
-                        <h6>{{ item.original_title }}</h6>
-                        <div class="card-meta">
-                            <span class="rating">⭐ {{ (item.vote_average|round(1)) if item.vote_average else '0.0' }}</span>
-                            <span class="lang">{{ item.flag or '🌏' }}</span>
-                        </div>
-                    </div>
-                </div>
-            </a>
-        {% endfor %}
+    <div id="ajax-collection-container">
+        {% include 'partials/collection_grid.html' %}
     </div>
-
-    <!-- Paginación con Números -->
-    {% if pagination.pages > 1 %}
-    <div class="pagination-controls-numbers">
-        {% if pagination.has_prev %}
-            <a href="{{ url_for('view_collection', status=status, page=pagination.prev_num) }}" class="page-btn-nav">
-                <i class="fas fa-chevron-left"></i>
-            </a>
-        {% endif %}
-
-        {# Cálculo de ventana de 5 números (Current in middle) #}
-        {% set start = [pagination.page - 2, 1] | max %}
-        {% set end = [start + 4, pagination.pages] | min %}
-        {% if end - start < 4 %}
-            {% set start = [end - 4, 1] | max %}
-        {% endif %}
-
-        {% for page_num in range(start, end + 1) %}
-            <a href="{{ url_for('view_collection', status=status, page=page_num) }}" 
-               class="page-number {% if page_num == pagination.page %}active{% endif %}">
-               {{ page_num }}
-            </a>
-        {% endfor %}
-
-        {% if pagination.has_next %}
-            <a href="{{ url_for('view_collection', status=status, page=pagination.next_num) }}" class="page-btn-nav">
-                <i class="fas fa-chevron-right"></i>
-            </a>
-        {% endif %}
-    </div>
-    {% endif %}
-    {% else %}
-        <p class="empty-msg-collection">Esta lista está vacía.</p>
-    {% endif %}
 </div>
+
+<script src="{{ url_for('static', filename='js/collection_view.js') }}"></script>
 
 {% endblock %}

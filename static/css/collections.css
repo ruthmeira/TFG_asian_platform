@@ -153,39 +153,10 @@
         font-size: 0.9rem;
     }
 
-    /* MATCHING HOME CARD LOGIC (140px width) */
+    /* CARDS IN COLLECTIONS (Centralized Styles) */
     .collection-section .card {
         width: 140px !important;
         min-width: 140px !important;
-    }
-
-    .collection-section .card img {
-        height: 197px !important; /* Perfect 1.41 ratio */
-    }
-
-    .collection-section .card-body {
-        padding: 10px !important;
-    }
-
-    .collection-section .card-body h4 {
-        font-size: 10px !important;
-        margin-bottom: 2px !important;
-    }
-
-    .collection-section .card-body h6 {
-        font-size: 8px !important;
-        margin-bottom: 6px !important;
-    }
-
-    .collection-section .card-meta {
-        font-size: 9px !important;
-    }
-
-    .collection-section .badge {
-        top: 10px !important;
-        left: 10px !important;
-        padding: 3px 9px !important;
-        font-size: 7px !important;
     }
 
     .empty-msg-collection {

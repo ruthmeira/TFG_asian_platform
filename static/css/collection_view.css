@@ -1,99 +1,288 @@
 /* ===================================================== */
-/* COLLECTION VIEW PAGE - ESTILOS MODULARES */
+/* COLLECTION VIEW - PROFESSIONAL NETFLIX-STYLE GRID   */
 /* ===================================================== */
 
-.view-all-container {
-    padding-top: 40px;
-    animation: fadeIn 0.8s ease;
+/* 1. CONTAINER & WRAPPERS */
+.cast-page-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    animation: fadeIn 0.8s ease-out;
 }
 
-.header-back {
+/* Forzar que el contenedor global de base.html se abra en esta página */
+.container {
+    max-width: 1600px !important;
+    margin: 0 auto !important;
+    padding: clamp(20px, 4vw, 50px) !important;
+    min-height: 80vh;
+}
+
+/* 2. HEADER STYLES */
+.cast-header-wrapper {
+    margin-bottom: 40px;
+    padding: 0;
+}
+
+.cast-main-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 50px;
-    border-bottom: 1px solid rgba(255, 69, 0, 0.2);
-    padding-bottom: 15px;
+    margin-bottom: 8px;
 }
 
-.header-back h1 {
-    font-size: 2.2rem;
-    color: #fff;
-    margin: 0;
+.cast-title {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 800;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 5px;
 }
 
-.back-link {
+.subtitle-premium {
     color: var(--text-muted);
-    text-decoration: none;
-    font-weight: 600;
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+/* 3. GRID SYSTEM & DYNAMICS */
+.collection-grid-premium {
+    display: grid !important;
+    /* Las tarjetas se estiran (1fr) hasta que cabe una nueva de mínimo 140px */
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+
+    /* Espaciado fijo en píxeles */
+    column-gap: 14px !important;
+    row-gap: 45px !important;
+
+    width: 100% !important;
+    margin-bottom: 50px;
+}
+
+/* En el GRID, las tarjetas deben ocupar el 100% de la celda, no el fijo de style.css */
+.collection-grid-premium .card {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+/* 4. CARD ARCHITECTURE */
+.collection-grid-premium .card-link {
+    text-decoration: none !important;
+    color: inherit !important;
+    width: 100% !important;
+    max-width: none !important;
+    display: block;
+    animation: zoomInBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+.collection-grid-premium .card {
+    position: relative;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: var(--transition);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.collection-grid-premium .card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+    border-color: rgba(255, 69, 0, 0.3);
+    z-index: 10;
+}
+
+/* 5. IMAGE & ASPECT RATIO */
+.collection-grid-premium .card img {
+    width: 100% !important;
+    /* El Ratio 2:3 asegura que la forma de cartel nunca se pierda al estirarse */
+    aspect-ratio: 2 / 3 !important;
+    object-fit: cover !important;
+    display: block;
     transition: var(--transition);
 }
 
-.back-link:hover {
-    color: var(--primary);
-    transform: translateX(-5px);
+.collection-grid-premium .card:hover img {
+    transform: scale(1.05);
 }
 
-.collection-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-    gap: 25px;
+/* 6. CARD BODY & TYPOGRAPHY (FLUID) */
+.collection-grid-premium .card-body {
+    padding: clamp(10px, 1.5vw, 15px);
+    background: var(--bg-card);
+    flex-grow: 1;
 }
 
-/* PAGINACIÓN POR NÚMEROS */
+.collection-grid-premium .card-meta {
+    margin-top: auto;
+}
+
+.rating {
+    color: #f5c518;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.lang {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-family: 'Noto Color Emoji', sans-serif;
+}
+
+.collection-grid-premium .card .badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: var(--primary-gradient);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 9px;
+    font-weight: 700;
+    z-index: 2;
+    text-transform: uppercase;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* 7. PAGINATION */
 .pagination-controls-numbers {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 10px;
-    margin-top: 50px;
-    padding-bottom: 40px;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
-.page-number, .page-btn-nav {
+.page-number,
+.page-btn-nav {
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 44px;
-    height: 44px;
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.7);
-    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #fff;
     text-decoration: none;
     font-weight: 600;
-    font-size: 14px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s ease;
 }
 
-.page-number:hover, .page-btn-nav:hover {
+.page-number:hover,
+.page-btn-nav:hover {
     background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.4);
-    color: #fff;
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+    border-color: var(--primary);
 }
 
 .page-number.active {
     background: var(--primary-gradient);
     border-color: transparent;
-    color: white;
-    box-shadow: 0 8px 20px rgba(255, 69, 0, 0.3);
+    box-shadow: 0 5px 15px rgba(255, 69, 0, 0.3);
 }
 
-.page-ellipsis {
-    color: rgba(255, 255, 255, 0.2);
-    font-weight: 800;
-    padding: 0 10px;
-}
-
-.empty-msg-collection {
-    color: var(--text-muted);
-    font-style: italic;
-    padding: 50px;
+/* 8. EMPTY STATE */
+.empty-msg-collection-premium {
     text-align: center;
-    background: rgba(255,255,255,0.02);
-    border: 1px dashed rgba(255,255,255,0.1);
+    padding: 100px 20px;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    background: rgba(255, 255, 255, 0.02);
     border-radius: 20px;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.empty-msg-collection-premium i {
+    display: block;
+    font-size: 3rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+/* 9. MEDIA QUERIES (RESPONSIVE) */
+@media (max-width: 600px) {
+    .container {
+        padding: 20px 15px !important;
+    }
+
+    .cast-main-header {
+        flex-direction: column;
+        /* Apilamos flecha y título */
+        align-items: center;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .header-text {
+        width: 100%;
+    }
+
+    .cast-title {
+        font-size: 1.8rem;
+        /* Tamaño más cómodo para móvil */
+        line-height: 1.2;
+    }
+
+    .subtitle-premium {
+        font-size: 14px;
+    }
+
+    .collection-grid-premium {
+        row-gap: 30px !important;
+    }
+
+    /* Ajuste de Paginación para móviles */
+    .pagination-controls-numbers {
+        gap: 6px !important;
+        /* Menos espacio entre botones */
+    }
+
+    .page-number,
+    .page-btn-nav {
+        width: 32px !important;
+        /* Botones más compactos */
+        height: 32px !important;
+        font-size: 13px !important;
+        border-radius: 8px !important;
+    }
+}
+
+/* 10. ANIMATIONS */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes zoomInBounce {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+
+    70% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }

@@ -20,20 +20,7 @@
     }
 }
 
-.back-link-premium {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--text-muted);
-    text-decoration: none;
-    font-weight: 600;
-    transition: var(--transition);
-    margin-bottom: 25px;
-}
-
-.back-link-premium:hover {
-    color: var(--primary);
-}
+/* 2. HEADER STYLES (Synchronized with global) */
 
 .cast-main-header {
     display: flex;
