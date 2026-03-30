@@ -7,6 +7,7 @@
 {% endblock %}
 
 {% block content %}
+<div class="cast-page-container">
     <div class="cast-header-wrapper">
         <a href="{{ url_for('media_detail', media_type='tv', media_id=series.id) }}" class="back-link-premium">
             <i class="fas fa-arrow-left"></i> Volver a la ficha
@@ -23,7 +24,11 @@
         </header>
     </div>
 
-    <h2 class="section-title"><i class="fas fa-list-ul"></i> Todas las Temporadas <span>({{ seasons|length }})</span></h2>
+    <h2 class="section-title">
+        <div class="title-main-info">
+            <i class="fas fa-list-ul"></i> Todas las Temporadas <span>({{ seasons|length }})</span>
+        </div>
+    </h2>
 
     <div class="seasons-list">
         {% for s in seasons %}
@@ -64,6 +69,9 @@
                 </div>
             </div>
         {% endfor %}
+    <!-- Botón Volver Arriba -->
+    <div id="scroll-to-top" class="scroll-to-top" title="Volver arriba">
+        <i class="fas fa-arrow-up"></i>
     </div>
 </div>
 {% endblock %}
