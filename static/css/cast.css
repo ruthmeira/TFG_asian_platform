@@ -5,20 +5,10 @@
 .cast-page-container {
     margin-bottom: 20px;
     max-width: 100%;
-    animation: castFadeIn 0.8s ease-out;
+    animation: fadeIn 0.8s ease-out;
 }
 
-@keyframes castFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+/* Base transitions handled globally in style.css */
 
 /* 2. HEADER STYLES (Synchronized with global) */
 

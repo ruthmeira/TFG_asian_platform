@@ -26,7 +26,7 @@
             <a href="{{ url_for('view_collection', status='favoritos') }}" class="view-all-link">Ver todo ></a>
         </h2>
         
-        <div class="carouselCollection">
+        <div class="media-carousel">
             {% for item in favorites %}
                 <a href="{{ url_for('media_detail', media_type=item.media_type, media_id=item.media_id) }}" class="card-link">
                     <div class="card">
@@ -69,7 +69,7 @@
         </h2>
 
         {% if items %}
-        <div class="carouselCollection">
+        <div class="media-carousel">
             {% for item in items %}
                 <a href="{{ url_for('media_detail', media_type=item.media_type, media_id=item.media_id) }}" class="card-link">
                     <div class="card">

@@ -33,7 +33,7 @@ async function loadCollectionPage(page = 1, perPage = null, useAnimation = true)
         const html = await response.text();
 
         gridContainer.innerHTML = html;
-        
+
         const newUrl = `/collections/${status}?page=${page}&per_page=${perPage}`;
         window.history.pushState({ path: newUrl }, '', newUrl);
 
@@ -77,15 +77,15 @@ function monitorGridResize() {
         // SOLO ACTIVAR EL RADAR SI EL CAMBIO DE VENTANA HA GENERADO UN NUEVO GRID
         if (newColumns !== currentColumns && currentColumns !== -1) {
             console.log(`Grid cambio detectado: de ${currentColumns} a ${newColumns}. Ajustando...`);
-            
+
             // Detectamos en qué página estamos actualmente para NO volver a la 1
             const urlParams = new URLSearchParams(window.location.search);
             const currentPage = urlParams.get('page') || 1;
-            
+
             loadCollectionPage(currentPage, null, false); // Mantenemos página y SIN EFECTO (false)
         }
         currentColumns = newColumns;
-    }, 500); 
+    }, 500);
 }
 
 // Inicialización
@@ -109,12 +109,13 @@ window.addEventListener('load', () => {
         const computedStyle = window.getComputedStyle(grid);
         const gridTemplateColumns = computedStyle.getPropertyValue('grid-template-columns');
         currentColumns = gridTemplateColumns.trim().split(/\s+/).length;
-        
-        // Si al entrar el per_page no cuadra, ajustamos por AJAX al momento
+
+        // AJUSTE INICIAL SILENCIOSO (Modo Fantasma)
         const urlParams = new URLSearchParams(window.location.search);
         const ideal = calculateIdealPerPage();
         if (!urlParams.has('per_page') || parseInt(urlParams.get('per_page')) !== ideal) {
-            loadCollectionPage(1, ideal, false); // SIN EFECTO al entrar (false)
+            // USAR ANIMACIÓN FALSE: Para que no parpadee al entrar (Modo Fantasma)
+            loadCollectionPage(1, ideal, false); 
         }
     }
 });

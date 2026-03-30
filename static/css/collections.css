@@ -1,19 +1,7 @@
 .cast-page-container {
     margin-bottom: 20px;
     width: 100%;
-    animation: fadeIn 0.8s ease-out;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    /* Eliminada la animación de entrada global para que resalten las tarjetas */
 }
 
 .cast-main-header {
@@ -89,71 +77,14 @@
     opacity: 0.2;
 }
 
-/* Specific carousel spacing for Collections */
-.carouselCollection {
-    display: flex;
-    overflow-x: auto;
-    gap: 20px;
-    padding: 20px 0 15px 5px;
-    /* Aligned with cards */
-    scroll-behavior: smooth;
-    /* Removed static mask-image to keep last cards sharp */
-}
+/* Carousels now use global .media-carousel in style.css */
 
-.carouselCollection::-webkit-scrollbar {
-    height: 6px;
-}
-
-.carouselCollection::-webkit-scrollbar-thumb {
-    background: var(--primary);
-    border-radius: 10px;
-}
-
-/* Entrance animation for cards in collections */
-.collection-section .card-link {
-    animation: cardEntrance 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
-    flex: 0 0 auto;
-}
-
-@keyframes cardEntrance {
-    0% {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-.carouselCollection .card-link:nth-child(1) {
-    animation-delay: 0.1s;
-}
-
-.carouselCollection .card-link:nth-child(2) {
-    animation-delay: 0.18s;
-}
-
-.carouselCollection .card-link:nth-child(3) {
-    animation-delay: 0.26s;
-}
-
-.carouselCollection .card-link:nth-child(4) {
-    animation-delay: 0.34s;
-}
-
-.carouselCollection .card-link:nth-child(5) {
-    animation-delay: 0.42s;
-}
-
-.carouselCollection .card-link:nth-child(n+6) {
-    animation-delay: 0.5s;
-}
+/* Card styles and entrance animations now handled globally in style.css */
 
 /* REPARTO / SEASON LINK HARMONIZATION */
 .view-all-link {
-    font-size: clamp(0.55rem, 3.5vw, 0.9rem); /* Fluidez total para que no empuje */
+    font-size: clamp(0.55rem, 3.5vw, 0.9rem);
+    /* Fluidez total para que no empuje */
     font-weight: 600;
 }
 
@@ -176,7 +107,8 @@
         overflow: hidden;
         text-overflow: ellipsis;
         padding-bottom: 10px;
-        gap: 5px; /* Menos hueco para ganar aire */
+        gap: 5px;
+        /* Menos hueco para ganar aire */
     }
 
     .title-main-info {
@@ -184,7 +116,7 @@
     }
 
     /* CARDS IN COLLECTIONS (Centralized Styles) */
-    .collection-section .card {
+    .media-carousel .card-link {
         width: 140px !important;
         min-width: 140px !important;
     }

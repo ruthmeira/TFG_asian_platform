@@ -8,7 +8,7 @@
     max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
-    animation: fadeIn 0.8s ease-out;
+    /* fadeIn removed to match Home parity */
 }
 
 /* Forzar que el contenedor global de base.html se abra en esta página */
@@ -62,95 +62,15 @@
     margin-bottom: 50px;
 }
 
-/* En el GRID, las tarjetas deben ocupar el 100% de la celda, no el fijo de style.css */
-.collection-grid-premium .card {
-    width: 100% !important;
-    max-width: none !important;
-}
-
-/* 4. CARD ARCHITECTURE */
+/* Card Architecture is now global in style.css */
+/* Layout overrides only */
 .collection-grid-premium .card-link {
-    text-decoration: none !important;
-    color: inherit !important;
     width: 100% !important;
     max-width: none !important;
-    display: block;
-    animation: zoomInBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
-
 .collection-grid-premium .card {
-    position: relative;
     width: 100% !important;
-    min-width: 0 !important;
     max-width: none !important;
-    background: var(--bg-card);
-    border-radius: 12px;
-    overflow: hidden;
-    transition: var(--transition);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    display: flex;
-    flex-direction: column;
-}
-
-.collection-grid-premium .card:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
-    border-color: rgba(255, 69, 0, 0.3);
-    z-index: 10;
-}
-
-/* 5. IMAGE & ASPECT RATIO */
-.collection-grid-premium .card img {
-    width: 100% !important;
-    /* El Ratio 2:3 asegura que la forma de cartel nunca se pierda al estirarse */
-    aspect-ratio: 2 / 3 !important;
-    object-fit: cover !important;
-    display: block;
-    transition: var(--transition);
-}
-
-.collection-grid-premium .card:hover img {
-    transform: scale(1.05);
-}
-
-/* 6. CARD BODY & TYPOGRAPHY (FLUID) */
-.collection-grid-premium .card-body {
-    padding: clamp(10px, 1.5vw, 15px);
-    background: var(--bg-card);
-    flex-grow: 1;
-}
-
-.collection-grid-premium .card-meta {
-    margin-top: auto;
-}
-
-.rating {
-    color: #f5c518;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.lang {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 2px 6px;
-    border-radius: 6px;
-    font-family: 'Noto Color Emoji', sans-serif;
-}
-
-.collection-grid-premium .card .badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: var(--primary-gradient);
-    color: #fff;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 9px;
-    font-weight: 700;
-    z-index: 2;
-    text-transform: uppercase;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
 
 /* 7. PAGINATION */
@@ -257,32 +177,4 @@
     }
 }
 
-/* 10. ANIMATIONS */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes zoomInBounce {
-    0% {
-        opacity: 0;
-        transform: scale(0.3);
-    }
-
-    70% {
-        opacity: 0.8;
-        transform: scale(1.05);
-    }
-
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
+/* View-specific animations removed in favor of global style.css */

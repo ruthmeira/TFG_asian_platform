@@ -91,78 +91,7 @@
     box-shadow: 0 5px 15px rgba(255, 69, 0, 0.3);
 }
 
-/* CAROUSEL */
-.carousel {
-    display: flex;
-    overflow-x: auto;
-    padding: 20px 0 15px 5px; /* Aligned with cards */
-    margin-right: 0; 
-    gap: 20px;
-    scroll-behavior: smooth;
-    /* Removed static mask-image to keep last cards 100% sharp */
-}
-
-.carousel::-webkit-scrollbar {
-    height: 6px;
-}
-
-.carousel::-webkit-scrollbar-thumb {
-    background: var(--primary);
-    border-radius: 10px;
-}
-
-/* HOME CARDS */
-.card-link {
-    text-decoration: none;
-    color: inherit;
-    display: block;
-    /* Gentler entry animation with very subtle bounce */
-    animation: zoomInBounce 0.5s cubic-bezier(0.2, 1.0, 0.3, 1) backwards;
-    transform-origin: center;
-}
-
-@keyframes zoomInBounce {
-    0% {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-
-    /* Start from 0.9 for smoother feel instead of 0.3 */
-    80% {
-        opacity: 0.95;
-        transform: scale(1.01);
-    }
-
-    /* Very subtle overshoot */
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-.carousel .card-link:nth-child(1) {
-    animation-delay: 0.05s;
-}
-
-.carousel .card-link:nth-child(2) {
-    animation-delay: 0.1s;
-}
-
-.carousel .card-link:nth-child(3) {
-    animation-delay: 0.15s;
-}
-
-.carousel .card-link:nth-child(4) {
-    animation-delay: 0.2s;
-}
-
-.carousel .card-link:nth-child(5) {
-    animation-delay: 0.25s;
-}
-
-.carousel .card-link:nth-child(n+6) {
-    animation-delay: 0.3s;
-}
+/* Carousel and Card animations are now global in style.css */
 
 /* CAROUSEL LOADER (Premium Matrix & Glassmorphism) */
 .carousel-loader {
@@ -358,17 +287,5 @@
         text-overflow: ellipsis;
     }
 
-    .carousel {
-        gap: 20px;
-    }
-
-    .card {
-        width: 140px !important;
-        min-width: 140px !important;
-    }
-
-    .card-link {
-        flex: 0 0 auto;
-        width: auto;
-    }
+    /* Media cards are now global in style.css */
 }
