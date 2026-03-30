@@ -4,10 +4,13 @@
 
 .media-detail-container {
     display: flex;
-    gap: 60px;
-    margin-top: 60px;
+    gap: clamp(20px, 4vw, 60px);
+    margin-bottom: 20px;
+    /* Fluid gap */
     align-items: flex-start;
     animation: fadeIn 0.8s ease;
+    width: 100%;
+    min-height: 800px; /* Safety for dropdown menus vs footer */
 }
 
 @keyframes fadeIn {
@@ -15,6 +18,7 @@
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -22,16 +26,18 @@
 }
 
 .media-poster {
-    flex: 0 0 340px;
+    flex: 0 0 clamp(260px, 25vw, 340px);
+    /* Responsive width: min 260px, max 340px */
     position: sticky;
     top: 100px;
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Distancia unificada para simetría total */
+    gap: 15px;
 }
 
 .media-poster img {
     width: 100%;
+    height: auto;
     border-radius: 24px;
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
     border: 1px solid var(--glass-border);
@@ -44,6 +50,7 @@
     gap: 10px;
     padding: 0;
     margin-top: 0;
+    width: 100%;
 }
 
 .fav-btn-action {
@@ -52,21 +59,24 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    padding: 14px 28px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: clamp(10px, 1.2vw, 14px) clamp(10px, 2vw, 28px);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 50px;
     color: white;
     font-weight: 700;
-    font-size: 15px;
+    font-size: clamp(13px, 1vw, 15px);
     cursor: pointer;
+    white-space: nowrap;
     transition: var(--transition);
 }
 
 .fav-btn-action:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     transform: translateY(-3px);
+    border-color: var(--primary);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    color: var(--primary);
 }
 
 .fav-btn-action.active {
@@ -86,7 +96,7 @@
     flex-direction: row !important;
     justify-content: center !important;
     align-items: center !important;
-    gap: 12px !important;
+    gap: clamp(6px, 1.2vw, 12px) !important;
     padding: 0 !important;
     width: 100% !important;
 }
@@ -103,26 +113,26 @@
     text-decoration: none !important;
     font-size: 1.2rem !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    background: rgba(255,255,255,0.05) !important;
-    width: 42px !important;
-    height: 42px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    width: clamp(34px, 4vw, 42px) !important;
+    height: clamp(34px, 4vw, 42px) !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     border-radius: 10px !important;
-    border: 1px solid rgba(255,255,255,0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 .media-links-row a:hover {
     color: var(--primary) !important;
-    background: rgba(255,69,0,0.1) !important;
-    border-color: rgba(255,69,0,0.3) !important;
+    background: rgba(255, 69, 0, 0.1) !important;
+    border-color: rgba(255, 69, 0, 0.3) !important;
     transform: translateY(-3px);
 }
 
 .link-divider {
-    color: rgba(255,255,255,0.15) !important;
-    font-size: 1.2rem !important;
+    color: rgba(255, 255, 255, 0.15) !important;
+    font-size: clamp(1rem, 1.2vw, 1.2rem) !important;
     font-weight: 300 !important;
     margin: 0 5px !important;
     user-select: none !important;
@@ -131,14 +141,15 @@
 /* Tráiler */
 .btn-trailer {
     width: 100%;
-    padding: 14px 28px;
+    padding: clamp(10px, 1.2vw, 14px) clamp(10px, 2vw, 28px);
     background: rgba(255, 255, 255, 0.08);
     color: white;
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 50px;
     font-weight: 700;
-    font-size: 15px;
+    font-size: clamp(13px, 1vw, 15px);
     cursor: pointer;
+    white-space: nowrap;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -157,18 +168,24 @@
 /* Info Principal */
 .media-info {
     flex: 1;
+    min-width: 0;
+    /* Crucial to allow shrinking without overflow */
     background: var(--glass-bg);
-    padding: 50px;
+    padding: clamp(20px, 4vw, 50px);
+    /* Fluid padding */
     border-radius: 32px;
     backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
 }
 
 .media-info h1 {
-    font-size: 3rem;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    /* Dynamic title size */
     font-weight: 800;
     margin-bottom: 25px;
     display: flex;
+    flex-wrap: wrap;
+    /* Allows wrap if title is too long */
     align-items: center;
     justify-content: flex-start;
     letter-spacing: -1px;
@@ -177,23 +194,28 @@
 .detail-year {
     color: var(--text-muted);
     font-weight: 300;
-    font-size: 2rem;
+    font-size: clamp(1.2rem, 3vw, 2rem);
     margin-left: 15px;
 }
 
 .detail-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 30px;
+    /* Allows wrap on small/medium screens */
+    gap: clamp(15px, 2vw, 30px);
     margin-bottom: 40px;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 16px;
+    padding: clamp(15px, 2vw, 25px);
+    /* Unified padding */
+    background: rgba(255, 255, 255, 0.04);
+    /* Unified glass look */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    backdrop-filter: blur(10px);
 }
 
 .detail-meta p {
     margin-bottom: 0;
-    font-size: 15px;
+    font-size: clamp(13px, 1.25vw, 15px);
     color: var(--text-muted);
 }
 
@@ -211,16 +233,16 @@
 }
 
 .detail-overview p strong {
-    font-size: 18px;
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
     color: var(--primary);
     display: block;
-    margin-bottom: 15px;
+    margin-bottom: clamp(15px, 3vw, 20px);
 }
 
 .overview-text {
-    line-height: 1.8;
+    line-height: clamp(1.6, 1.8vw, 1.8);
     color: #ddd;
-    font-size: 17px;
+    font-size: clamp(15px, 1.1vw, 17px);
     font-weight: 400;
 }
 
@@ -232,14 +254,15 @@
 
 #collection-toggle {
     width: 100%;
-    padding: 14px 28px;
+    padding: clamp(10px, 1.2vw, 14px) clamp(10px, 2vw, 28px);
     background: var(--primary-gradient);
     border: none;
     border-radius: 50px;
     color: white;
     font-weight: 700;
-    font-size: 15px;
+    font-size: clamp(13px, 1vw, 15px);
     cursor: pointer;
+    white-space: nowrap;
     transition: var(--transition);
     display: flex;
     align-items: center;
@@ -255,31 +278,40 @@
 
 #collection-options {
     position: absolute;
-    top: calc(100% + 15px);
+    top: calc(100% + 10px);
     left: 0;
-    background: #1a1a1a;
+    width: 100%;
+    background: rgba(26, 26, 26, 0.95);
+    backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
     border-radius: 20px;
-    padding: 15px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    min-width: 220px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    gap: 6px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
     z-index: 100;
     animation: dropdownFade 0.3s ease;
+    box-sizing: border-box;
 }
 
 @keyframes dropdownFade {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .collection-option {
     background: rgba(255, 255, 255, 0.05);
     border: none;
     color: var(--text-muted);
-    padding: 12px 18px;
+    padding: clamp(8px, 1.1vw, 12px) clamp(12px, 1.5vw, 18px);
     border-radius: 12px;
     cursor: pointer;
     transition: var(--transition);
@@ -300,27 +332,38 @@
 
 /* Temporadas Card */
 .detail-season-preview {
-    margin-top: 50px;
     animation: fadeIn 0.8s ease;
+    width: 100%;
+}
+
+.season-header h2 {
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    color: var(--primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: clamp(15px, 3vw, 20px);
 }
 
 .season-card-full {
     display: flex;
-    gap: 25px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-    padding: 25px;
+    gap: clamp(15px, 3vw, 25px);
+    background: rgba(255, 255, 255, 0.04);
+    /* Unified glass look */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: clamp(15px, 2.5vw, 25px);
     margin-top: 20px;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(15px);
+    align-items: flex-start;
 }
 
 .season-poster-mini {
-    flex: 0 0 130px;
-    height: 190px;
+    flex: 0 0 clamp(100px, 15vw, 135px);
+    height: clamp(145px, 21vw, 195px);
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -332,60 +375,79 @@
 
 .season-info-mini {
     flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    justify-content: center;
 }
 
 .season-title-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: clamp(4px, 1vw, 8px);
+    width: 100%;
 }
 
 .season-title-row h3 {
-    font-size: 1.4rem;
+    font-size: clamp(1.2rem, 1.8vw, 1.5rem);
     color: #fff;
-    font-weight: 700;
+    font-weight: 800;
+    margin: 0;
 }
 
 .season-rating {
-    background: rgba(255, 69, 0, 0.15);
+    background: rgba(255, 69, 0, 0.1);
     color: var(--primary);
-    padding: 4px 12px;
+    padding: 6px 14px;
     border-radius: 50px;
     font-weight: 800;
-    font-size: 0.85rem;
-    border: 1px solid rgba(255, 69, 0, 0.3);
-    box-shadow: 0 0 10px rgba(255, 69, 0, 0.2);
+    font-size: 0.8rem;
+    border: 1px solid rgba(255, 69, 0, 0.25);
+    box-shadow: 0 0 15px rgba(255, 69, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.season-rating i {
+    font-size: 0.75rem;
 }
 
 .season-meta-mini {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     align-items: center;
-    margin-bottom: 15px;
-    font-size: 0.95rem;
-    color: var(--primary);
+    margin-bottom: 12px;
+    font-size: clamp(12.5px, 1.1vw, 14.5px);
     font-weight: 600;
+    color: #fff;
+    opacity: 0.95;
+    flex-wrap: wrap;
+    /* Safety for very narrow screens */
+}
+
+.season-year strong {
+    font-weight: 700;
+}
+
+.season-ep-count {
+    color: var(--primary);
+    /* Distinguished orange color for ep count */
 }
 
 .season-dot {
-    color: rgba(255,255,255,0.2);
+    color: rgba(255, 255, 255, 0.25);
     font-size: 1.2rem;
-}
-
-.season-year {
-    color: #fff;
-    opacity: 0.9;
+    line-height: 1;
 }
 
 .season-overview-mini {
-    font-size: 0.95rem;
+    font-size: clamp(13px, 1.1vw, 15px);
     line-height: 1.6;
-    color: var(--text-muted);
-    margin-top: 5px;
+    color: rgba(255, 255, 255, 0.65);
+    margin: 0;
+    display: block;
+    /* Muestra toda la sinopsis sin cortes */
 }
 
 /* WATCH PROVIDERS */
@@ -394,35 +456,32 @@
 }
 
 .detail-watch p {
-    margin-bottom: 12px;
+    margin-bottom: clamp(15px, 3vw, 20px);
     color: var(--primary);
-    font-size: 18px;
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
     font-weight: 700;
 }
 
 .platform-icons-detail {
     display: flex;
-    gap: 12px;
     flex-wrap: wrap;
+    gap: 12px;
+    padding: 10px 0;
+    width: 100%;
 }
 
 .platform-circle-detail {
     min-width: 60px;
     height: 50px;
     border-radius: 12px;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     padding: 5px 12px;
-}
-
-.platform-circle-detail:hover {
-    transform: translateY(-3px);
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--primary);
 }
 
 .platform-circle-detail svg {
@@ -454,27 +513,38 @@
 
 /* CAST SECTION */
 .detail-cast {
-    margin-top: 40px;
+    margin-bottom: 20px;
 }
 
 .detail-cast h2 {
-    font-size: 1.5rem;
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
     color: var(--primary);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: clamp(15px, 3vw, 20px);
 }
 
 .cast-scroll-container {
     display: flex;
-    gap: 15px;
+    gap: clamp(15px, 2vw, 25px);
     overflow-x: auto;
-    padding-bottom: 15px;
+    padding: 15px 5px 10px 5px; /* Added top padding for the bar */
+    scroll-behavior: smooth;
+    width: 100%;
+    /* Mirror technique to put scrollbar on top */
+    transform: rotateX(180deg);
+    -ms-transform: rotateX(180deg); /* IE 9 */
+    -webkit-transform: rotateX(180deg); /* Safari and Chrome */
 }
 
+/* Custom scrollbar for better UX */
 .cast-scroll-container::-webkit-scrollbar {
     height: 4px;
+}
+
+.cast-scroll-container::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .cast-scroll-container::-webkit-scrollbar-thumb {
@@ -483,17 +553,26 @@
 }
 
 .cast-card {
-    flex: 0 0 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
+    flex: 0 0 clamp(85px, 10vw, 105px);
+    /* Mirror back the content so it's not upside down */
+    transform: rotateX(180deg);
+    -ms-transform: rotateX(180deg);
+    -webkit-transform: rotateX(180deg);
 }
 
 .cast-avatar {
-    width: 100px;
-    height: 100px;
+    width: clamp(80px, 10vw, 100px);
+    height: clamp(80px, 10vw, 100px);
     border-radius: 50%;
+    margin-bottom: 12px;
     overflow: hidden;
-    margin: 0 auto 10px;
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    transition: var(--transition);
 }
 
 .cast-avatar img {
@@ -504,22 +583,19 @@
 
 .cast-card .name {
     display: block;
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: clamp(0.75rem, 1vw, 0.9rem);
+    font-weight: 700;
     color: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    margin-bottom: 3px;
     text-decoration: none;
+    line-height: 1.25;
 }
 
 .cast-card .role {
     display: block;
-    font-size: 0.75rem;
+    font-size: clamp(0.7rem, 0.9vw, 0.8rem);
     color: var(--text-muted);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    line-height: 1.3;
 }
 
 /* KEYWORDS */
@@ -528,10 +604,10 @@
 }
 
 .detail-keywords p strong {
-    font-size: 18px;
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
     color: var(--primary);
     display: block;
-    margin-bottom: 15px;
+    margin-bottom: clamp(15px, 3vw, 20px);
 }
 
 .keywords-list-wrapper {
@@ -541,8 +617,8 @@
 }
 
 .keyword-tag {
-    font-size: 0.75rem;
-    padding: 6px 14px;
+    font-size: clamp(11px, 0.8vw, 13px);
+    padding: clamp(4px, 0.6vw, 6px) clamp(10px, 1vw, 14px);
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #ddd;
@@ -559,19 +635,187 @@
     transform: translateY(-2px);
 }
 
-/* SHARED VIEW ALL LINK */
-.view-all-link {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    text-decoration: none;
-    transition: var(--transition);
+/* UTILIDADES SIN DATOS / AVATARES */
+.no-avatar {
+    height: 100%;
+    width: 100%;
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-weight: 500;
+    justify-content: center;
+    background: #222;
+    color: #555;
+    font-size: 2.5rem;
 }
 
-.view-all-link:hover {
-    color: var(--primary);
-    transform: translateX(5px);
+.no-data-msg {
+    margin: 0;
+    text-transform: none;
+    color: var(--text-muted);
+}
+
+
+/* ===================================================== */
+/* TABLET (601px - 1024px) - AJUSTES DE ESTRUCTURA */
+/* ===================================================== */
+@media (min-width: 601px) and (max-width: 1024px) {
+    .media-detail-container {
+        gap: 20px;
+    }
+
+    .media-poster {
+        flex: 0 0 30%;
+        /* Proportional width to avoid squeeze */
+        max-width: 250px;
+        min-width: 180px;
+    }
+
+    .media-info {
+        padding: clamp(20px, 4vw, 30px);
+    }
+
+    .media-info h1 {
+        font-size: 2.2rem;
+    }
+}
+
+@media (max-width: 600px) {
+
+    /* APILADO VERTICAL: PÓSTER ARRIBA, INFO ABAJO */
+    .media-detail-container {
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    .media-poster {
+        width: 100%;
+        position: relative !important;
+        top: 0 !important;
+        align-items: center;
+        text-align: center;
+    }
+
+    .media-poster img {
+        max-width: clamp(200px, 60vw, 250px);
+        margin-bottom: 10px;
+    }
+
+    .media-info {
+        width: 100%;
+    }
+
+    .media-info h1 {
+        justify-content: center;
+        text-align: center;
+    }
+
+    .detail-year {
+        margin: 5px 0 0 10px;
+    }
+
+    .detail-meta {
+        justify-content: center;
+        text-align: center;
+    }
+
+    .detail-meta p {
+        text-align: center;
+    }
+}
+
+/* ===================================================== */
+/* ULTRA-NARROW (< 450px) - SPECIAL STACKING FOR CARDS   */
+/* ===================================================== */
+@media (max-width: 450px) {
+
+    /* Main Detail Section */
+    .media-info h1 {
+        font-size: 1.8rem;
+    }
+
+    /* Season Preview Section */
+    .detail-season-preview h2 {
+        justify-content: space-between !important;
+        flex-direction: row !important;
+        gap: 10px;
+    }
+
+    .view-all-link {
+        font-size: 0.85rem !important;
+    }
+
+    .season-card-full {
+        flex-direction: column;
+        align-items: center;
+        padding: 18px;
+        gap: 15px;
+    }
+
+    .season-poster-mini {
+        width: 100% !important;
+        height: 180px !important;
+        /* Reserved space to prevent overlap */
+        display: flex !important;
+        justify-content: center !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin-bottom: 5px;
+        overflow: visible !important;
+    }
+
+    .season-poster-mini img {
+        width: 120px !important;
+        height: 180px !important;
+        object-fit: cover;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .season-info-mini {
+        width: 100%;
+    }
+
+    .season-title-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        gap: 10px;
+    }
+
+    .season-title-row h3 {
+        font-size: 1.25rem !important;
+        margin-bottom: 0;
+        text-align: left;
+    }
+
+    .season-rating {
+        position: relative !important;
+        top: 0 !important;
+        right: 0 !important;
+        padding: 4px 10px;
+        font-size: 0.85rem;
+        background: rgba(255, 69, 0, 0.2);
+    }
+
+    .season-meta-mini {
+        font-size: 0.85rem;
+        margin-bottom: 12px;
+        justify-content: flex-start;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .season-overview-mini {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        text-align: left;
+        display: block !important;
+        -webkit-line-clamp: none !important;
+        line-clamp: none !important;
+        overflow: visible !important;
+    }
 }

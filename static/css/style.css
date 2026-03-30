@@ -38,7 +38,7 @@ body {
 }
 
 .container {
-    padding: 30px 30px 0px 30px; /* Cambiado de 5% a 40px fixed */
+    padding: clamp(15px, 3vw, 40px) clamp(15px, 3vw, 40px) 0 clamp(15px, 3vw, 40px);
     min-height: 80vh;
 }
 

@@ -1010,7 +1010,7 @@ def media_detail(media_type, media_id):
         user_region=user_region,
         keywords=keywords[:15],
         real_media_type='movie' if media_type == 'movie' else ('show' if res.get('media_subtype') == 'Programa' else 'tv'),
-        cast=credits.get('cast', [])[:5],
+        cast=credits.get('cast', [])[:9],
         crew=credits.get('crew', [])
     )
 
