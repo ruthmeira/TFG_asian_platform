@@ -37,33 +37,33 @@
     justify-content: space-between;
     align-items: center;
     gap: 30px;
-    width: 100%; /* Forzamos el ancho completo para separar elementos */
+    width: 100%;
 }
 
 .subtitle {
     color: var(--text-muted);
-    font-size: 16px;
+    font-size: 14.5px; /* Harmonized with 175px density */
     margin: 0;
-    flex: 1; /* Permite que el texto se adapte y empuje los botones */
+    flex: 1;
 }
 
 /* FILTER BUTTONS (Home only) */
 .filter-controls {
     display: flex;
-    gap: 15px;
+    gap: 12px;
 }
 
 .filter-btn {
     text-decoration: none;
     color: var(--text-muted);
     background: #111;
-    padding: 10px 24px;
+    padding: 10px 20px;
     border-radius: 50px;
     font-size: 14px;
     font-weight: 500;
     transition: var(--transition);
     border: 1px solid #222;
-    min-width: 140px; /* Igualamos el tamaño de ambos */
+    min-width: 130px; /* Slimmer and more modern for 175px layout */
     display: inline-flex;
     justify-content: center;
     align-items: center;
@@ -225,9 +225,8 @@
 }
 
 /* ===================================================== */
-/* MEDIA QUERIES (Mobile Adjustments) */
+/* MOBILE MEDIA QUERIES (Up to 600px) */
 /* ===================================================== */
-
 @media (max-width: 600px) {
     .home-header {
         align-items: center;

@@ -308,22 +308,21 @@ body {
 .card {
     position: relative;
     flex: 0 0 auto;
-    width: 220px;
-    border-radius: 16px;
-    overflow: hidden;
+    width: 175px; /* Unified Desktop/Tablet size for better density */
     background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
     transition: var(--transition);
-    border: 1px solid var(--glass-border);
-    display: flex;
-    flex-direction: column;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
 }
 
 .card img {
     width: 100%;
-    height: 310px;
+    height: 247px; /* Proportional 1.41 height for 175px width */
     object-fit: cover;
-    display: block;
-    transition: transform 0.6s cubic-bezier(0.2, 1, 0.3, 1);
+    transition: var(--transition);
+    border-radius: 12px 12px 0 0;
 }
 
 .card:hover {
@@ -338,12 +337,12 @@ body {
 
 
 .card-body {
-    padding: 15px;
+    padding: 12px; /* Proportional to 175px card */
     background: var(--bg-card);
 }
 
 .card-body h4 {
-    font-size: 16px;
+    font-size: 13.5px; /* Scaled text for high-density design */
     font-weight: 600;
     margin-bottom: 4px;
     white-space: nowrap;
@@ -352,7 +351,7 @@ body {
 }
 
 .card-body h6 {
-    font-size: 12px;
+    font-size: 10px;
     color: var(--text-muted);
     font-weight: 400;
     margin-bottom: 10px;
@@ -384,19 +383,20 @@ body {
     border-radius: 6px;
 }
 
-.badge {
+.card .badge {
     position: absolute;
-    top: 15px;
-    left: 15px;
+    top: 12px; /* Position refined for 175px width */
+    left: 12px;
     background: var(--primary-gradient);
-    padding: 5px 14px;
-    border-radius: 50px;
-    font-size: 10px;
-    font-weight: 800;
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 9px;
+    font-weight: 700;
+    z-index: 2;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    z-index: 10;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 /* ===================================================== */
