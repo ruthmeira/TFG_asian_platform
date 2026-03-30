@@ -136,9 +136,18 @@ window.HomeApp = (() => {
             container.innerHTML = `
                 <div class="carousel-loader">
                     <div class="matrix-container">
-                        <div class="matrix-column" style="animation-duration: 3s;">あ い う え お</div>
-                        <div class="matrix-column" style="animation-duration: 4.5s;">你好 龙 爱 美</div>
-                        <div class="matrix-column" style="animation-duration: 3.5s;">ㄱ ㄴ ㄷ ㄹ ㅁ</div>
+                        <div class="matrix-column" style="animation-duration: 2.1s;">あいうえおかきくけこ</div>
+                        <div class="matrix-column" style="animation-duration: 4.5s;">你好龙爱美平和</div>
+                        <div class="matrix-column" style="animation-duration: 3.2s;">ㄱㄴㄷㄹㅁㅂㅅㅇ</div>
+                        <div class="matrix-column" style="animation-duration: 5.1s;">SHIORIシステム</div>
+                        <div class="matrix-column" style="animation-duration: 2.8s;">さしすせそたちつてと</div>
+                        <div class="matrix-column" style="animation-duration: 6.4s;">アイウエオカキクケコ</div>
+                        <div class="matrix-column" style="animation-duration: 3.8s;">0101SHIORI</div>
+                        <div class="matrix-column" style="animation-duration: 4.2s;">旭日東昇</div>
+                        <div class="matrix-column" style="animation-duration: 2.5s;">シオリ開発</div>
+                        <div class="matrix-column" style="animation-duration: 5.7s;">한국드라마</div>
+                        <div class="matrix-column" style="animation-duration: 3.5s;">映画アニメ</div>
+                        <div class="matrix-column" style="animation-duration: 4.8s;">こんにちは</div>
                     </div>
                     <div class="loading-content">
                         <div class="shimmer-text">${labels[id]}</div>

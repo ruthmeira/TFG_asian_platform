@@ -10,13 +10,13 @@
 {% block content %}
 
 <div class="home-header">
-    <div class="title-section">
-        <h1>Explorar Tendencias</h1>
-        <p>Lo último en contenido asiático seleccionado para ti</p>
-    </div>
-    <div class="filter-controls">
-        <a href="{{ url_for('home', window='day') }}" class="filter-btn {{ 'active' if active_window == 'day' }}">Hoy</a>
-        <a href="{{ url_for('home', window='week') }}" class="filter-btn {{ 'active' if active_window == 'week' }}">Esta Semana</a>
+    <h1 class="main-title">Explorar Tendencias</h1>
+    <div class="header-secondary">
+        <p class="subtitle">Lo último en contenido asiático seleccionado para ti</p>
+        <div class="filter-controls">
+            <a href="{{ url_for('home', window='day') }}" class="filter-btn {{ 'active' if active_window == 'day' }}">Hoy</a>
+            <a href="{{ url_for('home', window='week') }}" class="filter-btn {{ 'active' if active_window == 'week' }}">Esta Semana</a>
+        </div>
     </div>
 </div>
 
@@ -58,9 +58,18 @@
                 {# SSR Loader #}
                 <div class="carousel-loader">
                     <div class="matrix-container">
-                        <div class="matrix-column" style="animation-duration: 3s;">あ い う え お</div>
-                        <div class="matrix-column" style="animation-duration: 4.5s;">你好 龙 爱 美</div>
-                        <div class="matrix-column" style="animation-duration: 3.5s;">ㄱ ㄴ ㄷ ㄹ ㅁ</div>
+                        <div class="matrix-column" style="animation-duration: 2.1s;">あいうえおかきくけこ</div>
+                        <div class="matrix-column" style="animation-duration: 4.5s;">你好龙爱美平和</div>
+                        <div class="matrix-column" style="animation-duration: 3.2s;">ㄱㄴㄷㄹㅁㅂㅅㅇ</div>
+                        <div class="matrix-column" style="animation-duration: 5.1s;">SHIORIシステム</div>
+                        <div class="matrix-column" style="animation-duration: 2.8s;">さしすせそたちつてと</div>
+                        <div class="matrix-column" style="animation-duration: 6.4s;">アイウエオカキクケコ</div>
+                        <div class="matrix-column" style="animation-duration: 3.8s;">0101SHIORI</div>
+                        <div class="matrix-column" style="animation-duration: 4.2s;">旭日東昇</div>
+                        <div class="matrix-column" style="animation-duration: 2.5s;">シオリ開発</div>
+                        <div class="matrix-column" style="animation-duration: 5.7s;">한국드라마</div>
+                        <div class="matrix-column" style="animation-duration: 3.5s;">映画アニメ</div>
+                        <div class="matrix-column" style="animation-duration: 4.8s;">こんにちは</div>
                     </div>
                     <div class="loading-content">
                         <div class="shimmer-text">{{ loader_names[type_key] }}</div>

@@ -38,7 +38,7 @@ body {
 }
 
 .container {
-    padding: 30px 5% 0px 5%; /* Reducido top padding ya que usamos sticky */
+    padding: 30px 30px 0px 30px; /* Cambiado de 5% a 40px fixed */
     min-height: 80vh;
 }
 
@@ -136,10 +136,6 @@ body {
 /* NAVBAR (Glassmorphism & Sticky) */
 /* ===================================================== */
 
-/* ===================================================== */
-/* NAVBAR (Glassmorphism & Sticky) */
-/* ===================================================== */
-
 .navbar {
     position: sticky;
     top: 0;
@@ -150,9 +146,9 @@ body {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--glass-border);
-    padding: 12px 5%;
+    padding: 12px 40px; /* Cambiado de 5% a 40px */
     transition: all 0.3s ease;
-    margin: 0; /* Asegurar que no hay margen */
+    margin: 0;
 }
 
 .navbar-wrapper {
@@ -199,6 +195,8 @@ body {
     cursor: pointer;
     z-index: 1100;
 }
+
+
 
 .nav-links {
     display: flex;
@@ -271,8 +269,7 @@ body {
     align-items: flex-end;
     margin-bottom: 50px;
     padding-bottom: 25px;
-    border-bottom: 1px solid var(--glass-border);
-}
+    border-bottom: 1px solid var(--glass-border);}
 
 .title-section h1 {
     font-size: 2.8rem;
@@ -331,7 +328,6 @@ body {
 
 .card:hover {
     transform: translateY(-8px);
-    border-color: rgba(255, 69, 0, 0.4);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
 }
 
@@ -410,9 +406,9 @@ body {
 .section-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
+    align-items: flex-end;
+    margin-bottom: 50px;
+    padding-bottom: 25px;
     border-bottom: 1px solid var(--glass-border);
 }
 
@@ -514,8 +510,8 @@ body {
 /* ===================================================== */
 .footer {
     width: 100%;
-    margin-top: 80px;
-    padding: 40px 5%;
+    margin-top: 0px; /* Margen eliminado */
+    padding: 40px 40px; /* Cambiado de 5% a 40px fixed */
     border-top: 1px solid var(--glass-border);
 }
 
@@ -547,7 +543,7 @@ body {
 
 @media (max-width: 600px) {
     .navbar {
-        padding: 15px 5%;
+        padding: 15px 15px; /* Consistent alignment with container */
     }
 
     .navbar-wrapper {
