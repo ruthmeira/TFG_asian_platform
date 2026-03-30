@@ -5,8 +5,15 @@
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .cast-main-header {
@@ -14,7 +21,7 @@
 }
 
 .cast-title {
-    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-size: clamp(1.2rem, 8vw, 3.2rem);
     font-weight: 800;
     margin-bottom: 8px;
     background: var(--primary-gradient);
@@ -57,7 +64,7 @@
 
 .title-main-info span {
     color: rgba(255, 255, 255, 0.3);
-    font-size: 1.1rem;
+    font-size: clamp(0.65rem, 2vw, 0.9rem);
     font-weight: 400;
 }
 
@@ -87,7 +94,8 @@
     display: flex;
     overflow-x: auto;
     gap: 20px;
-    padding: 20px 0 15px 5px; /* Aligned with cards */
+    padding: 20px 0 15px 5px;
+    /* Aligned with cards */
     scroll-behavior: smooth;
     /* Removed static mask-image to keep last cards sharp */
 }
@@ -108,20 +116,44 @@
 }
 
 @keyframes cardEntrance {
-    0% { opacity: 0; transform: scale(0.9); }
-    100% { opacity: 1; transform: scale(1); }
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
-.carouselCollection .card-link:nth-child(1) { animation-delay: 0.1s; }
-.carouselCollection .card-link:nth-child(2) { animation-delay: 0.18s; }
-.carouselCollection .card-link:nth-child(3) { animation-delay: 0.26s; }
-.carouselCollection .card-link:nth-child(4) { animation-delay: 0.34s; }
-.carouselCollection .card-link:nth-child(5) { animation-delay: 0.42s; }
-.carouselCollection .card-link:nth-child(n+6) { animation-delay: 0.5s; }
+.carouselCollection .card-link:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.carouselCollection .card-link:nth-child(2) {
+    animation-delay: 0.18s;
+}
+
+.carouselCollection .card-link:nth-child(3) {
+    animation-delay: 0.26s;
+}
+
+.carouselCollection .card-link:nth-child(4) {
+    animation-delay: 0.34s;
+}
+
+.carouselCollection .card-link:nth-child(5) {
+    animation-delay: 0.42s;
+}
+
+.carouselCollection .card-link:nth-child(n+6) {
+    animation-delay: 0.5s;
+}
 
 /* REPARTO / SEASON LINK HARMONIZATION */
 .view-all-link {
-    font-size: 0.9rem;
+    font-size: clamp(0.55rem, 3.5vw, 0.9rem); /* Fluidez total para que no empuje */
     font-weight: 600;
 }
 
@@ -130,6 +162,7 @@
         text-align: center;
         margin-bottom: 30px;
     }
+
     .header-text {
         display: flex;
         flex-direction: column;
@@ -138,19 +171,16 @@
 
     /* MATCHING HOME SECTION TITLE LOGIC */
     .section-title {
-        font-size: clamp(1rem, 6vw, 1.25rem) !important;
+        font-size: clamp(0.65rem, 5vw, 1.25rem) !important;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         padding-bottom: 10px;
+        gap: 5px; /* Menos hueco para ganar aire */
     }
 
     .title-main-info {
         gap: 8px;
-    }
-
-    .title-main-info span {
-        font-size: 0.9rem;
     }
 
     /* CARDS IN COLLECTIONS (Centralized Styles) */
@@ -163,7 +193,7 @@
         padding: 25px;
         font-size: 0.9rem;
     }
-    
+
     .empty-msg-collection i {
         font-size: 1.8rem;
     }
