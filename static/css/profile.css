@@ -525,13 +525,20 @@ main.container {
     box-shadow: none !important;
 }
 
-/* Autofill Fix for Glassmorphism inputs */
+/* Autofill Fix for Glassmorphism inputs (Sincronizado con Auth) */
 .edit-mode .input-group input:-webkit-autofill,
-.edit-mode .input-group input:-webkit-autofill:hover,
-.edit-mode .input-group input:-webkit-autofill:focus {
+.edit-mode .input-group input:-webkit-autofill:hover {
+    -webkit-box-shadow: 0 0 0 1000px #0a0a0a inset !important;
     -webkit-text-fill-color: #ffffff !important;
-    -webkit-box-shadow: 0 0 0px 1000px rgba(0, 0, 0, 0.3) inset !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
     transition: background-color 5000s ease-in-out 0s;
+}
+
+.edit-mode .input-group input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px #2a1a15 inset !important;
+    box-shadow: 0 0 0 1000px #2a1a15 inset !important;
+    border-color: var(--primary) !important;
+    -webkit-text-fill-color: #ffffff !important;
 }
 
 /* Si el input tiene un icono principal (i.main-icon), le damos padding extra a la izquierda */
@@ -564,8 +571,8 @@ main.container {
 .edit-mode .input-group input:focus {
     outline: none;
     border-color: var(--primary) !important;
-    background: rgba(255, 69, 0, 0.05) !important;
-    box-shadow: 0 0 15px rgba(255, 69, 0, 0.1) !important;
+    background: #2a1a15 !important; /* El tono exacto de Auth */
+    box-shadow: 0 0 15px rgba(255, 69, 0, 0.15) !important;
 }
 
 .input-group textarea {
@@ -586,7 +593,8 @@ main.container {
 .input-group textarea:focus {
     outline: none;
     border-color: var(--primary) !important;
-    background: rgba(255, 69, 0, 0.05) !important;
+    background: #2a1a15 !important;
+    box-shadow: 0 0 15px rgba(255, 69, 0, 0.15) !important;
 }
 
 .char-counter {
