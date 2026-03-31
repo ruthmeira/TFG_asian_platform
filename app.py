@@ -698,10 +698,14 @@ def toggle_status():
 
 
 # --- MEDIA DETAIL ---
+tmdb_session = requests.Session()
+
 def fetch_json(url):
     try:
-        response = requests.get(url, timeout=5)
-        return response.json() if response.status_code == 200 else {}
+        response = tmdb_session.get(url, timeout=5)
+        if response.status_code == 200:
+            return response.json()
+        return {}
     except:
         return {}
 
@@ -710,19 +714,19 @@ def media_detail(media_type, media_id):
     api_key = os.getenv("TMDB_API_KEY")
     is_tv = media_type == 'tv' or ('show' in request.path)
     
-    # 1. Definir URLs base para paralelismo
+    # 1. Definir URLs Maestras (Consolidamos appends para reducir peticiones de 7 a 3)
+    # Agregamos credits/aggregate_credits, keywords y watch/providers a la principal
+    append_master = "external_ids,videos,keywords,watch/providers"
+    append_master += ",aggregate_credits" if is_tv else ",credits"
+    
     urls = {
-        'es': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-ES&append_to_response=external_ids,videos",
+        'es': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-ES&append_to_response={append_master}",
         'mx': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-MX",
-        'en': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=en-US",
-        'credits': f"https://api.themoviedb.org/3/{media_type}/{media_id}/aggregate_credits?api_key={api_key}" if is_tv else f"https://api.themoviedb.org/3/{media_type}/{media_id}/credits?api_key={api_key}",
-        'keywords': f"https://api.themoviedb.org/3/{media_type}/{media_id}/keywords?api_key={api_key}",
-        'videos_en': f"https://api.themoviedb.org/3/{media_type}/{media_id}/videos?api_key={api_key}&language=en-US",
-        'providers': f"https://api.themoviedb.org/3/{media_type}/{media_id}/watch/providers?api_key={api_key}"
+        'en': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=en-US&append_to_response=videos"
     }
 
-    # 2. Ejecutar peticiones en paralelo
-    with ThreadPoolExecutor(max_workers=len(urls)) as executor:
+    # 2. Ejecutar peticiones en paralelo (Solo 3 ahora)
+    with ThreadPoolExecutor(max_workers=3) as executor:
         future_to_url = {executor.submit(fetch_json, url): name for name, url in urls.items()}
         raw = {future_to_url[future]: future.result() for future in future_to_url}
 
@@ -744,11 +748,11 @@ def media_detail(media_type, media_id):
             en_t = raw['en'].get('title' if media_type == 'movie' else 'name')
             res['display_title'] = en_t if en_t else orig_title
 
-    # --- SINOPSIS (Fallback + Traductor) ---
     if not res.get('overview'):
         res['overview'] = raw['mx'].get('overview') or raw['en'].get('overview') or "Sinopsis no disponible."
         if res['overview'] == raw['en'].get('overview') and len(res['overview']) > 10:
-            try: res['overview'] = GoogleTranslator(source='en', target='es').translate(res['overview'])
+            try:
+                res['overview'] = GoogleTranslator(source='en', target='es').translate(res['overview'])
             except: pass
 
     # --- SOCIAL & TRAILER ---
@@ -759,7 +763,7 @@ def media_detail(media_type, media_id):
     videos_es = res.get('videos', {}).get('results', [])
     res['trailer_key'] = next((v['key'] for v in videos_es if v['type'] == 'Trailer' and v['site'] == 'YouTube'), None)
     if not res['trailer_key']:
-        res['trailer_key'] = next((v['key'] for v in raw['videos_en'].get('results', []) if v['type'] == 'Trailer' and v['site'] == 'YouTube'), None)
+        res['trailer_key'] = next((v['key'] for v in raw['en'].get('videos', {}).get('results', []) if v['type'] == 'Trailer' and v['site'] == 'YouTube'), None)
 
     # --- GÉNEROS & STATUS ---
     genre_map = {'Action & Adventure': 'Acción y Aventura', 'Kids': 'Infantil', 'News': 'Noticias', 'Sci-Fi & Fantasy': 'Ciencia Ficción y Fantasía', 'War & Politics': 'Guerra y Política'}
@@ -770,11 +774,10 @@ def media_detail(media_type, media_id):
     res['status'] = status_map.get(res.get('status'), res.get('status'))
     res['media_subtype'] = 'Programa' if (media_type == 'tv' and any(g['name'] in ['Reality', 'Talk Show', 'Documental', 'Noticias'] for g in res.get('genres', []))) else 'Serie'
 
-    # --- BANDERA ---
     paises = list(set([p.upper() for p in res.get('origin_country', [])] + [c['iso_3166_1'].upper() for c in res.get('production_countries', [])]))
     lang = res.get('original_language', '').lower()
     lang_to_c = {'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN','tl':'PH','id':'ID','ms':'MY','zh':'CN','yue':'HK'}
-    codigo_final = lang_to_c.get(lang) if (media_type == 'tv' and lang_to_c.get(lang) in paises) else (lang_to_c.get(lang) or (paises[0] if paises else None))
+    codigo_final = lang_to_c.get(lang) if (is_tv and lang_to_c.get(lang) in paises) else (lang_to_c.get(lang) or (paises[0] if paises else None))
     res['flag'] = ASIA_FLAGS_MAP.get(codigo_final, '🌏')
 
     # --- TEMPORADAS (TV) ---
@@ -800,7 +803,8 @@ def media_detail(media_type, media_id):
             if not last_season.get('overview'):
                 last_season['overview'] = s_raw['mx'].get('overview') or s_raw['en'].get('overview')
                 if last_season['overview'] == s_raw['en'].get('overview') and last_season['overview']:
-                    try: last_season['overview'] = GoogleTranslator(source='en', target='es').translate(last_season['overview'])
+                    try:
+                        last_season['overview'] = GoogleTranslator(source='en', target='es').translate(last_season['overview'])
                     except: pass
             if last_season.get('air_date'):
                 try:
@@ -822,7 +826,7 @@ def media_detail(media_type, media_id):
     user_region = current_user.region if current_user.is_authenticated else None
     watch_providers = []
     if user_region:
-        flatrate = raw['providers'].get('results', {}).get(user_region, {}).get('flatrate', [])
+        flatrate = res.get('watch/providers', {}).get('results', {}).get(user_region, {}).get('flatrate', [])
         elite_ids = {8, 337, 283, 119, 9, 149, 115, 1899, 384, 350, 344, 1773, 188}
         seen_p = set()
         for p in flatrate:
@@ -834,14 +838,15 @@ def media_detail(media_type, media_id):
                     seen_p.add(pid)
 
     # --- CRÉDITOS & KEYWORDS ---
-    credits = raw['credits']
+    credits = res.get('aggregate_credits' if is_tv else 'credits', {})
     if is_tv:
         for a in credits.get('cast', []):
             if a.get('roles'):
                 roles = sorted(a['roles'], key=lambda x: x.get('episode_count', 0), reverse=True)
                 a['character'] = "<br>".join([f"{r['character']} <small style='opacity:0.6'>({r['episode_count']} {'episodio' if r['episode_count']==1 else 'episodios'})</small>" for r in roles if r.get('character')])
     
-    keywords = (raw['keywords'].get('results' if media_type == 'tv' else 'keywords', []))
+    keywords_raw = res.get('keywords', {})
+    keywords = keywords_raw.get('results' if is_tv else 'keywords', [])
     
     current_status, is_favorite = (None, False)
     if current_user.is_authenticated:
@@ -974,42 +979,42 @@ def seasons(media_id):
 @app.route('/media/<media_type>/<int:media_id>/cast')
 def media_cast(media_type, media_id):
     api_key = os.getenv("TMDB_API_KEY")
+    is_tv = media_type == 'tv'
+
+    # 1. Definir URLs para paralelismo (Misma lógica que media_detail pero con foco en Cast)
+    append_master = "aggregate_credits" if is_tv else "credits"
+    urls = {
+        'es': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-ES&append_to_response={append_master}",
+        'mx': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-MX",
+        'en': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=en-US"
+    }
+
+    # 2. Ejecutar peticiones en paralelo (Solo 3 ahora)
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        future_to_url = {executor.submit(fetch_json, url): name for name, url in urls.items()}
+        raw = {future_to_url[future]: future.result() for future in future_to_url}
+
+    res = raw['es']
+    if not res or 'id' not in res:
+        res = raw['mx'] if (raw['mx'] and 'id' in raw['mx']) else raw['en']
     
-    # 1. Datos básicos (Cast)
-    detail_url = f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-ES"
-    res = requests.get(detail_url).json()
+    if not res:
+        return "Error cargando medios", 404
 
     # --- TÍTULO: TIERED FALLBACK (ES-ES > ES-MX > EN-US) ---
-    title_es = res.get('title') if media_type == 'movie' else res.get('name')
+    res['display_title'] = res.get('title') if media_type == 'movie' else res.get('name')
     orig_title = res.get('original_title') if media_type == 'movie' else res.get('original_name')
     
-    if not title_es or title_es == orig_title:
-        # Nivel 2: México
-        mx_url = f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-MX"
-        try:
-            mx_res = requests.get(mx_url).json()
-            mx_title = mx_res.get('title') if media_type == 'movie' else mx_res.get('name')
-            if mx_title and mx_title != orig_title:
-                res['display_title'] = mx_title
-            else:
-                # Nivel 3: Inglés
-                url_en = f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=en-US"
-                res_en = requests.get(url_en).json()
-                en_title = res_en.get('title') if media_type == 'movie' else res_en.get('name')
-                res['display_title'] = en_title if en_title else orig_title
-        except:
-            res['display_title'] = orig_title
-    else:
-        res['display_title'] = title_es
-    # -----------------------------------------------------------
-    # -----------------------------------------------------------
-    # 2. Créditos (Agregados para TV, normales para Movie)
-    if media_type == 'tv' or (res.get('media_type') == 'tv' or 'first_air_date' in res):
-        credits_url = f"https://api.themoviedb.org/3/tv/{media_id}/aggregate_credits?api_key={api_key}"
-    else:
-        credits_url = f"https://api.themoviedb.org/3/movie/{media_id}/credits?api_key={api_key}"
-        
-    credits = requests.get(credits_url).json()
+    if not res['display_title'] or res['display_title'] == orig_title:
+        mx_t = raw['mx'].get('title' if media_type == 'movie' else 'name')
+        if mx_t and mx_t != orig_title:
+            res['display_title'] = mx_t
+        else:
+            en_t = raw['en'].get('title' if media_type == 'movie' else 'name')
+            res['display_title'] = en_t if en_t else orig_title
+
+    # 3. Créditos (Obtenidos del fetch paralelo master)
+    credits = res.get('aggregate_credits' if is_tv else 'credits', {})
     
     # Normalizar personas para que el template no falle
     final_cast = credits.get('cast', [])

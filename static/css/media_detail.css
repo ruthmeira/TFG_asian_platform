@@ -9,7 +9,7 @@
     /* Fluid gap */
     align-items: flex-start;
     /* View-specific animations now handled globally in style.css */
-    animation: fadeIn 0.8s ease;
+    animation: fadeIn 0.4s ease;
     width: 100%;
     min-height: 800px; /* Safety for dropdown menus vs footer */
 }
@@ -321,7 +321,7 @@
 
 /* Temporadas Card */
 .detail-season-preview {
-    animation: fadeIn 0.8s ease;
+    animation: fadeIn 0.4s ease;
     width: 100%;
 }
 
