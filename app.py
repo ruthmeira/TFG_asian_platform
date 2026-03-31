@@ -219,8 +219,8 @@ def forgot_password():
                 flash("Error al enviar el email de recuperación.", "error")
                 return redirect(url_for('forgot_password'))
         
-        # Mensaje unificado (si existe o si no) para máxima privacidad
-        flash("Si el email existe en nuestra base de datos, recibirás un enlace de recuperación en unos minutos. Revisa tu carpeta de spam.", "success")
+        # Mensaje unificado amigable (si existe o si no)
+        flash("🏮 ¡Enviado! Si el correo es correcto, recibirás el enlace en tu buzón en breves momentos.", "success")
         return redirect(url_for('forgot_password'))
     return render_template('forgot_password.html')
 
