@@ -376,9 +376,9 @@ body {
 /* GLOBAL CARDS (Coherencia Total) */
 /* ===================================================== */
 /* ESTANDARIZACIÓN TOTAL DE TARJETAS (Global) */
-.card-link, 
-.media-carousel .card-link,
-.collection-grid-premium .card-link {
+.card-link {
+    width: 175px; /* ANCHO ESTÁNDAR DESKTOP */
+    flex: 0 0 auto;
     display: block;
     text-decoration: none;
     color: inherit;
@@ -388,10 +388,16 @@ body {
     transform-origin: center;
 }
 
+.media-carousel .card-link {
+    width: 175px;
+    flex: 0 0 auto;
+}
+
 .card {
     position: relative;
     flex: 0 0 auto;
-    width: 175px; /* ANCHO ESTÁNDAR GLOBAL */
+    width: 100%; /* FLEXIBILIDAD TOTAL */
+    max-width: 175px; /* TOPE DE ANCHO */
     background: var(--bg-card);
     border-radius: 12px;
     overflow: hidden;
@@ -753,6 +759,12 @@ body {
         width: 100%;
         text-align: center;
         justify-content: center;
+    }
+
+    .media-carousel .card-link {
+        width: 145px;
+        min-width: 145px;
+        max-width: 145px;
     }
 
     .footer {

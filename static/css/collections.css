@@ -20,9 +20,10 @@
 
 .subtitle-premium {
     color: var(--text-muted);
-    font-size: clamp(14px, 1.2vw, 17px);
+    font-size: clamp(13px, 1.2vw, 16px);
     margin: 0;
-    opacity: 0.8;
+    opacity: 0.7;
+    font-weight: 500;
 }
 
 .collection-section {
@@ -106,9 +107,9 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        padding-bottom: 10px;
+        padding-bottom: 15px;
         gap: 5px;
-        /* Menos hueco para ganar aire */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .title-main-info {
@@ -117,8 +118,9 @@
 
     /* CARDS IN COLLECTIONS (Centralized Styles) */
     .media-carousel .card-link {
-        width: 140px !important;
-        min-width: 140px !important;
+        width: 145px !important;
+        min-width: 145px !important;
+        max-width: 145px !important;
     }
 
     .empty-msg-collection {
