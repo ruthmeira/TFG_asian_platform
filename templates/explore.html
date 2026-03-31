@@ -144,29 +144,28 @@
                 
                 <div class="genre-collapsible-content">
                     <div class="custom-region-dropdown" id="region-dropdown-container">
-                        <i class="fas fa-map-marker-alt location-icon" style="position: absolute; left: 15px; z-index: 2; pointer-events: none; color: var(--primary-color);"></i>
+                        <i class="fas fa-map-marker-alt location-icon"></i>
                         <input type="hidden" name="watch_region" id="watch-region-input" value="{{ current_region }}">
                     
-                    <div class="region-dropdown-btn" id="region-dropdown-btn">
-                        <div class="selected-region" id="region-selected-display">
-                            <!-- JS fills -->
-                            Cargando...
+                        <div class="region-dropdown-btn" id="region-dropdown-btn">
+                            <div class="selected-region" id="region-selected-display">
+                                Cargando...
+                            </div>
+                            <i class="fas fa-chevron-down dropdown-arrow"></i>
                         </div>
-                        <i class="fas fa-caret-down dropdown-arrow"></i>
-                    </div>
 
-                    <div class="region-dropdown-menu" id="region-dropdown-menu">
-                        <div class="region-search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" id="region-search-input" placeholder="Filtrar por país..." autocomplete="off">
-                        </div>
-                        <div class="region-list-container">
-                            <ul class="region-list" id="region-list">
-                                <!-- JS fills -->
-                            </ul>
+                        <div class="region-dropdown-menu" id="region-dropdown-menu">
+                            <div class="region-search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="region-search-input" placeholder="Buscar país..." autocomplete="off">
+                            </div>
+                            <div class="region-list-container">
+                                <ul class="region-list" id="region-list">
+                                    <!-- JS fills -->
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div>
 
 
                 <!-- Script movido a static/js/explore.js -->
@@ -250,10 +249,7 @@
                 <span id="results-count-num" class="count-highlight">0</span> resultados encontrados
             </div>
         </div>
-        <!-- BOTÓN SUBIR ARRIBA -->
-        <button id="scroll-top-btn" class="scroll-top-btn">
-            <i class="fas fa-chevron-up"></i>
-        </button>
+
         <!-- El cargador de Matrix ha sido reemplazado por esqueletos (skeletons) -->
 
         <div id="items-container" class="collection-grid">

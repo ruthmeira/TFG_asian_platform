@@ -125,3 +125,103 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+/**
+ * SHIORI GLOBAL UTILITIES
+ */
+window.SHIORI = {
+    /**
+     * Universal Region Selector Engine
+     * @param {Object} config - Configuration object
+     */
+    initRegionSelector: function(config) {
+        const container = config.container || document.getElementById(config.containerId);
+        if (!container) return;
+
+        const countries = config.countries || [];
+        const btn = container.querySelector('.region-dropdown-btn');
+        const display = container.querySelector('.selected-region');
+        const listContainer = container.querySelector('.region-list') || container.querySelector('ul');
+        const searchInput = container.querySelector('.region-search-box input') || container.querySelector('#region-search-input');
+        const hiddenInput = container.querySelector('input[type="hidden"]');
+        const placeholder = config.placeholder || "Selecciona un país...";
+
+        function renderDisplay(code) {
+            const country = countries.find(c => c.code === code);
+            if (country && display) {
+                display.innerHTML = `<span class="flag">${country.emoji}</span><span class="name">${country.name}</span><span class="code">${country.code}</span>`;
+                if (hiddenInput) {
+                    hiddenInput.value = country.code;
+                    // Disparar evento change manualmente por si alguien escucha
+                    hiddenInput.dispatchEvent(new Event('change'));
+                }
+                if (config.onSelect) config.onSelect(country);
+            } else if (display) {
+                display.innerHTML = placeholder;
+            }
+        }
+
+        function renderList(query = "") {
+            if (!listContainer) return;
+            listContainer.innerHTML = '';
+            const q = query.toLowerCase().trim();
+            const filtered = countries.filter(c => 
+                c.name.toLowerCase().includes(q) || 
+                c.code.toLowerCase().includes(q)
+            );
+            
+            if (filtered.length === 0) {
+                listContainer.innerHTML = `<li style="padding: 15px; color: rgba(255,255,255,0.4); text-align: center; font-size: 0.9rem;">No se encontraron países</li>`;
+                return;
+            }
+            
+            filtered.forEach(country => {
+                const li = document.createElement('li');
+                li.className = `region-item ${country.code === (hiddenInput ? hiddenInput.value : '') ? 'selected' : ''}`;
+                li.innerHTML = `<span class="flag">${country.emoji}</span><span class="name">${country.name}</span><span class="code">${country.code}</span>`;
+                
+                li.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    renderDisplay(country.code);
+                    container.classList.remove('open');
+                    if (searchInput) searchInput.value = "";
+                });
+                listContainer.appendChild(li);
+            });
+        }
+
+        if (btn) {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const isOpen = container.classList.toggle('open');
+                // Cerrar otros
+                document.querySelectorAll('.custom-region-dropdown').forEach(d => {
+                    if (d !== container) d.classList.remove('open');
+                });
+                if (isOpen && searchInput) {
+                    searchInput.value = "";
+                    renderList();
+                    setTimeout(() => searchInput.focus(), 100);
+                }
+            };
+        }
+
+        if (searchInput) {
+            searchInput.onclick = e => e.stopPropagation();
+            searchInput.oninput = e => renderList(e.target.value);
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!container.contains(e.target)) container.classList.remove('open');
+        });
+
+        // Initialize state
+        if (hiddenInput && hiddenInput.value) {
+            renderDisplay(hiddenInput.value);
+        } else if (config.defaultCountry) {
+            renderDisplay(config.defaultCountry);
+        }
+        
+        renderList();
+    }
+};

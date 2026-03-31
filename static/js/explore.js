@@ -46,7 +46,6 @@ window.ExploreApp = (() => {
         initKeywordTagging();
         initInfiniteScroll();
         initSPADetails();
-        initScrollTop();
         
         // Initial Load
         loadItems(1);
@@ -54,73 +53,16 @@ window.ExploreApp = (() => {
 
     // --- REGION DROPDOWN ---
     function initRegionDropdown() {
-        const container = document.querySelector(selectors.regionContainer);
-        const btn = document.querySelector(selectors.regionBtn);
-        const display = document.querySelector(selectors.regionDisplay);
-        const listContainer = document.querySelector(selectors.regionList);
-        const searchInput = document.querySelector(selectors.regionSearchInput);
-        const hiddenInput = document.querySelector(selectors.regionHiddenInput);
-
-        if (!container || !btn) return;
-
-        let currentCode = hiddenInput.value || 'ES';
-
-        function renderDisplay(code) {
-            const country = state.countries.find(c => c.code === code) || state.countries.find(c => c.code === 'ES');
-            if (country && display) {
-                display.innerHTML = `<span class="flag">${country.emoji}</span><span class="name">${country.name}</span><span class="code">${country.code}</span>`;
-                hiddenInput.value = country.code;
+        SHIORI.initRegionSelector({
+            containerId: 'region-dropdown-container',
+            countries: state.countries,
+            onSelect: (country) => {
                 state.filters.watch_region = country.code;
+                loadItems(1); // Recargar rejilla con la nueva región
             }
-        }
-
-        function renderList(query = "") {
-            if (!listContainer) return;
-            listContainer.innerHTML = '';
-            const q = query.toLowerCase().trim();
-            const filtered = state.countries.filter(c => c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q));
-
-            if (filtered.length === 0) {
-                listContainer.innerHTML = `<li style="padding: 15px; color: rgba(255,255,255,0.4); text-align: center; font-size: 0.9rem;">No se encontraron países</li>`;
-                return;
-            }
-
-            filtered.forEach(country => {
-                const li = document.createElement('li');
-                li.className = `region-item ${country.code === hiddenInput.value ? 'selected' : ''}`;
-                li.innerHTML = `<span class="flag">${country.emoji}</span><span class="name">${country.name}</span><span class="code">${country.code}</span>`;
-                li.onclick = (e) => {
-                    e.stopPropagation();
-                    renderDisplay(country.code);
-                    container.classList.remove('open');
-                    setTimeout(() => renderList(), 200);
-                };
-                listContainer.appendChild(li);
-            });
-        }
-
-        btn.onclick = (e) => {
-            e.stopPropagation();
-            const isOpen = container.classList.toggle('open');
-            if (isOpen) {
-                searchInput.value = "";
-                renderList();
-                setTimeout(() => searchInput.focus(), 100);
-            }
-        };
-
-        if (searchInput) {
-            searchInput.onclick = e => e.stopPropagation();
-            searchInput.oninput = e => renderList(e.target.value);
-        }
-
-        document.addEventListener('click', (e) => {
-            if (!container.contains(e.target)) container.classList.remove('open');
         });
-
-        renderDisplay(currentCode);
-        renderList();
     }
+
 
     // --- FILTER CHIPS ---
     function initFilterChips() {
@@ -533,19 +475,7 @@ window.ExploreApp = (() => {
         if (pop && history.state && history.state.isDetail) history.back();
     }
 
-    // --- UTILS ---
-    function initScrollTop() {
-        const btn = document.querySelector(selectors.scrollTopBtn);
-        if (!btn) return;
-        window.addEventListener('scroll', () => {
-            btn.classList.toggle('visible', window.scrollY > 500);
-            const scrollBottom = window.scrollY + window.innerHeight;
-            const footerTop = document.querySelector('.footer').offsetTop;
-            if (scrollBottom > footerTop) btn.style.bottom = (30 + (scrollBottom - footerTop)) + 'px';
-            else btn.style.bottom = '30px';
-        });
-        btn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+
 
     return { init, openDetail, closeDetail };
 })();
