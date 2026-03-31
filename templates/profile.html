@@ -20,11 +20,17 @@
 
     <div class="profile-user-info-clean">
         <div class="avatar-circle-clean">
-            {{ current_user.username[0] | upper }}
+            {% if current_user.profile_image %}
+                <img src="{{ url_for('static', filename=current_user.profile_image) }}" alt="{{ current_user.username }}" class="avatar-img-clean">
+            {% else %}
+                {{ current_user.username[0] | upper }}
+            {% endif %}
         </div>
         <div class="user-titles">
-            <h1>Hola, <span class="username-gradient">{{ current_user.username }}</span> 🏮</h1>
-            <p>Viviendo su propia crónica asiática</p>
+            <h1 class="username-gradient">@{{ current_user.username }}</h1>
+            {% if current_user.bio %}
+                <p class="user-bio">{{ current_user.bio }}</p>
+            {% endif %}
         </div>
     </div>
 

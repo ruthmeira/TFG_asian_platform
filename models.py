@@ -12,6 +12,8 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True)
     password_hash = db.Column(db.String(128))
     region = db.Column(db.String(10), nullable=True) # Código ISO del país (ej: 'ES', 'MX')
+    profile_image = db.Column(db.String(255), nullable=True) # Ruta de la foto
+    bio = db.Column(db.String(500), nullable=True) # Biografía personalizada
     collections = db.relationship('CollectionItem', backref='user', lazy=True)
 
     def set_password(self, password):

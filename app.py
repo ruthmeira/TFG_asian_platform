@@ -57,6 +57,17 @@ app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
 mail = Mail(app)
 
 db.init_app(app)
+ 
+# --- CONFIGURACIÓN DE UPLOAD ---
+UPLOAD_FOLDER = 'static/uploads/profiles'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+from werkzeug.utils import secure_filename
 
 # --- CONFIGURACIÓN GOOGLE OAUTH ---
 oauth = OAuth(app)
@@ -531,6 +542,16 @@ def edit_profile():
         current_user.username = username
         current_user.email = email
         current_user.region = region
+        current_user.bio = request.form.get('bio') # Actualizar Bio
+
+        # --- Lógica de Foto de Perfil ---
+        file = request.files.get('profile_image')
+        if file and file.filename != '' and allowed_file(file.filename):
+            filename = secure_filename(f"user_{current_user.id}_{int(time.time())}_{file.filename}")
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+            current_user.profile_image = f"uploads/profiles/{filename}"
+
         if password: current_user.set_password(password)
         db.session.commit()
         next_page = request.args.get('next')

@@ -35,12 +35,24 @@
       {% endif %}
     {% endwith %}
 
-    <form method="POST" action="{{ url_for('edit_profile', next=request.args.get('next')) }}">
+    <form method="POST" action="{{ url_for('edit_profile', next=request.args.get('next')) }}" enctype="multipart/form-data">
+        <!-- FOTO DE PERFIL -->
+        <div class="input-group">
+            <i class="fas fa-camera main-icon"></i>
+            <input type="file" name="profile_image" accept="image/*" class="file-input">
+            <span class="file-label">Foto de Perfil</span>
+        </div>
+
         <div class="input-group">
             <i class="fas fa-user main-icon"></i>
             <input type="text" name="username" value="{{ current_user.username }}" required spellcheck="false" placeholder="Usuario">
         </div>
         
+        <div class="input-group">
+            <i class="fas fa-comment-dots main-icon"></i>
+            <textarea name="bio" rows="3" placeholder="Tu crónica personal (biografía)..." maxlength="500">{{ current_user.bio or '' }}</textarea>
+        </div>
+
         <div class="input-group">
             <i class="fas fa-envelope main-icon"></i>
             <input type="email" name="email" value="{{ current_user.email }}" required spellcheck="false" placeholder="Email">
