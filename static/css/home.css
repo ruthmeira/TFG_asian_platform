@@ -113,47 +113,8 @@
 }
 
 .matrix-container {
-    position: absolute;
     top: -50px;
-    left: 0;
-    width: 105%;
     height: 120%;
-    display: flex;
-    justify-content: space-between;
-    opacity: 0.4;
-    /* Considerably more visible rain */
-    pointer-events: none;
-    filter: blur(0.3px);
-}
-
-.matrix-column {
-    font-family: 'Courier New', monospace;
-    font-size: clamp(0.7rem, 4vw, 1.5rem);
-    /* More aggressive small screening scaling */
-    color: var(--primary);
-    writing-mode: vertical-rl;
-    text-orientation: upright;
-    animation: matrixDrop linear infinite;
-    text-shadow: 0 0 12px rgba(255, 69, 0, 0.8);
-    white-space: nowrap;
-    letter-spacing: 4px;
-}
-
-@keyframes matrixDrop {
-    0% {
-        transform: translateY(-100%);
-        opacity: 0;
-    }
-
-    10%,
-    90% {
-        opacity: 1;
-    }
-
-    100% {
-        transform: translateY(100%);
-        opacity: 0;
-    }
 }
 
 .loading-content {
