@@ -39,14 +39,14 @@ window.ExploreApp = (() => {
         state.countries = config.availableCountries || [];
         state.genresByType = config.genresByType || {};
         state.filters = config.filters || {};
-        
+
         // Init Components
         initRegionDropdown();
         initFilterChips();
         initKeywordTagging();
         initInfiniteScroll();
         initSPADetails();
-        
+
         // Initial Load
         loadItems(1);
     }
@@ -98,7 +98,7 @@ window.ExploreApp = (() => {
 
         // Platforms logic
         if (toggleProviders) {
-            toggleProviders.onclick = function() {
+            toggleProviders.onclick = function () {
                 this.classList.toggle('active');
                 this.nextElementSibling.classList.toggle('open');
             };
@@ -114,7 +114,7 @@ window.ExploreApp = (() => {
         }
 
         platformIcons.forEach(icon => {
-            icon.onclick = function() {
+            icon.onclick = function () {
                 this.classList.toggle('active');
                 const activeOnes = Array.from(document.querySelectorAll('#chips-providers .platform-circle.active'));
                 const ids = activeOnes.map(i => i.dataset.id).join('|');
