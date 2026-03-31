@@ -45,7 +45,6 @@ window.ExploreApp = (() => {
         initFilterChips();
         initKeywordTagging();
         initInfiniteScroll();
-        initSPADetails();
 
         // Initial Load
         loadItems(1);
@@ -422,62 +421,7 @@ window.ExploreApp = (() => {
         window.requestAnimationFrame(step);
     }
 
-    // --- SPA DETAILS ---
-    function initSPADetails() {
-        const container = document.querySelector(selectors.container);
-        if (!container) return;
-
-        container.onclick = (e) => {
-            const link = e.target.closest('.card-link');
-            if (link && !e.ctrlKey && !e.metaKey) {
-                e.preventDefault();
-                openDetail(link.getAttribute('href'), true);
-            }
-        };
-
-        window.onpopstate = (event) => {
-            if (event.state && event.state.isDetail) openDetail(window.location.pathname, false);
-            else closeDetail(false);
-        };
-    }
-
-    async function openDetail(url, push = true) {
-        const layer = document.querySelector(selectors.detailLayer);
-        const content = document.querySelector(selectors.detailContent);
-        if (!layer || !content) return;
-
-        layer.classList.add('visible');
-        document.body.style.overflow = 'hidden';
-
-        content.innerHTML = `<div class="detail-skeleton"><div class="detail-skeleton-img"></div><div class="detail-skeleton-text"><div class="detail-skeleton-title"></div><div class="detail-skeleton-para"></div><div class="detail-skeleton-para"></div><div class="detail-skeleton-para"></div></div></div>`;
-
-        if (push) history.pushState({ isDetail: true, url: url }, '', url);
-
-        try {
-            const res = await fetch(url);
-            const html = await res.text();
-            const doc = new DOMParser().parseFromString(html, 'text/html');
-            const mainContent = doc.querySelector('.media-detail-container');
-            if (mainContent) {
-                content.innerHTML = mainContent.outerHTML;
-                if (window.MediaDetail) window.MediaDetail.init(content);
-            } else {
-                content.innerHTML = "<p>Error al cargar el detalle.</p>";
-            }
-        } catch (err) { console.error(err); content.innerHTML = "<p>No se pudo conectar.</p>"; }
-    }
-
-    function closeDetail(pop = true) {
-        const layer = document.querySelector(selectors.detailLayer);
-        if (!layer) return;
-        layer.classList.remove('visible');
-        document.body.style.overflow = '';
-        if (pop && history.state && history.state.isDetail) history.back();
-    }
-
-
-
-    return { init, openDetail, closeDetail };
+    return { init };
 })();
 
 // Auto-initialization if data element is present
