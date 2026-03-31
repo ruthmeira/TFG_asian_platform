@@ -53,13 +53,15 @@ main.container {
     color: white;
     box-shadow: 0 15px 35px rgba(255, 69, 0, 0.3);
     border: 4px solid rgba(255, 255, 255, 0.1);
-    overflow: hidden; /* IMPORTANTE: Para que la imagen no se salga del círculo */
+    overflow: hidden;
+    /* IMPORTANTE: Para que la imagen no se salga del círculo */
 }
 
 .avatar-img-clean {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Ajuste perfecto de la foto */
+    object-fit: cover;
+    /* Ajuste perfecto de la foto */
 }
 
 .user-titles h1 {
@@ -153,8 +155,10 @@ main.container {
 
 .stat-crystal {
     padding: clamp(15px, 2vw, 25px) 10px;
-    background: rgba(255, 255, 255, 0.08); /* Más visible que el glass estándar */
-    border: 1px solid rgba(255, 255, 255, 0.15); /* Borde más definido */
+    background: rgba(255, 255, 255, 0.08);
+    /* Más visible que el glass estándar */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    /* Borde más definido */
     backdrop-filter: blur(15px);
     border-radius: 24px;
     display: flex;
@@ -216,8 +220,10 @@ main.container {
 }
 
 .stat-crystal-link:hover .stat-crystal {
-    background: rgba(255, 255, 255, 0.12); /* Brillo sutil de fondo */
-    border-color: rgba(255, 255, 255, 0.25); /* Se nota más el borde pero sigue blanco/cristal */
+    background: rgba(255, 255, 255, 0.12);
+    /* Brillo sutil de fondo */
+    border-color: rgba(255, 255, 255, 0.25);
+    /* Se nota más el borde pero sigue blanco/cristal */
 }
 
 .stat-crystal-link:hover i {
@@ -309,180 +315,11 @@ main.container {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* Edit Form Components */
-.profile-actions-edit {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 25px;
-}
-
-.input-group textarea {
-    width: 100%;
-    background: transparent;
-    border: none;
-    color: white;
-    font-family: inherit;
-    font-size: 14px;
-    padding: 10px 0;
-    resize: none;
-}
-
-.file-input {
-    opacity: 0;
-    position: absolute;
-    width: 0;
-}
-
-.file-label {
-    font-size: 14px;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.input-group:hover .file-label {
-    color: var(--primary);
-}
-
-.save-btn {
-    background: var(--primary-gradient);
-    color: white;
-    padding: 16px;
-    border: none;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: var(--transition);
-    width: 100%;
-}
-
-.save-btn:hover {
-    transform: translateY(-3px);
-    filter: brightness(1.1);
-    box-shadow: 0 15px 30px rgba(255, 69, 0, 0.4);
-}
-
 /* ===================================================== */
-/* RESPONSIVE DESIGN - BLINDAJE ULTRA-NARROW (600px) */
+/* RESPONSIVE DESIGN - PROFILE VIEW (600px) */
 /* ===================================================== */
 
-@media (max-width: 600px) {
 
-    /* Cabecera Apilada */
-    .profile-user-info-clean {
-        flex-direction: column;
-        text-align: center;
-        justify-content: center;
-        gap: clamp(15px, 5vw, 20px);
-        padding: 30px 10px;
-    }
-
-    .avatar-circle-clean {
-        margin: 0 auto;
-        /* Avatar fluido: se achica en 180px */
-        width: clamp(70px, 30vw, 100px);
-        height: clamp(70px, 30vw, 100px);
-        font-size: clamp(1.8rem, 10vw, 2.5rem);
-        border-width: 3px;
-    }
-
-    .user-titles {
-        min-width: 0;
-        width: 100%;
-    }
-
-    .user-titles h1 {
-        justify-content: center; /* SOLUCIÓN: Centrar el flex en el móvil */
-        /* Prevención de desbordamiento de nombre */
-        overflow-wrap: break-word;
-        word-wrap: break-word;
-        hyphens: auto;
-        line-height: 1.1;
-        font-size: clamp(1.2rem, 10vw, 1.8rem);
-    }
-
-    /* Grid Atómico 3 + 2 (Se ajusta solo por debajo de 600px) */
-    .stats-grid {
-        /* Cambio a 1 columna en pantallas ultra-estrechas (< 280px) */
-        grid-template-columns: repeat(6, 1fr);
-        gap: 8px;
-        margin-bottom: 25px;
-    }
-
-    .stat-crystal-link:nth-child(1),
-    .stat-crystal-link:nth-child(2),
-    .stat-crystal-link:nth-child(3) {
-        grid-column: span 2;
-    }
-
-    .stat-crystal-link:nth-child(4),
-    .stat-crystal-link:nth-child(5) {
-        grid-column: span 3;
-    }
-
-    .stat-crystal {
-        padding: clamp(15px, 4vw, 30px) 5px;
-        /* Más aireado como escritorio */
-        border-radius: 28px;
-        /* Radio de escritorio */
-        gap: 15px;
-    }
-
-    .stat-crystal i {
-        width: clamp(40px, 8vw, 65px);
-        height: clamp(40px, 8vw, 65px);
-        font-size: clamp(1.2rem, 4vw, 2rem);
-        border-radius: 20px;
-    }
-
-    .stat-data h3 {
-        font-size: clamp(1.1rem, 6vw, 2.2rem);
-        /* Mínimo más bajo para ahorrar espacio */
-        margin-bottom: 5px;
-    }
-
-    .stat-data p {
-        font-size: clamp(4.5px, 2.5vw, 11px);
-        /* Mínimo extremo para 180px */
-        letter-spacing: clamp(0px, 0.5vw, 2px);
-        text-transform: uppercase;
-        white-space: nowrap;
-        line-height: 1.1;
-        font-weight: 700;
-        opacity: 0.85;
-    }
-
-    /* Acciones Táctiles en una línea si es posible */
-    .profile-actions-main {
-        flex-direction: row;
-        /* Intentar fila primero */
-        flex-wrap: wrap;
-        /* Pero envolver si es físicamente imposible */
-        justify-content: center;
-        width: 100%;
-        gap: 8px;
-    }
-
-    .profile-btn {
-        flex: 1;
-        min-width: 120px;
-        /* Tamaño mínimo para no romperse */
-        white-space: nowrap;
-        /* PROHIBIDO SALTAR DE LÍNEA */
-        padding: 12px clamp(10px, 4vw, 15px);
-        font-size: clamp(10px, 4vw, 13px);
-        /* Fuente más pequeña para que quepa */
-        gap: 8px;
-        /* Espacio más ajustado */
-    }
-
-    .profile-btn i {
-        font-size: clamp(0.9rem, 4vw, 1.1rem);
-        /* Icono proporcional a la frase */
-    }
-}
 
 /* CUSTOM REGION DROPDOWN */
 .custom-region-dropdown {
@@ -515,11 +352,23 @@ main.container {
 .selected-region {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     flex: 1;
+}
+
+.flag-img {
+    width: 22px;
+    height: auto;
+    border-radius: 3px;
+    display: block;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.region-item .flag-img {
+    width: 20px;
 }
 
 .selected-region .code {
@@ -676,5 +525,679 @@ main.container {
     to {
         opacity: 1;
         transform: translateY(-50%) scale(1);
+    }
+}
+
+/* ===================================================== */
+/* EDIT PROFILE - PREMIUM SETTINGS STYLES */
+/* ===================================================== */
+
+.container-profile.edit-mode {
+    width: 100%;
+    max-width: 100%;
+    margin: 0px auto 20px auto;
+    padding: 0 clamp(2px, 4vw, 40px) !important;
+}
+
+.edit-profile-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.edit-profile-header h1 {
+    font-size: clamp(1.4rem, 10vw, 2.8rem);
+    margin-bottom: 8px;
+    line-height: 1.2;
+}
+
+.edit-profile-header .subtitle {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    opacity: 0.8;
+}
+
+.edit-profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.glass-panel {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 24px;
+    padding: clamp(15px, 5vw, 35px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    transition: transform 0.3s;
+
+    /* Espaciado interno consistente para los hijos */
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* Avatar Preview Section */
+.avatar-edit-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(20px, 5vw, 50px);
+    width: 100%;
+}
+
+.avatar-preview-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.avatar-circle-clean.large.preview {
+    width: 160px;
+    height: 160px;
+    position: relative;
+    cursor: pointer;
+    box-shadow: 0 20px 40px rgba(255, 69, 0, 0.2);
+    border: 5px solid rgba(255, 255, 255, 0.1);
+}
+
+.upload-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+    border-radius: 50%;
+}
+
+.edit-mode .input-group:has(.password-toggle) input {
+    padding-right: 50px !important;
+}
+
+/* El overlay de cámara solo aparece cuando pasamos el ratón por el BOTÓN */
+.avatar-edit-wrapper:has(.change-photo-btn:hover) .upload-overlay {
+    opacity: 1;
+}
+
+.file-input-hidden {
+    display: none;
+}
+
+.change-photo-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.change-photo-btn:hover {
+    background: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 69, 0, 0.3);
+}
+
+/* Fields & Groups */
+.identity-fields {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    /* Standarized gap */
+    min-width: 0;
+}
+
+.input-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    /* Espacio etiqueta-input */
+    width: 100%;
+}
+
+.input-field label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.input-field label i {
+    color: var(--primary);
+    width: 20px;
+    text-align: center;
+}
+
+.edit-mode .input-group {
+    position: relative;
+    width: 100%;
+    display: block;
+}
+
+.edit-mode .input-group i.main-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 1rem;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.edit-mode .input-group input {
+    display: block !important;
+    width: 100% !important;
+    height: 52px;
+    background: rgba(0, 0, 0, 0.2) !important;
+    /* Mismo color que la región */
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px !important;
+    color: #ffffff !important;
+    font-size: 15px !important;
+    transition: all 0.3s;
+    padding: 0 20px !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Autofill Fix for Glassmorphism inputs */
+.edit-mode .input-group input:-webkit-autofill,
+.edit-mode .input-group input:-webkit-autofill:hover,
+.edit-mode .input-group input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #ffffff !important;
+    -webkit-box-shadow: 0 0 0px 1000px rgba(0, 0, 0, 0.3) inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Si el input tiene un icono principal (i.main-icon), le damos padding extra a la izquierda */
+.edit-mode .input-group i.main-icon+input {
+    padding-left: 50px !important;
+}
+
+/* Si el input tiene toggle de contraseña, le damos padding extra a la derecha */
+.edit-mode .input-group:has(.password-toggle) input {
+    padding-right: 50px !important;
+}
+
+/* Password Toggle */
+.edit-mode .input-group .password-toggle {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    font-size: 1.1rem;
+    z-index: 6;
+    transition: color 0.3s;
+}
+
+.edit-mode .input-group .password-toggle:hover {
+    color: var(--primary);
+}
+
+.edit-mode .input-group input:focus {
+    outline: none;
+    border-color: var(--primary) !important;
+    background: rgba(255, 69, 0, 0.05) !important;
+    box-shadow: 0 0 15px rgba(255, 69, 0, 0.1) !important;
+}
+
+.input-group textarea {
+    width: 100%;
+    min-height: 120px;
+    line-height: 1.6;
+    padding: 15px 18px !important;
+    background: rgba(0, 0, 0, 0.2) !important;
+    /* Coherencia con los inputs */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: white;
+    font-family: inherit;
+    resize: none;
+    transition: all 0.3s;
+}
+
+.input-group textarea:focus {
+    outline: none;
+    border-color: var(--primary) !important;
+    background: rgba(255, 69, 0, 0.05) !important;
+}
+
+.char-counter {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.3);
+    text-align: right;
+    margin-top: -5px;
+    /* Pegar más al input */
+}
+
+.section-title {
+    font-size: 1.2rem;
+    margin-bottom: 0;
+    /* Ya lo maneja el gap del glass-panel */
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 15px;
+}
+
+.section-title i {
+    color: var(--primary);
+}
+
+.settings-grid-2-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.field-hint {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 0;
+    /* Ya lo maneja el gap del input-field */
+    font-style: italic;
+}
+
+/* Actions Footer */
+.form-footer-actions {
+    display: flex;
+    flex-direction: column;
+    /* Apilar en vertical */
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.btn-secondary:hover {
+    color: white;
+    transform: translateX(-5px);
+}
+
+.save-profile-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--primary-gradient) !important;
+    color: #fff !important;
+    padding: 12px 44px;
+    /* Un poco más grande como se solicitó */
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 10px 20px rgba(255, 69, 0, 0.3);
+}
+
+.save-profile-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(255, 69, 0, 0.5);
+    filter: brightness(1.1);
+}
+
+.save-profile-btn:active {
+    transform: scale(0.98);
+}
+
+/* Alerts container in Edit Mode */
+.alerts-container {
+    max-width: 1000px;
+    margin: 0 auto 20px auto;
+}
+
+/* Redefining Region Dropdown for this page slightly */
+.edit-mode .custom-region-dropdown .region-dropdown-btn {
+    height: 52px;
+    background: rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.edit-mode .custom-region-dropdown.open .region-dropdown-btn {
+    border-color: var(--primary);
+    background: rgba(255, 69, 0, 0.05);
+}
+
+/* ===================================================== */
+/* RESPONSIVE QUERY - 600px (MOBILE) */
+/* ===================================================== */
+
+@media (max-width: 600px) {
+    /* ========================================== */
+    /* 1. SECCIÓN PERFIL (VISTA)                 */
+    /* ========================================== */
+
+    /* Cabecera Apilada */
+    .profile-user-info-clean {
+        flex-direction: column;
+        text-align: center;
+        justify-content: center;
+        gap: clamp(15px, 5vw, 20px);
+        padding: 30px 10px;
+    }
+
+    .avatar-circle-clean {
+        margin: 0 auto;
+        /* Avatar fluido: se achica en 180px */
+        width: clamp(70px, 30vw, 100px);
+        height: clamp(70px, 30vw, 100px);
+        font-size: clamp(1.8rem, 10vw, 2.5rem);
+        border-width: 3px;
+    }
+
+    .user-titles {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .user-titles h1 {
+        justify-content: center;
+        /* SOLUCIÓN: Centrar el flex en el móvil */
+        /* Prevención de desbordamiento de nombre */
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        hyphens: auto;
+        line-height: 1.1;
+        font-size: clamp(1.2rem, 10vw, 1.8rem);
+    }
+
+    /* Grid Atómico 3 + 2 (Se ajusta solo por debajo de 600px) */
+    .stats-grid {
+        /* Cambio a 1 columna en pantallas ultra-estrechas (< 280px) */
+        grid-template-columns: repeat(6, 1fr);
+        gap: 8px;
+        margin-bottom: 25px;
+    }
+
+    .stat-crystal-link:nth-child(1),
+    .stat-crystal-link:nth-child(2),
+    .stat-crystal-link:nth-child(3) {
+        grid-column: span 2;
+    }
+
+    .stat-crystal-link:nth-child(4),
+    .stat-crystal-link:nth-child(5) {
+        grid-column: span 3;
+    }
+
+    .stat-crystal {
+        padding: clamp(15px, 4vw, 30px) 5px;
+        /* Más aireado como escritorio */
+        border-radius: 28px;
+        /* Radio de escritorio */
+        gap: 15px;
+    }
+
+    .stat-crystal i {
+        width: clamp(40px, 8vw, 65px);
+        height: clamp(40px, 8vw, 65px);
+        font-size: clamp(1.2rem, 4vw, 2rem);
+        border-radius: 20px;
+    }
+
+    .stat-data h3 {
+        font-size: clamp(1.1rem, 6vw, 2.2rem);
+        /* Mínimo más bajo para ahorrar espacio */
+        margin-bottom: 5px;
+    }
+
+    .stat-data p {
+        font-size: clamp(4.5px, 2.5vw, 11px);
+        /* Mínimo extremo para 180px */
+        letter-spacing: clamp(0px, 0.5vw, 2px);
+        text-transform: uppercase;
+        white-space: nowrap;
+        line-height: 1.1;
+        font-weight: 700;
+        opacity: 0.85;
+    }
+
+    /* Acciones Táctiles en una línea si es posible */
+    .profile-actions-main {
+        flex-direction: row;
+        /* Intentar fila primero */
+        flex-wrap: wrap;
+        /* Pero envolver si es físicamente imposible */
+        justify-content: center;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .profile-btn {
+        flex: 1;
+        min-width: 120px;
+        /* Tamaño mínimo para no romperse */
+        white-space: nowrap;
+        /* PROHIBIDO SALTAR DE LÍNEA */
+        padding: 12px clamp(10px, 4vw, 15px);
+        font-size: clamp(10px, 4vw, 13px);
+        /* Fuente más pequeña para que quepa */
+        gap: 8px;
+        /* Espacio más ajustado */
+    }
+
+    .profile-btn i {
+        font-size: clamp(0.9rem, 4vw, 1.1rem);
+        /* Icono proporcional a la frase */
+    }
+
+    /* ========================================== */
+    /* 2. SECCIÓN EDITAR PERFIL                  */
+    /* ========================================== */
+    /* Reset total para forzar que nada rompa contenedores */
+    * {
+        box-sizing: border-box !important;
+    }
+
+    .container-profile.edit-mode {
+        padding: 0 clamp(10px, 5vw, 40px) !important;
+    }
+
+    .edit-profile-header {
+        margin-bottom: 25px;
+    }
+
+    .edit-profile-header h1 {
+        font-size: clamp(1.8rem, 10vw, 2.8rem);
+        margin-bottom: 8px;
+        line-height: 1.2;
+    }
+
+    .edit-profile-header .subtitle {
+        font-size: clamp(0.9rem, 4.5vw, 1.1rem);
+    }
+
+    /* Layout Global Containers */
+    .edit-profile-form {
+        gap: 15px;
+    }
+
+    .settings-grid-2-col {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    /* Mantener estilo estético del ordenador (Paddings y Bordes) */
+    .glass-panel {
+        padding: clamp(15px, 5vw, 35px);
+        gap: clamp(25px, 6vw, 30px); /* Espacio generoso entre grupos */
+        width: 100%;
+        min-width: 0 !important;
+        border-radius: 24px !important; /* Bordes redondeados del escritorio */
+    }
+
+    /* Ajustes de Títulos de Sección */
+    .section-title {
+        font-size: clamp(1.1rem, 5.5vw, 1.2rem);
+        padding-bottom: 12px;
+        gap: 10px;
+    }
+
+    /* Sección Principal (Avatar + Datos) */
+    .avatar-edit-wrapper {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .avatar-preview-container {
+        width: 100%;
+        order: -1;
+    }
+
+    .avatar-circle-clean.large.preview {
+        width: clamp(110px, 40vw, 140px);
+        height: clamp(110px, 40vw, 140px);
+    }
+
+    /* Campos y Grupos recalibrados */
+    .identity-fields {
+        width: 100%;
+        gap: 12px;
+    }
+
+    .input-field label {
+        font-size: clamp(0.85rem, 4vw, 0.95rem);
+        gap: 8px;
+        margin-bottom: 0 !important; /* Eliminado el margen extra que rompía la jerarquía visual */
+    }
+
+    .edit-mode .input-group input {
+        height: 48px;
+        font-size: 14px !important;
+        padding: 0 15px !important;
+        border-radius: 12px !important;
+        min-width: 0 !important; 
+        width: 100% !important;
+    }
+
+    .edit-mode .input-group i.main-icon {
+        left: 15px;
+        font-size: 0.95rem;
+    }
+
+    .edit-mode .input-group i.main-icon + input {
+        padding-left: 45px !important;
+    }
+
+    /* Password Toggle en móvil */
+    .edit-mode .input-group .password-toggle {
+        right: 15px;
+        font-size: 1.05rem;
+    }
+
+    .edit-mode .input-group:has(.password-toggle) input {
+        padding-right: 48px !important;
+    }
+
+    .input-group textarea {
+        min-height: 100px;
+        font-size: 14px;
+        padding: 15px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    /* Región / Selector (Restaurado estilo premium) */
+    .edit-mode .custom-region-dropdown .region-dropdown-btn {
+        height: 48px;
+        padding: 0 15px 0 45px !important;
+        font-size: 14px;
+        min-width: 0 !important;
+        gap: 12px;
+    }
+
+    .edit-mode .custom-region-dropdown .location-icon {
+        left: 15px;
+    }
+
+    .edit-mode .custom-region-dropdown .flag-img {
+        margin-right: 2px;
+    }
+
+    /* RESPONSIVE ACCORDION STYLE FOR DROPDOWN (Smoother growth) */
+    .region-dropdown-menu {
+        position: relative !important;
+        top: 0px !important;
+        left: 0 !important;
+        width: 100% !important;
+        max-height: 0;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px) !important;
+        margin: 0 !important;
+        transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease !important;
+        box-shadow: none !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        z-index: 10 !important;
+    }
+
+    .custom-region-dropdown.open .region-dropdown-menu {
+        max-height: 500px; /* Más aire para los países */
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0) !important;
+        margin-top: 10px !important;
+        margin-bottom: 20px !important;
+        border-color: rgba(255, 69, 0, 0.2) !important;
+        box-shadow: inset 0 0 15px rgba(0,0,0,0.3) !important;
+    }
+
+    .edit-mode .custom-region-dropdown .region-list {
+        max-height: 250px;
+    }
+
+    /* Botones Adaptables (Recuperado el estilo de ORDERNADOR + Fluidez) */
+    .change-photo-btn {
+        padding: clamp(6px, 2vw, 8px) clamp(12px, 4vw, 18px);
+        font-size: clamp(11px, 3.5vw, 13px);
+        white-space: nowrap;
+        border-radius: 50px !important;
+    }
+
+    .save-profile-btn {
+        width: 100%;
+        padding: 12px clamp(10px, 5vw, 25px);
+        font-size: clamp(12px, 4vw, 15px);
+        white-space: nowrap;
+        min-width: 0;
+        border-radius: 50px !important;
+    }
+
+    .save-profile-btn span {
+        font-size: inherit;
+    }
+    
+    .char-counter {
+        font-size: 0.55rem;
+    }
+
+    .view-all-link {
+        font-size: 11px;
     }
 }

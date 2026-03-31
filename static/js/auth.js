@@ -27,7 +27,8 @@ window.AuthApp = (function() {
         function renderDisplay(code) {
             const country = countries.find(c => c.code === code);
             if (country) {
-                display.innerHTML = `<span class="flag">${country.emoji}</span><span class="name">${country.name}</span><span class="code">${country.code}</span>`;
+                const flagUrl = `https://flagcdn.com/w40/${country.code.toLowerCase()}.png`;
+                display.innerHTML = `<img src="${flagUrl}" class="flag-img"><span class="name">${country.name}</span><span class="code">${country.code}</span>`;
                 hiddenInput.value = country.code;
             } else {
                 display.innerHTML = defaultText;
@@ -52,7 +53,8 @@ window.AuthApp = (function() {
             filtered.forEach(country => {
                 const li = document.createElement('li');
                 li.className = `region-item ${country.code === hiddenInput.value ? 'selected' : ''}`;
-                li.innerHTML = `<span class="flag">${country.emoji}</span><span class="name">${country.name}</span><span class="code">${country.code}</span>`;
+                const flagUrl = `https://flagcdn.com/w40/${country.code.toLowerCase()}.png`;
+                li.innerHTML = `<img src="${flagUrl}" class="flag-img"><span class="name">${country.name}</span><span class="code">${country.code}</span>`;
                 
                 li.addEventListener('click', (e) => {
                     e.stopPropagation();
