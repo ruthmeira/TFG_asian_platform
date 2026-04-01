@@ -149,10 +149,6 @@
     flex-wrap: wrap;
 }
 
-.season-year-text {
-    opacity: 0.8;
-}
-
 .season-ep-count {
     color: var(--primary);
 }
@@ -166,7 +162,7 @@
 .season-overview-mini {
     font-size: clamp(13px, 1.1vw, 15px);
     line-height: 1.6;
-    color: rgba(255, 255, 255, 0.6);
+    color: rgba(255, 255, 255, 0.65); /* Matched to main detail card */
     margin: 0;
 }
 
