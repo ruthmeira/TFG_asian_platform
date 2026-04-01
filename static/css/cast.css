@@ -96,10 +96,6 @@
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(10px);
-    /* Forzar aceleración por hardware (Evita info fantasmagórica al redimensionar) */
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
 }
 
 .credit-photo-small {
@@ -110,9 +106,6 @@
     flex-shrink: 0;
     border: 2px solid rgba(255, 255, 255, 0.1);
     transition: var(--transition);
-    /* Forzar redibujado de la imagen */
-    will-change: transform;
-    transform: translateZ(0);
 }
 
 .credit-photo-small a {
@@ -126,9 +119,6 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* Capa de video persistente */
-    transform: translateZ(0);
-    backface-visibility: hidden;
 }
 
 .no-photo-small {
@@ -146,9 +136,6 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
-    /* Evitar fantasmas en el texto con aceleración directa */
-    will-change: transform, opacity;
-    transform: translateZ(0);
 }
 
 .credit-info-row .name {

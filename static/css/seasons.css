@@ -84,9 +84,6 @@
     backdrop-filter: blur(15px);
     transition: var(--transition);
     align-items: flex-start;
-    /* Blindaje contra redimensionado */
-    transform: translateZ(0);
-    will-change: transform;
 }
 
 .season-poster-mini {

@@ -16,6 +16,26 @@
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ===================================================== */
+/* GLOBAL RENDER STABILITY FIX (Glassmorphism Shield)  */
+/* ===================================================== */
+/* Blindaje global para evitar "fantasmas" y desaparición de contenido 
+   en elementos que usan backdrop-filter al redimensionar la ventana. */
+.navbar, 
+.modal-content, 
+.modal-overlay, 
+[class*="card"], 
+[class*="panel"], 
+[class*="glass"], 
+.platform-circle-detail,
+.info-card,
+.media-info {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+    will-change: transform;
+}
+
 * {
     margin: 0;
     padding: 0;

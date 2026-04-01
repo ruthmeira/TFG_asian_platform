@@ -165,9 +165,6 @@
     border-radius: 32px;
     backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
-    /* Forzar redibujado en capa de video */
-    transform: translateZ(0);
-    will-change: transform;
 }
 
 .media-info h1 {
@@ -203,9 +200,6 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 24px;
     backdrop-filter: blur(10px);
-    /* Evitar info fantasma (cap, estado) */
-    transform: translateZ(0);
-    will-change: transform, opacity;
 }
 
 .detail-meta p {
@@ -355,9 +349,6 @@
     margin-top: 20px;
     backdrop-filter: blur(15px);
     align-items: flex-start;
-    /* Blindaje contra redimensionado */
-    transform: translateZ(0);
-    will-change: transform;
 }
 
 .season-poster-mini {
