@@ -390,27 +390,34 @@
     align-items: center;
     margin-bottom: clamp(4px, 1vw, 8px);
     width: 100%;
+    gap: clamp(8px, 1.5vw, 15px); /* Espacio elástico */
+    /* Quitamos flex-wrap para que se queden siempre juntos */
 }
 
 .season-title-row h3 {
-    font-size: clamp(1.2rem, 1.8vw, 1.5rem);
+    font-size: clamp(0.95rem, 1.6vw, 1.5rem); /* Tamaño mínimo legible */
     color: #fff;
     font-weight: 800;
     margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0; /* Permite que Flexbox lo encoja de verdad */
 }
 
 .season-rating {
     background: rgba(255, 69, 0, 0.1);
     color: var(--primary);
-    padding: 6px 14px;
+    padding: clamp(4px, 0.6vw, 6px) clamp(8px, 1vw, 14px);
     border-radius: 50px;
     font-weight: 800;
-    font-size: 0.8rem;
+    font-size: clamp(11px, 0.8vw, 13px); /* Tamaño elástico sincronizado */
     border: 1px solid rgba(255, 69, 0, 0.25);
     box-shadow: 0 0 15px rgba(255, 69, 0, 0.15);
     display: flex;
     align-items: center;
     gap: 6px;
+    flex-shrink: 0; /* No permitir que se aplaste demasiado, solo que se encoja */
 }
 
 .season-rating i {

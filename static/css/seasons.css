@@ -84,6 +84,9 @@
     backdrop-filter: blur(15px);
     transition: var(--transition);
     align-items: flex-start;
+    /* Blindaje contra redimensionado */
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 .season-poster-mini {
@@ -111,9 +114,10 @@
 .season-title-row {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start; /* Alineado arriba para títulos largos */
     margin-bottom: clamp(4px, 1vw, 8px);
     width: 100%;
+    gap: 15px;
 }
 
 .season-title-row h3 {
@@ -135,6 +139,8 @@
     display: flex;
     align-items: center;
     gap: 6px;
+    flex-shrink: 0; /* No permitir que se aplaste */
+    margin-top: 2px; /* Pequeño ajuste para centrar con la primera línea de texto */
 }
 
 .season-meta-mini {
