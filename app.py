@@ -1042,7 +1042,8 @@ def media_cast(media_type, media_id):
             'en': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=en-US"
         }
         with ThreadPoolExecutor(max_workers=3) as executor:
-            raw = {name: executor.submit(fetch_json, url).result() for name, url in urls.items()}
+            futures = {name: executor.submit(fetch_json, url) for name, url in urls.items()}
+            raw = {name: future.result() for name, future in futures.items()}
         res = raw['es']
         if not res.get('id'): res = raw['mx'] or raw['en']
         
