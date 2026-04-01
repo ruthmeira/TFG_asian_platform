@@ -948,7 +948,16 @@ def media_detail(media_type, media_id):
         for a in credits.get('cast', []):
             if a.get('roles'):
                 roles = sorted(a['roles'], key=lambda x: x.get('episode_count', 0), reverse=True)
-                a['character'] = "<br>".join([f"{r['character']} <small style='opacity:0.6'>({r['episode_count']} episodio{'s' if r['episode_count']!=1 else ''})</small>" for r in roles if r.get('character')])
+                valid_roles = [r for r in roles if r.get('character')]
+                if valid_roles:
+                    first = valid_roles[0]
+                    # Formato original para el primer personaje (nombre brillando, paréntesis oscurito)
+                    char_text = f"{first['character']} <small style='opacity:0.6'>({first['episode_count']} episodio{'s' if first['episode_count']!=1 else ''})</small>"
+                    # Si tiene más, añadimos el contador debajo al mismo color que el nombre
+                    if len(valid_roles) > 1:
+                        char_text += f"<br>y {len(valid_roles)-1} más..."
+                    a['character'] = char_text
+                else: a['character'] = "N/A"
     
     keywords = res.get('keywords', {}).get('results' if is_tv else 'keywords', [])
     res['cast_processed'] = credits.get('cast', [])[:9]
