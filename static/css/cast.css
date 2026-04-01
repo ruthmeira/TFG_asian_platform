@@ -96,6 +96,9 @@
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(10px);
+    /* Blindando contra desapariciones */
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 .credit-photo-small {

@@ -17,19 +17,21 @@
 }
 
 /* ===================================================== */
-/* GLOBAL RENDER STABILITY FIX (Glassmorphism Shield)  */
+/* GLOBAL RENDER STABILITY SHIELD (Anti-Ghosting)      */
 /* ===================================================== */
-/* Blindaje global para evitar "fantasmas" y desaparición de contenido 
-   en elementos que usan backdrop-filter al redimensionar la ventana. */
+/* Blindaje maestro para evitar fallos de repintado en elementos críticos. 
+   Usamos selectores específicos para no romper transformaciones especiales. */
 .navbar, 
 .modal-content, 
 .modal-overlay, 
-[class*="card"], 
-[class*="panel"], 
-[class*="glass"], 
+.season-card-full, 
+.credit-item-row,
 .platform-circle-detail,
 .info-card,
-.media-info {
+.media-info,
+.detail-meta,
+.custom-region-dropdown,
+.glass-panel {
     transform: translateZ(0);
     backface-visibility: hidden;
     perspective: 1000px;
