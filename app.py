@@ -806,11 +806,26 @@ def media_detail(media_type, media_id):
                     try:
                         last_season['overview'] = GoogleTranslator(source='en', target='es').translate(last_season['overview'])
                     except: pass
+            
+            # --- LÓGICA DE NOMBRE DE TEMPORADA (Misma que en /seasons) ---
+            if not last_season.get('name') or "Temporada" in last_season.get('name', ''):
+                alt_name_mx = s_raw['mx'].get('name')
+                if alt_name_mx and "Temporada" not in alt_name_mx:
+                    last_season['name'] = alt_name_mx
+                else:
+                    alt_name_en = s_raw['en'].get('name')
+                    if alt_name_en and "Season" not in alt_name_en:
+                        last_season['name'] = alt_name_en
+
             if last_season.get('air_date'):
                 try:
                     dt = datetime.strptime(last_season['air_date'], '%Y-%m-%d')
                     last_season['air_date_formatted'] = f"{dt.day} {['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.'][dt.month-1]} {dt.year}"
                 except: last_season['air_date_formatted'] = last_season['air_date']
+
+            # --- LÓGICA DE PÓSTER ---
+            if not last_season.get('poster_path'):
+                last_season['poster_path'] = s_raw['mx'].get('poster_path') or s_raw['en'].get('poster_path')
 
     res['last_season'] = last_season
     res['has_multiple_seasons'] = has_multiple_seasons
