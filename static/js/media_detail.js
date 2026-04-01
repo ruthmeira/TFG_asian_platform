@@ -121,3 +121,16 @@ document.addEventListener('DOMContentLoaded', () => {
         window.MediaDetail.init(container);
     }
 });
+
+// Silent Prefetch (Speed Triangle)
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        const path = window.location.pathname;
+        if (path.includes('/media/')) {
+            fetch(path + '/cast').catch(() => {});
+            if (path.includes('/tv/')) {
+                fetch(path + '/seasons').catch(() => {});
+            }
+        }
+    }, 1500);
+});
