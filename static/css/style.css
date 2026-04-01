@@ -120,6 +120,22 @@ main {
     display: none !important;
 }
 
+/* Global Empty States / No Info */
+.no-platforms {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.no-data-msg {
+    margin: 0;
+    text-transform: none;
+    color: var(--text-muted);
+}
+
 /* Modal Tráiler (Global) */
 .trailer-modal {
     position: fixed;

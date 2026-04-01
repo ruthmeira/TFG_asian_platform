@@ -121,7 +121,14 @@
 
         <div class="detail-overview">
             <p><strong>Sinopsis:</strong></p>
-            <p class="overview-text">{{ media.overview or "No hay sinopsis disponible en este momento." }}</p>
+            {% if media.overview %}
+                <p class="overview-text">{{ media.overview }}</p>
+            {% else %}
+                <div class="no-platforms" style="font-size: clamp(15px, 1.1vw, 17px);">
+                    <i class="fas fa-info-circle"></i>
+                    <p class="no-data-msg">No se ha añadido la sinopsis de momento.</p>
+                </div>
+            {% endif %}
         </div>
 
         <div class="detail-watch">
@@ -270,9 +277,14 @@
                             {% if s_meta_exists %}<span class="season-dot">•</span>{% endif %}
                             <span class="season-ep-count">{{ media.last_season.episode_count }} episodios</span>
                         </div>
-                        <p class="season-overview-mini">
-                            {{ media.last_season.overview or "No hay sinopsis disponible para esta temporada." }}
-                        </p>
+                        {% if media.last_season.overview %}
+                            <p class="season-overview-mini">{{ media.last_season.overview }}</p>
+                        {% else %}
+                            <div class="no-platforms" style="margin-top: 10px; font-size: clamp(13px, 1.1vw, 15px);">
+                                <i class="fas fa-info-circle"></i>
+                                <p class="no-data-msg">No se ha añadido la sinopsis de momento.</p>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -290,7 +302,7 @@
                 {% else %}
                     <div class="no-platforms">
                         <i class="fas fa-info-circle"></i>
-                        <p class="no-data-msg">No tiene palabras clave</p>
+                        <p class="no-data-msg">No tiene palabras clave de momento.</p>
                     </div>
                 {% endif %}
             </div>

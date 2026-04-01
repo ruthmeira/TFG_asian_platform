@@ -63,9 +63,14 @@
                         {% if meta_exists %}<span class="season-dot">•</span>{% endif %}
                         <span class="season-ep-count">{{ s.episode_count }} episodios</span>
                     </div>
-                    <p class="season-overview-mini">
-                        {{ s.overview or "No hay sinopsis disponible para esta temporada." }}
-                    </p>
+                    {% if s.overview %}
+                        <p class="season-overview-mini">{{ s.overview }}</p>
+                    {% else %}
+                        <div class="no-platforms" style="margin-top: 10px; font-size: clamp(13px, 1.1vw, 15px);">
+                            <i class="fas fa-info-circle"></i>
+                            <p class="no-data-msg">No se ha añadido la sinopsis de momento.</p>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}

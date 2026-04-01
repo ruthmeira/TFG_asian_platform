@@ -39,6 +39,22 @@ ASIA_FLAGS_MAP = {
 }
 GENRES_PROGRAMAS = [10764, 99, 10763, 10767] # Reality, Docu, Noticias, Talk Show
 
+def clean_overview(text):
+    if not text: return None
+    placeholders = ["sinopsis no disponible", "no hay sinopsis disponible", "no overview", "add a plot"]
+    t_lower = text.lower()
+    for p in placeholders:
+        if p in t_lower and len(text) < 50:
+            return None
+    return text
+
+def fetch_json(url):
+    try:
+        response = requests.get(url, timeout=5)
+        return response.json() if response.status_code == 200 else {}
+    except:
+        return {}
+
 app = Flask(__name__)
 load_dotenv()
 
@@ -840,11 +856,12 @@ def media_detail(media_type, media_id):
         if mx_t and mx_t != orig_title: res['display_title'] = mx_t
         else: res['display_title'] = raw['en'].get('title' if media_type == 'movie' else 'name') or orig_title
 
-    if not res.get('overview'):
-        res['overview'] = raw['mx'].get('overview') or raw['en'].get('overview') or "Sinopsis no disponible."
-        if res['overview'] == raw['en'].get('overview') and len(res['overview']) > 10:
+    if not res.get('overview') or not clean_overview(res.get('overview')):
+        res['overview'] = clean_overview(raw['mx'].get('overview')) or clean_overview(raw['en'].get('overview'))
+        if res['overview'] == clean_overview(raw['en'].get('overview')) and res['overview'] and len(res['overview']) > 10:
             try: res['overview'] = GoogleTranslator(source='en', target='es').translate(res['overview'])
             except: pass
+    res['overview'] = clean_overview(res.get('overview'))
 
     # Trailers & Social
     ext_ids = res.get('external_ids', {})
@@ -888,11 +905,12 @@ def media_detail(media_type, media_id):
             s_mx = next((s for s in raw['mx'].get('seasons', []) if s.get('season_number') == s_num), {})
             s_en = next((s for s in raw['en'].get('seasons', []) if s.get('season_number') == s_num), {})
             
-            if not last_season.get('overview'):
-                last_season['overview'] = s_mx.get('overview') or s_en.get('overview')
-                if last_season['overview'] == s_en.get('overview') and last_season['overview']:
+            if not last_season.get('overview') or not clean_overview(last_season.get('overview')):
+                last_season['overview'] = clean_overview(s_mx.get('overview')) or clean_overview(s_en.get('overview'))
+                if last_season['overview'] == clean_overview(s_en.get('overview')) and last_season['overview']:
                     try: last_season['overview'] = GoogleTranslator(source='en', target='es').translate(last_season['overview'])
                     except: pass
+            last_season['overview'] = clean_overview(last_season.get('overview'))
             if not last_season.get('name') or "Temporada" in last_season.get('name', ''):
                 if s_mx.get('name') and "Temporada" not in s_mx['name']: last_season['name'] = s_mx['name']
                 elif s_en.get('name') and "Season" not in s_en['name']: last_season['name'] = s_en['name']
@@ -994,9 +1012,9 @@ def seasons(media_id):
             if s_mx.get('name') and "Temporada" not in s_mx['name']: s['name'] = s_mx['name']
             elif s_en.get('name') and "Season" not in s_en['name']: s['name'] = s_en['name']
 
-        if not s.get('overview'):
-            if s_mx.get('overview'): s['overview'] = s_mx['overview']
-            elif s_en.get('overview'):
+        if not s.get('overview') or not clean_overview(s.get('overview')):
+            if clean_overview(s_mx.get('overview')): s['overview'] = clean_overview(s_mx['overview'])
+            elif clean_overview(s_en.get('overview')):
                 translations_needed.append((s, s_en['overview']))
 
         if s.get('air_date'):
