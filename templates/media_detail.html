@@ -268,9 +268,9 @@
                                 {% set s_meta_exists = true %}
                             {% endif %}
                             
-                            {% if media.last_episode_date_formatted %}
+                            {% if media.smart_episode_date %}
                                 {% if s_meta_exists %}<span class="season-dot">•</span>{% endif %}
-                                <span class="season-year">Último: {{ media.last_episode_date_formatted }}</span>
+                                <span class="season-year">{{ media.smart_episode_label }}: {{ media.smart_episode_date }}</span>
                                 {% set s_meta_exists = true %}
                             {% endif %}
                             

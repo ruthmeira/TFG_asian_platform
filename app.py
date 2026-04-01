@@ -889,13 +889,25 @@ def media_detail(media_type, media_id):
     # TEMPORADAS (Usa info de Wave 1)
     last_season = None
     has_multiple_seasons = False
-    last_episode_date = None
     if is_tv:
-        if res.get('last_episode_to_air') and res['last_episode_to_air'].get('air_date'):
+        # LÓGICA DE EPISODIOS INTELIGENTE (Detecta el más reciente y decide etiqueta)
+        last_meta = res.get('last_episode_to_air', {}) or {}
+        next_meta = res.get('next_episode_to_air', {}) or {}
+        l_date = last_meta.get('air_date')
+        n_date = next_meta.get('air_date')
+        
+        target_date_raw = n_date if (n_date and (not l_date or n_date >= l_date)) else l_date
+        
+        if target_date_raw:
             try:
-                dt_le = datetime.strptime(res['last_episode_to_air']['air_date'], '%Y-%m-%d')
-                last_episode_date = f"{dt_le.day} {['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.'][dt_le.month-1]} {dt_le.year}"
-            except: last_episode_date = res['last_episode_to_air']['air_date']
+                dt_target = datetime.strptime(target_date_raw, '%Y-%m-%d').date()
+                today = datetime.now().date()
+                label = "Próximo" if dt_target >= today else "Último"
+                
+                meses_f = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.']
+                res['smart_episode_label'] = label
+                res['smart_episode_date'] = f"{dt_target.day} {meses_f[dt_target.month-1]} {dt_target.year}"
+            except: pass
         
         seasons_list = [s for s in res.get('seasons', []) if s.get('season_number', 0) > 0]
         if seasons_list:
@@ -923,7 +935,7 @@ def media_detail(media_type, media_id):
 
     res['last_season'] = last_season
     res['has_multiple_seasons'] = has_multiple_seasons
-    res['last_episode_date_formatted'] = last_episode_date
+    res['last_episode_date_formatted'] = res.get('smart_episode_date')
 
     # Procesado final
     ert = res.get('episode_run_time') or [0]
@@ -951,6 +963,7 @@ def media_detail(media_type, media_id):
 
 @app.route('/media/tv/<int:media_id>/seasons')
 def seasons(media_id):
+    meses_f = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.']
     cached = get_cached_media(media_id, 'tv')
     # Si tenemos los datos cacheados y además ya procesamos las temporadas antes, las usamos
     u_id = session.get('session_id')
@@ -987,13 +1000,27 @@ def seasons(media_id):
         if not title_es or title_es == orig_title:
             mx_title = raw['mx'].get('name')
             response['display_title'] = mx_title if (mx_title and mx_title != orig_title) else (raw['en'].get('name') or orig_title)
-        else: response['display_title'] = title_es
+        
+        # LÓGICA SMART (Emergency path)
+        last_meta = response.get('last_episode_to_air', {}) or {}
+        next_meta = response.get('next_episode_to_air', {}) or {}
+        l_date = last_meta.get('air_date')
+        n_date = next_meta.get('air_date')
+        target_date_raw = n_date if (n_date and (not l_date or n_date >= l_date)) else l_date
 
-        raw_seasons = sorted(response.get('seasons', []), key=lambda x: x.get('season_number', 0))
+        if target_date_raw:
+            try:
+                dt_target = datetime.strptime(target_date_raw, '%Y-%m-%d').date()
+                today = datetime.now().date()
+                response['smart_episode_label'] = "Próximo" if dt_target >= today else "Último"
+                response['smart_episode_date'] = f"{dt_target.day} {meses_f[dt_target.month-1]} {dt_target.year}"
+            except: pass
+
+        series = response # Para mantener el nombre esperado en el render
+        raw_seasons = sorted(series.get('seasons', []), key=lambda x: x.get('season_number', 0))
         data_mx, data_en = raw['mx'], raw['en']
 
     # --- PROCESADO DE TEMPORADAS (OPTIMIZADO O(1) + PARALELO) ---
-    meses_f = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.']
     all_seasons = []
     
     mx_dict = {x.get('season_number'): x for x in data_mx.get('seasons', [])}
