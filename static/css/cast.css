@@ -83,7 +83,8 @@
     gap: 15px;
     padding: 0;
     overflow: hidden;
-    transition: max-height 0.4s cubic-bezier(0, 1, 0, 1);
+    /* Espacio extra al final solo cuando está desplegado */
+    padding-bottom: 25px;
 }
 
 .credit-item-row {
@@ -95,16 +96,23 @@
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(10px);
+    /* Forzar aceleración por hardware (Evita info fantasmagórica al redimensionar) */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 
 .credit-photo-small {
-    width: 65px;
-    height: 65px;
-    border-radius: 50%;
+    width: clamp(65px, 8vw, 80px);
+    height: clamp(65px, 8vw, 80px);
+    border-radius: 50%; /* Back to perfect circle */
     overflow: hidden;
     flex-shrink: 0;
     border: 2px solid rgba(255, 255, 255, 0.1);
     transition: var(--transition);
+    /* Forzar redibujado de la imagen */
+    will-change: transform;
+    transform: translateZ(0);
 }
 
 .credit-photo-small a {
@@ -118,6 +126,9 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    /* Capa de video persistente */
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 .no-photo-small {
@@ -135,6 +146,9 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+    /* Evitar fantasmas en el texto con aceleración directa */
+    will-change: transform, opacity;
+    transform: translateZ(0);
 }
 
 .credit-info-row .name {
@@ -143,6 +157,9 @@
     color: #fff;
     text-decoration: none;
     transition: var(--transition);
+    /* Forzar redibujado individual */
+    display: inline-block;
+    will-change: transform;
 }
 
 .credit-info-row .name:hover {
@@ -153,12 +170,16 @@
     font-size: clamp(0.8rem, 1.2vw, 0.9rem);
     color: var(--text-muted);
     line-height: 1.3;
+    /* Evitar desaparición durante transición */
+    display: block;
+    will-change: opacity;
 }
 
 /* Department Groups (Accordions) */
 .department-group {
     background: transparent;
     border: none;
+    margin-bottom: 8px; /* Espacio mínimo para efecto de lista agrupada */
 }
 
 .dept-subtitle {
@@ -203,20 +224,34 @@
     transform: rotate(-180deg);
 }
 
+/* FORZAR VISIBILIDAD EN ESCRITORIO (Anticierre para secciones maestras) */
+@media (min-width: 601px) {
+    /* Forzamos Reparto y el contenedor de Crew completo, pero NO los departamentos internos */
+    .cast-full-section > .credits-list-vertical,
+    .crew-full-section > .crew-collapse-container {
+        max-height: none !important;
+        overflow: visible !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+}
+
 @media (max-width: 600px) {
     /* CURSOR SOLO EN MÓVIL */
     .cast-full-section .section-title {
         cursor: pointer;
     }
 
-    /* COLAPSO SÓLO EN MÓVIL */
+    /* COLAPSO SÓLO EN MÓVIL (Reparto y Crew) */
     .cast-full-section.collapsed .credits-list-vertical,
-    .crew-full-section.collapsed .crew-collapse-container {
+    .crew-full-section.collapsed .crew-collapse-container,
+    .department-group.collapsed .credits-list-vertical {
         max-height: 0;
         padding-top: 0 !important;
         padding-bottom: 0 !important;
         margin: 0 !important;
         overflow: hidden;
+        border: none !important;
     }
 
     .crew-collapse-container {
