@@ -221,11 +221,15 @@
     margin-bottom: 40px;
 }
 
+.detail-overview p:first-child {
+    margin-bottom: 0px;
+}
+
 .detail-overview p strong {
     font-size: clamp(1.1rem, 2.5vw, 1.5rem);
     color: var(--primary);
     display: block;
-    margin-bottom: clamp(15px, 3vw, 20px);
+    margin-bottom: 10px; /* Reducido */
 }
 
 .overview-text {
@@ -331,7 +335,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: clamp(15px, 3vw, 20px);
+    margin-bottom: 10px; /* Reducido */
 }
 
 .season-card-full {
@@ -444,8 +448,8 @@
     margin-bottom: 40px;
 }
 
-.detail-watch p {
-    margin-bottom: clamp(15px, 3vw, 20px);
+.detail-watch p:first-child {
+    margin-bottom: 10px; /* Reducido */
     color: var(--primary);
     font-size: clamp(1.1rem, 2.5vw, 1.5rem);
     font-weight: 700;
@@ -511,7 +515,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: clamp(15px, 3vw, 20px);
+    margin-bottom: 10px; /* Reducido */
 }
 
 .cast-scroll-container {
@@ -592,11 +596,15 @@
     margin-top: 50px;
 }
 
+.detail-keywords p:first-child {
+    margin-bottom: 0px;
+}
+
 .detail-keywords p strong {
     font-size: clamp(1.1rem, 2.5vw, 1.5rem);
     color: var(--primary);
     display: block;
-    margin-bottom: clamp(15px, 3vw, 20px);
+    margin-bottom: 10px; /* Reducido */
 }
 
 .keywords-list-wrapper {
