@@ -944,23 +944,28 @@ def media_detail(media_type, media_id):
     res['original_language_name'] = {'ko':'Coreano','ja':'Japonés','zh':'Chino','cn':'Chino','yue':'Cantonés','th':'Tailandés','vi':'Vietnamita','hi':'Hindi','tl':'Filipino','id':'Indonesio'}.get(lang, lang.upper())
 
     credits = res.get('aggregate_credits' if is_tv else 'credits', {})
+    final_cast_preview = []
     if is_tv:
-        for a in credits.get('cast', []):
-            if a.get('roles'):
+        # Cogemos solo los 9 primeros para procesar menos
+        for a_orig in credits.get('cast', [])[:9]:
+            if a_orig.get('roles'):
+                a = a_orig.copy() # COPIA para no guarrear el caché maestro
                 roles = sorted(a['roles'], key=lambda x: x.get('episode_count', 0), reverse=True)
                 valid_roles = [r for r in roles if r.get('character')]
                 if valid_roles:
                     first = valid_roles[0]
-                    # Formato original para el primer personaje (nombre brillando, paréntesis oscurito)
+                    # Formato "1 personaje + contador" (original)
                     char_text = f"{first['character']} <small style='opacity:0.6'>({first['episode_count']} episodio{'s' if first['episode_count']!=1 else ''})</small>"
-                    # Si tiene más, añadimos el contador debajo al mismo color que el nombre
                     if len(valid_roles) > 1:
                         char_text += f"<br>y {len(valid_roles)-1} más..."
                     a['character'] = char_text
                 else: a['character'] = "N/A"
+                final_cast_preview.append(a)
+            else:
+                final_cast_preview.append(a_orig)
     
     keywords = res.get('keywords', {}).get('results' if is_tv else 'keywords', [])
-    res['cast_processed'] = credits.get('cast', [])[:9]
+    res['cast_processed'] = final_cast_preview
     res['crew_processed'] = credits.get('crew', [])
     res['keywords_processed'] = keywords[:15]
     res['raw_data'] = raw
@@ -1109,19 +1114,42 @@ def media_cast(media_type, media_id):
     credits = res.get('aggregate_credits' if is_tv else 'credits', {})
     final_cast, final_crew = credits.get('cast', []), credits.get('crew', [])
     
-    # Normalización de roles (Misma lógica pesada de antes)
+    # Normalizamos los roles y equipos como COPIAS para no afectar al caché global
+    final_cast_display = []
+    final_crew_display = []
+
     if is_tv:
-        for actor in final_cast:
-            if 'roles' in actor and actor['roles']:
-                sorted_roles = sorted(actor['roles'], key=lambda x: x.get('episode_count', 0), reverse=True)
-                actor['character'] = "<br>".join([f"{r['character']} <small style='opacity:0.6'>({r['episode_count']} episodio{'s' if r['episode_count']!=1 else ''})</small>" for r in sorted_roles if r.get('character')])
-        for member in final_crew:
-            if 'jobs' in member and member['jobs']:
-                member['job'] = "<br>".join([f"{j['job']} <small style='opacity:0.6'>({j['episode_count']} episodio{'s' if j['episode_count']!=1 else ''})</small>" for j in sorted(member['jobs'], key=lambda x: x.get('job', '').lower()) if j.get('job')])
-    
+        for a_orig in final_cast:
+            if 'roles' in a_orig and a_orig['roles']:
+                a = a_orig.copy()
+                sorted_roles = sorted(a['roles'], key=lambda x: x.get('episode_count', 0), reverse=True)
+                valid_roles = [r for r in sorted_roles if r.get('character')]
+                if valid_roles:
+                    parts = [f"{r['character']} <small style='opacity:0.6'>({r['episode_count']} episodio{'s' if r['episode_count']!=1 else ''})</small>" for r in valid_roles]
+                    a['character'] = ", ".join(parts)
+                else: a['character'] = "N/A"
+                final_cast_display.append(a)
+            else:
+                final_cast_display.append(a_orig)
+        
+        for m_orig in final_crew:
+            if 'jobs' in m_orig and m_orig['jobs']:
+                m = m_orig.copy()
+                valid_jobs = sorted([j for j in m['jobs'] if j.get('job')], key=lambda x: x.get('episode_count', 0), reverse=True)
+                if valid_jobs:
+                    parts = [f"{j['job']} <small style='opacity:0.6'>({j['episode_count']} episodio{'s' if j['episode_count']!=1 else ''})</small>" for j in valid_jobs]
+                    m['job'] = ", ".join(parts)
+                else: m['job'] = "N/A"
+                final_crew_display.append(m)
+            else:
+                final_crew_display.append(m_orig)
+    else:
+        final_cast_display = final_cast
+        final_crew_display = final_crew
+
     crew_by_dept = {}
     dept_translations = {"Directing": "Dirección", "Writing": "Guion", "Production": "Producción", "Art": "Arte", "Camera": "Cámara", "Costume & Make-Up": "Vestuario y Maquillaje", "Visual Effects": "Efectos Visuales", "Sound": "Sonido", "Editing": "Edición", "Crew": "Equipo", "Lighting": "Iluminación", "Actors": "Actores"}
-    for member in final_crew:
+    for member in final_crew_display:
         dept_es = dept_translations.get(member.get('department', 'Others'), member.get('department', 'Others'))
         if dept_es not in crew_by_dept: crew_by_dept[dept_es] = []
         crew_by_dept[dept_es].append(member)
@@ -1129,8 +1157,8 @@ def media_cast(media_type, media_id):
     sorted_crew = {dept: sorted(crew_by_dept[dept], key=lambda x: x.get('job', '')) for dept in sorted(crew_by_dept.keys())}
     
     cast_payload = {
-        'media': res, 'cast': final_cast, 'crew_by_dept': sorted_crew, 
-        'crew_total': len(final_crew), 'media_type': media_type, 'media_id': media_id
+        'media': res, 'cast': final_cast_display, 'crew_by_dept': sorted_crew, 
+        'crew_total': len(final_crew_display), 'media_type': media_type, 'media_id': media_id
     }
     if u_id and u_id in USER_CONTEXT_CACHES:
         USER_CONTEXT_CACHES[u_id]['cast_data'] = cast_payload
