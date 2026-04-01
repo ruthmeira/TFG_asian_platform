@@ -908,7 +908,8 @@ def media_detail(media_type, media_id):
     res['last_episode_date_formatted'] = last_episode_date
 
     # Procesado final
-    runtime = res.get('runtime') or (res.get('episode_run_time', [0])[0] if is_tv else 0)
+    ert = res.get('episode_run_time') or [0]
+    runtime = res.get('runtime') or (ert[0] if is_tv and ert else 0)
     res['runtime_formatted'] = f"{runtime // 60}h {runtime % 60}m" if runtime > 60 else f"{runtime}m"
     res['original_language_name'] = {'ko':'Coreano','ja':'Japonés','zh':'Chino','cn':'Chino','yue':'Cantonés','th':'Tailandés','vi':'Vietnamita','hi':'Hindi','tl':'Filipino','id':'Indonesio'}.get(lang, lang.upper())
 
