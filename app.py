@@ -347,7 +347,7 @@ def get_top_20(api_key, media_type, time_window):
     seen_ids = set() 
     page = 1
     
-    while len(final_list) < 20 and page < 40:
+    while len(final_list) < 20 and page < 80:
         # Usamos api_media_type para la consulta real a la API
         url = f"https://api.themoviedb.org/3/trending/{api_media_type}/{time_window}?api_key={api_key}&language=es-ES&page={page}"
         response = requests.get(url)
