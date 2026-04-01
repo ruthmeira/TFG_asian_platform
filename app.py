@@ -948,14 +948,17 @@ def seasons(media_id):
         data_mx = cached['raw_data']['mx']
         data_en = cached['raw_data']['en']
     else:
-        # Petición de emergencia si entran directo por URL (Paralelizada)
+        # Petición de emergencia si entran directo por URL (Paralelizada REAL)
         urls = {
             'es': f"https://api.themoviedb.org/3/tv/{media_id}?api_key={api_key}&language=es-ES&append_to_response=external_ids",
             'mx': f"https://api.themoviedb.org/3/tv/{media_id}?api_key={api_key}&language=es-MX",
             'en': f"https://api.themoviedb.org/3/tv/{media_id}?api_key={api_key}&language=en-US"
         }
         with ThreadPoolExecutor(max_workers=3) as executor:
-            raw = {name: executor.submit(fetch_json, url).result() for name, url in urls.items()}
+            # Lanzamos los 3 a la vez
+            futures = {name: executor.submit(fetch_json, url) for name, url in urls.items()}
+            # Recolectamos todo (esperando solo al que más tarde, no sumándolos)
+            raw = {name: future.result() for name, future in futures.items()}
         
         response = raw['es']
         if not response.get('overview'): response['overview'] = raw['mx'].get('overview') or raw['en'].get('overview')
@@ -971,32 +974,30 @@ def seasons(media_id):
         raw_seasons = sorted(response.get('seasons', []), key=lambda x: x.get('season_number', 0))
         data_mx, data_en = raw['mx'], raw['en']
 
-    # --- PROCESADO DE TEMPORADAS (Igual que antes pero usa la info ya disponible) ---
+    # --- PROCESADO DE TEMPORADAS (OPTIMIZADO O(1) + PARALELO) ---
     meses_f = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.']
     all_seasons = []
     
+    mx_dict = {x.get('season_number'): x for x in data_mx.get('seasons', [])}
+    en_dict = {x.get('season_number'): x for x in data_en.get('seasons', [])}
+    translations_needed = []
+    
     for s in raw_seasons:
         s_num = s.get('season_number')
+        s_mx = mx_dict.get(s_num, {})
+        s_en = en_dict.get(s_num, {})
+        
         if not s.get('poster_path'):
-            s_mx = next((x for x in data_mx.get('seasons', []) if x.get('season_number') == s_num), {})
-            s_en = next((x for x in data_en.get('seasons', []) if x.get('season_number') == s_num), {})
             s['poster_path'] = s_mx.get('poster_path') or s_en.get('poster_path')
         
         if not s.get('name') or "Temporada" in s.get('name', ''):
-            s_mx = next((x for x in data_mx.get('seasons', []) if x.get('season_number') == s_num), {})
             if s_mx.get('name') and "Temporada" not in s_mx['name']: s['name'] = s_mx['name']
-            else:
-                s_en = next((x for x in data_en.get('seasons', []) if x.get('season_number') == s_num), {})
-                if s_en.get('name') and "Season" not in s_en['name']: s['name'] = s_en['name']
+            elif s_en.get('name') and "Season" not in s_en['name']: s['name'] = s_en['name']
 
         if not s.get('overview'):
-            s_mx = next((x for x in data_mx.get('seasons', []) if x.get('season_number') == s_num), {})
             if s_mx.get('overview'): s['overview'] = s_mx['overview']
-            else:
-                s_en = next((x for x in data_en.get('seasons', []) if x.get('season_number') == s_num), {})
-                if s_en.get('overview'):
-                    try: s['overview'] = GoogleTranslator(source='en', target='es').translate(s_en['overview'])
-                    except: s['overview'] = s_en['overview']
+            elif s_en.get('overview'):
+                translations_needed.append((s, s_en['overview']))
 
         if s.get('air_date'):
             try:
@@ -1004,6 +1005,17 @@ def seasons(media_id):
                 s['air_date_formatted'] = f"{dt.day} {meses_f[dt.month-1]} {dt.year}"
             except: s['air_date_formatted'] = s['air_date']
         all_seasons.append(s)
+
+    if translations_needed:
+        def translate_overview(item_tuple):
+            season_dict, text_en = item_tuple
+            try:
+                season_dict['overview'] = GoogleTranslator(source='en', target='es').translate(text_en)
+            except:
+                season_dict['overview'] = text_en
+                
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            executor.map(translate_overview, translations_needed)
 
     # Guardamos en caché de contexto el resultado de las temporadas para rapidez total
     if u_id and u_id in USER_CONTEXT_CACHES:
