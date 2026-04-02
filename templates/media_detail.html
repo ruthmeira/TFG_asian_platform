@@ -17,10 +17,10 @@
             <div class="no-poster">Sin Imagen</div>
         {% endif %}
 
-        {% if media.social_links.instagram or media.social_links.twitter or media.social_links.facebook or media.social_links.homepage %}
+        {% if media.social_links.instagram or media.social_links.twitter or media.social_links.facebook or media.social_links.tiktok or media.social_links.youtube or media.social_links.homepage %}
         <div class="media-links-row">
             {# Grupo 1: Redes Sociales #}
-            {% if media.social_links.instagram or media.social_links.twitter or media.social_links.facebook %}
+            {% if media.social_links.instagram or media.social_links.twitter or media.social_links.facebook or media.social_links.tiktok or media.social_links.youtube %}
                 <div class="links-group">
                     {% if media.social_links.instagram %}
                         <a href="{{ media.social_links.instagram }}" target="_blank" class="social-btn" title="Instagram"><i class="fab fa-instagram"></i></a>
@@ -31,11 +31,17 @@
                     {% if media.social_links.facebook %}
                         <a href="{{ media.social_links.facebook }}" target="_blank" class="social-btn" title="Facebook"><i class="fab fa-facebook"></i></a>
                     {% endif %}
+                    {% if media.social_links.tiktok %}
+                        <a href="{{ media.social_links.tiktok }}" target="_blank" class="social-btn" title="TikTok"><i class="fab fa-tiktok"></i></a>
+                    {% endif %}
+                    {% if media.social_links.youtube %}
+                        <a href="{{ media.social_links.youtube }}" target="_blank" class="social-btn" title="YouTube"><i class="fab fa-youtube"></i></a>
+                    {% endif %}
                 </div>
             {% endif %}
 
             {# Separador 1 #}
-            {% if (media.social_links.instagram or media.social_links.twitter or media.social_links.facebook) and media.social_links.homepage %}
+            {% if (media.social_links.instagram or media.social_links.twitter or media.social_links.facebook or media.social_links.tiktok or media.social_links.youtube) and media.social_links.homepage %}
                 <span class="link-divider">|</span>
             {% endif %}
 

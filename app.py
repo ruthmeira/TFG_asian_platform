@@ -865,8 +865,21 @@ def media_detail(media_type, media_id):
 
     # Trailers & Social
     ext_ids = res.get('external_ids', {})
-    res['social_links'] = {k: f"https://{k}.com/{ext_ids[f'{k}_id']}" for k in ['instagram', 'twitter', 'facebook'] if ext_ids.get(f'{k}_id')}
-    if res.get('homepage'): res['social_links']['homepage'] = res['homepage']
+    
+    # Unificación total de Redes en Media
+    res['social_links'] = {}
+    for k in ['instagram', 'twitter', 'facebook', 'tiktok']:
+        val = ext_ids.get(f'{k}_id')
+        if val:
+            prefix = "@" if k == 'tiktok' else ""
+            res['social_links'][k] = f"https://{k}.com/{prefix}{val}"
+    
+    if ext_ids.get('youtube_id'):
+        res['social_links']['youtube'] = f"https://youtube.com/{ext_ids['youtube_id']}"
+        
+    if res.get('homepage'):
+        res['social_links']['homepage'] = res['homepage']
+
     videos_es = res.get('videos', {}).get('results', [])
     res['trailer_key'] = next((v['key'] for v in videos_es if v['type'] == 'Trailer' and v['site'] == 'YouTube'), None)
     if not res['trailer_key']:
@@ -1641,13 +1654,15 @@ def person_detail(person_id):
     gender_map = {1: "Femenino", 2: "Masculino", 3: "No Binario"}
     res['gender_name'] = gender_map.get(res.get('gender'), "-")
 
-    # REDES SOCIALES
+    # REDES SOCIALES (Versión Extendida)
     ext_ids = res.get('external_ids', {})
     res['socials'] = {
         'instagram': f"https://instagram.com/{ext_ids['instagram_id']}" if ext_ids.get('instagram_id') else None,
         'twitter': f"https://twitter.com/{ext_ids['twitter_id']}" if ext_ids.get('twitter_id') else None,
         'tiktok': f"https://tiktok.com/@{ext_ids['tiktok_id']}" if ext_ids.get('tiktok_id') else None,
-        'facebook': f"https://facebook.com/{ext_ids['facebook_id']}" if ext_ids.get('facebook_id') else None
+        'facebook': f"https://facebook.com/{ext_ids['facebook_id']}" if ext_ids.get('facebook_id') else None,
+        'youtube': f"https://youtube.com/{ext_ids['youtube_id']}" if ext_ids.get('youtube_id') else None,
+        'homepage': res.get('homepage')
     }
 
     # AKA List (limpieza)
