@@ -45,6 +45,7 @@ window.ExploreApp = (() => {
         initFilterChips();
         initKeywordTagging();
         initInfiniteScroll();
+        initYearFilter();
 
         // Initial Load
         loadItems(1);
@@ -296,6 +297,19 @@ window.ExploreApp = (() => {
                 state.selectedKeywords.pop();
                 renderKeywordTags();
             }
+        };
+    }
+
+    // --- YEAR FILTER ---
+    function initYearFilter() {
+        const yearInput = document.getElementById('year-input');
+        if (!yearInput) return;
+        
+        // Initial value if exists
+        if (yearInput.value) state.filters.year = yearInput.value.trim();
+
+        yearInput.oninput = (e) => {
+            state.filters.year = e.target.value.trim();
         };
     }
 

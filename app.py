@@ -14,7 +14,8 @@ import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
 
-GLOBAL_COUNTRIES_LIST = [{"code": "AL", "name": "Albania", "emoji": "🇦🇱"}, {"code": "DE", "name": "Alemania", "emoji": "🇩🇪"}, {"code": "AD", "name": "Andorra", "emoji": "🇦🇩"}, {"code": "AO", "name": "Angola", "emoji": "🇦🇴"}, {"code": "AG", "name": "Antigua y Barbuda", "emoji": "🇦🇬"}, {"code": "SA", "name": "Arabia Saudí", "emoji": "🇸🇦"}, {"code": "DZ", "name": "Argelia", "emoji": "🇩🇿"}, {"code": "AR", "name": "Argentina", "emoji": "🇦🇷"}, {"code": "AU", "name": "Australia", "emoji": "🇦🇺"}, {"code": "AT", "name": "Austria", "emoji": "🇦🇹"}, {"code": "AZ", "name": "Azerbaiyán", "emoji": "🇦🇿"}, {"code": "BS", "name": "Bahamas", "emoji": "🇧🇸"}, {"code": "BB", "name": "Barbados", "emoji": "🇧🇧"}, {"code": "BH", "name": "Baréin", "emoji": "🇧🇭"}, {"code": "BZ", "name": "Belice", "emoji": "🇧🇿"}, {"code": "BM", "name": "Bermudas", "emoji": "🇧🇲"}, {"code": "BY", "name": "Bielorrusia", "emoji": "🇧🇾"}, {"code": "BO", "name": "Bolivia", "emoji": "🇧🇴"}, {"code": "BA", "name": "Bosnia-Herzegovina", "emoji": "🇧🇦"}, {"code": "BR", "name": "Brasil", "emoji": "🇧🇷"}, {"code": "BG", "name": "Bulgaria", "emoji": "🇧🇬"}, {"code": "BF", "name": "Burkina Faso", "emoji": "🇧🇫"}, {"code": "BE", "name": "Bélgica", "emoji": "🇧🇪"}, {"code": "CV", "name": "Cabo Verde", "emoji": "🇨🇻"}, {"code": "CM", "name": "Camerún", "emoji": "🇨🇲"}, {"code": "CA", "name": "Canadá", "emoji": "🇨🇦"}, {"code": "CN", "name": "China", "emoji": "🇨🇳"}, {"code": "QA", "name": "Catar", "emoji": "🇶🇦"}, {"code": "TD", "name": "Chad", "emoji": "🇹🇩"}, {"code": "CL", "name": "Chile", "emoji": "🇨🇱"}, {"code": "CY", "name": "Chipre", "emoji": "🇨🇾"}, {"code": "VA", "name": "Ciudad del Vaticano", "emoji": "🇻🇦"}, {"code": "CO", "name": "Colombia", "emoji": "🇨🇴"}, {"code": "KR", "name": "Corea del Sur", "emoji": "🇰🇷"}, {"code": "CR", "name": "Costa Rica", "emoji": "🇨🇷"}, {"code": "CI", "name": "Costa de Marfil", "emoji": "🇨🇮"}, {"code": "HR", "name": "Croacia", "emoji": "🇭🇷"}, {"code": "CU", "name": "Cuba", "emoji": "🇨🇺"}, {"code": "DK", "name": "Dinamarca", "emoji": "🇩🇰"}, {"code": "EC", "name": "Ecuador", "emoji": "🇪🇨"}, {"code": "EG", "name": "Egipto", "emoji": "🇪🇬"}, {"code": "SV", "name": "El Salvador", "emoji": "🇸🇻"}, {"code": "AE", "name": "Emiratos Árabes Unidos", "emoji": "🇦🇪"}, {"code": "SK", "name": "Eslovaquia", "emoji": "🇸🇰"}, {"code": "SI", "name": "Eslovenia", "emoji": "🇸🇮"}, {"code": "ES", "name": "España", "emoji": "🇪🇸"}, {"code": "US", "name": "Estados Unidos", "emoji": "🇺🇸"}, {"code": "EE", "name": "Estonia", "emoji": "🇪🇪"}, {"code": "PH", "name": "Filipinas", "emoji": "🇵🇭"}, {"code": "FI", "name": "Finlandia", "emoji": "🇫🇮"}, {"code": "FJ", "name": "Fiyi", "emoji": "🇫🇯"}, {"code": "FR", "name": "Francia", "emoji": "🇫🇷"}, {"code": "GH", "name": "Ghana", "emoji": "🇬🇭"}, {"code": "GI", "name": "Gibraltar", "emoji": "🇬🇮"}, {"code": "GR", "name": "Grecia", "emoji": "🇬🇷"}, {"code": "GP", "name": "Guadalupe", "emoji": "🇬🇵"}, {"code": "GT", "name": "Guatemala", "emoji": "🇬🇹"}, {"code": "GF", "name": "Guayana Francesa", "emoji": "🇬🇫"}, {"code": "GQ", "name": "Guinea Ecuatorial", "emoji": "🇬🇶"}, {"code": "GY", "name": "Guyana", "emoji": "🇬🇾"}, {"code": "HN", "name": "Honduras", "emoji": "🇭🇳"}, {"code": "HU", "name": "Hungría", "emoji": "🇭🇺"}, {"code": "IN", "name": "India", "emoji": "🇮🇳"}, {"code": "ID", "name": "Indonesia", "emoji": "🇮🇩"}, {"code": "IQ", "name": "Iraq", "emoji": "🇮🇶"}, {"code": "IE", "name": "Irlanda", "emoji": "🇮🇪"}, {"code": "IS", "name": "Islandia", "emoji": "🇮🇸"}, {"code": "TC", "name": "Islas Turcas y Caicos", "emoji": "🇹🇨"}, {"code": "IL", "name": "Israel", "emoji": "🇮🇱"}, {"code": "IT", "name": "Italia", "emoji": "🇮🇹"}, {"code": "JM", "name": "Jamaica", "emoji": "🇯🇲"}, {"code": "JP", "name": "Japón", "emoji": "🇯🇵"}, {"code": "JO", "name": "Jordania", "emoji": "🇯🇴"}, {"code": "KE", "name": "Kenia", "emoji": "🇰🇪"}, {"code": "XK", "name": "Kosovo", "emoji": "🇽🇰"}, {"code": "KW", "name": "Kuwait", "emoji": "🇰🇼"}, {"code": "LV", "name": "Letonia", "emoji": "🇱🇻"}, {"code": "LY", "name": "Libia", "emoji": "🇱🇾"}, {"code": "LI", "name": "Liechtenstein", "emoji": "🇱🇮"}, {"code": "LT", "name": "Lituania", "emoji": "🇱🇹"}, {"code": "LU", "name": "Luxemburgo", "emoji": "🇱🇺"}, {"code": "LB", "name": "Líbano", "emoji": "🇱🇧"}, {"code": "MO", "name": "Macao", "emoji": "🇲🇴"}, {"code": "MK", "name": "Macedonia", "emoji": "🇲🇰"}, {"code": "MG", "name": "Madagascar", "emoji": "🇲🇬"}, {"code": "MY", "name": "Malasía", "emoji": "🇲🇾"}, {"code": "MW", "name": "Malaui", "emoji": "🇲🇼"}, {"code": "ML", "name": "Mali", "emoji": "🇲🇱"}, {"code": "MT", "name": "Malta", "emoji": "🇲🇹"}, {"code": "MA", "name": "Marruecos", "emoji": "🇲🇦"}, {"code": "MU", "name": "Mauricio", "emoji": "🇲🇺"}, {"code": "MD", "name": "Moldavia", "emoji": "🇲🇩"}, {"code": "ME", "name": "Montenegro", "emoji": "🇲🇪"}, {"code": "MZ", "name": "Mozambique", "emoji": "🇲🇿"}, {"code": "MX", "name": "México", "emoji": "🇲🇽"}, {"code": "MC", "name": "Mónaco", "emoji": "🇲🇨"}, {"code": "NI", "name": "Nicaragua", "emoji": "🇳🇮"}, {"code": "NG", "name": "Nigeria", "emoji": "🇳🇬"}, {"code": "NO", "name": "Noruega", "emoji": "🇳🇴"}, {"code": "NZ", "name": "Nueva Zelanda", "emoji": "🇳🇿"}, {"code": "NE", "name": "Níger", "emoji": "🇳🇪"}, {"code": "OM", "name": "Omán", "emoji": "🇴🇲"}, {"code": "PK", "name": "Pakistán", "emoji": "🇵🇰"}, {"code": "PA", "name": "Panamá", "emoji": "🇵🇦"}, {"code": "PG", "name": "Papúa Nueva Guinea", "emoji": "🇵🇬"}, {"code": "PY", "name": "Paraguay", "emoji": "🇵🇾"}, {"code": "NL", "name": "Países Bajos", "emoji": "🇳🇱"}, {"code": "PE", "name": "Perú", "emoji": "🇵🇪"}, {"code": "PF", "name": "Polinesia Francesa", "emoji": "🇵🇫"}, {"code": "PL", "name": "Polonia", "emoji": "🇵🇱"}, {"code": "PT", "name": "Portugal", "emoji": "🇵🇹"}, {"code": "HK", "name": "RAE de Hong Kong (China)", "emoji": "🇭🇰"}, {"code": "GB", "name": "Reino Unido", "emoji": "🇬🇧"}, {"code": "CZ", "name": "República Checa", "emoji": "🇨🇿"}, {"code": "CD", "name": "República Democrática del Congo", "emoji": "🇨🇩"}, {"code": "DO", "name": "República Dominicana", "emoji": "🇩🇴"}, {"code": "RO", "name": "Rumanía", "emoji": "🇷🇴"}, {"code": "RU", "name": "Rusia", "emoji": "🇷🇺"}, {"code": "SM", "name": "San Marino", "emoji": "🇸🇲"}, {"code": "LC", "name": "Santa Lucía", "emoji": "🇱🇨"}, {"code": "SN", "name": "Senegal", "emoji": "🇸🇳"}, {"code": "RS", "name": "Serbia", "emoji": "🇷🇸"}, {"code": "SC", "name": "Seychelles", "emoji": "🇸🇨"}, {"code": "SG", "name": "Singapur", "emoji": "🇸🇬"}, {"code": "ZA", "name": "Sudáfrica", "emoji": "🇿🇦"}, {"code": "SE", "name": "Suecia", "emoji": "se"}, {"code": "HK", "name": "RAE de Hong Kong (China)", "emoji": "🇭🇰"}, {"code": "GB", "name": "Reino Unido", "emoji": "🇬🇧"}, {"code": "CZ", "name": "República Checa", "emoji": "🇨🇿"}, {"code": "CD", "name": "República Democrática del Congo", "emoji": "🇨🇩"}, {"code": "DO", "name": "República Dominicana", "emoji": "🇩🇴"}, {"code": "RO", "name": "Rumanía", "emoji": "🇷🇴"}, {"code": "RU", "name": "Rusia", "emoji": "🇷🇺"}, {"code": "SM", "name": "San Marino", "emoji": "🇸🇲"}, {"code": "LC", "name": "Santa Lucía", "emoji": "🇱🇨"}, {"code": "SN", "name": "Senegal", "emoji": "🇸🇳"}, {"code": "RS", "name": "Serbia", "emoji": "🇷🇸"}, {"code": "SC", "name": "Seychelles", "emoji": "🇸🇨"}, {"code": "SG", "name": "Singapur", "emoji": "🇸🇬"}, {"code": "ZA", "name": "Sudáfrica", "emoji": "🇿🇦"}, {"code": "SE", "name": "Suecia", "emoji": "🇸🇪"}, {"code": "CH", "name": "Suiza", "emoji": "🇨🇭"}, {"code": "TH", "name": "Tailandia", "emoji": "🇹🇭"}, {"code": "TW", "name": "Taiwán", "emoji": "🇹🇼"}, {"code": "TZ", "name": "Tanzania", "emoji": "🇹🇿"}, {"code": "PS", "name": "Territorios Palestinos", "emoji": "🇵🇸"}, {"code": "TT", "name": "Trinidad y Tobago", "emoji": "🇹🇹"}, {"code": "TR", "name": "Turquía", "emoji": "🇹🇷"}, {"code": "TN", "name": "Túnez", "emoji": "🇹🇳"}, {"code": "UA", "name": "Ucrania", "emoji": "🇺🇦"}, {"code": "UG", "name": "Uganda", "emoji": "🇺🇬"}, {"code": "UY", "name": "Uruguay", "emoji": "🇺🇾"}, {"code": "VE", "name": "Venezuela", "emoji": "🇻🇪"}, {"code": "YE", "name": "Yemen", "emoji": "🇾🇪"}, {"code": "ZM", "name": "Zambia", "emoji": "🇿🇲"}, {"code": "ZW", "name": "Zimbabue", "emoji": "🇿🇼"}]
+GLOBAL_COUNTRIES_LIST = [{"code": "AL", "name": "Albania", "emoji": "🇦🇱"}, {"code": "DE", "name": "Alemania", "emoji": "🇩🇪"}, {"code": "AD", "name": "Andorra", "emoji": "🇦🇩"}, {"code": "AO", "name": "Angola", "emoji": "🇦🇴"}, {"code": "AG", "name": "Antigua y Barbuda", "emoji": "🇦🇬"}, {"code": "SA", "name": "Arabia Saudí", "emoji": "🇸🇦"}, {"code": "DZ", "name": "Argelia", "emoji": "🇩🇿"}, {"code": "AR", "name": "Argentina", "emoji": "🇦🇷"}, {"code": "AU", "name": "Australia", "emoji": "🇦🇺"}, {"code": "AT", "name": "Austria", "emoji": "🇦🇹"}, {"code": "AZ", "name": "Azerbaiyán", "emoji": "🇦🇿"}, {"code": "BS", "name": "Bahamas", "emoji": "🇧🇸"}, {"code": "BB", "name": "Barbados", "emoji": "🇧🇧"}, {"code": "BH", "name": "Baréin", "emoji": "🇧🇭"}, {"code": "BZ", "name": "Belice", "emoji": "🇧🇿"}, {"code": "BM", "name": "Bermudas", "emoji": "🇧🇲"}, {"code": "BY", "name": "Bielorrusia", "emoji": "🇧🇾"}, {"code": "BO", "name": "Bolivia", "emoji": "🇧🇴"}, {"code": "BA", "name": "Bosnia-Herzegovina", "emoji": "🇧🇦"}, {"code": "BR", "name": "Brasil", "emoji": "🇧🇷"}, {"code": "BG", "name": "Bulgaria", "emoji": "🇧🇬"}, {"code": "BF", "name": "Burkina Faso", "emoji": "🇧🇫"}, {"code": "BE", "name": "Bélgica", "emoji": "🇧🇪"}, {"code": "CV", "name": "Cabo Verde", "emoji": "🇨🇻"}, {"code": "CM", "name": "Camerún", "emoji": "🇨🇲"}, {"code": "CA", "name": "Canadá", "emoji": "🇨🇦"}, {"code": "CN", "name": "China", "emoji": "🇨🇳"}, {"code": "QA", "name": "Catar", "emoji": "🇶🇦"}, {"code": "TD", "name": "Chad", "emoji": "🇹🇩"}, {"code": "CL", "name": "Chile", "emoji": "🇨🇱"}, {"code": "CY", "name": "Chipre", "emoji": "🇨🇾"}, {"code": "VA", "name": "Ciudad del Vaticano", "emoji": "🇻🇦"}, {"code": "CO", "name": "Colombia", "emoji": "🇨🇴"}, {"code": "KR", "name": "Corea del Sur", "emoji": "🇰🇷"}, {"code": "CR", "name": "Costa Rica", "emoji": "🇨🇷"}, {"code": "CI", "name": "Costa de Marfil", "emoji": "🇨🇮"}, {"code": "HR", "name": "Croacia", "emoji": "🇭🇷"}, {"code": "CU", "name": "Cuba", "emoji": "🇨🇺"}, {"code": "DK", "name": "Dinamarca", "emoji": "🇩🇰"}, {"code": "EC", "name": "Ecuador", "emoji": "🇪🇨"}, {"code": "EG", "name": "Egipto", "emoji": "🇪🇬"}, {"code": "SV", "name": "El Salvador", "emoji": "🇸🇻"}, {"code": "AE", "name": "Emiratos Árabes Unidos", "emoji": "🇦🇪"}, {"code": "SK", "name": "Eslovaquia", "emoji": "🇸🇰"}, {"code": "SI", "name": "Eslovenia", "emoji": "🇸🇮"}, {"code": "ES", "name": "España", "emoji": "🇪🇸"}, {"code": "US", "name": "Estados Unidos", "emoji": "🇺🇸"}, {"code": "EE", "name": "Estonia", "emoji": "🇪🇪"}, {"code": "PH", "name": "Filipinas", "emoji": "🇵🇭"}, {"code": "FI", "name": "Finlandia", "emoji": "🇫🇮"}, {"code": "FJ", "name": "Fiyi", "emoji": "🇫🇯"}, {"code": "FR", "name": "Francia", "emoji": "🇫🇷"}, {"code": "GH", "name": "Ghana", "emoji": "🇬🇭"}, {"code": "GI", "name": "Gibraltar", "emoji": "🇬🇮"}, {"code": "GR", "name": "Grecia", "emoji": "🇬🇷"}, {"code": "GP", "name": "Guadalupe", "emoji": "🇬🇵"}, {"code": "GT", "name": "Guatemala", "emoji": "🇬🇹"}, {"code": "GF", "name": "Guayana Francesa", "emoji": "🇬🇫"}, {"code": "GQ", "name": "Guinea Ecuatorial", "emoji": "🇬🇶"}, {"code": "GY", "name": "Guyana", "emoji": "🇬🇾"}, {"code": "HN", "name": "Honduras", "emoji": "🇭🇳"}, {"code": "HU", "name": "Hungría", "emoji": "🇭🇺"}, {"code": "IN", "name": "India", "emoji": "🇮🇳"}, {"code": "ID", "name": "Indonesia", "emoji": "🇮🇩"}, {"code": "IQ", "name": "Iraq", "emoji": "🇮🇶"}, {"code": "IE", "name": "Irlanda", "emoji": "🇮🇪"}, {"code": "IS", "name": "Islandia", "emoji": "🇮🇸"}, {"code": "TC", "name": "Islas Turcas y Caicos", "emoji": "🇹🇨"}, {"code": "IL", "name": "Israel", "emoji": "🇮🇱"}, {"code": "IT", "name": "Italia", "emoji": "🇮🇹"}, {"code": "JM", "name": "Jamaica", "emoji": "🇯🇲"}, {"code": "JP", "name": "Japón", "emoji": "🇯🇵"}, {"code": "JO", "name": "Jordania", "emoji": "🇯🇴"}, {"code": "KE", "name": "Kenia", "emoji": "🇰🇪"}, {"code": "XK", "name": "Kosovo", "emoji": "🇽🇰"}, {"code": "KW", "name": "Kuwait", "emoji": "🇰🇼"}, {"code": "LV", "name": "Letonia", "emoji": "🇱🇻"}, {"code": "LY", "name": "Libia", "emoji": "🇱🇾"}, {"code": "LI", "name": "Liechtenstein", "emoji": "🇱🇮"}, {"code": "LT", "name": "Lituania", "emoji": "🇱🇹"}, {"code": "LU", "name": "Luxemburgo", "emoji": "🇱🇺"}, {"code": "LB", "name": "Líbano", "emoji": "🇱🇧"}, {"code": "MO", "name": "Macao", "emoji": "🇲🇴"}, {"code": "MK", "name": "Macedonia", "emoji": "🇲🇰"}, {"code": "MG", "name": "Madagascar", "emoji": "🇲🇬"}, {"code": "MY", "name": "Malasía", "emoji": "🇲🇾"}, {"code": "MW", "name": "Malaui", "emoji": "🇲🇼"}, {"code": "ML", "name": "Mali", "emoji": "🇲🇱"}, {"code": "MT", "name": "Malta", "emoji": "🇲🇹"}, {"code": "MA", "name": "Marruecos", "emoji": "🇲🇦"}, {"code": "MU", "name": "Mauricio", "emoji": "🇲🇺"}, {"code": "MD", "name": "Moldavia", "emoji": "🇲🇩"}, {"code": "ME", "name": "Montenegro", "emoji": "🇲🇪"}, {"code": "MZ", "name": "Mozambique", "emoji": "🇲🇿"}, {"code": "MX", "name": "México", "emoji": "🇲🇽"}, {"code": "MC", "name": "Mónaco", "emoji": "🇲🇨"}, {"code": "NI", "name": "Nicaragua", "emoji": "🇳🇮"}, {"code": "NG", "name": "Nigeria", "emoji": "🇳🇬"}, {"code": "NO", "name": "Noruega", "emoji": "🇳🇴"}, {"code": "NZ", "name": "Nueva Zelanda", "emoji": "🇳🇿"}, {"code": "NE", "name": "Níger", "emoji": "🇳🇪"}, {"code": "OM", "name": "Omán", "emoji": "🇴🇲"}, {"code": "PK", "name": "Pakistán", "emoji": "🇵🇰"}, {"code": "PA", "name": "Panamá", "emoji": "🇵🇦"}, {"code": "PG", "name": "Papúa Nueva Guinea", "emoji": "🇵🇬"}, {"code": "PY", "name": "Paraguay", "emoji": "🇵🇾"}, {"code": "NL", "name": "Países Bajos", "emoji": "🇳🇱"}, {"code": "PE", "name": "Perú", "emoji": "🇵🇪"}, {"code": "PF", "name": "Polinesia Francesa", "emoji": "🇵🇫"}, {"code": "PL", "name": "Polonia", "emoji": "🇵🇱"}, {"code": "PT", "name": "Portugal", "emoji": "🇵🇹"}, {"code": "HK", "name": "RAE de Hong Kong (China)", "emoji": "🇭🇰"}, {"code": "GB", "name": "Reino Unido", "emoji": "🇬🇧"}, {"code": "CZ", "name": "República Checa", "emoji": "🇨🇿"}, {"code": "CD", "name": "República Democrática del Congo", "emoji": "🇨🇩"}, {"code": "DO", "name": "República Dominicana", "emoji": "🇩🇴"}, {"code": "RO", "name": "Rumanía", "emoji": "🇷🇴"}, {"code": "RU", "name": "Rusia", "emoji": "🇷🇺"}, {"code": "SM", "name": "San Marino", "emoji": "🇸🇲"}, {"code": "LC", "name": "Santa Lucía", "emoji": "🇱🇨"}, {"code": "SN", "name": "Senegal", "emoji": "🇸🇳"}, {"code": "RS", "name": "Serbia", "emoji": "🇷🇸"}, {"code": "SC", "name": "Seychelles", "emoji": "🇸🇨"}, {"code": "SG", "name": "Singapur", "emoji": "🇸🇬"}, {"code": "ZA", "name": "Sudáfrica", "emoji": "🇿🇦"}, {"code": "SE", "name": "Suecia", "emoji": "🇸🇪"}, {"code": "CH", "name": "Suiza", "emoji": "🇨🇭"}, {"code": "TH", "name": "Tailandia", "emoji": "🇹🇭"}, {"code": "TW", "name": "Taiwán", "emoji": "🇹🇼"}, {"code": "TZ", "name": "Tanzania", "emoji": "🇹🇿"}, {"code": "PS", "name": "Territorios Palestinos", "emoji": "🇵🇸"}, {"code": "TT", "name": "Trinidad y Tobago", "emoji": "🇹🇹"}, {"code": "TR", "name": "Turquía", "emoji": "🇹🇷"}, {"code": "TN", "name": "Túnez", "emoji": "🇹🇳"}, {"code": "UA", "name": "Ucrania", "emoji": "🇺🇦"}, {"code": "UG", "name": "Uganda", "emoji": "🇺🇬"}, {"code": "UY", "name": "Uruguay", "emoji": "🇺🇾"}, {"code": "VE", "name": "Venezuela", "emoji": "🇻🇪"}, {"code": "YE", "name": "Yemen", "emoji": "🇾🇪"}, {"code": "ZM", "name": "Zambia", "emoji": "🇿🇲"}, {"code": "ZW", "name": "Zimbabue", "emoji": "🇿🇼"}]
+
 
 # Mapa de banderas para acceso rápido en plantillas
 REGIONS_MAP = {c['code']: c['emoji'] for c in GLOBAL_COUNTRIES_LIST}
@@ -37,7 +38,70 @@ ASIA_FLAGS_MAP = {
     'PH':'🇵🇭','ID':'🇮🇩','MY':'🇲🇾','SG':'🇸🇬','MO':'🇲🇴','MN':'🇲🇳','KH':'🇰🇭','MM':'🇲🇲',
     'LA':'🇱🇦','NP':'🇳🇵'
 }
+ASIA_LANG_NAMES = {
+    'ko':'Coreano', 'ja':'Japonés', 'zh':'Chino', 'cn':'Chino', 'yue':'Cantonés',
+    'th':'Tailandés', 'vi':'Vietnamita', 'id':'Indonesio', 'tl':'Filipino', 'fil':'Filipino',
+    'ms':'Malayo', 'mn':'Mongol', 'km':'Camboyano', 'my':'Birmano', 'lo':'Laosiano',
+    'ne':'Nepalí', 'hi':'Hindi', 'ta':'Tamil', 'te':'Telugu', 'ml':'Malayalam', 'kn':'Canarés',
+    'bn':'Bengalí', 'mr':'Maratí', 'gu':'Guyaratí', 'pa':'Panyabí', 'ur':'Urdu', 'or':'Oriya',
+    'as':'Asamés', 'sd':'Sindi', 'si':'Cingalés', 'dz':'Butanés', 'ks':'Cachemiro',
+    'bo':'Tibetano', 'ug':'Uigur'
+}
 GENRES_PROGRAMAS = [10764, 99, 10763, 10767] # Reality, Docu, Noticias, Talk Show
+
+# --- MAPEOS DE TRADUCCIÓN Y CÓDIGOS ---
+LANG_TO_COUNTRY_MAP = {
+    'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN',
+    'id':'ID','tl':'PH','fil':'PH','ms':'MY','mn':'MN',
+    'km':'KH','my':'MM','lo':'LA','ne':'NP',
+    'ta':'IN','te':'IN','ml':'IN','kn':'IN','bn':'IN',
+    'mr':'IN','gu':'IN','pa':'IN','ur':'IN','or':'IN',
+    'as':'IN','sd':'IN','ks':'IN',
+    'bo':'CN','ug':'CN'
+}
+
+ELITE_PROVIDER_IDS = {8, 337, 283, 119, 9, 149, 115, 1899, 384, 350, 344, 1773, 188}
+PROVIDER_UPGRADE_MAP = {9:119, 115:149, 1899:384}
+
+GENRE_MAP_ES = {'Action & Adventure': 'Acción y Aventura', 'Kids': 'Infantil', 'News': 'Noticias', 'Sci-Fi & Fantasy': 'Ciencia Ficción y Fantasía', 'War & Politics': 'Guerra y Política'}
+STATUS_MAP_ES = {'Ended':'Finalizada','Returning Series':'En emisión','Planned':'Planeada','Canceled':'Cancelada','In Production':'En producción','Released':'Estrenada'}
+DEPT_MAP_ES = {"Directing": "Dirección", "Writing": "Guion", "Production": "Producción", "Art": "Arte", "Camera": "Cámara", "Costume & Make-Up": "Vestuario y Maquillaje", "Visual Effects": "Efectos Visuales", "Sound": "Sonido", "Editing": "Edición", "Crew": "Equipo", "Lighting": "Iluminación", "Actors": "Actores"}
+
+# Datos para filtros de exploración
+ASIA_COUNTRIES_DATA = {
+    'KR': 'Corea del Sur', 'JP': 'Japón', 'CN': 'China', 'TW': 'Taiwán', 
+    'HK': 'Hong Kong', 'MO': 'Macao', 'MN': 'Mongolia', 'TH': 'Tailandia', 
+    'VN': 'Vietnam', 'IN': 'India', 'NP': 'Nepal', 'PH': 'Filipinas', 
+    'ID': 'Indonesia', 'MY': 'Malasia', 'SG': 'Singapur', 'KH': 'Camboya', 
+    'MM': 'Myanmar', 'LA': 'Laos'
+}
+
+GENRES_BY_TYPE = {
+    'movie': {
+        '28':'Acción', '16':'Animación', '12':'Aventura', '10752':'Bélica', '878':'Ciencia ficción', 
+        '35':'Comedia', '80':'Crimen', '99':'Documental', '18':'Drama', '10751':'Familia', 
+        '14':'Fantasía', '36':'Historia', '9648':'Misterio', '10402':'Música', '10770':'Película de TV', 
+        '10749':'Romance', '53':'Suspense', '27':'Terror', '37':'Western'
+    },
+    'tv': {
+        '10759':'Acción y Aventura', '16':'Animación', '35':'Comedia', '80':'Crimen', 
+        '18':'Drama', '10751':'Familia', '10762':'Infantil', '9648':'Misterio', 
+        '10765':'Ciencia Ficción y Fantasía', '10766':'Soap', '10768':'Guerra y Política', '37':'Western'
+    },
+    'show': {
+        '10764':'Reality', '99':'Documental', '10763':'Noticias', '10767':'Talk Show'
+    }
+}
+
+# --- UTILIDADES MAESTRAS ---
+tmdb_session = requests.Session()
+
+def fetch_json(url):
+    try:
+        response = tmdb_session.get(url, timeout=5)
+        return response.json() if response.status_code == 200 else {}
+    except:
+        return {}
 
 def clean_overview(text):
     if not text: return None
@@ -48,12 +112,120 @@ def clean_overview(text):
             return None
     return text
 
-def fetch_json(url):
-    try:
-        response = requests.get(url, timeout=5)
-        return response.json() if response.status_code == 200 else {}
-    except:
-        return {}
+def get_media_flag(item, det_res=None):
+    """
+    Lógica maestra de banderas:
+    1. Si el idioma coincide con uno de los países de producción, manda ese (Corea+China hablando coreano = Corea).
+    2. Si el idioma no coincide con ninguno, manda el primer país del registro (Singapur hablando chino = Singapur).
+    3. Fallback final por mapeo de idioma.
+    """
+    paises_origin = [p.upper() for p in item.get('origin_country', [])]
+    paises_prod = []
+    if det_res:
+         paises_prod = [c['iso_3166_1'].upper() for c in det_res.get('production_countries', [])]
+    
+    todos_paises = list(set(paises_origin + paises_prod))
+    # Para mantener el orden de prioridad del registro original (TV tiene primacía en origin_country)
+    paises_ordenados = []
+    if item.get('origin_country'): 
+        for p in item['origin_country']:
+            if p.upper() not in paises_ordenados: paises_ordenados.append(p.upper())
+    if det_res and det_res.get('production_countries'):
+        for c in det_res['production_countries']:
+            p = c['iso_3166_1'].upper()
+            if p not in paises_ordenados: paises_ordenados.append(p)
+
+    lang = item.get('original_language', '').lower()
+    c_sug = LANG_TO_COUNTRY_MAP.get(lang)
+
+    # REGLA 1: COINCIDENCIA IDIOMA-PAÍS (Prioridad Máxima)
+    if c_sug and c_sug in paises_ordenados:
+        return ASIA_FLAGS_MAP.get(c_sug, '🌏')
+
+    # REGLA 2: NO COINCIDE -> EL PRIMER PAÍS ASIÁTICO REGISTRADO
+    if paises_ordenados:
+        for p in paises_ordenados:
+            if p in ASIA_FLAGS_MAP: return ASIA_FLAGS_MAP[p]
+
+    # REGLA 3: FALLBACK POR IDIOMA (Si no hay países en registro)
+    if c_sug and c_sug in ASIA_FLAGS_MAP:
+        return ASIA_FLAGS_MAP[c_sug]
+        
+    return '🌏'
+
+def get_tiered_field(raw, field='title', media_type='movie'):
+    """
+    Recupera un campo (título o sinopsis) con lógica de fallback: ES > MX > EN+Trad
+    'raw' debe ser un dict con {'es': data, 'mx': data, 'en': data}
+    """
+    res_es, res_mx, res_en = raw.get('es', {}), raw.get('mx', {}), raw.get('en', {})
+    
+    orig_f = 'original_title' if media_type == 'movie' else 'original_name'
+    curr_f = 'title' if media_type == 'movie' else 'name'
+    orig_val = res_es.get(orig_f)
+
+    if field == 'title':
+        title_es = res_es.get(curr_f)
+        title_mx = res_mx.get(curr_f)
+        title_en = res_en.get(curr_f)
+        
+        # El original real (para saber si el de ES/MX es solo un relleno)
+        ref_val = orig_val if orig_val else title_en
+        
+        # 1. ES (Si no es igual al original y no está vacío)
+        if title_es and title_es != ref_val: return title_es
+        # 2. MX (Idem)
+        if title_mx and title_mx != ref_val: return title_mx
+        # 3. EN
+        return title_en or title_es or orig_val
+
+    if field == 'name':
+        # Alias para campos que se llaman 'name' en lugar de 'title' (Temporadas, Personas)
+        name_es = res_es.get('name')
+        name_mx = res_mx.get('name')
+        name_en = res_en.get('name')
+        
+        # Usamos el de EN como referencia si no hay original explícito
+        ref_val = orig_val if orig_val else name_en
+        
+        if name_es and name_es != ref_val: return name_es
+        if name_mx and name_mx != ref_val: return name_mx
+        return name_en or name_es or orig_val
+
+    if field == 'overview':
+        ov = clean_overview(res_es.get('overview'))
+        if ov: return ov
+        ov = clean_overview(res_mx.get('overview'))
+        if ov: return ov
+        ov_en = clean_overview(res_en.get('overview'))
+        if ov_en:
+            try: return GoogleTranslator(source='en', target='es').translate(ov_en)
+            except: return ov_en
+    if field == 'biography':
+        b_es = clean_overview(res_es.get('biography'))
+        if b_es: return b_es
+        b_mx = clean_overview(res_mx.get('biography'))
+        if b_mx: return b_mx
+        b_en = clean_overview(res_en.get('biography'))
+        if b_en:
+            try: return GoogleTranslator(source='en', target='es').translate(b_en)
+            except: return b_en
+    return None
+
+def process_watch_providers(providers_data, region):
+    """ Filtra y normaliza los proveedores de streaming para una región """
+    if not region: return []
+    flatrate = providers_data.get('results', {}).get(region, {}).get('flatrate', [])
+    watch_providers = []
+    seen_p = set()
+    for p in flatrate:
+        pid = p['provider_id']
+        if pid in ELITE_PROVIDER_IDS:
+            pid = PROVIDER_UPGRADE_MAP.get(pid, pid)
+            if pid not in seen_p:
+                watch_providers.append({'id': pid, 'name': p['provider_name']})
+                seen_p.add(pid)
+    return watch_providers
 
 app = Flask(__name__)
 load_dotenv()
@@ -130,20 +302,7 @@ def set_cached_media(media_id, data, user_region=None):
         u_id = session['session_id']
     
     # Pre-procesamos los providers para esa región específica
-    watch_providers = []
-    if user_region:
-        flatrate = data.get('watch/providers', {}).get('results', {}).get(user_region, {}).get('flatrate', [])
-        elite_ids = {8, 337, 283, 119, 9, 149, 115, 1899, 384, 350, 344, 1773, 188}
-        seen_p = set()
-        for p in flatrate:
-            pid = p['provider_id']
-            if pid in elite_ids:
-                pid = {9:119, 115:149, 1899:384}.get(pid, pid)
-                if pid not in seen_p:
-                    watch_providers.append({'id': pid, 'name': p['provider_name']})
-                    seen_p.add(pid)
-    
-    data['cached_watch_providers'] = watch_providers
+    data['cached_watch_providers'] = process_watch_providers(data.get('watch/providers', {}), user_region)
     data['cached_user_region'] = user_region
     
     USER_CONTEXT_CACHES[u_id] = {
@@ -337,12 +496,6 @@ def get_top_20(api_key, media_type, time_window):
     # Usamos api_media_type para la consulta real a la API
     api_media_type = 'tv' if media_type in ['tv', 'show'] else 'movie'
 
-    banderas_base = {
-        'ko': '🇰🇷', 'ja': '🇯🇵', 'zh': '🇨🇳', 'cn': '🇨🇳', 
-        'th': '🇹🇭', 'vi': '🇻🇳', 'id': '🇮🇩', 'tl': '🇵🇭',
-        'hi': '🇮🇳', 'te': '🇮🇳', 'ta': '🇮🇳'
-    }
-
     final_list = []
     seen_ids = set() 
     page = 1
@@ -350,12 +503,11 @@ def get_top_20(api_key, media_type, time_window):
     while len(final_list) < 20 and page < 80:
         # Usamos api_media_type para la consulta real a la API
         url = f"https://api.themoviedb.org/3/trending/{api_media_type}/{time_window}?api_key={api_key}&language=es-ES&page={page}"
-        response = requests.get(url)
+        data = fetch_json(url)
         
-        if response.status_code != 200:
+        if not data:
             break
             
-        data = response.json()
         results = data.get('results', [])
         
         if not results:
@@ -376,92 +528,27 @@ def get_top_20(api_key, media_type, time_window):
                     continue  # Si buscamos Programas, saltamos Series
             
             if lang in ASIA_LANGUAGES and item_id not in seen_ids and item.get('poster_path'):
-                # Detalles (usamos api_media_type para la ruta correcta)
-                det_url = f"https://api.themoviedb.org/3/{api_media_type}/{item_id}?api_key={api_key}&language=en-US"
-                det_res = requests.get(det_url).json()
+                # Detalles paralelos (MX y EN) para el fallback tiered
+                urls = {
+                    'mx': f"https://api.themoviedb.org/3/{api_media_type}/{item_id}?api_key={api_key}&language=es-MX",
+                    'en': f"https://api.themoviedb.org/3/{api_media_type}/{item_id}?api_key={api_key}&language=en-US"
+                }
+                with ThreadPoolExecutor(max_workers=2) as executor:
+                    futures = {name: executor.submit(fetch_json, url) for name, url in urls.items()}
+                    res_extra = {name: future.result() for name, future in futures.items()}
 
-                # --- LÓGICA DE BANDERA ROBUSTA (UNIFICADA) ---
-                paises_origin = [p.upper() for p in item.get('origin_country', [])]
-                paises_prod = [c['iso_3166_1'].upper() for c in det_res.get('production_countries', [])]
-                todos_paises = list(set(paises_origin + paises_prod))
-                idioma_orig = item.get('original_language', '').lower()
-
-                codigo_final = None
-                bandera_final = None
-
-                # 1. SERIES: Priorizar origin_country
-                if api_media_type == 'tv' and paises_origin:
-                    lang_to_c = {'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN','tl':'PH','id':'ID','ms':'MY','zh':'CN'}
-                    c_sug = lang_to_c.get(idioma_orig)
-                    codigo_final = c_sug if (c_sug and c_sug in paises_origin) else paises_origin[0]
-                    bandera_final = ASIA_FLAGS_MAP.get(codigo_final)
-
-                # 2. PELÍCULAS o fallback: idioma_orig + producción inteligente
-                if not bandera_final:
-                    lang_map = {
-                        'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN',
-                        'id':'ID','tl':'PH','fil':'PH','ms':'MY','mn':'MN',
-                        'km':'KH','my':'MM','lo':'LA','ne':'NP',
-                        'ta':'IN','te':'IN','ml':'IN','kn':'IN','bn':'IN',
-                        'mr':'IN','gu':'IN','pa':'IN','ur':'IN','or':'IN',
-                        'as':'IN','sd':'IN','ks':'IN',
-                        'bo':'CN','ug':'CN'
-                    }
-                    if idioma_orig in ['zh', 'cn', 'yue']:
-                        if 'HK' in todos_paises: codigo_final = 'HK'
-                        elif 'TW' in todos_paises: codigo_final = 'TW'
-                        elif 'MO' in todos_paises: codigo_final = 'MO'
-                        else: codigo_final = 'CN'
-                    elif idioma_orig in lang_map:
-                        codigo_final = lang_map[idioma_orig]
-                    if codigo_final: bandera_final = ASIA_FLAGS_MAP.get(codigo_final)
-
-                # 3. Fallback: Priority list
-                if not bandera_final:
-                    for code in ASIA_COUNTRIES:
-                        if code in todos_paises:
-                            bandera_final = ASIA_FLAGS_MAP.get(code)
-                            break
-
-                item['flag'] = bandera_final or '🌏'
-
-                curr_title = item.get('name') if api_media_type == 'tv' else item.get('title')
-                orig_title = item.get('original_name') if api_media_type == 'tv' else item.get('original_title')
-
-                # --- TÍTULO: TIERED FALLBACK (ES-ES > ES-MX > EN-US) ---
-                if not curr_title or curr_title == orig_title:
-                    # Nivel 2: México
-                    try:
-                        mx_res = requests.get(f"https://api.themoviedb.org/3/{api_media_type}/{item_id}?api_key={api_key}&language=es-MX").json()
-                        mx_title = mx_res.get('title') if api_media_type == 'movie' else mx_res.get('name')
-                        if mx_title and mx_title != orig_title:
-                            if api_media_type == 'tv': item['name'] = mx_title
-                            else: item['title'] = mx_title
-                        else:
-                            # Nivel 3: Inglés
-                            en_title = det_res.get('title') if api_media_type == 'movie' else det_res.get('name')
-                            if en_title:
-                                if api_media_type == 'tv': item['name'] = en_title
-                                else: item['title'] = en_title
-                    except: pass
-
-                # --- SINOPSIS: TIERED FALLBACK (ES-ES > ES-MX > EN-US + TRAD) ---
-                if not item.get('overview'):
-                    # Nivel 2: México
-                    try:
-                        mx_res = mx_res if 'mx_res' in locals() else requests.get(f"https://api.themoviedb.org/3/{api_media_type}/{item_id}?api_key={api_key}&language=es-MX").json()
-                        mx_overview = mx_res.get('overview')
-                        if mx_overview:
-                            item['overview'] = mx_overview
-                        else:
-                            # Nivel 3: Inglés + Traducción
-                            en_overview = det_res.get('overview')
-                            if en_overview:
-                                try:
-                                    item['overview'] = GoogleTranslator(source='en', target='es').translate(en_overview)
-                                except:
-                                    item['overview'] = en_overview
-                    except: pass
+                # --- METADATA UNIFICADA ---
+                item['flag'] = get_media_flag(item, res_extra['en'])
+                
+                # Títulos y Sinopsis con Fallback Tiered Real (ES > MX > EN)
+                raw_bundle = {'es': item, 'mx': res_extra['mx'], 'en': res_extra['en']}
+                
+                if api_media_type == 'tv':
+                     item['name'] = get_tiered_field(raw_bundle, 'title', 'tv')
+                     item['overview'] = get_tiered_field(raw_bundle, 'overview', 'tv')
+                else:
+                     item['title'] = get_tiered_field(raw_bundle, 'title', 'movie')
+                     item['overview'] = get_tiered_field(raw_bundle, 'overview', 'movie')
 
                 final_list.append(item)
                 seen_ids.add(item_id)
@@ -770,18 +857,6 @@ def toggle_status():
     return jsonify({'current_status': item.status})
 
 
-# --- MEDIA DETAIL ---
-tmdb_session = requests.Session()
-
-def fetch_json(url):
-    try:
-        response = tmdb_session.get(url, timeout=5)
-        if response.status_code == 200:
-            return response.json()
-        return {}
-    except:
-        return {}
-
 # --- RUTAS DE MEDIA (REFACTORIZADAS) ---
 @app.route('/media/<media_type>/<int:media_id>')
 def media_detail(media_type, media_id):
@@ -797,22 +872,11 @@ def media_detail(media_type, media_id):
 
     if cached:
         # Pre-procesar providers si la región cambió o no estaban
-        watch_providers = cached.get('cached_watch_providers', [])
         if cached.get('cached_user_region') != user_region:
-            watch_providers = []
-            if user_region:
-                flatrate = cached.get('watch/providers', {}).get('results', {}).get(user_region, {}).get('flatrate', [])
-                elite_ids = {8, 337, 283, 119, 9, 149, 115, 1899, 384, 350, 344, 1773, 188}
-                seen_p = set()
-                for p in flatrate:
-                    pid = p['provider_id']
-                    if pid in elite_ids:
-                        pid = {9:119, 115:149, 1899:384}.get(pid, pid)
-                        if pid not in seen_p:
-                            watch_providers.append({'id': pid, 'name': p['provider_name']})
-                            seen_p.add(pid)
-            cached['cached_watch_providers'] = watch_providers
+            cached['cached_watch_providers'] = process_watch_providers(cached.get('watch/providers', {}), user_region)
             cached['cached_user_region'] = user_region
+        
+        watch_providers = cached.get('cached_watch_providers', [])
 
         return render_template('media_detail.html', 
                                media=cached, 
@@ -830,7 +894,7 @@ def media_detail(media_type, media_id):
     is_tv = media_type == 'tv' or ('show' in request.path)
     
     # 2. ÚNICA OLEADA DE PETICIONES (Sin cascada)
-    append_master = "external_ids,videos,keywords,watch/providers"
+    append_master = "external_ids,videos,keywords,watch/providers,translations"
     append_master += ",aggregate_credits" if is_tv else ",credits"
     
     urls = {
@@ -848,20 +912,10 @@ def media_detail(media_type, media_id):
         res = raw['mx'] if (raw['mx'] and 'id' in raw['mx']) else raw['en']
     if not res: return "Error cargando medios", 404
 
+    lang = res.get('original_language', '').lower()
     # PROCESAMIENTO TÍTULO / OVERVIEW
-    res['display_title'] = res.get('title') if media_type == 'movie' else res.get('name')
-    orig_title = res.get('original_title') if media_type == 'movie' else res.get('original_name')
-    if not res['display_title'] or res['display_title'] == orig_title:
-        mx_t = raw['mx'].get('title' if media_type == 'movie' else 'name')
-        if mx_t and mx_t != orig_title: res['display_title'] = mx_t
-        else: res['display_title'] = raw['en'].get('title' if media_type == 'movie' else 'name') or orig_title
-
-    if not res.get('overview') or not clean_overview(res.get('overview')):
-        res['overview'] = clean_overview(raw['mx'].get('overview')) or clean_overview(raw['en'].get('overview'))
-        if res['overview'] == clean_overview(raw['en'].get('overview')) and res['overview'] and len(res['overview']) > 10:
-            try: res['overview'] = GoogleTranslator(source='en', target='es').translate(res['overview'])
-            except: pass
-    res['overview'] = clean_overview(res.get('overview'))
+    res['display_title'] = get_tiered_field(raw, 'title', 'movie' if media_type == 'movie' else 'tv')
+    res['overview'] = get_tiered_field(raw, 'overview', 'movie' if media_type == 'movie' else 'tv')
 
     # Trailers & Social
     ext_ids = res.get('external_ids', {})
@@ -886,18 +940,12 @@ def media_detail(media_type, media_id):
         res['trailer_key'] = next((v['key'] for v in raw['en'].get('videos', {}).get('results', []) if v['type'] == 'Trailer' and v['site'] == 'YouTube'), None)
 
     # Status, Genres, Flags
-    genre_map = {'Action & Adventure': 'Acción y Aventura', 'Kids': 'Infantil', 'News': 'Noticias', 'Sci-Fi & Fantasy': 'Ciencia Ficción y Fantasía', 'War & Politics': 'Guerra y Política'}
     if 'genres' in res: 
-        for g in res['genres']: g['name'] = genre_map.get(g['name'], g['name'])
-    status_map = {'Ended':'Finalizada','Returning Series':'En emisión','Planned':'Planeada','Canceled':'Cancelada','In Production':'En producción','Released':'Estrenada'}
-    res['status'] = status_map.get(res.get('status'), res.get('status'))
+        for g in res['genres']: g['name'] = GENRE_MAP_ES.get(g['name'], g['name'])
+    res['status'] = STATUS_MAP_ES.get(res.get('status'), res.get('status'))
     res['media_subtype'] = 'Programa' if (media_type == 'tv' and any(g['name'] in ['Reality', 'Talk Show', 'Documental', 'Noticias'] for g in res.get('genres', []))) else 'Serie'
     
-    paises = list(set([p.upper() for p in res.get('origin_country', [])] + [c['iso_3166_1'].upper() for c in res.get('production_countries', [])]))
-    lang = res.get('original_language', '').lower()
-    lang_to_c = {'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN','tl':'PH','id':'ID','ms':'MY','zh':'CN','yue':'HK'}
-    codigo_final = lang_to_c.get(lang) if (is_tv and lang_to_c.get(lang) in paises) else (lang_to_c.get(lang) or (paises[0] if paises else None))
-    res['flag'] = ASIA_FLAGS_MAP.get(codigo_final, '🌏')
+    res['flag'] = get_media_flag(res, res)
 
     # TEMPORADAS (Usa info de Wave 1)
     last_season = None
@@ -931,10 +979,7 @@ def media_detail(media_type, media_id):
             s_en = next((s for s in raw['en'].get('seasons', []) if s.get('season_number') == s_num), {})
             
             if not last_season.get('overview') or not clean_overview(last_season.get('overview')):
-                last_season['overview'] = clean_overview(s_mx.get('overview')) or clean_overview(s_en.get('overview'))
-                if last_season['overview'] == clean_overview(s_en.get('overview')) and last_season['overview']:
-                    try: last_season['overview'] = GoogleTranslator(source='en', target='es').translate(last_season['overview'])
-                    except: pass
+                last_season['overview'] = get_tiered_field({'mx': s_mx, 'en': s_en}, 'overview', 'tv')
             last_season['overview'] = clean_overview(last_season.get('overview'))
             if not last_season.get('name') or "Temporada" in last_season.get('name', ''):
                 if s_mx.get('name') and "Temporada" not in s_mx['name']: last_season['name'] = s_mx['name']
@@ -954,41 +999,64 @@ def media_detail(media_type, media_id):
     ert = res.get('episode_run_time') or [0]
     runtime = res.get('runtime') or (ert[0] if is_tv and ert else 0)
     res['runtime_formatted'] = f"{runtime // 60}h {runtime % 60}m" if runtime > 60 else f"{runtime}m"
-    res['original_language_name'] = {'ko':'Coreano','ja':'Japonés','zh':'Chino','cn':'Chino','yue':'Cantonés','th':'Tailandés','vi':'Vietnamita','hi':'Hindi','tl':'Filipino','id':'Indonesio'}.get(lang, lang.upper())
+    res['original_language_name'] = ASIA_LANG_NAMES.get(lang, lang.upper())
 
-    credits = res.get('aggregate_credits' if is_tv else 'credits', {})
-    final_cast_preview = []
-    if is_tv:
-        # Cogemos solo los 9 primeros para procesar menos
-        for a_orig in credits.get('cast', [])[:9]:
-            if a_orig.get('roles'):
-                a = a_orig.copy() # COPIA para no guarrear el caché maestro
-                roles = sorted(a['roles'], key=lambda x: x.get('episode_count', 0), reverse=True)
-                valid_roles = [r for r in roles if r.get('character')]
-                if valid_roles:
-                    first = valid_roles[0]
-                    # Formato "1 personaje + contador" (original)
-                    char_text = f"{first['character']} <small style='opacity:0.6'>({first['episode_count']} episodio{'s' if first['episode_count']!=1 else ''})</small>"
-                    if len(valid_roles) > 1:
-                        char_text += f"<br>y {len(valid_roles)-1} más..."
-                    a['character'] = char_text
-                else: a['character'] = "N/A"
-                final_cast_preview.append(a)
-            else:
-                final_cast_preview.append(a_orig)
-    else:
-        # PARA PELÍCULAS: Reparto estándar (mucho más simple)
-        final_cast_preview = credits.get('cast', [])[:9]
+    # DETERMINAR MEJOR FUENTE DE CRÉDITOS (Using TMDB Translation Info)
+    def get_best_credits_source(r_es, r_mx, r_en, tv=False):
+        key = 'aggregate_credits' if tv else 'credits'
+        trans_list = r_es.get('translations', {}).get('translations', [])
+        # 'es' suele cubrir tanto es-ES como es-MX en TMDB
+        has_es = any(t.get('iso_639_1') == 'es' for t in trans_list)
+        
+        if has_es:
+            # Si TMDB dice que hay traducción a español, confiamos en ES o MX
+            if r_es.get(key, {}).get('cast'): return r_es.get(key, {})
+            if r_mx.get(key, {}).get('cast'): return r_mx.get(key, {})
+        
+        # Si no hay marca de traducción a español, nos vamos directos al inglés
+        c_en = r_en.get(key, {})
+        return c_en if c_en.get('cast') else r_es.get(key, {})
+
+    credits_master = get_best_credits_source(raw['es'], raw['mx'], raw['en'], is_tv)
     
-    keywords = res.get('keywords', {}).get('results' if is_tv else 'keywords', [])
+    final_cast_preview = []
+    cast_source = credits_master.get('cast', [])[:9]
+    
+    for a_orig in cast_source:
+        a = a_orig.copy()
+        if is_tv and a.get('roles'):
+            roles = sorted(a['roles'], key=lambda x: x.get('episode_count', 0), reverse=True)
+            valid_roles = [r for r in roles if r.get('character')]
+            if valid_roles:
+                first = valid_roles[0]
+                char_text = f"{first['character']} <small style='opacity:0.6'>({first['episode_count']} episodio{'s' if first['episode_count']!=1 else ''})</small>"
+                if len(valid_roles) > 1:
+                    char_text += f"<br>y {len(valid_roles)-1} más..."
+                a['character'] = char_text
+            else: a['character'] = "N/A"
+        else:
+            a['character'] = a.get('character', 'N/A')
+            
+        final_cast_preview.append(a)
     res['cast_processed'] = final_cast_preview
-    res['crew_processed'] = credits.get('crew', [])
-    res['keywords_processed'] = keywords[:15]
+    res['crew_processed'] = credits_master.get('crew', [])
+    res['keywords_processed'] = res.get('keywords', {}).get('results' if is_tv else 'keywords', [])[:15]
     res['raw_data'] = raw
     
     # GUARDAR EN CACHÉ Y RENDERIZAR
     set_cached_media(media_id, res, user_region)
-    return media_detail(media_type, media_id)
+    watch_providers = process_watch_providers(res.get('watch/providers', {}), user_region)
+    return render_template('media_detail.html', 
+                           media=res, 
+                           is_favorite=is_favorite, 
+                           current_status=current_status, 
+                           watch_providers=watch_providers, 
+                           has_region=bool(user_region), 
+                           user_region=user_region, 
+                           keywords=res.get('keywords_processed', []), 
+                           real_media_type='movie' if media_type == 'movie' else ('show' if res.get('media_subtype') == 'Programa' else 'tv'), 
+                           cast=res.get('cast_processed', []), 
+                           crew=res.get('crew_processed', []))
 
 
 @app.route('/media/tv/<int:media_id>/seasons')
@@ -1022,14 +1090,9 @@ def seasons(media_id):
             raw = {name: future.result() for name, future in futures.items()}
         
         response = raw['es']
-        if not response.get('overview'): response['overview'] = raw['mx'].get('overview') or raw['en'].get('overview')
-        
         # Título tiered fallback
-        title_es = response.get('name')
-        orig_title = response.get('original_name')
-        if not title_es or title_es == orig_title:
-            mx_title = raw['mx'].get('name')
-            response['display_title'] = mx_title if (mx_title and mx_title != orig_title) else (raw['en'].get('name') or orig_title)
+        response['display_title'] = get_tiered_field(raw, 'title', 'tv')
+        response['overview'] = get_tiered_field(raw, 'overview', 'tv')
         
         # LÓGICA SMART (Emergency path)
         last_meta = response.get('last_episode_to_air', {}) or {}
@@ -1065,32 +1128,29 @@ def seasons(media_id):
         if not s.get('poster_path'):
             s['poster_path'] = s_mx.get('poster_path') or s_en.get('poster_path')
         
-        if not s.get('name') or "Temporada" in s.get('name', ''):
-            if s_mx.get('name') and "Temporada" not in s_mx['name']: s['name'] = s_mx['name']
-            elif s_en.get('name') and "Season" not in s_en['name']: s['name'] = s_en['name']
+        # Lógica de nombre inteligente: Si en ES/MX es genérico (Temporada 1), usamos el de EN si es descriptivo
+        name_es = s.get('name')
+        name_mx = s_mx.get('name')
+        name_en = s_en.get('name')
+        
+        def is_generic(n):
+            if not n: return True
+            nl = n.lower()
+            # Detecta "Temporada X" o "Season X"
+            return nl.startswith("temporada") or nl.startswith("season")
+
+        if is_generic(name_es):
+            if name_mx and not is_generic(name_mx):
+                s['name'] = name_mx
+            elif name_en and not is_generic(name_en):
+                s['name'] = name_en
+            else:
+                s['name'] = name_es # Se queda como está si ninguno tiene nombre real
 
         if not s.get('overview') or not clean_overview(s.get('overview')):
-            if clean_overview(s_mx.get('overview')): s['overview'] = clean_overview(s_mx['overview'])
-            elif clean_overview(s_en.get('overview')):
-                translations_needed.append((s, s_en['overview']))
-
-        if s.get('air_date'):
-            try:
-                dt = datetime.strptime(s['air_date'], '%Y-%m-%d')
-                s['air_date_formatted'] = f"{dt.day} {meses_f[dt.month-1]} {dt.year}"
-            except: s['air_date_formatted'] = s['air_date']
+            s['overview'] = get_tiered_field({'es': s, 'mx': s_mx, 'en': s_en}, 'overview', 'tv')
+        
         all_seasons.append(s)
-
-    if translations_needed:
-        def translate_overview(item_tuple):
-            season_dict, text_en = item_tuple
-            try:
-                season_dict['overview'] = GoogleTranslator(source='en', target='es').translate(text_en)
-            except:
-                season_dict['overview'] = text_en
-                
-        with ThreadPoolExecutor(max_workers=5) as executor:
-            executor.map(translate_overview, translations_needed)
 
     # Guardamos en caché de contexto el resultado de las temporadas para rapidez total
     if u_id and u_id in USER_CONTEXT_CACHES:
@@ -1109,12 +1169,13 @@ def media_cast(media_type, media_id):
 
     if cached:
         res = cached
+        raw = res.get('raw_data', {})
     else:
         # Petición de emergencia
         urls = {
-            'es': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-ES&append_to_response={'aggregate_credits' if is_tv else 'credits'}",
-            'mx': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-MX",
-            'en': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=en-US"
+            'es': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-ES&append_to_response={'aggregate_credits' if is_tv else 'credits'},translations",
+            'mx': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-MX&append_to_response={'aggregate_credits' if is_tv else 'credits'}",
+            'en': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=en-US&append_to_response={'aggregate_credits' if is_tv else 'credits'}"
         }
         with ThreadPoolExecutor(max_workers=3) as executor:
             futures = {name: executor.submit(fetch_json, url) for name, url in urls.items()}
@@ -1126,22 +1187,49 @@ def media_cast(media_type, media_id):
         orig_title = res.get('original_title') if media_type == 'movie' else res.get('original_name')
         if not res['display_title'] or res['display_title'] == orig_title:
             res['display_title'] = raw['mx'].get('name') or raw['en'].get('name') or orig_title
+        res['raw_data'] = raw
 
-    credits = res.get('aggregate_credits' if is_tv else 'credits', {})
-    final_cast, final_crew = credits.get('cast', []), credits.get('crew', [])
+    # DETERMINAR MEJOR FUENTE DE CRÉDITOS (Using TMDB Translation Info)
+    def get_best_credits_source(r_es, r_mx, r_en, tv=False):
+        key = 'aggregate_credits' if tv else 'credits'
+        trans_list = r_es.get('translations', {}).get('translations', [])
+        has_es = any(t.get('iso_639_1') == 'es' for t in trans_list)
+        
+        if has_es:
+            if r_es.get(key, {}).get('cast'): return r_es.get(key, {})
+            if r_mx.get(key, {}).get('cast'): return r_mx.get(key, {})
+        
+        c_en = r_en.get(key, {})
+        return c_en if c_en.get('cast') else r_es.get(key, {})
+
+    # Fallback si por algún motivo 'raw' no tiene los datos (ej: cache viejo)
+    if not 'raw' in locals() or not raw or 'es' not in raw:
+        urls_raw = {
+            'es': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-ES&append_to_response=translations",
+            'mx': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-MX",
+            'en': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=en-US"
+        }
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            raw = {name: executor.submit(fetch_json, url).result() for name, url in urls_raw.items()}
+
+    credits_master = get_best_credits_source(raw['es'], raw['mx'], raw['en'], is_tv)
+    final_cast, final_crew = credits_master.get('cast', []), credits_master.get('crew', [])
     
     # Normalizamos los roles y equipos como COPIAS para no afectar al caché global
     final_cast_display = []
     final_crew_display = []
-
+    
     if is_tv:
         for a_orig in final_cast:
-            if 'roles' in a_orig and a_orig['roles']:
-                a = a_orig.copy()
+            a = a_orig.copy()
+            if a.get('roles'):
                 sorted_roles = sorted(a['roles'], key=lambda x: x.get('episode_count', 0), reverse=True)
                 valid_roles = [r for r in sorted_roles if r.get('character')]
+                
                 if valid_roles:
-                    parts = [f"{r['character']} <small style='opacity:0.6'>({r['episode_count']} episodio{'s' if r['episode_count']!=1 else ''})</small>" for r in valid_roles]
+                    parts = []
+                    for r in valid_roles:
+                        parts.append(f"{r['character']} <small style='opacity:0.6'>({r['episode_count']} episodio{'s' if r['episode_count']!=1 else ''})</small>")
                     a['character'] = ", ".join(parts)
                 else: a['character'] = "N/A"
                 final_cast_display.append(a)
@@ -1149,24 +1237,21 @@ def media_cast(media_type, media_id):
                 final_cast_display.append(a_orig)
         
         for m_orig in final_crew:
-            if 'jobs' in m_orig and m_orig['jobs']:
-                m = m_orig.copy()
-                valid_jobs = sorted([j for j in m['jobs'] if j.get('job')], key=lambda x: x.get('episode_count', 0), reverse=True)
-                if valid_jobs:
-                    parts = [f"{j['job']} <small style='opacity:0.6'>({j['episode_count']} episodio{'s' if j['episode_count']!=1 else ''})</small>" for j in valid_jobs]
-                    m['job'] = ", ".join(parts)
-                else: m['job'] = "N/A"
-                final_crew_display.append(m)
-            else:
-                final_crew_display.append(m_orig)
+            m = m_orig.copy()
+            final_crew_display.append(m)
     else:
-        final_cast_display = final_cast
+        # PELÍCULAS: Reparto estándar desde la mejor fuente
+        for a_orig in final_cast:
+            a = a_orig.copy()
+            a['name'] = a.get('name', 'N/A')
+            a['character'] = a.get('character', 'N/A')
+            final_cast_display.append(a)
+            
         final_crew_display = final_crew
 
     crew_by_dept = {}
-    dept_translations = {"Directing": "Dirección", "Writing": "Guion", "Production": "Producción", "Art": "Arte", "Camera": "Cámara", "Costume & Make-Up": "Vestuario y Maquillaje", "Visual Effects": "Efectos Visuales", "Sound": "Sonido", "Editing": "Edición", "Crew": "Equipo", "Lighting": "Iluminación", "Actors": "Actores"}
     for member in final_crew_display:
-        dept_es = dept_translations.get(member.get('department', 'Others'), member.get('department', 'Others'))
+        dept_es = DEPT_MAP_ES.get(member.get('department', 'Others'), member.get('department', 'Others'))
         if dept_es not in crew_by_dept: crew_by_dept[dept_es] = []
         crew_by_dept[dept_es].append(member)
 
@@ -1196,31 +1281,6 @@ def explore():
     watch_region = request.args.get('watch_region', default_region)
     keywords = request.args.get('keywords', '')
 
-    asia_countries = {
-        'KR': 'Corea del Sur', 'JP': 'Japón', 'CN': 'China', 'TW': 'Taiwán', 
-        'HK': 'Hong Kong', 'MO': 'Macao', 'MN': 'Mongolia', 'TH': 'Tailandia', 
-        'VN': 'Vietnam', 'IN': 'India', 'NP': 'Nepal', 'PH': 'Filipinas', 
-        'ID': 'Indonesia', 'MY': 'Malasia', 'SG': 'Singapur', 'KH': 'Camboya', 
-        'MM': 'Myanmar', 'LA': 'Laos'
-    }
-    
-    genres_by_type = {
-        'movie': {
-            '28':'Acción', '16':'Animación', '12':'Aventura', '10752':'Bélica', '878':'Ciencia ficción', 
-            '35':'Comedia', '80':'Crimen', '99':'Documental', '18':'Drama', '10751':'Familia', 
-            '14':'Fantasía', '36':'Historia', '9648':'Misterio', '10402':'Música', '10770':'Película de TV', 
-            '10749':'Romance', '53':'Suspense', '27':'Terror', '37':'Western'
-        },
-        'tv': {
-            '10759':'Acción y Aventura', '16':'Animación', '35':'Comedia', '80':'Crimen', 
-            '18':'Drama', '10751':'Familia', '10762':'Infantil', '9648':'Misterio', 
-            '10765':'Ciencia Ficción y Fantasía', '10766':'Soap', '10768':'Guerra y Política', '37':'Western'
-        },
-        'show': {
-            '10764':'Reality', '99':'Documental', '10763':'Noticias', '10767':'Talk Show'
-        }
-    }
-    
     target_type = 'movie' if media_type == 'movie' else 'tv'
     date_key = 'primary_release_date' if target_type == 'movie' else 'first_air_date'
     sort_options = {'popularity.desc': 'Más Populares', 'popularity.asc': 'Menos Populares', 'vote_average.desc': 'Mejor Valorados', 'vote_average.asc': 'Peor Valorados', f'{date_key}.desc': 'Más Recientes', f'{date_key}.asc': 'Más Antiguos', 'vote_count.desc': 'Más Votados', 'vote_count.asc': 'Menos Votados'}
@@ -1232,7 +1292,7 @@ def explore():
                            current_sort=sort_by, current_status_id=status_id,
                            current_providers=watch_providers, current_region=watch_region,
                            current_keywords=keywords,
-                           asia_langs=asia_countries, genres_by_type=genres_by_type, 
+                           asia_langs=ASIA_COUNTRIES_DATA, genres_by_type=GENRES_BY_TYPE, 
                            sort_options=sort_options, status_options=status_options,
                            available_countries=GLOBAL_COUNTRIES_LIST,
                            regions_map=REGIONS_MAP)
@@ -1289,6 +1349,14 @@ def api_explore():
 
             # --- FILTRADO DE ORIGEN: Solo idiomas asiáticos (Corrige el contador) ---
             url += f"&with_original_language={'|'.join(ASIA_LANGUAGES)}"
+
+            # --- VALIDACIÓN DE AÑO (Seguridad para disparidad en contador) ---
+            if year and str(year).strip():
+                y_val = str(year).strip()
+                if len(y_val) != 4:
+                    yield json.dumps({'total_results': 0}) + '\n'
+                    yield json.dumps({'done': True}) + '\n'
+                    return
 
             if year:
                 year_param = 'first_air_date_year' if target_type == 'tv' else 'primary_release_year'
@@ -1348,7 +1416,7 @@ def api_explore():
                 url += f"&without_genres={','.join(without_ids)}"
 
             try:
-                res = requests.get(url).json()
+                res = fetch_json(url)
                 results = res.get('results', [])
                 total_pages = res.get('total_pages', 1)
                 total_results = res.get('total_results', 0)
@@ -1388,6 +1456,14 @@ def api_explore():
                 idioma_orig = item.get('original_language', '').lower()
                 if idioma_orig not in ASIA_LANGUAGES: continue
 
+                # --- FILTRO MANUAL DE AÑO (Seguridad extra) ---
+                if year and str(year).strip():
+                    y_str = str(year).strip()
+                    # Buscamos la fecha según el tipo (first_air_date para series, release_date para pelis)
+                    item_date = item.get('first_air_date') if target_type == 'tv' else item.get('release_date')
+                    if not item_date or item_date[:4] != y_str:
+                        continue
+
                 item_id = item.get('id')
                 item['media_type_fixed'] = target_type
                 
@@ -1400,109 +1476,33 @@ def api_explore():
                     else:
                          item['tipo_label'] = 'Serie'
                 
-                det_url = f"https://api.themoviedb.org/3/{target_type}/{item_id}?api_key={api_key}&language=en-US"
-                try: 
-                    det_res = requests.get(det_url).json()
-                except: 
-                    det_res = {}
+                # Fetch det_res and mx_res in parallel for tiered fallback
+                urls = {
+                    'mx': f"https://api.themoviedb.org/3/{target_type}/{item_id}?api_key={api_key}&language=es-MX",
+                    'en': f"https://api.themoviedb.org/3/{target_type}/{item_id}?api_key={api_key}&language=en-US"
+                }
+                with ThreadPoolExecutor(max_workers=2) as executor:
+                    futures = {name: executor.submit(fetch_json, url) for name, url in urls.items()}
+                    res_extra = {name: future.result() for name, future in futures.items()}
+                
+                det_res = res_extra['en']
+                mx_res = res_extra['mx']
 
-                # --- LÓGICA DE BANDERA ROBUSTA (UNIFICADA) ---
-                paises_origin = [p.upper() for p in item.get('origin_country', [])]
-                paises_prod = [c['iso_3166_1'].upper() for c in det_res.get('production_countries', [])]
-                todos_paises = list(set(paises_origin + paises_prod))
-                idioma_orig = item.get('original_language', '').lower()
-
-                codigo_final = None
-                bandera_final = None
-
-                # 1. SERIES: Priorizar origin_country
-                if target_type == 'tv' and paises_origin:
-                    lang_to_c = {'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN','tl':'PH','id':'ID','ms':'MY','zh':'CN'}
-                    c_sug = lang_to_c.get(idioma_orig)
-                    codigo_final = c_sug if (c_sug and c_sug in paises_origin) else paises_origin[0]
-                    bandera_final = ASIA_FLAGS_MAP.get(codigo_final)
-
-                # 2. PELÍCULAS o fallback: idioma_orig
-                if not bandera_final:
-                    lang_map = {
-                        'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN',
-                        'id':'ID','tl':'PH','fil':'PH','ms':'MY','mn':'MN',
-                        'km':'KH','my':'MM','lo':'LA','ne':'NP',
-                        'ta':'IN','te':'IN','ml':'IN','kn':'IN','bn':'IN',
-                        'mr':'IN','gu':'IN','pa':'IN','ur':'IN','or':'IN',
-                        'as':'IN','sd':'IN','ks':'IN',
-                        'bo':'CN','ug':'CN'
-                    }
-                    if idioma_orig in ['zh', 'cn', 'yue']:
-                        if 'HK' in todos_paises: codigo_final = 'HK'
-                        elif 'TW' in todos_paises: codigo_final = 'TW'
-                        elif 'MO' in todos_paises: codigo_final = 'MO'
-                        else: codigo_final = 'CN'
-                    elif idioma_orig in lang_map:
-                        codigo_final = lang_map[idioma_orig]
-                    if codigo_final: bandera_final = ASIA_FLAGS_MAP.get(codigo_final)
-
-                # 3. Fallback: Priority list
-                if not bandera_final:
-                    for code in ASIA_COUNTRIES:
-                        if code in todos_paises:
-                            bandera_final = ASIA_FLAGS_MAP.get(code)
-                            break
-
-                # --- FILTRADO ESTRICTO ---
-                # Si estamos filtrando por país, el código determinado debe estar en la lista seleccionada
+                # --- METADATA UNIFICADA ---
+                item['flag'] = get_media_flag(item, det_res)
+                
+                # --- FILTRADO MANUAL DE PUREZA (Solo si se eligió un país específico) ---
                 if country_code:
-                    selected_countries = country_code.upper().split('|')
-                    if codigo_final not in selected_countries:
-                        continue
-
-                item['flag'] = bandera_final or '🌏'
-                title_es = item.get('name') if target_type == 'tv' else item.get('title')
-                orig_title = item.get('original_name') if target_type == 'tv' else item.get('original_title')
+                    requested_flag = ASIA_FLAGS_MAP.get(country_code.upper())
+                    if requested_flag and item.get('flag') != requested_flag:
+                        continue # Si la bandera final no coincide con el país pedido, fuera de la lista
                 
-                item['original_title_h6'] = orig_title
-                item['media_type_fixed'] = target_type
-                item['tipo_label'] = 'Película' if target_type == 'movie' else ('Programa' if es_programa else 'Serie')
+                # Títulos y Sinopsis con Fallback robusto
+                raw_bundle = {'es': item, 'mx': mx_res, 'en': det_res}
+                item['display_title'] = get_tiered_field(raw_bundle, 'title', target_type)
+                item['overview'] = get_tiered_field(raw_bundle, 'overview', target_type)
                 
-                # --- TÍTULO: TIERED FALLBACK (ES-ES > ES-MX > EN-US) ---
-                if not title_es or title_es == orig_title:
-                    # Nivel 2: México
-                    try:
-                        if not mx_res:
-                            mx_url = f"https://api.themoviedb.org/3/{target_type}/{item_id}?api_key={api_key}&language=es-MX"
-                            mx_res = requests.get(mx_url).json()
-                        
-                        mx_title = mx_res.get('title') if target_type == 'movie' else mx_res.get('name')
-                        if mx_title and mx_title != orig_title:
-                            item['display_title'] = mx_title
-                        else:
-                            # Nivel 3: Inglés (Usamos el det_res ya cargado arriba)
-                            eng_title = det_res.get('name') if target_type == 'tv' else det_res.get('title')
-                            item['display_title'] = eng_title if eng_title else orig_title
-                    except:
-                        item['display_title'] = orig_title
-                else: 
-                    item['display_title'] = title_es
-
-                # --- SINOPSIS: TIERED FALLBACK (ES-ES > ES-MX > EN-US + TRAD) ---
-                if not item.get('overview'):
-                    # Nivel 2: México
-                    try:
-                        if not mx_res:
-                            mx_res = requests.get(f"https://api.themoviedb.org/3/{target_type}/{item_id}?api_key={api_key}&language=es-MX").json()
-                        
-                        mx_overview = mx_res.get('overview')
-                        if mx_overview:
-                            item['overview'] = mx_overview
-                        else:
-                            # Nivel 3: Inglés + Traducción
-                            en_overview = det_res.get('overview')
-                            if en_overview:
-                                try:
-                                    item['overview'] = GoogleTranslator(source='en', target='es').translate(en_overview)
-                                except:
-                                    item['overview'] = en_overview
-                    except: pass
+                item['original_title_h6'] = item.get('original_title') if target_type == 'movie' else item.get('original_name')
 
                 # Renderizar HTML para este item solo
                 html = render_template('explore_items.html', items=[item])
@@ -1541,11 +1541,8 @@ def api_keywords_search():
         return jsonify({'results': []})
     
     url = f"https://api.themoviedb.org/3/search/keyword?api_key={api_key}&query={query}"
-    try:
-        res = requests.get(url).json()
-        return jsonify(res)
-    except:
-        return jsonify({'results': []})
+    res = fetch_json(url)
+    return jsonify(res)
 
 
 @app.route('/person/<person_id>')
@@ -1556,10 +1553,6 @@ def person_detail(person_id):
     asian_re = re.compile(r'[\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\uac00-\ud7af]')
     
     # --- LANZADERA 1: ESPAÑA, MÉXICO, EEUU (OPTIMIZADA) ---
-    def fetch_data(url):
-        try: return requests.get(url, timeout=5).json()
-        except: return {}
-
     initial_urls = {
         "es": f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=es-ES&append_to_response=external_ids",
         "mx": f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=es-MX",
@@ -1567,27 +1560,16 @@ def person_detail(person_id):
     }
 
     with ThreadPoolExecutor(max_workers=3) as executor:
-        future_to_url = {executor.submit(fetch_data, url): name for name, url in initial_urls.items()}
-        results = {name: future.result() for future, name in future_to_url.items()}
+        futures = {name: executor.submit(fetch_json, url) for name, url in initial_urls.items()}
+        results = {name: future.result() for name, future in futures.items()}
 
     res = results["es"]
     res_mx = results["mx"]
     res_en = results["en"]
     if not res or 'id' not in res: return "Error", 404
 
-    # --- FUSIÓN INTELIGENTE DE BIOGRAFÍAS CON TRADUCCIÓN (MANTENIDA) ---
-    bio = res.get('biography')
-    if not bio or len(bio) < 10:
-        bio = res_mx.get('biography')
-    
-    if (not bio or len(bio) < 10) and res_en.get('biography'):
-        en_bio = res_en.get('biography')
-        try:
-            bio = GoogleTranslator(source='auto', target='es').translate(en_bio)
-        except:
-            bio = en_bio
-            
-    res['biography'] = bio or "No tenemos una biografía disponible de momento."
+    # --- FUSIÓN INTELIGENTE DE BIOGRAFÍAS (Tiered) ---
+    res['biography'] = get_tiered_field(results, 'biography', 'person') or "No tenemos una biografía disponible de momento."
     
     if not res.get('place_of_birth'): 
         res['place_of_birth'] = res_mx.get('place_of_birth') or res_en.get('place_of_birth') or "-"
@@ -1634,10 +1616,6 @@ def person_detail(person_id):
 @app.route('/api/person/<int:person_id>/projects')
 def api_person_projects(person_id):
     api_key = os.getenv("TMDB_API_KEY")
-    
-    def fetch_data(url):
-        try: return requests.get(url, timeout=5).json()
-        except: return {}
 
     # AQUÍ MUDAMOS LA LANZADERA DE CRÉDITOS
     urls = {
@@ -1647,15 +1625,15 @@ def api_person_projects(person_id):
     }
 
     with ThreadPoolExecutor(max_workers=3) as executor:
-        future_to_url = {executor.submit(fetch_data, url): name for name, url in urls.items()}
-        results = {name: future.result() for future, name in future_to_url.items()}
+        futures = {name: executor.submit(fetch_json, url) for name, url in urls.items()}
+        results = {name: future.result() for name, future in futures.items()}
 
     c_es = results["es"]
     c_mx = results["mx"]
     c_en = results["en"]
 
-    mx_map = {f"{w.get('media_type')}_{w.get('id')}": (w.get('title') or w.get('name')) for w in (c_mx.get('cast', []) + c_mx.get('crew', []))}
-    en_map = {f"{w.get('media_type')}_{w.get('id')}": (w.get('title') or w.get('name')) for w in (c_en.get('cast', []) + c_en.get('crew', []))}
+    mx_map = {f"{w.get('media_type')}_{w.get('id')}": w for w in (c_mx.get('cast', []) + c_mx.get('crew', []))}
+    en_map = {f"{w.get('media_type')}_{w.get('id')}": w for w in (c_en.get('cast', []) + c_en.get('crew', []))}
 
     all_credits = c_es.get('cast', []) + c_es.get('crew', [])
     seen_ids = set()
@@ -1676,19 +1654,12 @@ def api_person_projects(person_id):
         if idioma_orig not in ASIA_LANGUAGES: continue
         seen_ids.add(cid)
         
-        # TU LÓGICA DE TÍTULO JERÁRQUICA ESTRICTA
-        key = f"{media_type}_{cid}"
+        c_mx_item = mx_map.get(f"{media_type}_{cid}", {})
+        c_en_item = en_map.get(f"{media_type}_{cid}", {})
         orig_title = (work.get('original_title') or work.get('original_name') or "").strip()
-        title_es = (work.get('title') or work.get('name') or "").strip()
-        
-        best_t = title_es
-        if idioma_orig != 'es' and (not title_es or title_es.lower() == orig_title.lower()):
-            title_mx = (mx_map.get(key) or "").strip()
-            title_en = (en_map.get(key) or "").strip()
-            if title_mx and title_mx.lower() != orig_title.lower(): best_t = title_mx
-            else: best_t = title_en or title_es or orig_title
 
-        work['display_title'] = best_t
+        # TÍTULOS CON FALLBACK MÁS LIMPIO
+        work['display_title'] = get_tiered_field({'es': work, 'mx': c_mx_item, 'en': c_en_item}, 'title', media_type)
         work['original_title_h6'] = orig_title
         work['media_type_fixed'] = media_type
         if media_type == 'movie':
@@ -1697,22 +1668,8 @@ def api_person_projects(person_id):
             item_genres = work.get('genre_ids', [])
             work['tipo_label'] = 'Programa' if any(g in item_genres for g in GENRES_PROGRAMAS) else 'Serie'
 
-        # TU LÓGICA DE BANDERAS
-        paises_origin = [p.upper() for p in work.get('origin_country', [])]
-        bandera_final = '🌏'
-        if paises_origin:
-            lang_to_c = {'ko':'KR','ja':'JP','zh':'CN','th':'TH','vi':'VN','hi':'IN','tl':'PH','id':'ID'}
-            codigo = lang_to_c.get(idioma_orig, paises_origin[0])
-            if idioma_orig in ['zh', 'cn', 'yue']:
-                if 'HK' in paises_origin: codigo = 'HK'
-                elif 'TW' in paises_origin: codigo = 'TW'
-                else: codigo = 'CN'
-            bandera_final = ASIA_FLAGS_MAP.get(codigo, '🌏')
-        else:
-            c_f = {'ko':'KR','ja':'JP','zh':'CN','th':'TH','vi':'VN','hi':'IN'}.get(idioma_orig)
-            bandera_final = ASIA_FLAGS_MAP.get(c_f, '🌏')
-
-        work['flag'] = bandera_final
+        # BANDERAS UNIFICADAS
+        work['flag'] = get_media_flag(work, work)
         known_for.append(work)
         if len(known_for) >= 60: break
     

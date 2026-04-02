@@ -51,8 +51,8 @@
 /* 3. GRID SYSTEM & DYNAMICS */
 .collection-grid-premium {
     display: grid !important;
-    /* Las tarjetas se estiran (1fr) hasta que cabe una nueva de mínimo 140px */
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+    /* Tamaño de tarjetas optimizado: 175px escritorio, 140px móvil fallback */
+    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)) !important;
 
     /* Espaciado fijo en píxeles */
     column-gap: 14px !important;
@@ -159,6 +159,7 @@
     }
 
     .collection-grid-premium {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
         row-gap: 30px !important;
     }
 

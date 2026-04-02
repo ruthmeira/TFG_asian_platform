@@ -33,7 +33,7 @@ async function loadCollectionPage(page = 1, perPage = null, useAnimation = true,
         gridContainer.innerHTML = html;
 
         const newUrl = `/collections/${status}?page=${page}&per_page=${perPage}`;
-        
+
         // GESTIÓN DE HISTORIAL PROFESIONAL
         if (replaceHistory) {
             window.history.replaceState({ path: newUrl }, '', newUrl);
@@ -61,8 +61,13 @@ function calculateIdealPerPage() {
 
     if (columns <= 0) return 18;
 
-    const idealRows = Math.max(2, Math.round(18 / columns));
-    return columns * idealRows;
+    let rows = Math.round(18 / columns);
+    // En pantallas muy grandes (ej 10 cols), no permitas una sola fila
+    if (rows < 2 && columns >= 9) rows = 2;
+    // En móviles, permite scroll más largo
+    if (columns <= 3) rows = Math.max(6, rows);
+
+    return columns * Math.max(1, rows);
 }
 
 /**
@@ -82,7 +87,7 @@ function monitorGridResize() {
             console.log(`Grid cambio detectado: de ${currentColumns} a ${newColumns}.`);
             const urlParams = new URLSearchParams(window.location.search);
             const currentPage = urlParams.get('page') || 1;
-            
+
             // Usamos replaceHistory=true para que el resize no ensucie el botón Atrás
             loadCollectionPage(currentPage, null, false, true);
         }
@@ -116,7 +121,7 @@ window.addEventListener('load', () => {
         const ideal = calculateIdealPerPage();
         if (!urlParams.has('per_page') || parseInt(urlParams.get('per_page')) !== ideal) {
             // Ajuste inicial: replaceHistory=true
-            loadCollectionPage(1, ideal, false, true); 
+            loadCollectionPage(1, ideal, false, true);
         }
     }
 
@@ -126,6 +131,6 @@ window.addEventListener('load', () => {
         const page = urlParams.get('page') || 1;
         const perPage = urlParams.get('per_page') || 18;
         // Al navegar por historial, usamos replaceHistory=true para no crear bucles
-        loadCollectionPage(page, perPage, true, true); 
+        loadCollectionPage(page, perPage, true, true);
     });
 });
