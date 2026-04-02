@@ -963,6 +963,9 @@ def media_detail(media_type, media_id):
                 final_cast_preview.append(a)
             else:
                 final_cast_preview.append(a_orig)
+    else:
+        # PARA PELÍCULAS: Reparto estándar (mucho más simple)
+        final_cast_preview = credits.get('cast', [])[:9]
     
     keywords = res.get('keywords', {}).get('results' if is_tv else 'keywords', [])
     res['cast_processed'] = final_cast_preview
