@@ -1555,7 +1555,7 @@ def person_detail(person_id):
     import re
     asian_re = re.compile(r'[\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\uac00-\ud7af]')
     
-    # --- LANZADERA 1: ESPAÑA, MÉXICO, EEUU Y TRADUCCIONES (UNIVERSAL) ---
+    # --- LANZADERA 1: ESPAÑA, MÉXICO, EEUU (OPTIMIZADA) ---
     def fetch_data(url):
         try: return requests.get(url, timeout=5).json()
         except: return {}
@@ -1563,40 +1563,17 @@ def person_detail(person_id):
     initial_urls = {
         "es": f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=es-ES&append_to_response=external_ids",
         "mx": f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=es-MX",
-        "en": f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=en-US",
-        "trans": f"https://api.themoviedb.org/3/person/{person_id}/translations?api_key={api_key}"
+        "en": f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=en-US"
     }
 
-    with ThreadPoolExecutor(max_workers=4) as executor:
+    with ThreadPoolExecutor(max_workers=3) as executor:
         future_to_url = {executor.submit(fetch_data, url): name for name, url in initial_urls.items()}
         results = {name: future.result() for future, name in future_to_url.items()}
 
     res = results["es"]
     res_mx = results["mx"]
     res_en = results["en"]
-    res_trans = results["trans"]
     if not res or 'id' not in res: return "Error", 404
-
-    # --- LANZADERA 2: DETECCIÓN UNIVERSAL ASÍATICA (USANDO TU LISTA ASIA_LANGUAGES) ---
-    res['artistic_name'] = "-"
-    
-    # Buscamos en todas sus traducciones cuál coincide con tus lenguajes asiáticos configurados
-    translations = res_trans.get('translations', [])
-    for t in translations:
-        lang = t.get('iso_639_1')
-        if lang in ASIA_LANGUAGES:
-            n_name = t.get('data', {}).get('name')
-            if n_name and asian_re.search(n_name):
-                res['artistic_name'] = n_name
-                break
-
-    # Fallback AKA (seguridad extra)
-    if res['artistic_name'] == "-":
-        aka_list = res.get('also_known_as', [])
-        for aka in aka_list:
-            if asian_re.search(aka):
-                res['artistic_name'] = aka
-                break
 
     # --- FUSIÓN INTELIGENTE DE BIOGRAFÍAS CON TRADUCCIÓN (MANTENIDA) ---
     bio = res.get('biography')
@@ -1648,8 +1625,7 @@ def person_detail(person_id):
         'homepage': res.get('homepage')
     }
 
-    aka_list_final = res.get('also_known_as', [])
-    res['aka_list'] = [aka for aka in aka_list_final if aka != res['artistic_name']]
+    res['aka_list'] = res.get('also_known_as', [])
     if not res['aka_list']: res['aka_list'] = ["-"]
 
     return render_template('person_detail.html', person=res, known_for=[])
