@@ -103,31 +103,13 @@
 
         <section class="known-for-section">
             <h2>Proyectos</h2>
-            <div class="known-for-grid" id="works-grid">
-                {% for work in known_for %}
-                <a href="{{ url_for('media_detail', media_type=work.media_type_fixed, media_id=work.id) }}"
-                    class="card-link {% if loop.index > 8 %}hidden-work{% endif %}">
-                    <div class="card">
-                        <div class="badge">{{ work.tipo_label }}</div>
-                        <img src="https://image.tmdb.org/t/p/w500{{ work.poster_path }}" alt="{{ work.display_title }}">
-                        <div class="card-body">
-                            <h4>{{ work.display_title }}</h4>
-                            <h6>{{ work.original_title_h6 }}</h6>
-                            <div class="card-meta">
-                                <span class="rating">⭐ {{ (work.vote_average or 0)|round(1) }}</span>
-                                <span class="lang">{{ work.flag }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-                {% endfor %}
+            <div class="known-for-grid" id="works-grid" data-person-id="{{ person.id }}">
+                {# Los proyectos aparecerán aquí en segundos para no retrasar la Bio #}
             </div>
 
-            {% if known_for|length > 8 %}
-            <div class="show-more-container">
-                <button id="show-more-btn" class="btn-more">Ver filmografía completa (+{{ known_for|length - 8 }})</button>
+            <div id="show-more-container" style="display: none;" class="show-more-container">
+                <button id="show-more-btn" class="btn-more">Ver filmografía completa</button>
             </div>
-            {% endif %}
         </section>
     </main>
 </div>

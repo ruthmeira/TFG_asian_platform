@@ -1555,58 +1555,42 @@ def person_detail(person_id):
     import re
     asian_re = re.compile(r'[\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\uac00-\ud7af]')
     
-    # --- LANZADERA 1: ESPAÑA, MÉXICO, EEUU Y CRÉDITOS ---
+    # --- LANZADERA 1: ESPAÑA, MÉXICO, EEUU Y TRADUCCIONES (UNIVERSAL) ---
     def fetch_data(url):
-        try:
-            return requests.get(url, timeout=5).json()
-        except:
-            return {}
+        try: return requests.get(url, timeout=5).json()
+        except: return {}
 
     initial_urls = {
         "es": f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=es-ES&append_to_response=external_ids",
         "mx": f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=es-MX",
         "en": f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=en-US",
-        "credits_es": f"https://api.themoviedb.org/3/person/{person_id}/combined_credits?api_key={api_key}&language=es-ES",
-        "credits_mx": f"https://api.themoviedb.org/3/person/{person_id}/combined_credits?api_key={api_key}&language=es-MX",
-        "credits_en": f"https://api.themoviedb.org/3/person/{person_id}/combined_credits?api_key={api_key}&language=en-US"
+        "trans": f"https://api.themoviedb.org/3/person/{person_id}/translations?api_key={api_key}"
     }
 
-    with ThreadPoolExecutor(max_workers=7) as executor:
+    with ThreadPoolExecutor(max_workers=4) as executor:
         future_to_url = {executor.submit(fetch_data, url): name for name, url in initial_urls.items()}
         results = {name: future.result() for future, name in future_to_url.items()}
 
     res = results["es"]
     res_mx = results["mx"]
     res_en = results["en"]
-    c_es = results["credits_es"]
-    c_mx = results["credits_mx"]
-    c_en = results["credits_en"]
+    res_trans = results["trans"]
+    if not res or 'id' not in res: return "Error", 404
 
-    # --- LANZADERA 2: FICHA NATIVA (Si detectamos origen asiático) ---
+    # --- LANZADERA 2: DETECCIÓN UNIVERSAL ASÍATICA (USANDO TU LISTA ASIA_LANGUAGES) ---
     res['artistic_name'] = "-"
-    place = (res.get('place_of_birth') or res_mx.get('place_of_birth') or res_en.get('place_of_birth') or "").lower()
     
-    native_lang_map = {
-        'china': 'zh-CN', 'taiwan': 'zh-TW', 'hong kong': 'zh-HK',
-        'japan': 'ja-JP', 'korea': 'ko-KR'
-    }
-    
-    target_lang = None
-    for region, lang_code in native_lang_map.items():
-        if region in place:
-            target_lang = lang_code
-            break
-            
-    if target_lang:
-        try:
-            # Petición flash a la ficha nativa
-            native_res = requests.get(f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language={target_lang}", timeout=3).json()
-            n_name = native_res.get('name')
+    # Buscamos en todas sus traducciones cuál coincide con tus lenguajes asiáticos configurados
+    translations = res_trans.get('translations', [])
+    for t in translations:
+        lang = t.get('iso_639_1')
+        if lang in ASIA_LANGUAGES:
+            n_name = t.get('data', {}).get('name')
             if n_name and asian_re.search(n_name):
                 res['artistic_name'] = n_name
-        except: pass
+                break
 
-    # Fallback AKA si no hay nombre nativo oficial
+    # Fallback AKA (seguridad extra)
     if res['artistic_name'] == "-":
         aka_list = res.get('also_known_as', [])
         for aka in aka_list:
@@ -1614,7 +1598,7 @@ def person_detail(person_id):
                 res['artistic_name'] = aka
                 break
 
-    # --- FUSIÓN INTELIGENTE DE BIOGRAFÍAS CON TRADUCCIÓN ---
+    # --- FUSIÓN INTELIGENTE DE BIOGRAFÍAS CON TRADUCCIÓN (MANTENIDA) ---
     bio = res.get('biography')
     if not bio or len(bio) < 10:
         bio = res_mx.get('biography')
@@ -1631,14 +1615,12 @@ def person_detail(person_id):
     if not res.get('place_of_birth'): 
         res['place_of_birth'] = res_mx.get('place_of_birth') or res_en.get('place_of_birth') or "-"
 
-    # Ajuste de Nombre (Evitar nombres asiáticos en el título principal si hay occidental)
     best_name = res.get('name') or res_mx.get('name') or res_en.get('name')
     if best_name and asian_re.search(best_name):
         if res_mx.get('name') and not asian_re.search(res_mx['name']): best_name = res_mx['name']
         elif res_en.get('name') and not asian_re.search(res_en['name']): best_name = res_en['name']
     res['name'] = best_name or "-"
 
-    # FECHAS Y EDAD
     birthday = res.get('birthday')
     today = datetime.today()
     if birthday:
@@ -1651,14 +1633,11 @@ def person_detail(person_id):
         except: res['birthday'] = birthday
     else: res['birthday'] = "-"
 
-    if deathday := res.get('deathday'):
-        try: res['deathday'] = datetime.strptime(deathday, "%Y-%m-%d").strftime("%d/%m/%Y")
+    if deathday_ext := res.get('deathday'):
+        try: res['deathday'] = datetime.strptime(deathday_ext, "%Y-%m-%d").strftime("%d/%m/%Y")
         except: pass
     
-    gender_map = {1: "Femenino", 2: "Masculino", 3: "No Binario"}
-    res['gender_name'] = gender_map.get(res.get('gender'), "-")
-
-    # REDES SOCIALES (Versión Extendida)
+    res['gender_name'] = {1: "Femenino", 2: "Masculino", 3: "No Binario"}.get(res.get('gender'), "-")
     ext_ids = res.get('external_ids', {})
     res['socials'] = {
         'instagram': f"https://instagram.com/{ext_ids['instagram_id']}" if ext_ids.get('instagram_id') else None,
@@ -1669,20 +1648,43 @@ def person_detail(person_id):
         'homepage': res.get('homepage')
     }
 
-    # AKA List (limpieza)
-    aka_list = res.get('also_known_as', [])
-    res['aka_list'] = [aka for aka in aka_list if aka != res['artistic_name']]
+    aka_list_final = res.get('also_known_as', [])
+    res['aka_list'] = [aka for aka in aka_list_final if aka != res['artistic_name']]
     if not res['aka_list']: res['aka_list'] = ["-"]
 
-    # --- CONOCIDO POR (FUSIÓN TRIPLE DE IDIOMAS) ---
-    all_credits = c_es.get('cast', []) + c_es.get('crew', [])
+    return render_template('person_detail.html', person=res, known_for=[])
+
+
+@app.route('/api/person/<int:person_id>/projects')
+def api_person_projects(person_id):
+    api_key = os.getenv("TMDB_API_KEY")
     
-    # Mapas de búsqueda rápida para títulos alternativos
+    def fetch_data(url):
+        try: return requests.get(url, timeout=5).json()
+        except: return {}
+
+    # AQUÍ MUDAMOS LA LANZADERA DE CRÉDITOS
+    urls = {
+        "es": f"https://api.themoviedb.org/3/person/{person_id}/combined_credits?api_key={api_key}&language=es-ES",
+        "mx": f"https://api.themoviedb.org/3/person/{person_id}/combined_credits?api_key={api_key}&language=es-MX",
+        "en": f"https://api.themoviedb.org/3/person/{person_id}/combined_credits?api_key={api_key}&language=en-US"
+    }
+
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        future_to_url = {executor.submit(fetch_data, url): name for name, url in urls.items()}
+        results = {name: future.result() for future, name in future_to_url.items()}
+
+    c_es = results["es"]
+    c_mx = results["mx"]
+    c_en = results["en"]
+
     mx_map = {f"{w.get('media_type')}_{w.get('id')}": (w.get('title') or w.get('name')) for w in (c_mx.get('cast', []) + c_mx.get('crew', []))}
     en_map = {f"{w.get('media_type')}_{w.get('id')}": (w.get('title') or w.get('name')) for w in (c_en.get('cast', []) + c_en.get('crew', []))}
 
+    all_credits = c_es.get('cast', []) + c_es.get('crew', [])
     seen_ids = set()
     known_for = []
+
     def relevance_key(x):
         genre_ids = x.get('genre_ids', [])
         is_ficcion = not any(gid in genre_ids for gid in GENRES_PROGRAMAS)
@@ -1698,30 +1700,18 @@ def person_detail(person_id):
         if idioma_orig not in ASIA_LANGUAGES: continue
         seen_ids.add(cid)
         
-        # LÓGICA DE TÍTULO JERÁRQUICA ESTRICTA (ES -> MX -> EN)
-        cid = work.get('id')
-        media_type = work.get('media_type', 'movie')
+        # TU LÓGICA DE TÍTULO JERÁRQUICA ESTRICTA
         key = f"{media_type}_{cid}"
-        idioma_orig = work.get('original_language', '').lower()
-        
-        title_es = (work.get('title') or work.get('name') or "").strip()
-        title_mx = (mx_map.get(key) or "").strip()
-        title_en = (en_map.get(key) or "").strip()
         orig_title = (work.get('original_title') or work.get('original_name') or "").strip()
+        title_es = (work.get('title') or work.get('name') or "").strip()
         
-        # El objetivo es encontrar un título que NO sea igual al original asiático
         best_t = title_es
-        
-        # Si el idioma NO es español, y el título que tenemos coincide con el original asiático, buscamos reemplazo
-        if idioma_orig != 'es':
-            if not title_es or title_es.lower() == orig_title.lower():
-                # ¿México tiene algo distinto?
-                if title_mx and title_mx.lower() != orig_title.lower():
-                    best_t = title_mx
-                # Si no queda otra, Inglaterra/Internacional (sea lo que sea) o lo que haya
-                else:
-                    best_t = title_en or title_es or orig_title
-        
+        if idioma_orig != 'es' and (not title_es or title_es.lower() == orig_title.lower()):
+            title_mx = (mx_map.get(key) or "").strip()
+            title_en = (en_map.get(key) or "").strip()
+            if title_mx and title_mx.lower() != orig_title.lower(): best_t = title_mx
+            else: best_t = title_en or title_es or orig_title
+
         work['display_title'] = best_t
         work['original_title_h6'] = orig_title
         work['media_type_fixed'] = media_type
@@ -1731,6 +1721,7 @@ def person_detail(person_id):
             item_genres = work.get('genre_ids', [])
             work['tipo_label'] = 'Programa' if any(g in item_genres for g in GENRES_PROGRAMAS) else 'Serie'
 
+        # TU LÓGICA DE BANDERAS
         paises_origin = [p.upper() for p in work.get('origin_country', [])]
         bandera_final = '🌏'
         if paises_origin:
@@ -1749,7 +1740,7 @@ def person_detail(person_id):
         known_for.append(work)
         if len(known_for) >= 60: break
     
-    return render_template('person_detail.html', person=res, known_for=known_for)
+    return render_template('person_items.html', known_for=known_for)
 
 
 if __name__ == '__main__':

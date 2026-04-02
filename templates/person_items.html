@@ -1,0 +1,17 @@
+{% for work in known_for %}
+<a href="{{ url_for('media_detail', media_type=work.media_type_fixed, media_id=work.id) }}"
+    class="card-link">
+    <div class="card">
+        <div class="badge">{{ work.tipo_label }}</div>
+        <img src="https://image.tmdb.org/t/p/w500{{ work.poster_path }}" alt="{{ work.display_title }}">
+        <div class="card-body">
+            <h4>{{ work.display_title }}</h4>
+            <h6>{{ work.original_title_h6 }}</h6>
+            <div class="card-meta">
+                <span class="rating">⭐ {{ (work.vote_average or 0)|round(1) }}</span>
+                <span class="lang">{{ work.flag }}</span>
+            </div>
+        </div>
+    </div>
+</a>
+{% endfor %}
