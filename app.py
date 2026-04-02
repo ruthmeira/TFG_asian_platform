@@ -1181,13 +1181,8 @@ def media_cast(media_type, media_id):
         with ThreadPoolExecutor(max_workers=3) as executor:
             futures = {name: executor.submit(fetch_json, url) for name, url in urls.items()}
             raw = {name: future.result() for name, future in futures.items()}
-        res = raw['es']
-        if not res.get('id'): res = raw['mx'] or raw['en']
-        
-        res['display_title'] = res.get('title') if media_type == 'movie' else res.get('name')
-        orig_title = res.get('original_title') if media_type == 'movie' else res.get('original_name')
-        if not res['display_title'] or res['display_title'] == orig_title:
-            res['display_title'] = raw['mx'].get('name') or raw['en'].get('name') or orig_title
+        # Títulos con Fallback centralizado
+        res['display_title'] = get_tiered_field(raw, 'title', media_type)
         res['raw_data'] = raw
 
     # DETERMINAR MEJOR FUENTE DE CRÉDITOS (Using TMDB Translation Info)
@@ -1427,7 +1422,7 @@ def api_explore():
                     yield json.dumps({
                         'total_results': total_results, 
                         'total_pages': total_pages
-                    }) + '\n'
+                    }, ensure_ascii=False) + '\n'
                     total_metadata_sent = True
 
                 items_processed_in_this_page = 0
@@ -1507,7 +1502,7 @@ def api_explore():
 
                 # Renderizar HTML para este item solo
                 html = render_template('explore_items.html', items=[item])
-                yield json.dumps({'item_html': html}) + '\n'
+                yield json.dumps({'item_html': html}, ensure_ascii=False) + '\n'
                 
                 final_items_count += 1
                 if final_items_count >= 20: 
@@ -1529,7 +1524,7 @@ def api_explore():
             'next_api_skip': last_api_skip,
             'total_found': final_items_count,
             'total_pages': total_pages
-        }) + '\n'
+        }, ensure_ascii=False) + '\n'
 
     return Response(stream_with_context(generate()), mimetype='application/x-ndjson')
 
@@ -1550,12 +1545,9 @@ def api_keywords_search():
 def person_detail(person_id):
     api_key = os.getenv("TMDB_API_KEY")
     
-    import re
-    asian_re = re.compile(r'[\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\uac00-\ud7af]')
-    
     # --- LANZADERA 1: ESPAÑA, MÉXICO, EEUU (OPTIMIZADA) ---
     initial_urls = {
-        "es": f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=es-ES&append_to_response=external_ids",
+        "es": f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=es-ES&append_to_response=external_ids,translations",
         "mx": f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=es-MX",
         "en": f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=en-US"
     }
@@ -1569,17 +1561,22 @@ def person_detail(person_id):
     res_en = results["en"]
     if not res or 'id' not in res: return "Error", 404
 
+    # --- LÓGICA DE TRADUCCIÓN OFICIAL (Jerarquía Pura) ---
+    trans_list = res.get('translations', {}).get('translations', [])
+    has_es_main = any(t.get('iso_639_1') == 'es' and t.get('iso_3166_1') == 'ES' for t in trans_list)
+    has_es_mx = any(t.get('iso_639_1') == 'es' and t.get('iso_3166_1') == 'MX' for t in trans_list)
+
+    if has_es_main:
+        name_to_use = res.get('name')
+    elif has_es_mx:
+        name_to_use = res_mx.get('name') or res.get('name')
+    else:
+        name_to_use = res_en.get('name') or res.get('name')
+
+    res['name'] = name_to_use or "-"
+
     # --- FUSIÓN INTELIGENTE DE BIOGRAFÍAS (Tiered) ---
     res['biography'] = get_tiered_field(results, 'biography', 'person') or "No tenemos una biografía disponible de momento."
-    
-    if not res.get('place_of_birth'): 
-        res['place_of_birth'] = res_mx.get('place_of_birth') or res_en.get('place_of_birth') or "-"
-
-    best_name = res.get('name') or res_mx.get('name') or res_en.get('name')
-    if best_name and asian_re.search(best_name):
-        if res_mx.get('name') and not asian_re.search(res_mx['name']): best_name = res_mx['name']
-        elif res_en.get('name') and not asian_re.search(res_en['name']): best_name = res_en['name']
-    res['name'] = best_name or "-"
 
     birthday = res.get('birthday')
     today = datetime.today()
