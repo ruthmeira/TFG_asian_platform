@@ -1566,17 +1566,21 @@ def person_detail(person_id):
         "es": f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=es-ES&append_to_response=external_ids",
         "mx": f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=es-MX",
         "en": f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=en-US",
-        "credits": f"https://api.themoviedb.org/3/person/{person_id}/combined_credits?api_key={api_key}&language=es-ES"
+        "credits_es": f"https://api.themoviedb.org/3/person/{person_id}/combined_credits?api_key={api_key}&language=es-ES",
+        "credits_mx": f"https://api.themoviedb.org/3/person/{person_id}/combined_credits?api_key={api_key}&language=es-MX",
+        "credits_en": f"https://api.themoviedb.org/3/person/{person_id}/combined_credits?api_key={api_key}&language=en-US"
     }
 
-    with ThreadPoolExecutor(max_workers=5) as executor:
+    with ThreadPoolExecutor(max_workers=7) as executor:
         future_to_url = {executor.submit(fetch_data, url): name for name, url in initial_urls.items()}
         results = {name: future.result() for future, name in future_to_url.items()}
 
     res = results["es"]
     res_mx = results["mx"]
     res_en = results["en"]
-    credits_data = results["credits"]
+    c_es = results["credits_es"]
+    c_mx = results["credits_mx"]
+    c_en = results["credits_en"]
 
     # --- LANZADERA 2: FICHA NATIVA (Si detectamos origen asiático) ---
     res['artistic_name'] = "-"
@@ -1670,8 +1674,13 @@ def person_detail(person_id):
     res['aka_list'] = [aka for aka in aka_list if aka != res['artistic_name']]
     if not res['aka_list']: res['aka_list'] = ["-"]
 
-    # --- CONOCIDO POR (MÁXIMA VELOCIDAD) ---
-    all_credits = credits_data.get('cast', []) + credits_data.get('crew', [])
+    # --- CONOCIDO POR (FUSIÓN TRIPLE DE IDIOMAS) ---
+    all_credits = c_es.get('cast', []) + c_es.get('crew', [])
+    
+    # Mapas de búsqueda rápida para títulos alternativos
+    mx_map = {f"{w.get('media_type')}_{w.get('id')}": (w.get('title') or w.get('name')) for w in (c_mx.get('cast', []) + c_mx.get('crew', []))}
+    en_map = {f"{w.get('media_type')}_{w.get('id')}": (w.get('title') or w.get('name')) for w in (c_en.get('cast', []) + c_en.get('crew', []))}
+
     seen_ids = set()
     known_for = []
     def relevance_key(x):
@@ -1689,8 +1698,32 @@ def person_detail(person_id):
         if idioma_orig not in ASIA_LANGUAGES: continue
         seen_ids.add(cid)
         
-        work['display_title'] = work.get('title') or work.get('name') or work.get('original_title') or work.get('original_name')
-        work['original_title_h6'] = work.get('original_title') or work.get('original_name')
+        # LÓGICA DE TÍTULO JERÁRQUICA ESTRICTA (ES -> MX -> EN)
+        cid = work.get('id')
+        media_type = work.get('media_type', 'movie')
+        key = f"{media_type}_{cid}"
+        idioma_orig = work.get('original_language', '').lower()
+        
+        title_es = (work.get('title') or work.get('name') or "").strip()
+        title_mx = (mx_map.get(key) or "").strip()
+        title_en = (en_map.get(key) or "").strip()
+        orig_title = (work.get('original_title') or work.get('original_name') or "").strip()
+        
+        # El objetivo es encontrar un título que NO sea igual al original asiático
+        best_t = title_es
+        
+        # Si el idioma NO es español, y el título que tenemos coincide con el original asiático, buscamos reemplazo
+        if idioma_orig != 'es':
+            if not title_es or title_es.lower() == orig_title.lower():
+                # ¿México tiene algo distinto?
+                if title_mx and title_mx.lower() != orig_title.lower():
+                    best_t = title_mx
+                # Si no queda otra, Inglaterra/Internacional (sea lo que sea) o lo que haya
+                else:
+                    best_t = title_en or title_es or orig_title
+        
+        work['display_title'] = best_t
+        work['original_title_h6'] = orig_title
         work['media_type_fixed'] = media_type
         if media_type == 'movie':
             work['tipo_label'] = 'Película'
