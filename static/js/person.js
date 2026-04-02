@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const worksGrid = document.getElementById('works-grid');
     const personId = worksGrid?.dataset.personId;
     const showMoreContainer = document.getElementById('show-more-container');
@@ -6,9 +6,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 1. CARGA DE PROYECTOS (Async)
     if (personId) {
+        const loader = document.getElementById('projects-loader');
         fetch(`/api/person/${personId}/projects`)
             .then(response => response.text())
             .then(html => {
+                // Quitar cargador de golpe
+                if (loader) loader.remove();
+
                 worksGrid.innerHTML = html;
                 const items = worksGrid.querySelectorAll('.card-link');
                 
@@ -25,11 +29,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     showMoreBtn.textContent = `Ver filmografía completa (+${items.length - 8})`;
                 }
             })
-            .catch(err => console.error("Error cargando proyectos:", err));
+            .catch(err => {
+                if (loader) loader.remove();
+                console.error("Error cargando proyectos:", err);
+            });
     }
 
     // 2. TU LÓGICA ORIGINAL DE MOSTRAR MÁS
-    showMoreBtn?.addEventListener('click', function() {
+    showMoreBtn?.addEventListener('click', function () {
         const hiddenItems = document.querySelectorAll('.hidden-work');
         hiddenItems.forEach((item, index) => {
             setTimeout(() => {
@@ -43,14 +50,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // 3. TU LÓGICA ORIGINAL DE BIOGRAFÍA
     const bioText = document.getElementById('bio-text');
     const toggleBtn = document.getElementById('bio-toggle');
-    
+
     if (!bioText || !toggleBtn) return;
-    
+
     if (bioText.scrollHeight > bioText.clientHeight + 20) {
         toggleBtn.style.display = 'flex';
     }
-    
-    toggleBtn.addEventListener('click', function() {
+
+    toggleBtn.addEventListener('click', function () {
         if (bioText.classList.contains('expanded')) {
             bioText.style.maxHeight = '150px';
             bioText.classList.remove('expanded');

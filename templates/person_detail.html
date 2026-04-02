@@ -3,7 +3,7 @@
 {% block title %}{{ person.name }} - SHIORI{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/person.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/person.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -19,31 +19,33 @@
             {% endif %}
         </div>
 
-        {% if person.socials and (person.socials.instagram or person.socials.twitter or person.socials.tiktok or person.socials.facebook or person.socials.youtube or person.socials.homepage) %}
+        {% if person.socials and (person.socials.instagram or person.socials.twitter or person.socials.tiktok or
+        person.socials.facebook or person.socials.youtube or person.socials.homepage) %}
         <div class="person-socials">
             {# Grupo 1: Redes #}
             <div class="social-group">
                 {% for platform, url in person.socials.items() %}
-                    {% if url and platform != 'homepage' %}
-                        <a href="{{ url }}" target="_blank" class="social-btn" title="{{ platform | capitalize }}">
-                            <i class="fab fa-{{ platform }}{% if platform == 'facebook' %}-f{% endif %}"></i>
-                        </a>
-                    {% endif %}
+                {% if url and platform != 'homepage' %}
+                <a href="{{ url }}" target="_blank" class="social-btn" title="{{ platform | capitalize }}">
+                    <i class="fab fa-{{ platform }}{% if platform == 'facebook' %}-f{% endif %}"></i>
+                </a>
+                {% endif %}
                 {% endfor %}
             </div>
 
             {# Divisor #}
-            {% if (person.socials.instagram or person.socials.twitter or person.socials.tiktok or person.socials.facebook or person.socials.youtube) and person.socials.homepage %}
-                <span class="link-divider">|</span>
+            {% if (person.socials.instagram or person.socials.twitter or person.socials.tiktok or
+            person.socials.facebook or person.socials.youtube) and person.socials.homepage %}
+            <span class="link-divider">|</span>
             {% endif %}
 
             {# Grupo 2: Homepage #}
             {% if person.socials.homepage %}
-                <div class="social-group">
-                    <a href="{{ person.socials.homepage }}" target="_blank" class="social-btn" title="Sitio Web Oficial">
-                        <i class="fas fa-globe"></i>
-                    </a>
-                </div>
+            <div class="social-group">
+                <a href="{{ person.socials.homepage }}" target="_blank" class="social-btn" title="Sitio Web Oficial">
+                    <i class="fas fa-globe"></i>
+                </a>
+            </div>
             {% endif %}
         </div>
         {% endif %}
@@ -99,6 +101,28 @@
 
         <section class="known-for-section">
             <h2>Proyectos</h2>
+
+            <div id="projects-loader" class="projects-loader">
+                <div class="matrix-container">
+                    <div class="matrix-column" style="animation-duration: 2.1s;">あいうえおかきくけこ</div>
+                    <div class="matrix-column" style="animation-duration: 4.5s;">你好龙爱美平和</div>
+                    <div class="matrix-column" style="animation-duration: 3.2s;">ㄱㄴㄷㄹㅁㅂㅅㅇ</div>
+                    <div class="matrix-column" style="animation-duration: 5.1s;">SHIORIシステム</div>
+                    <div class="matrix-column" style="animation-duration: 2.8s;">さしすせそたちつてと</div>
+                    <div class="matrix-column" style="animation-duration: 6.4s;">アイウエオカキクケコ</div>
+                    <div class="matrix-column" style="animation-duration: 3.8s;">0101SHIORI</div>
+                    <div class="matrix-column" style="animation-duration: 4.2s;">旭日東昇</div>
+                    <div class="matrix-column" style="animation-duration: 2.5s;">シオリ開発</div>
+                    <div class="matrix-column" style="animation-duration: 5.7s;">한국드라마</div>
+                    <div class="matrix-column" style="animation-duration: 3.5s;">映画アニメ</div>
+                    <div class="matrix-column" style="animation-duration: 4.8s;">こんにちは</div>
+                </div>
+                <div class="loading-content">
+                    <div class="shimmer-text">Cargando filmografía de {{ person.name }}</div>
+                    <div class="loading-dots-glow"><span>.</span><span>.</span><span>.</span></div>
+                </div>
+            </div>
+
             <div class="known-for-grid" id="works-grid" data-person-id="{{ person.id }}">
                 {# Los proyectos aparecerán aquí en segundos para no retrasar la Bio #}
             </div>
@@ -111,6 +135,6 @@
 </div>
 
 {% block extra_js %}
-    <script src="{{ url_for('static', filename='js/person.js') }}"></script>
+<script src="{{ url_for('static', filename='js/person.js') }}"></script>
 {% endblock %}
 {% endblock %}
