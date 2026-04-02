@@ -21,10 +21,10 @@
 /* ===================================================== */
 /* Blindaje maestro para evitar fallos de repintado en elementos críticos. 
    Usamos selectores específicos para no romper transformaciones especiales. */
-.navbar, 
-.modal-content, 
-.modal-overlay, 
-.season-card-full, 
+.navbar,
+.modal-content,
+.modal-overlay,
+.season-card-full,
 .credit-item-row,
 .platform-circle-detail,
 .info-card,
@@ -50,12 +50,16 @@
 @keyframes zoomInBounce {
     0% {
         opacity: 0;
-        transform: scale(0.9); /* Inicio suave desde 0.9 */
+        transform: scale(0.9);
+        /* Inicio suave desde 0.9 */
     }
+
     80% {
         opacity: 0.95;
-        transform: scale(1.01); /* Pequeño rebote */
+        transform: scale(1.01);
+        /* Pequeño rebote */
     }
+
     100% {
         opacity: 1;
         transform: scale(1);
@@ -92,9 +96,20 @@
 }
 
 @keyframes matrixDrop {
-    0% { transform: translateY(-100%); opacity: 0; }
-    10%, 90% { opacity: 1; }
-    100% { transform: translateY(100%); opacity: 0; }
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    10%,
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
 }
 
 @keyframes fadeIn {
@@ -102,6 +117,7 @@
         opacity: 0;
         transform: translateY(15px);
     }
+
     100% {
         opacity: 1;
         transform: translateY(0);
@@ -403,7 +419,8 @@ main {
     white-space: nowrap;
     display: flex;
     align-items: center;
-    gap: 8px; /* Espacio entre icono y texto */
+    gap: 8px;
+    /* Espacio entre icono y texto */
     transition: transform 0.2s ease;
 }
 
@@ -491,7 +508,8 @@ main {
 /* ===================================================== */
 /* ESTANDARIZACIÓN TOTAL DE TARJETAS (Global) */
 .card-link {
-    width: 175px; /* ANCHO ESTÁNDAR DESKTOP */
+    width: 175px;
+    /* ANCHO ESTÁNDAR DESKTOP */
     flex: 0 0 auto;
     display: block;
     text-decoration: none;
@@ -510,8 +528,10 @@ main {
 .card {
     position: relative;
     flex: 0 0 auto;
-    width: 100%; /* FLEXIBILIDAD TOTAL */
-    max-width: 175px; /* TOPE DE ANCHO */
+    width: 100%;
+    /* FLEXIBILIDAD TOTAL */
+    max-width: 175px;
+    /* TOPE DE ANCHO */
     background: var(--bg-card);
     border-radius: 12px;
     overflow: hidden;
@@ -694,7 +714,8 @@ main {
     overflow-x: auto;
     overflow-y: hidden;
     gap: 20px;
-    padding: 20px 0 15px 5px; /* Distancia original recuperada */
+    padding: 20px 0 15px 5px;
+    /* Distancia original recuperada */
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
 }
@@ -710,23 +731,66 @@ main {
 }
 
 /* Cascada de animación Global para Carruseles (Tiempos de Home) */
-.media-carousel .card-link:nth-child(1) { animation-delay: 0.05s; }
-.media-carousel .card-link:nth-child(2) { animation-delay: 0.1s; }
-.media-carousel .card-link:nth-child(3) { animation-delay: 0.15s; }
-.media-carousel .card-link:nth-child(4) { animation-delay: 0.2s; }
-.media-carousel .card-link:nth-child(5) { animation-delay: 0.25s; }
-.media-carousel .card-link:nth-child(n+6) { animation-delay: 0.3s; }
+.media-carousel .card-link:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.media-carousel .card-link:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.media-carousel .card-link:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+.media-carousel .card-link:nth-child(4) {
+    animation-delay: 0.2s;
+}
+
+.media-carousel .card-link:nth-child(5) {
+    animation-delay: 0.25s;
+}
+
+.media-carousel .card-link:nth-child(n+6) {
+    animation-delay: 0.3s;
+}
 
 /* Cascada de animación para Rejillas (View Collection) */
-.collection-grid-premium .card-link:nth-child(1) { animation-delay: 0.05s; }
-.collection-grid-premium .card-link:nth-child(2) { animation-delay: 0.1s; }
-.collection-grid-premium .card-link:nth-child(3) { animation-delay: 0.15s; }
-.collection-grid-premium .card-link:nth-child(4) { animation-delay: 0.2s; }
-.collection-grid-premium .card-link:nth-child(5) { animation-delay: 0.25s; }
-.collection-grid-premium .card-link:nth-child(6) { animation-delay: 0.3s; }
-.collection-grid-premium .card-link:nth-child(7) { animation-delay: 0.35s; }
-.collection-grid-premium .card-link:nth-child(8) { animation-delay: 0.4s; }
-.collection-grid-premium .card-link:nth-child(n+9) { animation-delay: 0.45s; }
+.collection-grid-premium .card-link:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.collection-grid-premium .card-link:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.collection-grid-premium .card-link:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+.collection-grid-premium .card-link:nth-child(4) {
+    animation-delay: 0.2s;
+}
+
+.collection-grid-premium .card-link:nth-child(5) {
+    animation-delay: 0.25s;
+}
+
+.collection-grid-premium .card-link:nth-child(6) {
+    animation-delay: 0.3s;
+}
+
+.collection-grid-premium .card-link:nth-child(7) {
+    animation-delay: 0.35s;
+}
+
+.collection-grid-premium .card-link:nth-child(8) {
+    animation-delay: 0.4s;
+}
+
+.collection-grid-premium .card-link:nth-child(n+9) {
+    animation-delay: 0.45s;
+}
 
 
 /* CERO EFECTOS PARA ACTUALIZACIONES AJAX (Instantáneo) */
@@ -1131,6 +1195,7 @@ main {
     color: var(--primary);
     transform: translateY(-50%) scale(1.1);
 }
+
 .scroll-to-top {
     position: fixed;
     bottom: 30px;
@@ -1180,4 +1245,4 @@ main {
     display: inline-block;
     line-height: 1;
     vertical-align: middle;
-}
+}

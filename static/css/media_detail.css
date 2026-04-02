@@ -667,11 +667,12 @@
         top: 0 !important;
         align-items: center;
         text-align: center;
+        gap: 15px; /* ESPACIO RESTAURADO PARA QUE RESPIRE */
     }
 
     .media-poster img {
         max-width: clamp(200px, 60vw, 250px);
-        margin-bottom: 10px;
+        margin-bottom: 0px; /* MARGEN ELIMINADO PARA PEGAR LAS REDES */
     }
 
     .media-info {

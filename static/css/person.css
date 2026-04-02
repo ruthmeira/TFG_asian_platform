@@ -197,6 +197,7 @@
     .person-socials {
         order: 2;
         justify-content: center;
+        margin-top: -8px; /* ESPACIO EQUILIBRADO RELAJADO */
     }
 
     .person-name {
