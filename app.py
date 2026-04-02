@@ -1594,22 +1594,29 @@ def person_detail(person_id):
                 res['artistic_name'] = aka
                 break
 
-    # --- FUSIÓN INTELIGENTE DE BIOGRAFÍAS ---
-    if not res.get('biography') or asian_re.search(res.get('name', '')):
-        if not res.get('biography'): res['biography'] = res_mx.get('biography')
-        if not res.get('place_of_birth'): res['place_of_birth'] = res_mx.get('place_of_birth')
-        if not res.get('biography') and res_en.get('biography'):
-            res['biography'] = res_en.get('biography')
+    # --- FUSIÓN INTELIGENTE DE BIOGRAFÍAS CON TRADUCCIÓN ---
+    bio = res.get('biography')
+    if not bio or len(bio) < 10:
+        bio = res_mx.get('biography')
+    
+    if (not bio or len(bio) < 10) and res_en.get('biography'):
+        en_bio = res_en.get('biography')
+        try:
+            bio = GoogleTranslator(source='auto', target='es').translate(en_bio)
+        except:
+            bio = en_bio
             
-        best_name = res.get('name') or res_mx.get('name') or res_en.get('name')
-        if best_name and asian_re.search(best_name):
-            if res_mx.get('name') and not asian_re.search(res_mx['name']): best_name = res_mx['name']
-            elif res_en.get('name') and not asian_re.search(res_en['name']): best_name = res_en['name']
-        res['name'] = best_name or "-"
+    res['biography'] = bio or "No tenemos una biografía disponible de momento."
+    
+    if not res.get('place_of_birth'): 
+        res['place_of_birth'] = res_mx.get('place_of_birth') or res_en.get('place_of_birth') or "-"
 
-    # Fallbacks de seguridad
-    if not res.get('biography'): res['biography'] = "No tenemos una biografía disponible de momento."
-    if not res.get('place_of_birth'): res['place_of_birth'] = "-"
+    # Ajuste de Nombre (Evitar nombres asiáticos en el título principal si hay occidental)
+    best_name = res.get('name') or res_mx.get('name') or res_en.get('name')
+    if best_name and asian_re.search(best_name):
+        if res_mx.get('name') and not asian_re.search(res_mx['name']): best_name = res_mx['name']
+        elif res_en.get('name') and not asian_re.search(res_en['name']): best_name = res_en['name']
+    res['name'] = best_name or "-"
 
     # FECHAS Y EDAD
     birthday = res.get('birthday')
