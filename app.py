@@ -54,6 +54,7 @@ LANG_TO_COUNTRY_MAP = {
     'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN',
     'id':'ID','tl':'PH','fil':'PH','ms':'MY','mn':'MN',
     'km':'KH','my':'MM','lo':'LA','ne':'NP',
+    'zh':'CN', 'cn':'CN', 'yue':'HK',
     'ta':'IN','te':'IN','ml':'IN','kn':'IN','bn':'IN',
     'mr':'IN','gu':'IN','pa':'IN','ur':'IN','or':'IN',
     'as':'IN','sd':'IN','ks':'IN',
