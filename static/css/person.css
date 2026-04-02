@@ -116,9 +116,6 @@
     font-weight: 700;
     margin-bottom: 20px; /* Un poco más de aire con las cards */
     margin-top: 0;
-}
-
-.known-for-section h2 {
     text-align: center;
 }
 
@@ -248,9 +245,8 @@
         width: 100%;
     }
 
-    /* CENTRADO TOTAL DE TÍTULOS Y BIO */
+    /* CENTRADO DE TÍTULOS NECESARIOS EN MÓVIL */
     .biography-section h2, 
-    .known-for-section h2,
     .person-info-sidebar h3 {
         text-align: center;
         width: 100%;
