@@ -8,117 +8,110 @@
 
 {% block content %}
 <div class="person-detail-container">
-    <div class="person-header">
-        <div class="person-poster-side">
-            <div class="person-photo">
-                {% if person.profile_path %}
-                    <img src="https://image.tmdb.org/t/p/h632{{ person.profile_path }}" alt="{{ person.name }}">
-                {% else %}
-                    <div class="no-photo-person">
-                        <i class="fas fa-user-circle"></i>
-                    </div>
-                {% endif %}
-            </div>
-
-            {% if person.socials %}
-            <div class="person-socials">
-                {% if person.socials.instagram %}
-                <a href="{{ person.socials.instagram }}" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
-                {% endif %}
-                {% if person.socials.twitter %}
-                <a href="{{ person.socials.twitter }}" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
-                {% endif %}
-                {% if person.socials.tiktok %}
-                <a href="{{ person.socials.tiktok }}" target="_blank" title="TikTok"><i class="fab fa-tiktok"></i></a>
-                {% endif %}
-                {% if person.socials.facebook %}
-                <a href="{{ person.socials.facebook }}" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                {% endif %}
+    <aside class="person-poster-side">
+        <div class="person-photo">
+            {% if person.profile_path %}
+            <img src="https://image.tmdb.org/t/p/h632{{ person.profile_path }}" alt="{{ person.name }}">
+            {% else %}
+            <div class="no-photo-person">
+                <i class="fas fa-user-circle"></i>
             </div>
             {% endif %}
-            
-            <div class="person-info-sidebar">
-                <h3>Información Personal</h3>
-                
-                <div class="info-item">
-                    <strong>Nombre Artístico:</strong>
-                    <span>{{ person.artistic_name }}</span>
-                </div>
+        </div>
 
-                <div class="info-item">
-                    <strong>Sexo:</strong>
-                    <span>{{ person.gender_name }}</span>
-                </div>
+        {% if person.socials and (person.socials.instagram or person.socials.twitter or person.socials.tiktok or person.socials.facebook) %}
+        <div class="person-socials">
+            {% for platform, url in person.socials.items() %}
+            {% if url %}
+            <a href="{{ url }}" target="_blank" class="social-btn" title="{{ platform | capitalize }}"><i
+                    class="fab fa-{{ platform }}{% if platform == 'facebook' %}-f{% endif %}"></i></a>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
 
-                <div class="info-item">
-                    <strong>Nacimiento:</strong>
-                    <span>{{ person.birthday }}</span>
-                </div>
+        <div class="person-info-sidebar">
+            <h3>Información Personal</h3>
 
-                {% if person.deathday %}
-                <div class="info-item">
-                    <strong>Fallecimiento:</strong>
-                    <span>{{ person.deathday }}</span>
-                </div>
-                {% endif %}
+            <div class="info-item">
+                <strong>Nombre Artístico:</strong>
+                <span>{{ person.artistic_name }}</span>
+            </div>
 
-                <div class="info-item">
-                    <strong>Lugar de nacimiento:</strong>
-                    <span>{{ person.place_of_birth }}</span>
-                </div>
+            <div class="info-item">
+                <strong>Sexo:</strong>
+                <span>{{ person.gender_name }}</span>
+            </div>
 
-                <div class="info-item">
-                    <strong>También conocido como:</strong>
+            <div class="info-item">
+                <strong>Nacimiento:</strong>
+                <span>{{ person.birthday }}</span>
+            </div>
+
+            {% if person.deathday %}
+            <div class="info-item">
+                <strong>Fallecimiento:</strong>
+                <span>{{ person.deathday }}</span>
+            </div>
+            {% endif %}
+
+            <div class="info-item">
+                <strong>Lugar de nacimiento:</strong>
+                <span>{{ person.place_of_birth }}</span>
+            </div>
+
+            <div class="info-item">
+                <strong>También conocido como:</strong>
+                <div class="aka-row">
                     {% for aka in person.aka_list %}
-                        <span class="aka-tag">{{ aka }}</span>
+                    <span class="aka-tag-box">{{ aka }}</span>
                     {% endfor %}
                 </div>
             </div>
         </div>
+    </aside>
 
-        <div class="person-content-side">
-            <h1 class="person-name">{{ person.name }}</h1>
-            
-            <div class="biography-section">
-                <h2>Biografía</h2>
-                <div class="bio-wrapper">
-                    <p class="bio-text" id="bio-text">{{ person.biography | safe }}</p>
-                </div>
-                <button id="bio-toggle" class="btn-read-more" style="display: none;">Leer más <i class="fas fa-chevron-down"></i></button>
+    <main class="person-content-side">
+        <h1 class="person-name">{{ person.name }}</h1>
+
+        <section class="biography-section">
+            <h2>Biografía</h2>
+            <div class="bio-wrapper">
+                <p class="bio-text" id="bio-text">{{ person.biography | safe }}</p>
             </div>
+            <button id="bio-toggle" class="btn-read-more" style="display: none;">Leer más <i
+                    class="fas fa-chevron-down"></i></button>
+        </section>
 
-            <div class="known-for-section">
-                <h2>Conocido por</h2>
-                <div class="known-for-grid" id="works-grid">
-                    {% for work in known_for %}
-                    <a href="{{ url_for('media_detail', media_type=work.media_type_fixed, media_id=work.id) }}" 
-                       class="card-link {% if loop.index > 8 %}hidden-work{% endif %}">
-                        <div class="card">
-                            <div class="badge">{{ work.tipo_label }}</div>
-                            <img src="https://image.tmdb.org/t/p/w500{{ work.poster_path }}" alt="{{ work.display_title }}">
-                            <div class="card-body">
-                                <h4>{{ work.display_title }}</h4>
-                                <h6>{{ work.original_title_h6 }}</h6>
-                                <div class="card-meta">
-                                    <span class="rating">⭐ {{ (work.vote_average or 0)|round(1) }}</span>
-                                    <span class="lang">{{ work.flag }}</span>
-                                </div>
+        <section class="known-for-section">
+            <h2>Conocido por</h2>
+            <div class="known-for-grid" id="works-grid">
+                {% for work in known_for %}
+                <a href="{{ url_for('media_detail', media_type=work.media_type_fixed, media_id=work.id) }}"
+                    class="card-link {% if loop.index > 8 %}hidden-work{% endif %}">
+                    <div class="card">
+                        <div class="badge">{{ work.tipo_label }}</div>
+                        <img src="https://image.tmdb.org/t/p/w500{{ work.poster_path }}" alt="{{ work.display_title }}">
+                        <div class="card-body">
+                            <h4>{{ work.display_title }}</h4>
+                            <h6>{{ work.original_title_h6 }}</h6>
+                            <div class="card-meta">
+                                <span class="rating">⭐ {{ (work.vote_average or 0)|round(1) }}</span>
+                                <span class="lang">{{ work.flag }}</span>
                             </div>
                         </div>
-                    </a>
-                    {% endfor %}
-                </div>
-                
-                {% if known_for|length > 8 %}
-                <div class="show-more-container">
-                    <button id="show-more-btn" class="btn-more">
-                        <i class="fas fa-plus"></i> Ver filmografía completa (+{{ known_for|length - 8 }})
-                    </button>
-                </div>
-                {% endif %}
+                    </div>
+                </a>
+                {% endfor %}
             </div>
-        </div>
-    </div>
+
+            {% if known_for|length > 8 %}
+            <div class="show-more-container">
+                <button id="show-more-btn" class="btn-more">Ver filmografía completa (+{{ known_for|length - 8 }})</button>
+            </div>
+            {% endif %}
+        </section>
+    </main>
 </div>
 
 {% block extra_js %}

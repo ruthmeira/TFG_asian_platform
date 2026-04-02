@@ -158,6 +158,55 @@ main {
     color: var(--text-muted);
 }
 
+/* ===================================================== */
+/* BOTONES DE REDES SOCIALES (Global) */
+/* ===================================================== */
+.social-btn {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 1.2rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.05);
+    width: clamp(34px, 4vw, 42px);
+    height: clamp(34px, 4vw, 42px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.social-btn:hover {
+    color: var(--primary);
+    background: rgba(255, 69, 0, 0.1);
+    border-color: rgba(255, 69, 0, 0.3);
+    transform: translateY(-3px);
+}
+
+/* ===================================================== */
+/* BOTONES DE ACCIÓN (Ver más / Filmografía) */
+/* ===================================================== */
+.btn-more {
+    background: rgba(255, 69, 0, 0.08);
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-more:hover {
+    background: var(--primary);
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(255, 69, 0, 0.2);
+}
+
 /* Modal Tráiler (Global) */
 .trailer-modal {
     position: fixed;

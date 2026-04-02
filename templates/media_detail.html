@@ -23,13 +23,13 @@
             {% if media.social_links.instagram or media.social_links.twitter or media.social_links.facebook %}
                 <div class="links-group">
                     {% if media.social_links.instagram %}
-                        <a href="{{ media.social_links.instagram }}" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="{{ media.social_links.instagram }}" target="_blank" class="social-btn" title="Instagram"><i class="fab fa-instagram"></i></a>
                     {% endif %}
                     {% if media.social_links.twitter %}
-                        <a href="{{ media.social_links.twitter }}" target="_blank" title="Twitter/X"><i class="fab fa-twitter"></i></a>
+                        <a href="{{ media.social_links.twitter }}" target="_blank" class="social-btn" title="Twitter/X"><i class="fab fa-twitter"></i></a>
                     {% endif %}
                     {% if media.social_links.facebook %}
-                        <a href="{{ media.social_links.facebook }}" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="{{ media.social_links.facebook }}" target="_blank" class="social-btn" title="Facebook"><i class="fab fa-facebook"></i></a>
                     {% endif %}
                 </div>
             {% endif %}
@@ -42,7 +42,7 @@
             {# Grupo 2: Sitio Oficial #}
             {% if media.social_links.homepage %}
                 <div class="links-group">
-                    <a href="{{ media.social_links.homepage }}" target="_blank" title="Sitio Web Oficial"><i class="fas fa-globe"></i></a>
+                    <a href="{{ media.social_links.homepage }}" target="_blank" class="social-btn" title="Sitio Web Oficial"><i class="fas fa-globe"></i></a>
                 </div>
             {% endif %}
         </div>

@@ -81,50 +81,22 @@
 
 /* Redes Sociales en Sidebar */
 .media-links-row {
-    display: flex !important;
-    flex-direction: row !important;
-    justify-content: center !important;
-    align-items: center !important;
-    gap: clamp(6px, 1.2vw, 12px) !important;
-    padding: 0 !important;
-    width: 100% !important;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 0; /* Espaciado controlado por el gap del padre */
 }
 
 .links-group {
-    display: flex !important;
-    flex-direction: row !important;
-    gap: 10px !important;
-    align-items: center !important;
-}
-
-.media-links-row a {
-    color: var(--text-muted) !important;
-    text-decoration: none !important;
-    font-size: 1.2rem !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    background: rgba(255, 255, 255, 0.05) !important;
-    width: clamp(34px, 4vw, 42px) !important;
-    height: clamp(34px, 4vw, 42px) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 10px !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-
-.media-links-row a:hover {
-    color: var(--primary) !important;
-    background: rgba(255, 69, 0, 0.1) !important;
-    border-color: rgba(255, 69, 0, 0.3) !important;
-    transform: translateY(-3px);
+    display: flex;
+    gap: 10px;
+    align-items: center;
 }
 
 .link-divider {
-    color: rgba(255, 255, 255, 0.15) !important;
-    font-size: clamp(1rem, 1.2vw, 1.2rem) !important;
-    font-weight: 300 !important;
-    margin: 0 5px !important;
-    user-select: none !important;
+    color: rgba(255, 255, 255, 0.15);
 }
 
 /* Tráiler */
