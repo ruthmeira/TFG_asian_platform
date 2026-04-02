@@ -84,7 +84,7 @@
         </section>
 
         <section class="known-for-section">
-            <h2>Conocido por</h2>
+            <h2>Proyectos</h2>
             <div class="known-for-grid" id="works-grid">
                 {% for work in known_for %}
                 <a href="{{ url_for('media_detail', media_type=work.media_type_fixed, media_id=work.id) }}"

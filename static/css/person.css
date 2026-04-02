@@ -103,11 +103,19 @@
     line-height: 1.2;
 }
 
-.biography-section h2,
-.known-for-section h2 {
+.biography-section h2 {
     font-size: 1.5rem;
     color: #fff;
     font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.known-for-section h2 {
+    font-size: 1.5rem;
+    color: var(--primary); /* Título en Naranja global */
+    font-weight: 700;
+    margin-bottom: 20px; /* Un poco más de aire con las cards */
+    margin-top: 0;
 }
 
 .known-for-section h2 {
@@ -154,4 +162,118 @@
 
 .hidden-work {
     display: none !important;
+}
+
+/* ===================================================== */
+/* RESPONSIVE DESIGN (Móvil hasta 600px) */
+/* ===================================================== */
+@media (max-width: 600px) {
+    .person-detail-container {
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    /* El truco de contents para reordenar piezas aisladas */
+    .person-poster-side, 
+    .person-content-side {
+        display: contents;
+    }
+
+    /* ORDEN MAESTRO POR PIEZAS */
+    .person-photo {
+        order: 1;
+        max-width: clamp(200px, 60vw, 250px); /* EXACTO COMO EN MEDIA_DETAIL */
+        margin: 0 auto;
+    }
+
+    .person-socials {
+        order: 2;
+        justify-content: center;
+    }
+
+    .person-name {
+        order: 3;
+        width: 100%;
+        text-align: center;
+        font-size: 2.2rem; /* EXACTO COMO EN MEDIA_DETAIL MOVIL */
+    }
+
+    .biography-section {
+        order: 4;
+        width: 100%;
+    }
+
+    /* INFO PERSONAL LADO A LADO CON AKA AL FINAL */
+    .person-info-sidebar {
+        order: 5;
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px 25px; /* Espacio horizontal generoso */
+        justify-content: center;
+    }
+
+    .info-item {
+        flex: 1 1 auto; /* Items base se reparten el espacio */
+        min-width: 120px;
+        align-items: center;
+        text-align: center;
+        margin-bottom: 0px;
+    }
+
+    /* Especial para AKA: Ocupa toda la fila al final */
+    .info-item:has(.aka-tag-box) {
+        flex: 1 1 100%;
+        order: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 10px;
+    }
+
+    .info-item:has(.aka-tag-box) strong {
+        margin-bottom: 15px;
+        width: 100%;
+    }
+
+    /* Los AKA fluyen horizontalmente (Tags) */
+    .aka-tag-box {
+        display: inline-block !important; /* Salen de la columna vertical */
+        margin: 4px !important;
+        width: auto !important;
+    }
+
+    .known-for-section {
+        order: 6;
+        width: 100%;
+    }
+
+    /* CENTRADO TOTAL DE TÍTULOS Y BIO */
+    .biography-section h2, 
+    .known-for-section h2,
+    .person-info-sidebar h3 {
+        text-align: center;
+        width: 100%;
+    }
+
+    .bio-text {
+        text-align: left;
+    }
+
+    .btn-read-more {
+        justify-content: flex-start;
+    }
+
+    /* Grid centrado con cards a 145px */
+    .known-for-grid {
+        grid-template-columns: repeat(auto-fill, 145px);
+        gap: 15px;
+        justify-content: center;
+    }
+
+    .known-for-grid .card-link {
+        width: 145px !important;
+        min-width: 145px !important;
+        max-width: 145px !important;
+    }
 }
