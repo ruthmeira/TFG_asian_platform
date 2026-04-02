@@ -953,6 +953,16 @@ main {
         max-width: 145px;
     }
 
+    /* OPTIMIZACIÓN SELECTIVA DE SCROLL (SIN ROMPER RENDERIZADO) */
+    .media-carousel, 
+    .cast-scroll-container, 
+    .known-for-grid, 
+    .collection-grid-premium {
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+        will-change: transform;
+    }
+
     .footer {
         padding: 30px 5%;
     }
