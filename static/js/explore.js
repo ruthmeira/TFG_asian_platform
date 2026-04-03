@@ -109,8 +109,16 @@ window.ExploreApp = (() => {
         setupFilterChips('chips-status', statusInput, 'status', toggleStatus, { multi: false });
         setupFilterChips('chips-country', countryInput, 'lang', toggleCountry, { multi: true });
         setupFilterChips('chips-sort', sortInput, 'sort_by', toggleSort, { multi: false });
-        setupFilterChips('genre-chips-include', genreInputInclude, 'genre', toggleInclude, { multi: true, defaultText: 'Todos' });
-        setupFilterChips('genre-chips-exclude', genreInputExclude, 'without_genre', toggleExclude, { multi: true, defaultText: 'Ninguno' });
+        setupFilterChips('genre-chips-include', genreInputInclude, 'genre', toggleInclude, { 
+            multi: true, 
+            defaultText: 'Todos',
+            allowEmpty: true 
+        });
+        setupFilterChips('genre-chips-exclude', genreInputExclude, 'without_genre', toggleExclude, { 
+            multi: true, 
+            defaultText: 'Ninguno',
+            allowEmpty: true 
+        });
 
         // Platforms logic
         if (toggleProviders) {
@@ -176,7 +184,7 @@ window.ExploreApp = (() => {
                         if (allBtn) allBtn.classList.remove('active');
                         this.classList.toggle('active');
                     }
-                    if (!container.querySelector('.genre-chip.active')) {
+                    if (!container.querySelector('.genre-chip.active') && !options.allowEmpty) {
                         const allBtn = Array.from(chips).find(c => c.dataset.id === "" || c.textContent.trim() === 'Todos');
                         if (allBtn) allBtn.classList.add('active');
                         else chips[0].classList.add('active');
@@ -227,7 +235,11 @@ window.ExploreApp = (() => {
                 chip.textContent = name;
                 container.appendChild(chip);
             });
-            setupFilterChips(container.id, input, filterKey, toggleBtn, { multi: true, defaultText: def });
+            setupFilterChips(container.id, input, filterKey, toggleBtn, { 
+                multi: true, 
+                defaultText: def,
+                allowEmpty: true 
+            });
         };
 
         repopulate(genreChipsInclude, document.getElementById('genre-input-include'), 'genre', document.getElementById('toggle-include'), 'Todos');
