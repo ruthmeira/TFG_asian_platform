@@ -116,12 +116,13 @@ def clean_overview(text):
             return None
     return text
 
-def get_media_flag(item, det_res=None):
+def get_media_flag(item, det_res=None, country_hint=None):
     """
     Lógica maestra de banderas:
     1. Si el idioma coincide con uno de los países de producción, manda ese (Corea+China hablando coreano = Corea).
     2. Si el idioma no coincide con ninguno, manda el primer país del registro (Singapur hablando chino = Singapur).
-    3. Fallback final por mapeo de idioma.
+    3. Fallback inteligente con Hint (Taiwán/HK) si no hay países.
+    4. Fallback final por mapeo de idioma.
     """
     paises_origin = [p.upper() for p in item.get('origin_country', [])]
     paises_prod = []
@@ -158,7 +159,12 @@ def get_media_flag(item, det_res=None):
         for p in paises_ordenados:
             if p in ASIA_FLAGS_MAP: return ASIA_FLAGS_MAP[p]
 
-    # REGLA 3: FALLBACK POR IDIOMA (Si no hay países en registro)
+    # REGLA 3: FALLBACK POR HINT (Sensibilidad Regional Fallback)
+    # Si no hay países en registro pero el artista es de Taiwán/HK/MO, lo usamos.
+    if lang in ['zh', 'cn', 'yue'] and country_hint in ['TW', 'HK', 'MO']:
+        return ASIA_FLAGS_MAP.get(country_hint, '🌏')
+
+    # REGLA 4: FALLBACK POR IDIOMA (Si no hay países ni hint)
     if c_sug and c_sug in ASIA_FLAGS_MAP:
         return ASIA_FLAGS_MAP[c_sug]
         
@@ -1599,6 +1605,14 @@ def person_detail(person_id):
     res['aka_list'] = res.get('also_known_as', [])
     if not res['aka_list']: res['aka_list'] = ["-"]
 
+    # Deteción de origen (Hint para banderas de proyectos)
+    place = res.get('place_of_birth', '').lower() if res.get('place_of_birth') else ""
+    country_hint = ""
+    if 'taiwan' in place: country_hint = 'TW'
+    elif 'hong kong' in place: country_hint = 'HK'
+    elif 'macao' in place or 'macau' in place: country_hint = 'MO'
+    res['country_hint'] = country_hint
+
     return render_template('person_detail.html', person=res, known_for=[])
 
 
@@ -1635,6 +1649,7 @@ def api_person_projects(person_id):
 
     sorted_works = sorted(all_credits, key=relevance_key, reverse=True)
 
+    hint = request.args.get('h')
     for work in sorted_works:
         cid = work.get('id')
         media_type = work.get('media_type', 'movie')
@@ -1657,8 +1672,8 @@ def api_person_projects(person_id):
             item_genres = work.get('genre_ids', [])
             work['tipo_label'] = 'Programa' if any(g in item_genres for g in GENRES_PROGRAMAS) else 'Serie'
 
-        # BANDERAS UNIFICADAS
-        work['flag'] = get_media_flag(work, work)
+        # BANDERAS UNIFICADAS CON HINT SI NO HAY PAÍS
+        work['flag'] = get_media_flag(work, work, country_hint=hint)
         known_for.append(work)
         if len(known_for) >= 60: break
     

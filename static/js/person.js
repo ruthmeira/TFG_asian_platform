@@ -7,7 +7,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // 1. CARGA DE PROYECTOS (Async)
     if (personId) {
         const loader = document.getElementById('projects-loader');
-        fetch(`/api/person/${personId}/projects`)
+        const hint = worksGrid.dataset.countryHint || '';
+        fetch(`/api/person/${personId}/projects?h=${hint}`)
             .then(response => response.text())
             .then(html => {
                 // Quitar cargador de golpe
