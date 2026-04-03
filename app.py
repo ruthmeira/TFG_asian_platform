@@ -142,7 +142,14 @@ def get_media_flag(item, det_res=None):
     lang = item.get('original_language', '').lower()
     c_sug = LANG_TO_COUNTRY_MAP.get(lang)
 
-    # REGLA 1: COINCIDENCIA IDIOMA-PAÍS (Prioridad Máxima)
+    # REGLA 0: SENSIBILIDAD REGIONAL (Taiwán / Hong Kong / Macao)
+    # Si el idioma es Chino, pero existe Taiwán o HK en el registro, ellos mandan.
+    if lang in ['zh', 'cn', 'yue']:
+        for p in ['TW', 'HK', 'MO']:
+            if p in paises_ordenados:
+                return ASIA_FLAGS_MAP.get(p, '🌏')
+
+    # REGLA 1: COINCIDENCIA IDIOMA-PAÍS (Prioridad Máxima Estándar)
     if c_sug and c_sug in paises_ordenados:
         return ASIA_FLAGS_MAP.get(c_sug, '🌏')
 
