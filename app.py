@@ -719,11 +719,6 @@ scheduler.add_job(
     misfire_grace_time=300
 )
 
-# En modo debug de Flask, el scheduler arrancaría dos veces. 
-# WERKZEUG_RUN_MAIN asegura que solo se inicie en el proceso principal.
-if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
-    scheduler.start()
-    print("🚀 Scheduler iniciado: 'day' cada 20 min, 'week' cada 24 h")
 
 # Forzar una carga inicial de TODO (en paralelo) para que las primeras personas no tengan que esperar
 with app.app_context():
@@ -1431,52 +1426,38 @@ def api_explore():
         while final_items_count < 20 and current_api_page < max_pages_to_scan:
             url = f"https://api.themoviedb.org/3/discover/{target_type}?api_key={api_key}&language=es-ES&page={current_api_page}&sort_by={sort_by}"
             if 'vote_average' in sort_by: url += "&vote_count.gte=100"
-            
             if target_type == 'tv':
                 url += f"&first_air_date.lte={today}"
                 if status_id: url += f"&with_status={status_id}"
             else:
                 url += f"&primary_release_date.lte={today}"
 
-            if country_code: url += f"&with_origin_country={country_code}"
-            else: url += f"&with_origin_country={'|'.join(ASIA_COUNTRIES)}"
+            # --- FILTRADO DE ADN (Búsqueda inicial) ---
+            if country_code: 
+                # Si hay país, permitimos búsqueda por idiomas asiáticos + Inglés (para catch global como Pachinko)
+                url += f"&with_origin_country={country_code}"
+                url += f"&with_original_language={'|'.join(ASIA_LANGUAGES + ['en'])}"
+            else:
+                url += f"&with_origin_country={'|'.join(ASIA_COUNTRIES)}"
+                url += f"&with_original_language={'|'.join(ASIA_LANGUAGES)}"
 
-            # --- FILTRADO DE ORIGEN: Solo idiomas asiáticos (Corrige el contador) ---
-            url += f"&with_original_language={'|'.join(ASIA_LANGUAGES)}"
-
-            # --- VALIDACIÓN DE AÑO (Seguridad para disparidad en contador) ---
             if year and str(year).strip():
                 y_val = str(year).strip()
-                if len(y_val) != 4:
-                    yield json.dumps({'total_results': 0}) + '\n'
-                    yield json.dumps({'done': True}) + '\n'
-                    return
-
-            if year:
-                year_param = 'first_air_date_year' if target_type == 'tv' else 'primary_release_year'
-                url += f"&{year_param}={year}"
+                url += f"&{target_type == 'movie' and 'primary_release_year' or 'first_air_date_year'}={y_val}"
 
             if watch_providers:
                 url += f"&with_watch_providers={watch_providers}&watch_region={watch_region}&with_watch_monetization_types=flatrate|free"
 
             if keywords:
-                # El formato ahora es ID_Nombre|ID_Nombre... para persistencia
                 keyword_ids = [k.split('_')[0] for k in keywords.split('|') if k]
-                if keyword_ids:
-                    url += f"&with_keywords={'|'.join(keyword_ids)}"
+                if keyword_ids: url += f"&with_keywords={'|'.join(keyword_ids)}"
 
-            # --- GESTIÓN UNIFICADA DE GÉNEROS (Para que el contador sea exacto) ---
+            # Gestión de Géneros
             with_ids = []
             without_ids = []
-
-            # 1. Programas vs Series (Lógica fija)
             if target_type == 'tv':
-                if media_type == 'show': 
-                    with_ids.append(genres_programas_or) # Usamos OR '|' para incluir alguno
-                elif media_type == 'tv': 
-                    without_ids.append(genres_programas_and) # Usamos AND ',' para excluir cualquier
-
-            # 2. Géneros a INCLUIR (Si el usuario los elige)
+                if media_type == 'show': with_ids.append("|".join(map(str, GENRES_PROGRAMAS)))
+                elif media_type == 'tv': without_ids.append(",".join(map(str, GENRES_PROGRAMAS)))
             if genre_id:
                 genre_list = genre_id.split('|')
                 processed_genres = []
@@ -1487,9 +1468,7 @@ def api_explore():
                         elif gid == '10749': actual_gid = '10766|10749|18'
                         elif gid in ['14', '878']: actual_gid = '10765'
                     processed_genres.append(actual_gid)
-                with_ids.append('|'.join(processed_genres)) # Siempre OR para incluir varios
-
-            # 3. Géneros a EXCLUIR (Si el usuario los elige)
+                with_ids.append('|'.join(processed_genres))
             if without_genre_id:
                 without_genre_list = without_genre_id.split('|')
                 processed_without = []
@@ -1500,135 +1479,82 @@ def api_explore():
                         elif gid == '10749': actual_gid = '10766|10749|18'
                         elif gid in ['14', '878']: actual_gid = '10765'
                     processed_without.append(actual_gid)
-                without_ids.append(','.join(processed_without)) # Siempre AND ',' para excluir cualquier
-
-            # --- CONSTRUCCIÓN FINAL DE PARÁMETROS (Sin duplicados) ---
-            if with_ids: 
-                # Unimos con comas o barras según convenga, pero aquí buscamos añadir filtros
-                url += f"&with_genres={','.join(with_ids)}"
-            if without_ids:
-                url += f"&without_genres={','.join(without_ids)}"
+                without_ids.append(','.join(processed_without))
+            if with_ids: url += f"&with_genres={','.join(with_ids)}"
+            if without_ids: url += f"&without_genres={','.join(without_ids)}"
 
             try:
                 res = fetch_json(url)
                 results = res.get('results', [])
                 total_pages = res.get('total_pages', 1)
                 total_results = res.get('total_results', 0)
-                
-                # Reportar metadata inicial (Solo en el primer yield de este bloque)
                 if not total_metadata_sent:
-                    yield json.dumps({
-                        'total_results': total_results, 
-                        'total_pages': total_pages
-                    }, ensure_ascii=False) + '\n'
+                    yield json.dumps({'total_results': total_results, 'total_pages': total_pages}) + '\n'
                     total_metadata_sent = True
+                
+                # PARALELIZACIÓN DE PÁGINA (Máxima velocidad SHIORI)
+                def fetch_full_info(item):
+                    i_id = item.get('id')
+                    url_en = f"https://api.themoviedb.org/3/{target_type}/{i_id}?api_key={api_key}&language=en-US"
+                    url_mx = f"https://api.themoviedb.org/3/{target_type}/{i_id}?api_key={api_key}&language=es-MX"
+                    return {'en': fetch_json(url_en), 'mx': fetch_json(url_mx)}
+
+                with ThreadPoolExecutor(max_workers=20) as executor:
+                    full_info_list = list(executor.map(fetch_full_info, results))
 
                 items_processed_in_this_page = 0
-            except: 
-                break
-                
-            if not results: 
-                break 
+            except: break
+            if not results: break 
 
-            for item in results:
-                mx_res = None
-                det_res = None
+            for item, info in zip(results, full_info_list):
                 item_id = item.get('id')
+                det_res = info.get('en', {})
+                mx_res = info.get('mx', {})
 
-                # --- FILTRO ANTI-DUPLICADOS (Garantiza que cada tarjeta sea única) ---
                 if item_id in seen_ids:
                     items_processed_in_this_page += 1
                     continue
                 seen_ids.add(item_id)
-
                 items_processed_in_this_page += 1
                 
-                # 1. Lógica de salto (PRECISIÓN: No repetir ni saltar series)
                 if current_api_page == api_start_page and to_skip > 0:
                     to_skip -= 1
                     continue
 
-                # --- SISTEMA DE FILTRADO MANUAL (Garantiza Pureza Total) ---
                 genre_ids = item.get('genre_ids', [])
                 es_programa = any(gid in GENRES_PROGRAMAS for gid in genre_ids)
+                if media_type == 'tv' and es_programa: continue 
+                if media_type == 'show' and not es_programa: continue 
 
-                if media_type == 'tv' and es_programa: continue # Fuera intrusos en Series
-                if media_type == 'show' and not es_programa: continue # Fuera intrusos en Programas
-
-                idioma_orig = item.get('original_language', '').lower()
-                if idioma_orig not in ASIA_LANGUAGES: continue
-
-                # --- FILTRO MANUAL DE AÑO (Seguridad extra) ---
-                if year and str(year).strip():
-                    y_str = str(year).strip()
-                    # Buscamos la fecha según el tipo (first_air_date para series, release_date para pelis)
-                    item_date = item.get('first_air_date') if target_type == 'tv' else item.get('release_date')
-                    if not item_date or item_date[:4] != y_str:
-                        continue
-
-                item_id = item.get('id')
-                item['media_type_fixed'] = target_type
-                
-                # Detectar tipo_label correctamente (Igual que en Home)
-                if target_type == 'movie':
-                    item['tipo_label'] = 'Película'
-                else:
-                    if es_programa:
-                         item['tipo_label'] = 'Programa'
-                    else:
-                         item['tipo_label'] = 'Serie'
-                
-                # Fetch det_res and mx_res in parallel for tiered fallback
-                urls = {
-                    'mx': f"https://api.themoviedb.org/3/{target_type}/{item_id}?api_key={api_key}&language=es-MX",
-                    'en': f"https://api.themoviedb.org/3/{target_type}/{item_id}?api_key={api_key}&language=en-US"
-                }
-                with ThreadPoolExecutor(max_workers=2) as executor:
-                    futures = {name: executor.submit(fetch_json, url) for name, url in urls.items()}
-                    res_extra = {name: future.result() for name, future in futures.items()}
-                
-                det_res = res_extra['en']
-                mx_res = res_extra['mx']
-
-                # --- METADATA UNIFICADA ---
+                # REGLAS DE ORO: Validación final de la bandera
                 item['flag'] = get_media_flag(item, det_res)
-                
-                # --- FILTRADO MANUAL DE PUREZA (Solo si se eligió un país específico) ---
                 if country_code:
                     requested_flag = ASIA_FLAGS_MAP.get(country_code.upper())
-                    if requested_flag and item.get('flag') != requested_flag:
-                        continue # Si la bandera final no coincide con el país pedido, fuera de la lista
-                
-                # TÍTULOS CON FALLBACK ROBUSTO (Sin sinopsis para ganar velocidad en Explorar)
+                    if requested_flag and item['flag'] != requested_flag:
+                        continue 
+
+                item['media_type_fixed'] = target_type
+                item['tipo_label'] = 'Película' if target_type == 'movie' else ('Programa' if es_programa else 'Serie')
                 raw_bundle = {'es': item, 'mx': mx_res, 'en': det_res}
                 item['display_title'] = get_tiered_field(raw_bundle, 'title', target_type)
-                
                 item['original_title_h6'] = item.get('original_title') if target_type == 'movie' else item.get('original_name')
 
-                # Renderizar HTML para este item solo
                 html = render_template('explore_items.html', items=[item])
-                yield json.dumps({'item_html': html}, ensure_ascii=False) + '\n'
+                yield json.dumps({'item_html': html}) + '\n'
                 
                 final_items_count += 1
                 if final_items_count >= 20: 
-                    # GUARDAMOS EL PUNTO EXACTO DE SALIDA (Para no repetir ni saltar)
                     last_api_page = current_api_page
                     last_api_skip = items_processed_in_this_page
                     break
             
-            if final_items_count >= 20: 
-                break 
-
+            if final_items_count >= 20: break 
             current_api_page += 1
-            to_skip = 0 # En las siguientes páginas de este bloque arrancamos de cero
+            to_skip = 0 
 
-        # Al terminar enviamos el estado para que la siguiente UI Page sepa donde seguir
         yield json.dumps({
-            'done': True, 
-            'next_api_page': last_api_page,
-            'next_api_skip': last_api_skip,
-            'total_found': final_items_count,
-            'total_pages': total_pages
+            'done': True, 'next_api_page': last_api_page, 'next_api_skip': last_api_skip,
+            'total_found': final_items_count, 'total_pages': total_pages
         }, ensure_ascii=False) + '\n'
 
     return Response(stream_with_context(generate()), mimetype='application/x-ndjson')
