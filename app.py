@@ -234,30 +234,37 @@ def get_media_flag(item, det_res=None, country_hint=None):
     lang = item.get('original_language', '').lower()
     c_sug = LANG_TO_COUNTRY_MAP.get(lang)
 
-    # REGLA 0: SENSIBILIDAD REGIONAL (Taiwán / Hong Kong / Macao)
-    # Si el idioma es Chino, pero existe Taiwán o HK en el registro, ellos mandan.
+    # REGLA 1: COINCIDENCIA IDIOMA-PAÍS (Prioridad Inteligente y Respeto al Orden)
+    # Refinamiento para co-producciones Chinas/HK/TW (Tal como pidió el usuario)
     if lang in ['zh', 'cn', 'yue']:
-        for p in ['TW', 'HK', 'MO']:
-            if p in paises_ordenados:
-                return ASIA_FLAGS_MAP.get(p, '🌏')
+        # Si el PRIMER país ya es de habla china, manda el orden oficial
+        if paises_ordenados and paises_ordenados[0] in ['CN', 'HK', 'TW', 'MO']:
+            return ASIA_FLAGS_MAP[paises_ordenados[0]]
+            
+        # Si el primero no lo es, buscamos el "match" más lógico segun dialecto
+        if lang == 'yue' and 'HK' in paises_ordenados: return ASIA_FLAGS_MAP['HK']
+        if lang in ['zh', 'cn'] and 'CN' in paises_ordenados: return ASIA_FLAGS_MAP['CN']
+        
+        # Por si acaso, si hay algun territorio chino en la lista aunque no sea el primero
+        for p in ['CN', 'HK', 'TW', 'MO']:
+            if p in paises_ordenados: return ASIA_FLAGS_MAP[p]
 
-    # REGLA 1: COINCIDENCIA IDIOMA-PAÍS (Prioridad Máxima Estándar)
+    # Caso estándar (Corea -> KR, Japón -> JP, etc.)
     if c_sug and c_sug in paises_ordenados:
         return ASIA_FLAGS_MAP.get(c_sug, '🌏')
 
-    # REGLA 2: NO COINCIDE -> EL PRIMER PAÍS ASIÁTICO REGISTRADO
+    # REGLA 2: NO COINCIDE IDIOMA-PAÍS -> EL PRIMER PAÍS ASIÁTICO REGISTRADO
     if paises_ordenados:
         for p in paises_ordenados:
             if p in ASIA_FLAGS_MAP: return ASIA_FLAGS_MAP[p]
 
-    # REGLA 3: FALLBACK POR HINT (Sensibilidad Regional Fallback)
-    # Si no hay países en registro pero el artista es de Taiwán/HK/MO, lo usamos.
-    if lang in ['zh', 'cn', 'yue'] and country_hint in ['TW', 'HK', 'MO']:
-        return ASIA_FLAGS_MAP.get(country_hint, '🌏')
-
-    # REGLA 4: FALLBACK POR IDIOMA (Si no hay países ni hint)
+    # REGLA 3: FALLBACK POR IDIOMA (Para consistencia en Home, Explorar y Personas)
     if c_sug and c_sug in ASIA_FLAGS_MAP:
         return ASIA_FLAGS_MAP[c_sug]
+
+    # REGLA 4: FALLBACK POR ARTISTA (Lugar de nacimiento como último recurso absoluto)
+    if country_hint in ASIA_FLAGS_MAP:
+        return ASIA_FLAGS_MAP[country_hint]
         
     return '🌏'
 
@@ -1711,7 +1718,7 @@ def person_detail(person_id):
 def api_person_projects(person_id):
     api_key = os.getenv("TMDB_API_KEY")
 
-    # AQUÍ MUDAMOS LA LANZADERA DE CRÉDITOS
+    # 1. LANZADERA DE CRÉDITOS (Jerarquía ES/MX/EN)
     urls = {
         "es": f"https://api.themoviedb.org/3/person/{person_id}/combined_credits?api_key={api_key}&language=es-ES",
         "mx": f"https://api.themoviedb.org/3/person/{person_id}/combined_credits?api_key={api_key}&language=es-MX",
@@ -1722,51 +1729,66 @@ def api_person_projects(person_id):
         futures = {name: executor.submit(fetch_json, url) for name, url in urls.items()}
         results = {name: future.result() for name, future in futures.items()}
 
-    c_es = results["es"]
-    c_mx = results["mx"]
-    c_en = results["en"]
+    c_es, c_mx, c_en = results["es"], results["mx"], results["en"]
+    mx_map = {f"{w.get('media_type', 'movie')}_{w.get('id')}": w for w in (c_mx.get('cast', []) + c_mx.get('crew', []))}
+    en_map = {f"{w.get('media_type', 'movie')}_{w.get('id')}": w for w in (c_en.get('cast', []) + c_en.get('crew', []))}
 
-    mx_map = {f"{w.get('media_type')}_{w.get('id')}": w for w in (c_mx.get('cast', []) + c_mx.get('crew', []))}
-    en_map = {f"{w.get('media_type')}_{w.get('id')}": w for w in (c_en.get('cast', []) + c_en.get('crew', []))}
-
+    # 2. FILTRADO Y ORDENACIÓN INICIAL (Top 60 Relevantes)
     all_credits = c_es.get('cast', []) + c_es.get('crew', [])
-    seen_ids = set()
-    known_for = []
-
     def relevance_key(x):
         genre_ids = x.get('genre_ids', [])
         is_ficcion = not any(gid in genre_ids for gid in GENRES_PROGRAMAS)
         return (is_ficcion, x.get('vote_count', 0), x.get('popularity', 0))
 
     sorted_works = sorted(all_credits, key=relevance_key, reverse=True)
+    
+    top_works = []
+    seen_ids = set()
+    for w in sorted_works:
+        cid = w.get('id')
+        m_type = w.get('media_type', 'movie')
+        if cid in seen_ids: continue
+        if w.get('original_language', '').lower() not in ASIA_LANGUAGES: continue
+        seen_ids.add(cid)
+        top_works.append(w)
+        if len(top_works) >= 60: break
 
+    # 3. LANZADERA DE PRECISIÓN (Fetching details for each movie/tv show in parallel)
+    def fetch_full_detail(w):
+        m_id = w.get('id')
+        m_type = w.get('media_type', 'movie')
+        url = f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=en-US"
+        return fetch_json(url)
+
+    with ThreadPoolExecutor(max_workers=20) as executor:
+        full_details_results = list(executor.map(fetch_full_detail, top_works))
+
+    # 4. PROCESADO FINAL CON METADATA COMPLETA
+    known_for = []
     hint = request.args.get('h')
-    for work in sorted_works:
+    for work, det_res in zip(top_works, full_details_results):
         cid = work.get('id')
         media_type = work.get('media_type', 'movie')
-        if cid in seen_ids: continue
-        idioma_orig = work.get('original_language', '').lower()
-        if idioma_orig not in ASIA_LANGUAGES: continue
-        seen_ids.add(cid)
         
         c_mx_item = mx_map.get(f"{media_type}_{cid}", {})
         c_en_item = en_map.get(f"{media_type}_{cid}", {})
         orig_title = (work.get('original_title') or work.get('original_name') or "").strip()
 
-        # TÍTULOS CON FALLBACK MÁS LIMPIO
+        # Metadatos del trabajo
         work['display_title'] = get_tiered_field({'es': work, 'mx': c_mx_item, 'en': c_en_item}, 'title', media_type)
         work['original_title_h6'] = orig_title
         work['media_type_fixed'] = media_type
+        
+        # Etiquetado Serie/Peli/Programa
         if media_type == 'movie':
             work['tipo_label'] = 'Película'
         else:
             item_genres = work.get('genre_ids', [])
             work['tipo_label'] = 'Programa' if any(g in item_genres for g in GENRES_PROGRAMAS) else 'Serie'
 
-        # BANDERAS UNIFICADAS CON HINT SI NO HAY PAÍS
-        work['flag'] = get_media_flag(work, work, country_hint=hint)
+        # BANDERA DE MÁXIMA PRECISIÓN (Usamos det_res para tener production_countries)
+        work['flag'] = get_media_flag(work, det_res, country_hint=hint)
         known_for.append(work)
-        if len(known_for) >= 60: break
     
     return render_template('person_items.html', known_for=known_for)
 
