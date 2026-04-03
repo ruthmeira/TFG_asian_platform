@@ -93,7 +93,12 @@
         <section class="biography-section">
             <h2>Biografía</h2>
             <div class="bio-wrapper">
-                <p class="bio-text" id="bio-text">{{ person.biography | safe }}</p>
+                <p class="bio-text" id="bio-text">
+                    {% if 'No tenemos una biografía' in person.biography %}
+                    <i class="fas fa-info-circle bio-info-icon"></i>
+                    {% endif %}
+                    {{ person.biography | safe }}
+                </p>
             </div>
             <button id="bio-toggle" class="btn-read-more" style="display: none;">Leer más <i
                     class="fas fa-chevron-down"></i></button>
