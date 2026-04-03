@@ -15,45 +15,7 @@
     /* Pegado al carrusel */
 }
 
-.home-header {
-    margin-bottom: 20px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--glass-border);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    /* Todo a la izquierda en escritorio */
-    text-align: left;
-    gap: 15px;
-}
-
-.main-title {
-    font-size: 2.8rem;
-    font-weight: 800;
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: -1.5px;
-    margin: 0;
-}
-
-.header-secondary {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 30px;
-    width: 100%;
-}
-
-.subtitle {
-    color: var(--text-muted);
-    font-size: 14.5px;
-    /* Harmonized with 175px density */
-    margin: 0;
-    flex: 1;
-}
-
+/* Carousel and Card animations are now global in style.css */
 /* FILTER BUTTONS (Home only) */
 .filter-controls {
     display: flex;
@@ -194,28 +156,6 @@
 /* MOBILE MEDIA QUERIES (Up to 600px) */
 /* ===================================================== */
 @media (max-width: 600px) {
-    .home-header {
-        align-items: center;
-        text-align: center;
-        padding-bottom: 20px;
-    }
-
-    .header-secondary {
-        flex-direction: column;
-        gap: 20px;
-        width: 100%;
-    }
-
-    .main-title {
-        font-size: clamp(1.4rem, 8vw, 2.2rem) !important;
-        line-height: 1.1;
-        letter-spacing: -1.5px;
-    }
-
-    .subtitle {
-        font-size: clamp(0.85rem, 4vw, 0.95rem) !important;
-    }
-
     .filter-controls {
         justify-content: center;
         flex-wrap: wrap;

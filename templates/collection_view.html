@@ -13,14 +13,12 @@
         <span>Volver a Colecciones</span>
     </a>
 
-    <div class="cast-header-wrapper">
-        <header class="cast-main-header">
-            <div class="header-text">
-                <h1 class="cast-title">{{ display_name }}</h1>
-                <p class="subtitle-premium">Listado completo de tu selección personal 🏮</p>
-            </div>
-        </header>
+<div class="prime-header">
+    <div class="prime-header-content">
+        <h1 class="prime-title">{{ display_name }}</h1>
+        <p class="prime-subtitle">Explora tu selección de contenidos filtrada por categoría 🏮</p>
     </div>
+</div>
     <div id="ajax-collection-container">
         {% include 'partials/collection_grid.html' %}
     </div>

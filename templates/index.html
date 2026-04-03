@@ -9,10 +9,12 @@
 
 {% block content %}
 
-<div class="home-header">
-    <h1 class="main-title">Explorar Tendencias</h1>
-    <div class="header-secondary">
-        <p class="subtitle">Lo último en contenido asiático seleccionado para ti</p>
+<div class="prime-header">
+    <div class="prime-header-content">
+        <h1 class="prime-title">Explorar Tendencias</h1>
+        <p class="prime-subtitle">Lo último en contenido asiático seleccionado para ti 🏮</p>
+    </div>
+    <div class="prime-header-actions">
         <div class="filter-controls">
             <a href="{{ url_for('home', window='day') }}" class="filter-btn {{ 'active' if active_window == 'day' }}">Hoy</a>
             <a href="{{ url_for('home', window='week') }}" class="filter-btn {{ 'active' if active_window == 'week' }}">Esta Semana</a>
