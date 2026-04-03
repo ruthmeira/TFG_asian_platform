@@ -1134,26 +1134,30 @@ main {
 }
 
 .region-dropdown-menu {
-    position: absolute;
-    top: calc(100% + 10px);
+    position: relative;
+    top: 0;
     left: 0;
     width: 100%;
-    background: #111;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    max-height: 0;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1000;
     overflow: hidden;
+    transition: all 0.2s ease;
+    z-index: 10;
+    margin-top: 0;
 }
 
 .custom-region-dropdown.open .region-dropdown-menu {
+    max-height: 400px;
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
+    margin-top: 15px;
+    margin-bottom: 10px;
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 .region-search-box {
@@ -1244,7 +1248,7 @@ main {
 .custom-region-dropdown .location-icon {
     position: absolute;
     left: 18px;
-    top: 50%;
+    top: 27px;
     transform: translateY(-50%);
     z-index: 2;
     pointer-events: none;
