@@ -162,13 +162,17 @@
 }
 
 .known-for-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 175px);
+    display: flex;
+    flex-wrap: wrap;
     gap: 20px;
     justify-content: center;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
+.known-for-grid .card-link {
+    width: 175px;
+    flex: 0 0 175px;
+}
 .show-more-container {
     display: flex;
     justify-content: center;
@@ -287,7 +291,6 @@
 
     /* Grid centrado con cards a 145px */
     .known-for-grid {
-        grid-template-columns: repeat(auto-fill, 145px);
         gap: 15px;
         justify-content: center;
     }
