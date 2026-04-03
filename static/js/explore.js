@@ -377,7 +377,7 @@ window.ExploreApp = (() => {
         if (state.pageCache[page] && state.pageCache[page].done) {
             if (container) container.insertAdjacentHTML('beforeend', state.pageCache[page].html || '');
             state.isLoadingMore = false;
-            prefetchPage(page + 1);
+            handleBatchLoadEnd(page);
             return;
         }
 
@@ -411,10 +411,7 @@ window.ExploreApp = (() => {
                         const data = JSON.parse(line);
                         if (data.total_results !== undefined) {
                             const countNum = document.getElementById('results-count-num');
-                            // Solo animar si es la primera página para evitar el bucle visual
-                            if (page === 1 && countNum) {
-                                animateValue(countNum, 0, data.total_results, 1000);
-                            }
+                            if (page === 1 && countNum) animateValue(countNum, 0, data.total_results, 1000);
                             document.getElementById('results-count-wrapper').style.display = 'block';
                             if (data.total_pages) state.totalPages = data.total_pages;
                         }
@@ -427,22 +424,7 @@ window.ExploreApp = (() => {
                             if (data.next_api_page !== undefined) {
                                 state.apiPageMap[page + 1] = { page: data.next_api_page, skip: data.next_api_skip || 0 };
                             }
-                            // CARGA AUTOMÁTICA CON LÍMITE (400 items = +20 páginas)
-                            if (page < state.totalPages && page < state.autoLimit) {
-                                setTimeout(() => loadItems(page + 1), 50); 
-                            } else if (page >= state.autoLimit && page < state.totalPages) {
-                                // Solo mostramos el botón si realmente QUEDAN más páginas por cargar
-                                state.isLoadingMore = false;
-                                const wrapper = document.querySelector(selectors.autoLoadWrapper);
-                                if (wrapper) wrapper.style.display = 'flex';
-                                console.log(`Límite de ${state.autoLimit * 20} alcanzado. Más resultados disponibles.`);
-                            } else {
-                                // Si hemos llegado al final absoluto de TMDB, ocultamos todo y paramos
-                                state.isLoadingMore = false;
-                                const wrapper = document.querySelector(selectors.autoLoadWrapper);
-                                if (wrapper) wrapper.style.display = 'none';
-                                console.log("Fin de catálogo alcanzado.");
-                            }
+                            handleBatchLoadEnd(page);
                         }
                     } catch (e) { console.warn("Parse error", e); }
                 }
@@ -454,6 +436,20 @@ window.ExploreApp = (() => {
             state.fetchingPages.delete(page);
             delete state.abortControllers[page];
             state.isLoadingMore = false;
+        }
+    }
+
+    function handleBatchLoadEnd(page) {
+        if (page < state.totalPages && page < state.autoLimit) {
+            setTimeout(() => loadItems(page + 1), 50);
+        } else if (page >= state.autoLimit && page < state.totalPages) {
+            state.isLoadingMore = false;
+            const wrapper = document.querySelector(selectors.autoLoadWrapper);
+            if (wrapper) wrapper.style.display = 'flex';
+        } else {
+            state.isLoadingMore = false;
+            const wrapper = document.querySelector(selectors.autoLoadWrapper);
+            if (wrapper) wrapper.style.display = 'none';
         }
     }
 
