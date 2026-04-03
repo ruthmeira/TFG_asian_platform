@@ -1329,6 +1329,7 @@ def api_explore():
 
     def generate():
         final_items_count = 0
+        seen_ids = set() # Escudo anti-duplicados
         current_api_page = api_start_page
         to_skip = api_skip # Ítems de la primera página a ignorar (ya vistos)
         max_pages_to_scan = current_api_page + 10 
@@ -1443,6 +1444,14 @@ def api_explore():
             for item in results:
                 mx_res = None
                 det_res = None
+                item_id = item.get('id')
+
+                # --- FILTRO ANTI-DUPLICADOS (Garantiza que cada tarjeta sea única) ---
+                if item_id in seen_ids:
+                    items_processed_in_this_page += 1
+                    continue
+                seen_ids.add(item_id)
+
                 items_processed_in_this_page += 1
                 
                 # 1. Lógica de salto (PRECISIÓN: No repetir ni saltar series)
@@ -1501,10 +1510,9 @@ def api_explore():
                     if requested_flag and item.get('flag') != requested_flag:
                         continue # Si la bandera final no coincide con el país pedido, fuera de la lista
                 
-                # Títulos y Sinopsis con Fallback robusto
+                # TÍTULOS CON FALLBACK ROBUSTO (Sin sinopsis para ganar velocidad en Explorar)
                 raw_bundle = {'es': item, 'mx': mx_res, 'en': det_res}
                 item['display_title'] = get_tiered_field(raw_bundle, 'title', target_type)
-                item['overview'] = get_tiered_field(raw_bundle, 'overview', target_type)
                 
                 item['original_title_h6'] = item.get('original_title') if target_type == 'movie' else item.get('original_name')
 
