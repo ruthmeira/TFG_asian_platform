@@ -107,6 +107,97 @@ def fetch_json(url):
     except:
         return {}
 
+# --- SISTEMA DE SINCRONIZACIÓN AUTOMÁTICA (Silent Refresh) ---
+def get_media_summary(m_id, m_type):
+    """
+    Obtiene los datos base (tarjeta) de un medio usando la jerarquía ES/MX/EN.
+    Retorna un dict con título, póster, voto, bandera y tipo.
+    """
+    api_key = os.getenv("TMDB_API_KEY")
+    urls = {
+        'es': f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=es-ES",
+        'mx': f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=es-MX",
+        'en': f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=en-US"
+    }
+    
+    raw = {}
+    for lang, url in urls.items():
+        resp = fetch_json(url)
+        if resp and resp.get('id'): raw[lang] = resp
+    
+    if not raw.get('en'): return None
+
+    # Procesamiento unificado de la "card"
+    summary = {
+        'title': get_tiered_field(raw, 'title', m_type),
+        'poster_path': raw.get('es', {}).get('poster_path') or raw.get('en', {}).get('poster_path'),
+        'vote_average': raw.get('en', {}).get('vote_average', 0),
+        'original_title': raw['en'].get('original_title' if m_type=='movie' else 'original_name'),
+    }
+    
+    # Bandera y Subtipo (Basado en IDs para consistencia total)
+    res_en = raw['en']
+    summary['flag'] = get_media_flag(raw.get('es', res_en), res_en)
+    
+    genre_ids = [g.get('id') for g in res_en.get('genres', [])]
+    if m_type == 'movie':
+        summary['media_subtype'] = 'Película'
+    else:
+        is_prod = any(gid in GENRES_PROGRAMAS for gid in genre_ids)
+        summary['media_subtype'] = 'Programa' if is_prod else 'Serie'
+    
+    return summary
+
+def sync_collections():
+    """
+    Vigila los cambios globales en TMDB y actualiza nuestra caché local de colecciones.
+    """
+    with app.app_context():
+        api_key = os.getenv("TMDB_API_KEY")
+        if not api_key: return
+
+        try:
+            # 1. Lista de cambios globales
+            movie_changes = fetch_json(f"https://api.themoviedb.org/3/movie/changes?api_key={api_key}").get('results', [])
+            tv_changes = fetch_json(f"https://api.themoviedb.org/3/tv/changes?api_key={api_key}").get('results', [])
+            
+            changed_ids = {
+                'movie': {x['id'] for x in movie_changes},
+                'tv': {x['id'] for x in tv_changes}
+            }
+            
+            # 2. Cruce con DB
+            all_media_ids = db.session.query(CollectionItem.media_id, CollectionItem.media_type).distinct().all()
+            to_refresh = [(m_id, m_type) for m_id, m_type in all_media_ids if m_id in changed_ids.get(m_type, {})]
+            
+            if not to_refresh: return
+
+            # 3. Refresco rápido usando el nuevo helper
+            for m_id, m_type in to_refresh:
+                new_data = get_media_summary(m_id, m_type)
+                if not new_data: continue
+
+                items_in_db = CollectionItem.query.filter_by(media_id=m_id, media_type=m_type).all()
+                for item in items_in_db:
+                    item.title = new_data['title']
+                    item.poster_path = new_data['poster_path']
+                    item.vote_average = new_data['vote_average']
+                    item.flag = new_data['flag']
+                    item.original_title = new_data['original_title']
+                    item.media_subtype = new_data['media_subtype']
+                
+                db.session.commit()
+                time.sleep(0.2) 
+                
+        except Exception as e:
+            print(f"[Sync] Error: {str(e)}")
+
+# Configuración del Scheduler
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=sync_collections, trigger="interval", hours=24)
+# ------------------------------------------------------------
+
+
 def clean_overview(text):
     if not text: return None
     placeholders = ["sinopsis no disponible", "no hay sinopsis disponible", "no overview", "add a plot"]
@@ -1683,4 +1774,9 @@ def api_person_projects(person_id):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+    
+    # Arrancar el scheduler solo en el proceso principal (evita duplicados al recargar en desarrollo)
+    if not os.environ.get('WERKZEUG_RUN_MAIN'):
+        scheduler.start()
+        
     app.run(debug=True)
