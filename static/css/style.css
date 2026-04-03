@@ -1312,3 +1312,24 @@ main {
     line-height: 1;
     vertical-align: middle;
 }
+
+/* ===================================================== */
+/* GLOBAL PROVIDER ICONS OVERRIDES                       */
+/* ===================================================== */
+/* Scale horizontal logos for better legibility */
+div[data-id="344"] svg, div[data-provider-id="344"] svg,
+div[data-id="1773"] svg, div[data-provider-id="1773"] svg {
+    transform: scale(1.3);
+}
+
+/* Hover effects for all provider circles */
+.platform-circle:hover svg, 
+.platform-circle-detail:hover svg {
+    transform: scale(1.1);
+}
+
+/* Specific hover for the horizontal ones */
+div[data-id="344"]:hover svg, div[data-provider-id="344"]:hover svg,
+div[data-id="1773"]:hover svg, div[data-provider-id="1773"]:hover svg {
+    transform: scale(1.4);
+}
