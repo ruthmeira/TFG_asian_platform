@@ -1562,19 +1562,9 @@ def person_detail(person_id):
     res_en = results["en"]
     if not res or 'id' not in res: return "Error", 404
 
-    # --- LÓGICA DE TRADUCCIÓN OFICIAL (Jerarquía Pura) ---
-    trans_list = res.get('translations', {}).get('translations', [])
-    has_es_main = any(t.get('iso_639_1') == 'es' and t.get('iso_3166_1') == 'ES' for t in trans_list)
-    has_es_mx = any(t.get('iso_639_1') == 'es' and t.get('iso_3166_1') == 'MX' for t in trans_list)
+    # --- NOMBRE (Directamente del inglés como fuente maestra) ---
+    res['name'] = res_en.get('name') or res.get('name') or "-"
 
-    if has_es_main:
-        name_to_use = res.get('name')
-    elif has_es_mx:
-        name_to_use = res_mx.get('name') or res.get('name')
-    else:
-        name_to_use = res_en.get('name') or res.get('name')
-
-    res['name'] = name_to_use or "-"
 
     # --- FUSIÓN INTELIGENTE DE BIOGRAFÍAS (Tiered) ---
     res['biography'] = get_tiered_field(results, 'biography', 'person') or "No tenemos una biografía disponible de momento."
