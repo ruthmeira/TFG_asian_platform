@@ -903,13 +903,13 @@ def media_detail(media_type, media_id):
     is_tv = media_type == 'tv' or ('show' in request.path)
     
     # 2. ÚNICA OLEADA DE PETICIONES (Sin cascada)
-    append_master = "external_ids,videos,keywords,watch/providers,translations"
-    append_master += ",aggregate_credits" if is_tv else ",credits"
+    append_base = "external_ids,videos,keywords,watch/providers,translations"
+    append_credits = ",aggregate_credits" if is_tv else ",credits"
     
     urls = {
-        'es': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-ES&append_to_response={append_master}",
-        'mx': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-MX&append_to_response={append_master}",
-        'en': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=en-US&append_to_response={append_master}"
+        'es': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-ES&append_to_response={append_base}",
+        'mx': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-MX&append_to_response={append_base}",
+        'en': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=en-US&append_to_response={append_base + append_credits}"
     }
 
     with ThreadPoolExecutor(max_workers=3) as executor:
@@ -1013,18 +1013,8 @@ def media_detail(media_type, media_id):
     # DETERMINAR MEJOR FUENTE DE CRÉDITOS (Using TMDB Translation Info)
     def get_best_credits_source(r_es, r_mx, r_en, tv=False):
         key = 'aggregate_credits' if tv else 'credits'
-        trans_list = r_es.get('translations', {}).get('translations', [])
-        # 'es' suele cubrir tanto es-ES como es-MX en TMDB
-        has_es = any(t.get('iso_639_1') == 'es' for t in trans_list)
-        
-        if has_es:
-            # Si TMDB dice que hay traducción a español, confiamos en ES o MX
-            if r_es.get(key, {}).get('cast'): return r_es.get(key, {})
-            if r_mx.get(key, {}).get('cast'): return r_mx.get(key, {})
-        
-        # Si no hay marca de traducción a español, nos vamos directos al inglés
-        c_en = r_en.get(key, {})
-        return c_en if c_en.get('cast') else r_es.get(key, {})
+        # Los nombres de actores y personajes son universales; el inglés es la fuente más completa
+        return r_en.get(key, {})
 
     credits_master = get_best_credits_source(raw['es'], raw['mx'], raw['en'], is_tv)
     
@@ -1181,10 +1171,11 @@ def media_cast(media_type, media_id):
         raw = res.get('raw_data', {})
     else:
         # Petición de emergencia
+        append_credits = 'aggregate_credits' if is_tv else 'credits'
         urls = {
-            'es': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-ES&append_to_response={'aggregate_credits' if is_tv else 'credits'},translations",
-            'mx': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-MX&append_to_response={'aggregate_credits' if is_tv else 'credits'}",
-            'en': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=en-US&append_to_response={'aggregate_credits' if is_tv else 'credits'}"
+            'es': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-ES&append_to_response=translations",
+            'mx': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-MX",
+            'en': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=en-US&append_to_response={append_credits}"
         }
         with ThreadPoolExecutor(max_workers=3) as executor:
             futures = {name: executor.submit(fetch_json, url) for name, url in urls.items()}
@@ -1193,25 +1184,19 @@ def media_cast(media_type, media_id):
         res['display_title'] = get_tiered_field(raw, 'title', media_type)
         res['raw_data'] = raw
 
-    # DETERMINAR MEJOR FUENTE DE CRÉDITOS (Using TMDB Translation Info)
+    # DETERMINAR FUENTE DE CRÉDITOS (English-first Strategy)
     def get_best_credits_source(r_es, r_mx, r_en, tv=False):
         key = 'aggregate_credits' if tv else 'credits'
-        trans_list = r_es.get('translations', {}).get('translations', [])
-        has_es = any(t.get('iso_639_1') == 'es' for t in trans_list)
-        
-        if has_es:
-            if r_es.get(key, {}).get('cast'): return r_es.get(key, {})
-            if r_mx.get(key, {}).get('cast'): return r_mx.get(key, {})
-        
-        c_en = r_en.get(key, {})
-        return c_en if c_en.get('cast') else r_es.get(key, {})
+        # Priorizamos el inglés por mayor completitud en nombres propios de cast y crew
+        return r_en.get(key, {})
 
     # Fallback si por algún motivo 'raw' no tiene los datos (ej: cache viejo)
-    if not 'raw' in locals() or not raw or 'es' not in raw:
+    if not 'raw' in locals() or not raw or 'es' not in raw or ('en' in raw and ('aggregate_credits' if is_tv else 'credits') not in raw['en']):
+        append_credits = 'aggregate_credits' if is_tv else 'credits'
         urls_raw = {
             'es': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-ES&append_to_response=translations",
             'mx': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-MX",
-            'en': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=en-US"
+            'en': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=en-US&append_to_response={append_credits}"
         }
         with ThreadPoolExecutor(max_workers=3) as executor:
             raw = {name: executor.submit(fetch_json, url).result() for name, url in urls_raw.items()}
