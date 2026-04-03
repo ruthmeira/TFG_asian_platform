@@ -15,11 +15,14 @@ window.ExploreApp = (() => {
         fetchingPages: new Set(),
         abortControllers: {},
         isLoadingMore: false,
-        selectedKeywords: []
+        selectedKeywords: [],
+        autoLimit: 20 // Límite inicial de 400 (20 páginas * 20 items)
     };
 
     const selectors = {
         container: '#items-container',
+        autoLoadWrapper: '#auto-load-container',
+        autoLoadBtn: '#auto-load-pause-btn',
         regionContainer: '#region-dropdown-container',
         regionBtn: '#region-dropdown-btn',
         regionDisplay: '#region-selected-display',
@@ -46,9 +49,22 @@ window.ExploreApp = (() => {
         initKeywordTagging();
         initInfiniteScroll();
         initYearFilter();
+        initAutoLoadControl();
 
         // Initial Load
         loadItems(1);
+    }
+
+    function initAutoLoadControl() {
+        const btn = document.querySelector(selectors.autoLoadBtn);
+        if (btn) {
+            btn.onclick = () => {
+                const wrapper = document.querySelector(selectors.autoLoadWrapper);
+                if (wrapper) wrapper.style.display = 'none';
+                state.autoLimit += 20; // Extendemos el permiso otros 400 resultados
+                loadItems(state.currentPage + 1);
+            };
+        }
     }
 
     // --- REGION DROPDOWN ---
@@ -351,6 +367,10 @@ window.ExploreApp = (() => {
         state.currentPage = page;
         state.isLoadingMore = true;
 
+        // OCULTAMOS EL BOTÓN AL EMPEZAR CUALQUIER CARGA
+        const autoLoadWrapper = document.querySelector(selectors.autoLoadWrapper);
+        if (autoLoadWrapper) autoLoadWrapper.style.display = 'none';
+
         const container = document.querySelector(selectors.container);
         if (page === 1 && container) container.innerHTML = '';
 
@@ -391,8 +411,12 @@ window.ExploreApp = (() => {
                         const data = JSON.parse(line);
                         if (data.total_results !== undefined) {
                             const countNum = document.getElementById('results-count-num');
-                            if (countNum) animateValue(countNum, parseInt(countNum.innerText.replace(/,/g, '') || '0'), data.total_results, 1000);
+                            // Solo animar si es la primera página para evitar el bucle visual
+                            if (page === 1 && countNum) {
+                                animateValue(countNum, 0, data.total_results, 1000);
+                            }
                             document.getElementById('results-count-wrapper').style.display = 'block';
+                            if (data.total_pages) state.totalPages = data.total_pages;
                         }
                         if (data.item_html) {
                             state.pageCache[page].html += data.item_html;
@@ -403,7 +427,22 @@ window.ExploreApp = (() => {
                             if (data.next_api_page !== undefined) {
                                 state.apiPageMap[page + 1] = { page: data.next_api_page, skip: data.next_api_skip || 0 };
                             }
-                            prefetchPage(page + 1);
+                            // CARGA AUTOMÁTICA CON LÍMITE (400 items = +20 páginas)
+                            if (page < state.totalPages && page < state.autoLimit) {
+                                setTimeout(() => loadItems(page + 1), 50); 
+                            } else if (page >= state.autoLimit && page < state.totalPages) {
+                                // Solo mostramos el botón si realmente QUEDAN más páginas por cargar
+                                state.isLoadingMore = false;
+                                const wrapper = document.querySelector(selectors.autoLoadWrapper);
+                                if (wrapper) wrapper.style.display = 'flex';
+                                console.log(`Límite de ${state.autoLimit * 20} alcanzado. Más resultados disponibles.`);
+                            } else {
+                                // Si hemos llegado al final absoluto de TMDB, ocultamos todo y paramos
+                                state.isLoadingMore = false;
+                                const wrapper = document.querySelector(selectors.autoLoadWrapper);
+                                if (wrapper) wrapper.style.display = 'none';
+                                console.log("Fin de catálogo alcanzado.");
+                            }
                         }
                     } catch (e) { console.warn("Parse error", e); }
                 }

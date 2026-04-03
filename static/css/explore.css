@@ -247,6 +247,7 @@
 }
 
 .results-count-text {
+    display: none;
     font-size: 1.1rem;
     color: rgba(255, 255, 255, 0.8);
     font-weight: 500;
@@ -304,7 +305,7 @@
 
 /* PAGINACIÓN POR NÚMEROS */
 .pagination-controls-numbers {
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
     gap: 10px;
@@ -506,3 +507,18 @@
         margin-bottom: 20px;
     }
 }
+
+/* ===================================================== */
+/* AUTO-LOAD PAUSE BUTTON (Filmografía Style) */
+/* ===================================================== */
+.load-more-wrapper {
+    display: none;
+    justify-content: center;
+    width: 100%;
+    padding-top: 20px;
+}
+
+@keyframes fadeInBtn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}

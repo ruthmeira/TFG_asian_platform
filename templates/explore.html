@@ -298,7 +298,7 @@
 
     <div class="explore-results">
         <div class="results-meta">
-            <div id="results-count-wrapper" class="results-count-text" style="display: none;">
+            <div id="results-count-wrapper" class="results-count-text">
                 <span id="results-count-num" class="count-highlight">0</span> resultados encontrados
             </div>
         </div>
@@ -308,9 +308,15 @@
             <!-- Los items se cargarán por AJAX -->
         </div>
 
-        <div id="infinite-scroll-trigger" style="height: 50px; margin-bottom: 100px;"></div>
+        <div id="auto-load-container" class="load-more-wrapper">
+            <button id="auto-load-pause-btn" class="btn-more">
+                <i class="fas fa-plus-circle"></i> Mostrar más resultados
+            </button>
+        </div>
 
-        <div id="pagination-wrapper" class="pagination-controls-numbers" style="display: none;">
+        <div id="infinite-scroll-trigger"></div>
+
+        <div id="pagination-wrapper" class="pagination-controls-numbers">
             <!-- Desactivado por scroll infinito -->
         </div>
     </div>
