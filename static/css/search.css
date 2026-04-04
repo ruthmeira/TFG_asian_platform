@@ -123,7 +123,6 @@
     margin-bottom: 30px;
     color: white;
     font-weight: 800;
-    text-align: center; /* Centrar el título de resultados */
 }
 
 .query-highlight {
@@ -273,25 +272,31 @@
 @media (max-width: 600px) {
     .search-layout-wrapper {
         flex-direction: column;
-        padding: 20px 15px;
-        gap: 30px;
+        padding: 15px 12px;
+        /* Margen para que se vean las curvas de la caja */
+        gap: 20px;
+        max-width: 100%;
+        width: 100%;
     }
 
-    /* Caja de búsqueda estilo Explorar: Ocupa todo el ancho */
+    /* Caja de búsqueda estilo Explorar: Muy redondeada */
     .classic-sidebar-style {
         width: 100%;
         position: relative;
         top: 0;
-        border-radius: 18px;
+        border-radius: 25px;
+        /* Puntas muy redondeadas */
         margin-bottom: 0;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        /* Recuperamos borde para definir la curva */
     }
 
     .sidebar-header-blue {
-        padding: 20px;
+        padding: 22px 20px;
     }
 
     .sidebar-item {
-        padding: 15px 20px;
+        padding: 18px 20px;
     }
 
     .search-results-main {
@@ -300,29 +305,61 @@
     }
 
     .search-header-info {
-        margin-top: 0;
+        margin-top: 10px;
         margin-bottom: 25px;
     }
 
     .search-header-info h2 {
-        font-size: 1.5rem;
+        font-size: 1.6rem;
+        text-align: center;
+        /* Título centrado solo en móvil */
     }
 
-    /* Grid de tarjetas a 145px - Optimizado para 2 columnas */
-    .search-grid {
-        grid-template-columns: repeat(auto-fill, 145px);
-        gap: 12px;
+    /* Grid de tarjetas de 145px - Fluye según el ancho de pantalla */
+    .search-grid, #search-results-grid {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fill, 145px) !important;
+        gap: 15px;
+        width: 100%;
         justify-content: center;
     }
 
-    /* Filas de personas y keywords ocupando el ancho */
-    .person-row-card, .keyword-row {
-        padding: 15px;
-        border-radius: 15px;
+    /* FORZADO ABSOLUTO CON SELECTORES REALES */
+    #search-results-grid .card-link,
+    #search-results-grid .card {
+        width: 145px !important;
+        min-width: 145px !important;
+        max-width: 145px !important;
+        margin: 0 auto;
+    }
+
+    #search-results-grid .card img {
+        width: 145px !important;
+        height: 217px !important;
+        object-fit: cover;
+    }
+
+    /* Filas de personas y keywords: EXCEPCIÓN para que sigan siendo 100% */
+    #search-results-grid .person-row-link, 
+    #search-results-grid .keyword-row {
+        width: 100% !important;
+        max-width: 100% !important;
+        display: flex !important;
+        grid-column: 1 / -1;
+    }
+
+    .person-row-card {
+        width: 100%;
+        padding: 18px 15px;
+        border-radius: 22px; 
     }
 
     .person-avatar-mini {
         width: 55px;
         height: 55px;
+    }
+
+    .person-info-main h4 {
+        font-size: 1rem;
     }
 }
