@@ -7,6 +7,16 @@
 {% endblock %}
 
 {% block content %}
+<div class="home-hero-search">
+    <div class="search-sub-nav">
+        <div class="search-bar-inline">
+            <i class="fas fa-search search-icon-mini"></i>
+            <input type="text" id="home-search-input" placeholder="¿Qué quieres ver hoy? Busca series, pelis o gente..." value="{{ query }}" autocomplete="off">
+            <button id="home-search-btn" class="search-btn-mini">Buscar</button>
+        </div>
+    </div>
+</div>
+
 <div class="search-layout-wrapper">
     <!-- SIDEBAR DE RESULTADOS (ESTILO LISTA CLÁSICA) -->
     <aside class="search-sidebar classic-sidebar-style">
