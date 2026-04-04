@@ -16,6 +16,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             item.classList.add('active');
             window.activeFilter = item.dataset.target;
             console.log("Cambiando a filtro:", window.activeFilter);
+
+            if (window.activeFilter === 'person' || window.activeFilter === 'keyword') {
+                resultsGrid.classList.add('list-layout');
+            } else {
+                resultsGrid.classList.remove('list-layout');
+            }
             
             // Re-renderizar lo que ya tenemos
             resultsGrid.innerHTML = '';
