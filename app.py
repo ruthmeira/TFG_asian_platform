@@ -106,7 +106,7 @@ def fetch_json(url):
     except:
         return {}
 
-def get_media_summary(m_id, m_type):
+def get_media_summary(m_id, m_type, country_hint=None):
     """
     Obtiene los datos base (tarjeta) de un medio usando la jerarquía ES/MX/EN.
     Optimizado: 1 sola llamada usando append_to_response=translations.
@@ -136,7 +136,7 @@ def get_media_summary(m_id, m_type):
         'poster_path': res_es.get('poster_path'),
         'vote_average': res_es.get('vote_average', 0),
         'original_title': res_es.get('original_title' if m_type=='movie' else 'original_name'),
-        'flag': get_media_flag(res_es, res_es)
+        'flag': get_media_flag(res_es, res_es, country_hint=country_hint)
     }
     
     genre_ids = [g.get('id') for g in res_es.get('genres', [])]
@@ -1599,23 +1599,12 @@ def person_detail(person_id):
 def api_person_projects(person_id):
     api_key = os.getenv("TMDB_API_KEY")
 
-    # 1. LANZADERA DE CRÉDITOS (Jerarquía ES/MX/EN)
-    urls = {
-        "es": f"https://api.themoviedb.org/3/person/{person_id}/combined_credits?api_key={api_key}&language=es-ES",
-        "mx": f"https://api.themoviedb.org/3/person/{person_id}/combined_credits?api_key={api_key}&language=es-MX",
-        "en": f"https://api.themoviedb.org/3/person/{person_id}/combined_credits?api_key={api_key}&language=en-US"
-    }
-
-    with ThreadPoolExecutor(max_workers=3) as executor:
-        futures = {name: executor.submit(fetch_json, url) for name, url in urls.items()}
-        results = {name: future.result() for name, future in futures.items()}
-
-    c_es, c_mx, c_en = results["es"], results["mx"], results["en"]
-    mx_map = {f"{w.get('media_type', 'movie')}_{w.get('id')}": w for w in (c_mx.get('cast', []) + c_mx.get('crew', []))}
-    en_map = {f"{w.get('media_type', 'movie')}_{w.get('id')}": w for w in (c_en.get('cast', []) + c_en.get('crew', []))}
+    # 1. LANZADERA DE CRÉDITOS (A single call for combined credits)
+    url = f"https://api.themoviedb.org/3/person/{person_id}/combined_credits?api_key={api_key}&language=es-ES"
+    credits_res = fetch_json(url)
 
     # 2. FILTRADO Y ORDENACIÓN INICIAL (Top 60 Relevantes)
-    all_credits = c_es.get('cast', []) + c_es.get('crew', [])
+    all_credits = credits_res.get('cast', []) + credits_res.get('crew', [])
     def relevance_key(x):
         genre_ids = x.get('genre_ids', [])
         is_ficcion = not any(gid in genre_ids for gid in GENRES_PROGRAMAS)
@@ -1627,49 +1616,35 @@ def api_person_projects(person_id):
     seen_ids = set()
     for w in sorted_works:
         cid = w.get('id')
-        m_type = w.get('media_type', 'movie')
         if cid in seen_ids: continue
         if w.get('original_language', '').lower() not in ASIA_LANGUAGES: continue
         seen_ids.add(cid)
         top_works.append(w)
         if len(top_works) >= 60: break
 
-    # 3. LANZADERA DE PRECISIÓN (Fetching details for each movie/tv show in parallel)
-    def fetch_full_detail(w):
-        m_id = w.get('id')
-        m_type = w.get('media_type', 'movie')
-        url = f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=en-US"
-        return fetch_json(url)
+    # 3. LANZADERA DE PRECISIÓN CON get_media_summary
+    hint = request.args.get('h')
+    
+    def process_work(w):
+        return get_media_summary(w.get('id'), w.get('media_type', 'movie'), country_hint=hint)
 
     with ThreadPoolExecutor(max_workers=20) as executor:
-        full_details_results = list(executor.map(fetch_full_detail, top_works))
+        summaries = list(executor.map(process_work, top_works))
 
     # 4. PROCESADO FINAL CON METADATA COMPLETA
     known_for = []
-    hint = request.args.get('h')
-    for work, det_res in zip(top_works, full_details_results):
-        cid = work.get('id')
-        media_type = work.get('media_type', 'movie')
+    for w_base, summary in zip(top_works, summaries):
+        if not summary: continue
         
-        c_mx_item = mx_map.get(f"{media_type}_{cid}", {})
-        c_en_item = en_map.get(f"{media_type}_{cid}", {})
-        orig_title = (work.get('original_title') or work.get('original_name') or "").strip()
-
-        # Metadatos del trabajo
-        work['display_title'] = get_tiered_field({'es': work, 'mx': c_mx_item, 'en': c_en_item}, 'title', media_type)
-        work['original_title_h6'] = orig_title
-        work['media_type_fixed'] = media_type
+        media_type = w_base.get('media_type', 'movie')
         
-        # Etiquetado Serie/Peli/Programa
-        if media_type == 'movie':
-            work['tipo_label'] = 'Película'
-        else:
-            item_genres = work.get('genre_ids', [])
-            work['tipo_label'] = 'Programa' if any(g in item_genres for g in GENRES_PROGRAMAS) else 'Serie'
-
-        # BANDERA DE MÁXIMA PRECISIÓN (Usamos det_res para tener production_countries)
-        work['flag'] = get_media_flag(work, det_res, country_hint=hint)
-        known_for.append(work)
+        # Metadatos de compatibilidad para person_items.html
+        summary['display_title'] = summary['title']
+        summary['original_title_h6'] = summary.get('original_title', '')
+        summary['media_type_fixed'] = media_type
+        summary['tipo_label'] = summary.get('media_subtype', 'Serie')
+        
+        known_for.append(summary)
     
     return render_template('person_items.html', known_for=known_for)
 
