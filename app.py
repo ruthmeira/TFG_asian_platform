@@ -123,10 +123,12 @@ def get_media_summary(m_id, m_type):
     t_mx = next((x['data'] for x in trans if x['iso_3166_1'] == 'MX'), {})
     t_en = next((x['data'] for x in trans if x['iso_639_1'] == 'en'), {})
 
-    # REGLA DE 3 PURA (ES > MX > EN)
+    # REGLA DE 3 (ES > MX > EN > Original)
+    # Buscamos ES/MX, si no EN, y si todo falla, el Título Original (para evitar None)
     best_title = t_es.get('title') or t_es.get('name') or \
                  t_mx.get('title') or t_mx.get('name') or \
-                 t_en.get('title') or t_en.get('name')
+                 t_en.get('title') or t_en.get('name') or \
+                 res_es.get('original_title') or res_es.get('original_name') or "-"
 
     summary = {
         'id': res_es.get('id'),
@@ -268,7 +270,7 @@ def get_media_flag(item, det_res=None, country_hint=None):
 
 def get_tiered_field(raw, field='title', media_type='movie'):
     """
-    Recupera un campo (título o sinopsis) con lógica de fallback: ES > MX > EN+Trad
+    Recupera un campo (título o sinopsis) con lógica de fallback: ES > MX > EN > Original
     'raw' debe ser un dict con {'es': data, 'mx': data, 'en': data}
     """
     res_es, res_mx, res_en = raw.get('es', {}), raw.get('mx', {}), raw.get('en', {})
@@ -277,33 +279,20 @@ def get_tiered_field(raw, field='title', media_type='movie'):
     curr_f = 'title' if media_type == 'movie' else 'name'
     orig_val = res_es.get(orig_f)
 
-    if field == 'title':
-        title_es = res_es.get(curr_f)
-        title_mx = res_mx.get(curr_f)
-        title_en = res_en.get(curr_f)
+    if field == 'title' or field == 'name':
+        f_key = 'title' if (field == 'title' and media_type == 'movie') else 'name'
         
-        # El original real (para saber si el de ES/MX es solo un relleno)
-        ref_val = orig_val if orig_val else title_en
-        
-        # 1. ES (Si no es igual al original y no está vacío)
-        if title_es and title_es != ref_val: return title_es
-        # 2. MX (Idem)
-        if title_mx and title_mx != ref_val: return title_mx
+        # 1. ES
+        val = res_es.get(f_key)
+        if val and val != orig_val: return val
+        # 2. MX
+        val = res_mx.get(f_key)
+        if val and val != orig_val: return val
         # 3. EN
-        return title_en or title_es or orig_val
-
-    if field == 'name':
-        # Alias para campos que se llaman 'name' en lugar de 'title' (Temporadas, Personas)
-        name_es = res_es.get('name')
-        name_mx = res_mx.get('name')
-        name_en = res_en.get('name')
-        
-        # Usamos el de EN como referencia si no hay original explícito
-        ref_val = orig_val if orig_val else name_en
-        
-        if name_es and name_es != ref_val: return name_es
-        if name_mx and name_mx != ref_val: return name_mx
-        return name_en or name_es or orig_val
+        val = res_en.get(f_key)
+        if val: return val
+        # 4. ORIGINAL (Salvavidas final)
+        return orig_val or "-"
 
     if field == 'overview':
         ov = clean_overview(res_es.get('overview'))
@@ -605,70 +594,46 @@ api_cache = {'day': {'series': [], 'movies': [], 'shows': [], 'last_updated': 0,
              'week': {'series': [], 'movies': [], 'shows': [], 'last_updated': 0, 'expire': 86400}}
 
 def get_top_20(api_key, media_type, time_window):
-    # Usamos api_media_type para la consulta real a la API
+    """
+    Obtiene el Top 20 asiático para una categoría usando get_media_summary para consistencia.
+    """
     api_media_type = 'tv' if media_type in ['tv', 'show'] else 'movie'
-
     final_list = []
     seen_ids = set() 
     page = 1
     
     while len(final_list) < 20 and page < 80:
-        # Usamos api_media_type para la consulta real a la API
         url = f"https://api.themoviedb.org/3/trending/{api_media_type}/{time_window}?api_key={api_key}&language=es-ES&page={page}"
         data = fetch_json(url)
-        
-        if not data:
-            break
-            
+        if not data: break
         results = data.get('results', [])
-        
-        if not results:
-            break
+        if not results: break
             
         for item in results:
             item_id = item.get('id')
             lang = item.get('original_language', '').lower()
-
-            # --- LÓGICA DE FILTRADO POR GÉNERO ---
-            if api_media_type == 'tv':
-                item_genres = item.get('genre_ids', [])
-                es_no_ficcion = any(g in item_genres for g in GENRES_PROGRAMAS)
-                
-                if media_type == 'tv' and es_no_ficcion:
-                    continue  # Si buscamos Series, saltamos Programas
-                elif media_type == 'show' and not es_no_ficcion:
-                    continue  # Si buscamos Programas, saltamos Series
+            countries = [c.upper() for c in item.get('origin_country', [])]
             
-            if lang in ASIA_LANGUAGES and item_id not in seen_ids and item.get('poster_path'):
-                # Detalles paralelos (MX y EN) para el fallback tiered
-                urls = {
-                    'mx': f"https://api.themoviedb.org/3/{api_media_type}/{item_id}?api_key={api_key}&language=es-MX",
-                    'en': f"https://api.themoviedb.org/3/{api_media_type}/{item_id}?api_key={api_key}&language=en-US"
-                }
-                with ThreadPoolExecutor(max_workers=2) as executor:
-                    futures = {name: executor.submit(fetch_json, url) for name, url in urls.items()}
-                    res_extra = {name: future.result() for name, future in futures.items()}
-
-                # --- METADATA UNIFICADA ---
-                item['flag'] = get_media_flag(item, res_extra['en'])
-                
-                # Títulos y Sinopsis con Fallback Tiered Real (ES > MX > EN)
-                raw_bundle = {'es': item, 'mx': res_extra['mx'], 'en': res_extra['en']}
-                
+            # --- FILTRADO ASIÁTICO ---
+            is_asian = lang in ASIA_LANGUAGES or any(c in ASIA_COUNTRIES for c in countries)
+            
+            if is_asian and item_id not in seen_ids and item.get('poster_path'):
+                # --- Filtro de subcategoría (Series vs Programas) ---
                 if api_media_type == 'tv':
-                     item['name'] = get_tiered_field(raw_bundle, 'title', 'tv')
-                     item['overview'] = get_tiered_field(raw_bundle, 'overview', 'tv')
-                else:
-                     item['title'] = get_tiered_field(raw_bundle, 'title', 'movie')
-                     item['overview'] = get_tiered_field(raw_bundle, 'overview', 'movie')
+                    genre_ids = item.get('genre_ids', [])
+                    es_no_ficcion = any(g in genre_ids for g in GENRES_PROGRAMAS)
+                    if media_type == 'tv' and es_no_ficcion: continue
+                    if media_type == 'show' and not es_no_ficcion: continue
 
-                final_list.append(item)
-                seen_ids.add(item_id)
+                # --- UNIFICACIÓN MAESTRA ---
+                summary = get_media_summary(item_id, api_media_type)
+                if summary:
+                    summary['type'] = api_media_type # Aseguramos el tipo para el enlace
+                    final_list.append(summary)
+                    seen_ids.add(item_id)
+                    print(f"✅ Top {media_type} [Summary]: {summary['title']} [{summary['flag']}]")
                 
-                print(f"✅ Añadido al Top {media_type}: {item.get('name') if api_media_type == 'tv' else item.get('title')} [{item['flag']}]")
-                
-                if len(final_list) >= 20:
-                    break
+                if len(final_list) >= 20: break
         page += 1
         
     return final_list
