@@ -117,16 +117,16 @@ def get_media_summary(m_id, m_type):
     res_es = fetch_json(url)
     if not res_es or not res_es.get('id'): return None
     
-    # Extraer traducciones de respuesta única
+    # Extraer traducciones (Solo ES, MX y Salvavidas EN)
     trans = res_es.get('translations', {}).get('translations', [])
+    t_es = next((x['data'] for x in trans if x['iso_3166_1'] == 'ES'), {})
     t_mx = next((x['data'] for x in trans if x['iso_3166_1'] == 'MX'), {})
     t_en = next((x['data'] for x in trans if x['iso_639_1'] == 'en'), {})
 
-    # Título jerárquico
-    best_title = res_es.get('title') or res_es.get('name') or \
+    # REGLA DE 3 PURA (ES > MX > EN)
+    best_title = t_es.get('title') or t_es.get('name') or \
                  t_mx.get('title') or t_mx.get('name') or \
-                 t_en.get('title') or t_en.get('name') or \
-                 res_es.get('original_title') or res_es.get('original_name') or "-"
+                 t_en.get('title') or t_en.get('name')
 
     summary = {
         'id': res_es.get('id'),
