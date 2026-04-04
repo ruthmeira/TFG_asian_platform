@@ -1457,24 +1457,19 @@ def api_explore():
                     yield json.dumps({'total_results': total_results, 'total_pages': total_pages}) + '\n'
                     total_metadata_sent = True
                 
-                # PARALELIZACIÓN DE PÁGINA (Máxima velocidad SHIORI)
-                def fetch_full_info(item):
-                    i_id = item.get('id')
-                    url_en = f"https://api.themoviedb.org/3/{target_type}/{i_id}?api_key={api_key}&language=en-US"
-                    url_mx = f"https://api.themoviedb.org/3/{target_type}/{i_id}?api_key={api_key}&language=es-MX"
-                    return {'en': fetch_json(url_en), 'mx': fetch_json(url_mx)}
-
+                # PARALELIZACIÓN MAESTRA (Máxima velocidad SHIORI)
                 with ThreadPoolExecutor(max_workers=20) as executor:
-                    full_info_list = list(executor.map(fetch_full_info, results))
+                    full_summaries = list(executor.map(lambda x: get_media_summary(x.get('id'), target_type), results))
 
                 items_processed_in_this_page = 0
-            except: break
+            except Exception as e: 
+                print(f"Error en Explore Stream: {e}")
+                break
             if not results: break 
 
-            for item, info in zip(results, full_info_list):
-                item_id = item.get('id')
-                det_res = info.get('en', {})
-                mx_res = info.get('mx', {})
+            for summary in full_summaries:
+                if not summary: continue
+                item_id = summary['id']
 
                 if item_id in seen_ids:
                     items_processed_in_this_page += 1
@@ -1486,25 +1481,20 @@ def api_explore():
                     to_skip -= 1
                     continue
 
-                genre_ids = item.get('genre_ids', [])
-                es_programa = any(gid in GENRES_PROGRAMAS for gid in genre_ids)
-                if media_type == 'tv' and es_programa: continue 
-                if media_type == 'show' and not es_programa: continue 
-
-                # REGLAS DE ORO: Validación final de la bandera
-                item['flag'] = get_media_flag(item, det_res)
+                # REGLA DE FILTRADO (País y Género ya procesados en summary)
                 if country_code:
                     requested_flag = ASIA_FLAGS_MAP.get(country_code.upper())
-                    if requested_flag and item['flag'] != requested_flag:
+                    if requested_flag and summary['flag'] != requested_flag:
                         continue 
 
-                item['media_type_fixed'] = target_type
-                item['tipo_label'] = 'Película' if target_type == 'movie' else ('Programa' if es_programa else 'Serie')
-                raw_bundle = {'es': item, 'mx': mx_res, 'en': det_res}
-                item['display_title'] = get_tiered_field(raw_bundle, 'title', target_type)
-                item['original_title_h6'] = item.get('original_title') if target_type == 'movie' else item.get('original_name')
+                # Inyectar datos para la plantilla explore_items.html
+                # (Asegurando compatibilidad con los nombres de variables antiguos)
+                summary['display_title'] = summary['title']
+                summary['original_title_h6'] = summary['original_title']
+                summary['tipo_label'] = summary['media_subtype']
+                summary['media_type_fixed'] = target_type
 
-                html = render_template('explore_items.html', items=[item])
+                html = render_template('explore_items.html', items=[summary])
                 yield json.dumps({'item_html': html}) + '\n'
                 
                 final_items_count += 1
