@@ -23,9 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             // Si el stream sigue vivo y el grid está vacío para esta categoría, poner un mini-loader
             if (window.isStreaming && resultsGrid.innerHTML === '') {
-                resultsGrid.innerHTML = `<div class="streaming-loader animate__animated animate__fadeIn">
-                    <i class="fas fa-satellite-dish fa-spin"></i> Buscando resultados de ${item.innerText.trim()}...
-                </div>`;
+                resultsGrid.innerHTML = getMatrixLoader(`Buscando ${item.innerText.replace(/[0-9]/g, '').trim()}...`);
             }
         };
     });
@@ -36,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Inicializar grid
-    resultsGrid.innerHTML = '<div class="streaming-loader animate__animated animate__fadeIn"><i class="fas fa-satellite-dish fa-spin"></i> Explorando catálogo asiático...</div>';
+    resultsGrid.innerHTML = getMatrixLoader('Explorando catálogo asiático...');
 
     // --- 2. INICIAR STREAMING ---
     try {
@@ -87,7 +85,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Si lo que llega coincide con lo que el usuario está viendo ahora, pintarlo
         if (window.activeFilter === cat) {
             // Quitar loader específico si existía
-            const loader = resultsGrid.querySelector('.streaming-loader');
+            const loader = resultsGrid.querySelector('.search-loader');
             if (loader) loader.remove();
 
             if (cat === 'movie' || cat === 'series' || cat === 'program') {
@@ -101,7 +99,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function finalizeSearch() {
-        const loader = resultsGrid.querySelector('.streaming-loader');
+        const loader = resultsGrid.querySelector('.search-loader');
         if (loader) loader.remove();
 
         const totalFound = Object.values(window.currentSearchResults).reduce((acc, arr) => acc + arr.length, 0);
@@ -204,5 +202,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             <span class="keyword-hint">Explorar etiqueta</span>
         `;
         return link;
+    }
+
+    function getMatrixLoader(text) {
+        return `
+            <div class="search-loader animate__animated animate__fadeIn">
+                <div class="matrix-container">
+                    <div class="matrix-column" style="animation-duration: 2.1s;">あいうえおかきくけこ</div>
+                    <div class="matrix-column" style="animation-duration: 4.5s;">你好龙爱美平和</div>
+                    <div class="matrix-column" style="animation-duration: 3.2s;">ㄱㄴㄷㄹㅁㅂㅅㅇ</div>
+                    <div class="matrix-column" style="animation-duration: 5.1s;">SHIORIシステム</div>
+                    <div class="matrix-column" style="animation-duration: 2.8s;">さしすせそたちつてと</div>
+                    <div class="matrix-column" style="animation-duration: 6.4s;">アイウエオカキクケコ</div>
+                    <div class="matrix-column" style="animation-duration: 3.8s;">0101SHIORI</div>
+                    <div class="matrix-column" style="animation-duration: 4.2s;">旭日東昇</div>
+                    <div class="matrix-column" style="animation-duration: 2.5s;">シオリ開発</div>
+                    <div class="matrix-column" style="animation-duration: 5.7s;">한국드라마</div>
+                    <div class="matrix-column" style="animation-duration: 3.5s;">映画アニメ</div>
+                    <div class="matrix-column" style="animation-duration: 4.8s;">こんにちは</div>
+                </div>
+                <div class="loading-content">
+                    <div class="shimmer-text">${text}</div>
+                    <div class="loading-dots-glow"><span>.</span><span>.</span><span>.</span></div>
+                </div>
+            </div>`;
     }
 });
