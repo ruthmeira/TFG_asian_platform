@@ -65,6 +65,10 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+.sidebar-item:last-child {
+    border-bottom: none;
+}
+
 .sidebar-item:hover {
     background: rgba(255, 255, 255, 0.05);
     color: #fff;
@@ -244,17 +248,6 @@
     transition: all 0.3s ease;
 }
 
-/* KEYWORD LIST STYLE */
-.keyword-row {
-    transition: all 0.3s ease;
-}
-
-.keyword-row:hover {
-    background: rgba(255, 255, 255, 0.08);
-    transform: translateY(-2px);
-    border-color: rgba(255, 255, 255, 0.15);
-}
-
 .keyword-row {
     grid-column: 1 / -1;
     display: flex;
@@ -266,6 +259,28 @@
     text-decoration: none;
     margin-bottom: 10px;
     border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s ease;
+}
+
+.keyword-row:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.keyword-icon {
+    color: var(--primary);
+    margin-right: 15px;
+}
+
+.keyword-text {
+    font-weight: 600;
+}
+
+.keyword-hint {
+    margin-left: auto;
+    font-size: 0.75rem;
+    opacity: 0.5;
 }
 
 /* RESPONSIVE DESIGN (600px or less) */
@@ -327,15 +342,16 @@
     /* FORZADO ABSOLUTO CON SELECTORES REALES */
     #search-results-grid .card-link,
     #search-results-grid .card {
-        width: 145px !important;
-        min-width: 145px !important;
-        max-width: 145px !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
         margin: 0 auto;
     }
 
     #search-results-grid .card img {
-        width: 145px !important;
-        height: 217px !important;
+        width: 100% !important;
+        aspect-ratio: 2 / 3;
+        height: auto !important;
         object-fit: cover;
     }
 

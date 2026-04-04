@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const department = person.department || 'Talento';
         let avatarHTML = '';
         if (person.image && !person.image.includes('null')) {
-            avatarHTML = `<img src="${person.image}" alt="${person.title}" onerror="this.parentElement.innerHTML='<div class=\\'person-placeholder\\'><i class=\\'fas fa-user\\'></i></div>';">`;
+            avatarHTML = `<img src="${person.image}" alt="${person.title}">`;
         } else {
             avatarHTML = `<div class="person-placeholder"><i class="fas fa-user"></i></div>`;
         }
@@ -183,6 +183,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <i class="fas fa-chevron-right person-arrow"></i>
             </div>
         `;
+        
+        const img = link.querySelector('.person-avatar-mini img');
+        if (img) {
+            img.onerror = function() {
+                this.parentElement.innerHTML = '<div class="person-placeholder"><i class="fas fa-user"></i></div>';
+            };
+        }
+        
         return link;
     }
 
@@ -191,9 +199,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         link.href = `/explore?keywords=${kw.id}_${kw.title.toLowerCase()}`;
         link.className = 'keyword-row animate__animated animate__fadeIn';
         link.innerHTML = `
-            <i class="fas fa-hashtag" style="color: var(--primary); margin-right: 15px"></i>
-            <span style="font-weight: 600">${kw.title}</span>
-            <span style="margin-left: auto; font-size: 0.75rem; opacity: 0.5">Explorar etiqueta</span>
+            <i class="fas fa-hashtag keyword-icon"></i>
+            <span class="keyword-text">${kw.title}</span>
+            <span class="keyword-hint">Explorar etiqueta</span>
         `;
         return link;
     }
