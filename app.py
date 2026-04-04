@@ -707,7 +707,8 @@ scheduler.add_job(
     seconds=14400, 
     args=['day'],
     id='refresh_day',
-    misfire_grace_time=300
+    misfire_grace_time=3600, # Margen de 1 hora para no saltar si hay retraso
+    coalesce=True            # Si hay varios retrasos, ejecutar solo una vez
 )
 
 scheduler.add_job(
@@ -716,7 +717,8 @@ scheduler.add_job(
     seconds=86400, 
     args=['week'],
     id='refresh_week',
-    misfire_grace_time=300
+    misfire_grace_time=3600,
+    coalesce=True
 )
 
 
