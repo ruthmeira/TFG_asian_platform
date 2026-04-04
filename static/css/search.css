@@ -222,11 +222,6 @@
     }
 }
 
-@media (max-width: 600px) {
-    .search-loader {
-        height: 250px;
-    }
-}
 
 /* Base styles for people and keywords grid might change later */
 
@@ -371,6 +366,10 @@
 
 /* RESPONSIVE DESIGN (600px or less) */
 @media (max-width: 600px) {
+    .search-loader {
+        height: 250px;
+    }
+
     .search-layout-wrapper {
         flex-direction: column;
         padding: 15px 12px;

@@ -11,7 +11,8 @@
     <div class="search-sub-nav">
         <div class="search-bar-inline">
             <i class="fas fa-search search-icon-mini"></i>
-            <input type="text" id="home-search-input" placeholder="¿Qué quieres ver hoy? Busca series, pelis o gente..." value="{{ query }}" autocomplete="off">
+            <input type="text" id="home-search-input" placeholder="¿Qué quieres ver hoy? Busca series, pelis o gente..."
+                value="{{ query }}" autocomplete="off">
             <button id="home-search-btn" class="search-btn-mini">Buscar</button>
         </div>
     </div>
@@ -78,7 +79,13 @@
             </div>
         </div>
     </main>
+
+    <!-- Botón Volver Arriba -->
+    <div id="scroll-to-top" class="scroll-to-top" title="Volver arriba">
+        <i class="fas fa-arrow-up"></i>
+    </div>
 </div>
+
 
 <script src="{{ url_for('static', filename='js/search.js') }}"></script>
 {% endblock %}
