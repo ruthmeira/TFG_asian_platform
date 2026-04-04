@@ -124,6 +124,24 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     }
+
+    // --- LÓGICA DE BÚSQUEDA (Solo en Home) ---
+    const homeSearchInput = document.getElementById('home-search-input');
+    const homeSearchBtn = document.getElementById('home-search-btn');
+
+    if (homeSearchInput && homeSearchBtn) {
+        const performSearch = () => {
+            const query = homeSearchInput.value.trim();
+            if (query) {
+                window.location.href = `/search?q=${encodeURIComponent(query)}`;
+            }
+        };
+
+        homeSearchBtn.addEventListener('click', performSearch);
+        homeSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
+        });
+    }
 });
 
 /**

@@ -1,0 +1,328 @@
+.search-layout-wrapper {
+    display: flex;
+    gap: 44px;
+    max-width: 100%;
+    margin-bottom: 20px;
+    align-items: flex-start;
+}
+
+/* SIDEBAR SHIORI STYLE (Clean List Edition) */
+.classic-sidebar-style {
+    width: 280px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    overflow: hidden;
+    position: sticky;
+    top: 100px;
+    flex-shrink: 0;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+.sidebar-header-blue {
+    background: rgba(255, 255, 255, 0.05);
+    /* No más azul, estilo Shiori */
+    padding: 25px 20px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-header-blue i {
+    color: var(--primary);
+    font-size: 1.4rem;
+    filter: drop-shadow(0 0 8px rgba(255, 69, 0, 0.3));
+}
+
+.sidebar-header-blue h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.sidebar-list-white {
+    list-style: none;
+    padding: 0;
+    /* Sin huecos laterales */
+    margin: 0;
+}
+
+.sidebar-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 25px;
+    /* Más espacio interno para confort */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    /* transform eliminado */
+}
+
+.sidebar-item.active {
+    background: var(--primary-gradient);
+    color: white;
+    font-weight: 700;
+    /* Eliminada la sombra para un look íntegro */
+}
+
+.count-pill {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 3px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    color: #fff;
+    font-weight: 700;
+}
+
+.sidebar-item.active .count-pill {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-item .category-name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sidebar-item .category-name i {
+    width: 20px;
+    text-align: center;
+    font-size: 0.95rem;
+    opacity: 0.8;
+}
+
+.sidebar-item.active .category-name i {
+    opacity: 1;
+}
+
+/* MAIN CONTENT STYLES */
+.search-results-main {
+    flex: 1;
+}
+
+.search-header-info {
+    margin-top: 15px;
+    /* Ajuste preciso para alinear con el texto del sidebar */
+}
+
+.search-header-info h2 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    color: white;
+    font-weight: 800;
+    text-align: center; /* Centrar el título de resultados */
+}
+
+.query-highlight {
+    color: var(--primary);
+}
+
+.search-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 175px);
+    gap: 18px;
+    justify-content: start;
+    width: 100%;
+}
+
+.search-loader {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 100px 0;
+}
+
+.search-loader i {
+    font-size: 3rem;
+    color: var(--primary);
+    margin-bottom: 20px;
+}
+
+.search-loader p {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 1.1rem;
+}
+
+/* Base styles for people and keywords grid might change later */
+
+/* PERSON CARD STYLES */
+/* PERSON ROW STYLE (Image 10 Match) */
+.person-row-link {
+    grid-column: 1 / -1;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.person-row-card {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    /* Color de sección */
+    padding: 15px 25px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    gap: 20px;
+    transition: all 0.3s ease;
+}
+
+.person-row-link:hover .person-row-card {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.person-avatar-mini {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    background: #1a1a1a;
+    /* Fondo base para placeholders */
+}
+
+/* PLACEHOLDER STYLE (Image 13) */
+.person-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #2a2a2a;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.person-placeholder i {
+    font-size: 1.5rem;
+}
+
+.person-avatar-mini img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.person-info-main {
+    flex: 1;
+}
+
+.person-info-main h4 {
+    margin: 0;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.person-info-main p {
+    margin: 4px 0 0;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.person-arrow {
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 1.1rem;
+}
+
+.person-row-link:hover .person-arrow {
+    color: var(--primary);
+    transform: translateX(5px);
+    transition: all 0.3s ease;
+}
+
+/* KEYWORD LIST STYLE */
+.keyword-row {
+    transition: all 0.3s ease;
+}
+
+.keyword-row:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.keyword-row {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px 25px;
+    border-radius: 15px;
+    color: white;
+    text-decoration: none;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* RESPONSIVE DESIGN (600px or less) */
+@media (max-width: 600px) {
+    .search-layout-wrapper {
+        flex-direction: column;
+        padding: 20px 15px;
+        gap: 30px;
+    }
+
+    /* Caja de búsqueda estilo Explorar: Ocupa todo el ancho */
+    .classic-sidebar-style {
+        width: 100%;
+        position: relative;
+        top: 0;
+        border-radius: 18px;
+        margin-bottom: 0;
+    }
+
+    .sidebar-header-blue {
+        padding: 20px;
+    }
+
+    .sidebar-item {
+        padding: 15px 20px;
+    }
+
+    .search-results-main {
+        width: 100%;
+        padding: 0;
+    }
+
+    .search-header-info {
+        margin-top: 0;
+        margin-bottom: 25px;
+    }
+
+    .search-header-info h2 {
+        font-size: 1.5rem;
+    }
+
+    /* Grid de tarjetas a 145px - Optimizado para 2 columnas */
+    .search-grid {
+        grid-template-columns: repeat(auto-fill, 145px);
+        gap: 12px;
+        justify-content: center;
+    }
+
+    /* Filas de personas y keywords ocupando el ancho */
+    .person-row-card, .keyword-row {
+        padding: 15px;
+        border-radius: 15px;
+    }
+
+    .person-avatar-mini {
+        width: 55px;
+        height: 55px;
+    }
+}

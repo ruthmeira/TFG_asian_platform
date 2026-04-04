@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Búsqueda: "{{ query }}" - SHIORI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/search.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="search-layout-wrapper">
+    <!-- SIDEBAR DE RESULTADOS (ESTILO LISTA CLÁSICA) -->
+    <aside class="search-sidebar classic-sidebar-style">
+        <div class="sidebar-header-blue">
+            <i class="fas fa-search"></i>
+            <h3>Resultados de la búsqueda</h3>
+        </div>
+
+        <ul class="sidebar-list-white">
+            <li class="sidebar-item active" data-target="movie">
+                <span class="category-name"><i class="fas fa-film"></i> Películas</span>
+                <span class="count-pill" id="count-movie">0</span>
+            </li>
+            <li class="sidebar-item" data-target="series">
+                <span class="category-name"><i class="fas fa-tv"></i> Series</span>
+                <span class="count-pill" id="count-series">0</span>
+            </li>
+            <li class="sidebar-item" data-target="program">
+                <span class="category-name"><i class="fas fa-star"></i> Programas</span>
+                <span class="count-pill" id="count-program">0</span>
+            </li>
+            <li class="sidebar-item" data-target="person">
+                <span class="category-name"><i class="fas fa-users"></i> Gente</span>
+                <span class="count-pill" id="count-person">0</span>
+            </li>
+            <li class="sidebar-item" data-target="keyword" style="border-bottom: none;">
+                <span class="category-name"><i class="fas fa-tags"></i> Palabras clave</span>
+                <span class="count-pill" id="count-keyword">0</span>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL DE RESULTADOS -->
+    <main class="search-results-main">
+        <div class="search-header-info">
+            <h2>Resultados para: <span class="query-highlight">"{{ query }}"</span></h2>
+        </div>
+
+        <div id="search-results-grid" class="search-grid">
+            <div class="search-loader">
+                <i class="fas fa-circle-notch fa-spin"></i>
+                <p>Buscando en toda Asia...</p>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="{{ url_for('static', filename='js/search.js') }}"></script>
+{% endblock %}

@@ -1719,6 +1719,91 @@ def api_person_projects(person_id):
     return render_template('person_items.html', known_for=known_for)
 
 
+@app.route('/search')
+def search():
+    query = request.args.get('q', '')
+    return render_template('search.html', query=query)
+
+
+@app.route('/api/search/unified')
+def api_search_unified():
+    api_key = os.getenv("TMDB_API_KEY")
+    query = request.args.get('q', '')
+    if not query:
+        return jsonify({'results': {}, 'counts': {}})
+
+    # 1. Búsqueda Multi (Series y Pelis)
+    multi_url = f"https://api.themoviedb.org/3/search/multi?api_key={api_key}&language=es-ES&query={query}&include_adult=false"
+    multi_res = fetch_json(multi_url)
+    
+    # 2. Búsqueda de PERSONAS dedicada
+    person_url = f"https://api.themoviedb.org/3/search/person?api_key={api_key}&language=es-ES&query={query}&include_adult=false"
+    person_res = fetch_json(person_url)
+
+    # 3. Búsqueda de PALABRAS CLAVE
+    kw_url = f"https://api.themoviedb.org/3/search/keyword?api_key={api_key}&query={query}"
+    kw_res = fetch_json(kw_url)
+
+    processed = {
+        'movie': [],
+        'series': [],
+        'program': [],
+        'person': [],
+        'keyword': []
+    }
+
+    # Procesar Palabras Clave
+    for kw in kw_res.get('results', []):
+        processed['keyword'].append({
+            'id': kw.get('id'),
+            'type': 'keyword',
+            'title': kw.get('name', '').capitalize()
+        })
+
+    # Procesar Personas
+    for p in person_res.get('results', []):
+        img = p.get('profile_path')
+        processed['person'].append({
+            'id': p.get('id'),
+            'type': 'person',
+            'title': p.get('name', '-'),
+            'image': f"https://image.tmdb.org/t/p/w200{img}" if img else None,
+            'department': p.get('known_for_department', 'Actor/Actriz')
+        })
+
+    # Procesar Media (Filtro Asiático)
+    for item in multi_res.get('results', []):
+        m_type = item.get('media_type')
+        if m_type not in ['movie', 'tv']: continue
+        
+        # Filtro asiático estricto
+        lang = item.get('original_language', '').lower()
+        if lang not in ASIA_LANGUAGES: continue
+
+        original_title = item.get('original_title') or item.get('original_name') or ""
+        
+        cat = m_type
+        if m_type == 'tv':
+            genre_ids = item.get('genre_ids', [])
+            cat = 'program' if any(gid in genre_ids for gid in GENRES_PROGRAMAS) else 'series'
+        
+        title = item.get('title') or item.get('name') or "-"
+        img = item.get('poster_path')
+        
+        processed[cat].append({
+            'id': item.get('id'),
+            'type': m_type,
+            'title': title,
+            'original_title': original_title,
+            'image': f"https://image.tmdb.org/t/p/w300{img}" if img else None,
+            'rating': item.get('vote_average', 0),
+            'flag': ASIA_FLAGS_MAP.get(item.get('original_language', '').upper(), '🌏')
+        })
+
+    counts = {k: len(v) for k, v in processed.items()}
+    return jsonify({'results': processed, 'counts': counts})
+
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
