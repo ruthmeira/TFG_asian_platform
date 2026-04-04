@@ -1,81 +1,139 @@
-/**
- * SEARCH RESULTS LOGIC
- * Fetches unified results and renders them using the platform's standard card system.
- */
 document.addEventListener('DOMContentLoaded', async () => {
     const resultsGrid = document.getElementById('search-results-grid');
     const urlParams = new URLSearchParams(window.location.search);
     const query = urlParams.get('q');
+    const sidebarItems = document.querySelectorAll('.sidebar-item');
+    
+    // Almacén global para filtrado por sidebar
+    window.currentSearchResults = { movie: [], series: [], program: [], person: [], keyword: [] };
+    window.activeFilter = 'movie';
+    window.isStreaming = true;
+
+    // --- 1. ACTIVAR SIDEBAR AL INSTANTE (Máxima Prioridad) ---
+    sidebarItems.forEach(item => {
+        item.onclick = (e) => {
+            sidebarItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            window.activeFilter = item.dataset.target;
+            console.log("Cambiando a filtro:", window.activeFilter);
+            
+            // Re-renderizar lo que ya tenemos
+            resultsGrid.innerHTML = '';
+            renderAllKnown();
+            
+            // Si el stream sigue vivo y el grid está vacío para esta categoría, poner un mini-loader
+            if (window.isStreaming && resultsGrid.innerHTML === '') {
+                resultsGrid.innerHTML = `<div class="streaming-loader animate__animated animate__fadeIn">
+                    <i class="fas fa-satellite-dish fa-spin"></i> Buscando resultados de ${item.innerText.trim()}...
+                </div>`;
+            }
+        };
+    });
 
     if (!query) {
         if (resultsGrid) resultsGrid.innerHTML = '<div class="search-loader"><p>Escribe algo en el buscador de la Home para empezar...</p></div>';
         return;
     }
 
+    // Inicializar grid
+    resultsGrid.innerHTML = '<div class="streaming-loader animate__animated animate__fadeIn"><i class="fas fa-satellite-dish fa-spin"></i> Explorando catálogo asiático...</div>';
+
+    // --- 2. INICIAR STREAMING ---
     try {
-        const res = await fetch(`/api/search/unified?q=${encodeURIComponent(query)}`);
-        const data = await res.json();
+        const response = await fetch(`/api/search/unified?q=${encodeURIComponent(query)}`);
+        if (!response.body) throw new Error("Flujo no soportado");
 
-        // Actualizar contadores
-        updateSidebar(data.counts);
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
 
-        // Guardar datos globales para filtrar
-        window.currentSearchResults = data.results;
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+                window.isStreaming = false;
+                finalizeSearch();
+                break;
+            }
 
-        renderResults(data.results, 'all');
-        setupSidebarFiltering();
+            buffer += decoder.decode(value, { stream: true });
+            let lines = buffer.split('\n');
+            buffer = lines.pop(); 
 
+            for (let line of lines) {
+                if (!line.trim()) continue;
+                try {
+                    const data = JSON.parse(line);
+                    if (data.done) {
+                        window.isStreaming = false;
+                        finalizeSearch();
+                        continue;
+                    }
+                    handleIncomingItem(data);
+                } catch (e) {}
+            }
+        }
+        
     } catch (err) {
-        console.error("Search error:", err);
+        console.error("Search streaming error:", err);
         if (resultsGrid) resultsGrid.innerHTML = '<div class="search-loader"><p>Error de conexión con el servidor asiático.</p></div>';
     }
 
-    function updateSidebar(counts) {
-        document.getElementById('count-movie').textContent = counts.movie || 0;
-        document.getElementById('count-series').textContent = counts.series || 0;
-        document.getElementById('count-program').textContent = counts.program || 0;
-        document.getElementById('count-person').textContent = counts.person || 0;
-        document.getElementById('count-keyword').textContent = counts.keyword || 0;
-    }
+    function handleIncomingItem(item) {
+        const cat = item.category;
+        if (!window.currentSearchResults[cat]) return;
+        window.currentSearchResults[cat].push(item);
+        updateSidebarCounters();
 
-    function setupSidebarFiltering() {
-        const items = document.querySelectorAll('.sidebar-item');
-        items.forEach(item => {
-            item.onclick = () => {
-                items.forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
-                renderResults(window.currentSearchResults, item.dataset.target);
-            };
-        });
-    }
+        // Si lo que llega coincide con lo que el usuario está viendo ahora, pintarlo
+        if (window.activeFilter === cat) {
+            // Quitar loader específico si existía
+            const loader = resultsGrid.querySelector('.streaming-loader');
+            if (loader) loader.remove();
 
-    function renderResults(results, filter = 'all') {
-        if (!resultsGrid) return;
-        resultsGrid.innerHTML = '';
-
-        let totalItems = 0;
-
-        // Determinar qué categorías mostrar
-        const catsToShow = filter === 'all' ? ['movie', 'series', 'program', 'person', 'keyword'] : [filter];
-
-        catsToShow.forEach(cat => {
-            const items = results[cat] || [];
-            items.forEach(item => {
-                if (cat === 'movie' || cat === 'series' || cat === 'program') {
-                    resultsGrid.appendChild(createMediaCard(item, cat));
-                } else if (cat === 'person') {
-                    resultsGrid.appendChild(createPersonCard(item));
-                } else if (cat === 'keyword') {
-                    resultsGrid.appendChild(createKeywordItem(item));
-                }
-                totalItems++;
-            });
-        });
-
-        if (totalItems === 0) {
-            resultsGrid.innerHTML = '<div class="search-loader"><p>No se han encontrado resultados en esta categoría.</p></div>';
+            if (cat === 'movie' || cat === 'series' || cat === 'program') {
+                resultsGrid.appendChild(createMediaCard(item, cat));
+            } else if (cat === 'person') {
+                resultsGrid.appendChild(createPersonCard(item));
+            } else if (cat === 'keyword') {
+                resultsGrid.appendChild(createKeywordItem(item));
+            }
         }
     }
+
+    function finalizeSearch() {
+        const loader = resultsGrid.querySelector('.streaming-loader');
+        if (loader) loader.remove();
+
+        const totalFound = Object.values(window.currentSearchResults).reduce((acc, arr) => acc + arr.length, 0);
+        if (totalFound === 0) {
+            resultsGrid.innerHTML = '<div class="search-loader"><p>No se han encontrado resultados asiáticos.</p></div>';
+        }
+    }
+
+    function updateSidebarCounters() {
+        if (document.getElementById('count-movie')) document.getElementById('count-movie').textContent = window.currentSearchResults.movie.length;
+        if (document.getElementById('count-series')) document.getElementById('count-series').textContent = window.currentSearchResults.series.length;
+        if (document.getElementById('count-program')) document.getElementById('count-program').textContent = window.currentSearchResults.program.length;
+        if (document.getElementById('count-person')) document.getElementById('count-person').textContent = window.currentSearchResults.person.length;
+        if (document.getElementById('count-keyword')) document.getElementById('count-keyword').textContent = window.currentSearchResults.keyword.length;
+    }
+
+    function renderAllKnown() {
+        const filter = window.activeFilter;
+        // Solo renderizar la categoría activa
+        const items = window.currentSearchResults[filter] || [];
+        items.forEach(item => {
+            if (filter === 'movie' || filter === 'series' || filter === 'program') {
+                resultsGrid.appendChild(createMediaCard(item, filter));
+            } else if (filter === 'person') {
+                resultsGrid.appendChild(createPersonCard(item));
+            } else if (filter === 'keyword') {
+                resultsGrid.appendChild(createKeywordItem(item));
+            }
+        });
+    }
+
+    // --- HELPERS DE RENDERIZACIÓN ---
 
     function createMediaCard(item, cat) {
         const link = document.createElement('a');
@@ -108,8 +166,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         link.className = 'person-row-link animate__animated animate__fadeInUp';
 
         const department = person.department || 'Talento';
-
-        // REPLICAR COMPORTAMIENTO DE CAST (de base.html / cast section)
         let avatarHTML = '';
         if (person.image && !person.image.includes('null')) {
             avatarHTML = `<img src="${person.image}" alt="${person.title}" onerror="this.parentElement.innerHTML='<div class=\\'person-placeholder\\'><i class=\\'fas fa-user\\'></i></div>';">`;
@@ -119,9 +175,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         link.innerHTML = `
             <div class="person-row-card">
-                <div class="person-avatar-mini">
-                    ${avatarHTML}
-                </div>
+                <div class="person-avatar-mini">${avatarHTML}</div>
                 <div class="person-info-main">
                     <h4>${person.title}</h4>
                     <p>${department}</p>

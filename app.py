@@ -23,14 +23,14 @@ GLOBAL_COUNTRIES_LIST = [{"code": "AL", "name": "Albania", "emoji": "🇦🇱"},
 # Mapa de banderas para acceso rápido en plantillas
 REGIONS_MAP = {c['code']: c['emoji'] for c in GLOBAL_COUNTRIES_LIST}
 
-# --- CONSTANTES MAESTRAS ASIÁTICAS ---
+# --- CONSTANTES MAESTRAS ASIÁTICAS (Foco Total: 18 Países) ---
 ASIA_LANGUAGES = [
     # Corea, Japón, China y regiones
     'ko', 'ja', 'zh', 'cn', 'yue', 'bo', 'ug', 'mn',
     # Sudeste Asiático (Países ASEAN)
     'th', 'vi', 'tl', 'fil', 'id', 'ms', 'km', 'my', 'lo',
-    # Sur de Asia (India, Nepal, etc.)
-    'hi', 'ne', 'ta', 'te', 'ml', 'kn', 'bn', 'mr', 'gu', 'pa', 'ur', 'or', 'as', 'sd', 'si', 'dz', 'ks'
+    # Sur de Asia (India y Nepal)
+    'hi', 'ne', 'ta', 'te', 'ml', 'kn', 'bn', 'mr', 'gu', 'pa', 'ur', 'or', 'as', 'sd', 'ks'
 ]
 ASIA_COUNTRIES = [
     'KR', 'JP', 'CN', 'TW', 'HK', 'TH', 'VN', 'IN', 'PH', 'ID', 'MY', 'SG', 'MO',
@@ -47,8 +47,7 @@ ASIA_LANG_NAMES = {
     'ms':'Malayo', 'mn':'Mongol', 'km':'Camboyano', 'my':'Birmano', 'lo':'Laosiano',
     'ne':'Nepalí', 'hi':'Hindi', 'ta':'Tamil', 'te':'Telugu', 'ml':'Malayalam', 'kn':'Canarés',
     'bn':'Bengalí', 'mr':'Maratí', 'gu':'Guyaratí', 'pa':'Panyabí', 'ur':'Urdu', 'or':'Oriya',
-    'as':'Asamés', 'sd':'Sindi', 'si':'Cingalés', 'dz':'Butanés', 'ks':'Cachemiro',
-    'bo':'Tibetano', 'ug':'Uigur'
+    'as':'Asamés', 'sd':'Sindi', 'ks':'Cachemiro', 'bo':'Tibetano', 'ug':'Uigur'
 }
 GENRES_PROGRAMAS = [10764, 99, 10763, 10767] # Reality, Docu, Noticias, Talk Show
 
@@ -107,39 +106,38 @@ def fetch_json(url):
     except:
         return {}
 
-# --- SISTEMA DE SINCRONIZACIÓN AUTOMÁTICA (Silent Refresh) ---
 def get_media_summary(m_id, m_type):
     """
     Obtiene los datos base (tarjeta) de un medio usando la jerarquía ES/MX/EN.
-    Retorna un dict con título, póster, voto, bandera y tipo.
+    Optimizado: 1 sola llamada usando append_to_response=translations.
     """
     api_key = os.getenv("TMDB_API_KEY")
-    urls = {
-        'es': f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=es-ES",
-        'mx': f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=es-MX",
-        'en': f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=en-US"
-    }
+    url = f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=es-ES&append_to_response=translations"
     
-    raw = {}
-    for lang, url in urls.items():
-        resp = fetch_json(url)
-        if resp and resp.get('id'): raw[lang] = resp
+    res_es = fetch_json(url)
+    if not res_es or not res_es.get('id'): return None
     
-    if not raw.get('en'): return None
+    # Extraer traducciones de respuesta única
+    trans = res_es.get('translations', {}).get('translations', [])
+    t_mx = next((x['data'] for x in trans if x['iso_3166_1'] == 'MX'), {})
+    t_en = next((x['data'] for x in trans if x['iso_639_1'] == 'en'), {})
 
-    # Procesamiento unificado de la "card"
+    # Título jerárquico
+    best_title = res_es.get('title') or res_es.get('name') or \
+                 t_mx.get('title') or t_mx.get('name') or \
+                 t_en.get('title') or t_en.get('name') or \
+                 res_es.get('original_title') or res_es.get('original_name') or "-"
+
     summary = {
-        'title': get_tiered_field(raw, 'title', m_type),
-        'poster_path': raw.get('es', {}).get('poster_path') or raw.get('en', {}).get('poster_path'),
-        'vote_average': raw.get('en', {}).get('vote_average', 0),
-        'original_title': raw['en'].get('original_title' if m_type=='movie' else 'original_name'),
+        'id': res_es.get('id'),
+        'title': best_title,
+        'poster_path': res_es.get('poster_path'),
+        'vote_average': res_es.get('vote_average', 0),
+        'original_title': res_es.get('original_title' if m_type=='movie' else 'original_name'),
+        'flag': get_media_flag(res_es, res_es)
     }
     
-    # Bandera y Subtipo (Basado en IDs para consistencia total)
-    res_en = raw['en']
-    summary['flag'] = get_media_flag(raw.get('es', res_en), res_en)
-    
-    genre_ids = [g.get('id') for g in res_en.get('genres', [])]
+    genre_ids = [g.get('id') for g in res_es.get('genres', [])]
     if m_type == 'movie':
         summary['media_subtype'] = 'Película'
     else:
@@ -1729,81 +1727,175 @@ def search():
 
 @app.route('/api/search/unified')
 def api_search_unified():
+    from urllib.parse import quote
     api_key = os.getenv("TMDB_API_KEY")
     query = request.args.get('q', '')
     if not query:
         return jsonify({'results': {}, 'counts': {}})
 
-    # 1. Búsqueda Multi (Series y Pelis)
-    multi_url = f"https://api.themoviedb.org/3/search/multi?api_key={api_key}&language=es-ES&query={query}&include_adult=false"
-    multi_res = fetch_json(multi_url)
-    
-    # 2. Búsqueda de PERSONAS dedicada
-    person_url = f"https://api.themoviedb.org/3/search/person?api_key={api_key}&language=es-ES&query={query}&include_adult=false"
-    person_res = fetch_json(person_url)
+    q_safe = quote(query)
 
-    # 3. Búsqueda de PALABRAS CLAVE
-    kw_url = f"https://api.themoviedb.org/3/search/keyword?api_key={api_key}&query={query}"
-    kw_res = fetch_json(kw_url)
+    def generate():
+        try:
+            # --- MOTOR DE BÚSQUEDA MULTITAREA (Ondas Sincronizadas) ---
+            seen_media_ids = set()
+            ROLE_MAP = {'Acting': 'Actuación', 'Directing': 'Dirección', 'Production': 'Producción', 'Writing': 'Guion', 'Editing': 'Montaje', 'Art': 'Arte', 'Sound': 'Sonido', 'Camera': 'Cámara', 'Visual Effects': 'Efectos Visuales', 'Costume & Make-Up': 'Vestuario', 'Crew': 'Equipo'}
+            
+            # 1. Obtener primera página de TODO para calcular totales
+            with ThreadPoolExecutor(max_workers=4) as executor:
+                f_p1 = executor.submit(fetch_json, f"https://api.themoviedb.org/3/search/person?api_key={api_key}&language=en-US&query={q_safe}&include_adult=false&page=1")
+                f_k1 = executor.submit(fetch_json, f"https://api.themoviedb.org/3/search/keyword?api_key={api_key}&query={q_safe}&page=1")
+                f_m1 = executor.submit(fetch_json, f"https://api.themoviedb.org/3/search/movie?api_key={api_key}&query={q_safe}&page=1")
+                f_t1 = executor.submit(fetch_json, f"https://api.themoviedb.org/3/search/tv?api_key={api_key}&query={q_safe}&page=1")
+                
+                p1, k1, m1, t1 = f_p1.result(), f_k1.result(), f_m1.result(), f_t1.result()
 
-    processed = {
-        'movie': [],
-        'series': [],
-        'program': [],
-        'person': [],
-        'keyword': []
-    }
+            total_p = min(p1.get('total_pages', 0), 25)
+            total_k = min(k1.get('total_pages', 0), 25)
+            total_m = min(m1.get('total_pages', 0), 500)
+            total_t = min(t1.get('total_pages', 0), 500)
+            
+            max_p_total = max(total_p, total_k, total_m, total_t)
+            
+            # Función interna para procesar media (Películas/Series)
+            def process_media_batch(batch, m_type):
+                asian_items = []
+                for item in batch:
+                    m_id = item.get('id')
+                    if m_id in seen_media_ids: continue
+                    lang = item.get('original_language', '').lower()
+                    countries = [c.upper() for c in item.get('origin_country', [])]
+                    if lang in ASIA_LANGUAGES or any(c in ASIA_COUNTRIES for c in countries):
+                        seen_media_ids.add(m_id)
+                        asian_items.append((item, m_type))
+                
+                if not asian_items: return
+                
+                with ThreadPoolExecutor(max_workers=10) as trans_executor:
+                    results = list(trans_executor.map(lambda x: (enrich_with_translation(x[0], x[1]), x[1]), asian_items))
+                    for item, original_m_type in results:
+                        cat = original_m_type
+                        if original_m_type == 'tv':
+                            genre_ids = item.get('genre_ids', [])
+                            cat = 'program' if any(gid in genre_ids for gid in GENRES_PROGRAMAS) else 'series'
+                        
+                        lang = item.get('original_language', '').lower()
+                        countries = [c.upper() for c in item.get('origin_country', [])]
+                        c_code = LANG_TO_COUNTRY_MAP.get(lang)
+                        if not c_code or (countries and c_code not in countries):
+                            if countries: c_code = countries[0]
+                        
+                        yield_data = json.dumps({
+                            'category': cat, 'id': item.get('id'), 'type': original_m_type,
+                            'title': item.get('title'),
+                            'original_title': item.get('original_title') or item.get('original_name') or "",
+                            'image': f"https://image.tmdb.org/t/p/w300{item.get('poster_path')}" if item.get('poster_path') else None,
+                            'rating': item.get('vote_average', 0), 'flag': ASIA_FLAGS_MAP.get(c_code, '🌏')
+                        }, ensure_ascii=False) + '\n'
+                        # No podemos usar yield aquí en un loop anidado si no retornamos generator, 
+                        # así que lo manejaremos fuera.
 
-    # Procesar Palabras Clave
-    for kw in kw_res.get('results', []):
-        processed['keyword'].append({
-            'id': kw.get('id'),
-            'type': 'keyword',
-            'title': kw.get('name', '').capitalize()
-        })
+            def enrich_with_translation(media_item, m_type_fixed):
+                it_id = media_item.get('id')
+                try:
+                    t_data = fetch_json(f"https://api.themoviedb.org/3/{m_type_fixed}/{it_id}/translations?api_key={api_key}")
+                    trans = t_data.get('translations', [])
+                    t_es = next((x['data'] for x in trans if x['iso_3166_1'] == 'ES'), {})
+                    t_mx = next((x['data'] for x in trans if x['iso_3166_1'] == 'MX'), {})
+                    best_title = t_es.get('title') or t_es.get('name') or \
+                                 t_mx.get('title') or t_mx.get('name') or \
+                                 media_item.get('title') or media_item.get('name') or \
+                                 media_item.get('original_title') or media_item.get('original_name') or "-"
+                    media_item['title'] = best_title
+                except: pass
+                return media_item
 
-    # Procesar Personas
-    for p in person_res.get('results', []):
-        img = p.get('profile_path')
-        processed['person'].append({
-            'id': p.get('id'),
-            'type': 'person',
-            'title': p.get('name', '-'),
-            'image': f"https://image.tmdb.org/t/p/w200{img}" if img else None,
-            'department': p.get('known_for_department', 'Actor/Actriz')
-        })
+            # --- BUCLE DE ONDAS ---
+            for current_page in range(1, max_p_total + 1):
+                futures = {}
+                with ThreadPoolExecutor(max_workers=4) as wave_executor:
+                    if current_page <= total_p:
+                        futures['p'] = p1 if current_page == 1 else wave_executor.submit(fetch_json, f"https://api.themoviedb.org/3/search/person?api_key={api_key}&language=en-US&query={q_safe}&include_adult=false&page={current_page}")
+                    if current_page <= total_k:
+                        futures['k'] = k1 if current_page == 1 else wave_executor.submit(fetch_json, f"https://api.themoviedb.org/3/search/keyword?api_key={api_key}&query={q_safe}&page={current_page}")
+                    if current_page <= total_m:
+                        futures['m'] = m1 if current_page == 1 else wave_executor.submit(fetch_json, f"https://api.themoviedb.org/3/search/movie?api_key={api_key}&query={q_safe}&page={current_page}")
+                    if current_page <= total_t:
+                        futures['t'] = t1 if current_page == 1 else wave_executor.submit(fetch_json, f"https://api.themoviedb.org/3/search/tv?api_key={api_key}&query={q_safe}&page={current_page}")
 
-    # Procesar Media (Filtro Asiático)
-    for item in multi_res.get('results', []):
-        m_type = item.get('media_type')
-        if m_type not in ['movie', 'tv']: continue
-        
-        # Filtro asiático estricto
-        lang = item.get('original_language', '').lower()
-        if lang not in ASIA_LANGUAGES: continue
+                # --- PROCESAR RESULTADOS DE LA ONDA ---
+                
+                # A. Personas
+                if 'p' in futures:
+                    res = futures['p'] if current_page == 1 else futures['p'].result()
+                    for p in res.get('results', []):
+                        img = p.get('profile_path')
+                        role_en = p.get('known_for_department', 'Talento')
+                        yield json.dumps({
+                            'category': 'person', 'id': p.get('id'), 'type': 'person', 'title': p.get('name', '-'),
+                            'image': f"https://image.tmdb.org/t/p/w200{img}" if img else None,
+                            'department': ROLE_MAP.get(role_en, role_en)
+                        }, ensure_ascii=False) + '\n'
 
-        original_title = item.get('original_title') or item.get('original_name') or ""
-        
-        cat = m_type
-        if m_type == 'tv':
-            genre_ids = item.get('genre_ids', [])
-            cat = 'program' if any(gid in genre_ids for gid in GENRES_PROGRAMAS) else 'series'
-        
-        title = item.get('title') or item.get('name') or "-"
-        img = item.get('poster_path')
-        
-        processed[cat].append({
-            'id': item.get('id'),
-            'type': m_type,
-            'title': title,
-            'original_title': original_title,
-            'image': f"https://image.tmdb.org/t/p/w300{img}" if img else None,
-            'rating': item.get('vote_average', 0),
-            'flag': ASIA_FLAGS_MAP.get(item.get('original_language', '').upper(), '🌏')
-        })
+                # B. Keywords
+                if 'k' in futures:
+                    res = futures['k'] if current_page == 1 else futures['k'].result()
+                    for kw in res.get('results', []):
+                        yield json.dumps({
+                            'category': 'keyword', 'id': kw.get('id'), 'type': 'keyword', 'title': kw.get('name', '').capitalize()
+                        }, ensure_ascii=False) + '\n'
 
-    counts = {k: len(v) for k, v in processed.items()}
-    return jsonify({'results': processed, 'counts': counts})
+                # C. Media (Películas + Series) - Requiere traducción
+                media_batch = []
+                if 'm' in futures:
+                    res = futures['m'] if current_page == 1 else futures['m'].result()
+                    media_batch.extend([(item, 'movie') for item in res.get('results', [])])
+                if 't' in futures:
+                    res = futures['t'] if current_page == 1 else futures['t'].result()
+                    media_batch.extend([(item, 'tv') for item in res.get('results', [])])
+
+                # Filtrado asiático
+                asian_items_batch = []
+                for item, m_type in media_batch:
+                    m_id = item.get('id')
+                    if m_id in seen_media_ids: continue
+                    lang = item.get('original_language', '').lower()
+                    countries = [c.upper() for c in item.get('origin_country', [])]
+                    if lang in ASIA_LANGUAGES or any(c in ASIA_COUNTRIES for c in countries):
+                        seen_media_ids.add(m_id)
+                        asian_items_batch.append((item, m_type))
+
+                if asian_items_batch:
+                    with ThreadPoolExecutor(max_workers=10) as t_executor:
+                        # Usar la FUNCIÓN MAESTRA para consistencia total
+                        # Pasamos 'id' a get_media_summary
+                        enriched = list(t_executor.map(lambda x: (get_media_summary(x[0]['id'], x[1]), x[1], x[0]['id']), asian_items_batch))
+                        
+                        for summary, original_m_type, it_id in enriched:
+                            if not summary: continue
+                            
+                            yield json.dumps({
+                                'category': summary['media_subtype'].lower().replace('película', 'movie').replace('serie', 'series').replace('programa', 'program'),
+                                'id': it_id,
+                                'type': original_m_type,
+                                'title': summary['title'],
+                                'original_title': summary.get('original_title', ""),
+                                'image': f"https://image.tmdb.org/t/p/w300{summary['poster_path']}" if summary['poster_path'] else None,
+                                'rating': summary.get('vote_average', 0), 
+                                'flag': summary.get('flag', '🌏')
+                            }, ensure_ascii=False) + '\n'
+
+            yield json.dumps({'done': True}) + '\n'
+
+        except Exception as e:
+            print(f"❌ Error en Stream de Búsqueda: {str(e)}")
+            yield json.dumps({'done': True, 'error': str(e)}) + '\n'
+
+        except Exception as e:
+            print(f"❌ Error en Stream de Búsqueda: {str(e)}")
+            yield json.dumps({'done': True, 'error': str(e)}) + '\n'
+
+    return Response(stream_with_context(generate()), mimetype='application/x-ndjson')
 
 
 if __name__ == '__main__':
