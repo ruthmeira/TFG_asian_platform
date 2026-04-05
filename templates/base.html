@@ -51,6 +51,10 @@
                 <a href="{{ url_for('explore') }}" class="{{ 'active' if request.endpoint == 'explore' }}"><i
                         class="fas fa-compass"></i> Explorar</a>
                 {% if current_user.is_authenticated %}
+                {% if current_user.is_admin %}
+                <a href="{{ url_for('admin_reviews') }}" class="{{ 'active' if request.endpoint == 'admin_reviews' }}"><i
+                        class="fas fa-shield-alt"></i> Moderación</a>
+                {% endif %}
                 <a href="{{ url_for('collections') }}" class="{{ 'active' if request.endpoint == 'collections' }}"><i
                         class="fas fa-layer-group"></i> Colecciones</a>
                 <a href="{{ url_for('profile') }}" class="{{ 'active' if request.endpoint == 'profile' }}"><i

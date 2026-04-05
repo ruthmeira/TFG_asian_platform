@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shiori_admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-banned-page">
+    <div class="admin-header-wrapper" style="margin-top: 20px;">
+        <a href="{{ url_for('admin_reviews') }}" class="back-link-premium">
+            <i class="fas fa-arrow-left"></i> Volver a Moderación
+        </a>
+    </div>
+
+    <div class="prime-header">
+        <div class="prime-header-content">
+            <h1 class="prime-title"><i class="fas fa-gavel"></i> Cárcel de Shiori</h1>
+            <p class="prime-subtitle">Expedientes de usuarios bajo exclusión permanente. Vigilancia eterna 🏮</p>
+        </div>
+    </div>
+
+    <div class="banned-users-grid">
+        {% if banned_users %}
+        {% for user in banned_users %}
+        <div class="banned-user-card">
+            <div class="banned-user-avatar">
+                {% if user.profile_image %}
+                <img src="{{ url_for('static', filename=user.profile_image) }}" class="admin-avatar-main">
+                {% else %}
+                <div class="admin-avatar-fallback">{{ user.username[0]|upper }}</div>
+                {% endif %}
+                <div class="ban-badge-overlay"><i class="fas fa-user-slash"></i></div>
+            </div>
+
+            <div class="banned-user-info">
+                <h3>{{ user.username }}</h3>
+                <p class="banned-email">{{ user.email }}</p>
+                <div class="banned-meta-tags">
+                    <span class="tag-shiori banned">BANEADO</span>
+                    <span class="tag-shiori forensic">Historial Disponible</span>
+                </div>
+            </div>
+
+            <a href="{{ url_for('admin_user_history', user_id=user.id) }}" class="btn-examine-dossier">
+                Ver Expediente Completo <i class="fas fa-folder-open"></i>
+            </a>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="admin-empty-state prison-empty">
+            <i class="fas fa-door-open"></i>
+            <h2>Cárcel Vacía</h2>
+            <p>No hay usuarios bajo exclusión permanente. La paz reina en Shiori.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

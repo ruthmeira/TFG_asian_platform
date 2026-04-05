@@ -5,7 +5,7 @@ from flask_mail import Mail, Message
 from authlib.integrations.flask_client import OAuth  # Nueva importación
 from deep_translator import GoogleTranslator
 from dotenv import load_dotenv
-from models import db, User, CollectionItem, Review, ReviewVote, ReviewReport
+from models import db, User, CollectionItem, Review, ReviewVote, ReviewReport, ModerationLog
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
@@ -458,7 +458,13 @@ def login():
         identifier = request.form['email']  # email o username
         password = request.form['password']
         user = User.query.filter_by(email=identifier).first() or User.query.filter_by(username=identifier).first()
+        
         if user and user.check_password(password):
+            # --- VERIFICACIÓN DE BANEO SHIORI ---
+            if user.is_banned:
+                flash("Tu cuenta ha sido bloqueada permanentemente por administración de Shiori. Acceso denegado.", "error")
+                return redirect(url_for('login'))
+                
             remember = True if request.form.get('remember') else False
             login_user(user, remember=remember)
             next_page = request.args.get('next')
@@ -518,6 +524,10 @@ def google_authorize():
                 flash("No encontramos ninguna cuenta de SHIORI vinculada a este correo. Regístrate primero para poder conectar con Google.", "error")
                 return redirect(url_for('login'))
         
+        if user and user.is_banned:
+            flash("Esta cuenta ha sido bloqueada permanentemente de Shiori. Acceso denegado.", "error")
+            return redirect(url_for('login'))
+
         # Loguear al usuario existente con sesión persistente (por comodidad)
         login_user(user, remember=True)
         next_page = session.pop('google_auth_next', None)
@@ -1205,14 +1215,214 @@ def report_review(review_id):
         return jsonify({'category': 'error', 'message': 'Error al procesar el reporte.'}), 500
 
 
+from functools import wraps
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated or not getattr(current_user, 'is_admin', False):
+            flash("Acceso denegado. Se requieren permisos de administrador.", "error")
+            return redirect(url_for('home'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# --- RUTA PANEL ADMINISTRACIÓN: MODERACIÓN AVANZADA SHIORI ---
+@app.route('/admin/reviews')
+@login_required
+@admin_required
+def admin_reviews():
+    # Buscamos todas las reseñas que requieren atención (por filtro o por reporte)
+    reviews_to_moderate = Review.query.filter(
+        (Review.status == 'pending') | (Review.report_count > 0)
+    ).order_by(Review.report_count.desc(), Review.created_at.asc()).all()
+    
+    # Enriquecemos con estadísticas de reputación antes de mandar al template
+    for r in reviews_to_moderate:
+        # ¿Cuántas veces le hemos borrado cosas a este autor?
+        r.author_strikes = ModerationLog.query.filter_by(author_id=r.user_id, action='deleted_review').count()
+        
+        # ¿Cómo de fiables son las personas que han reportado?
+        for report in r.reports:
+            # ¿Cuántas denuncias "falsas" (rechazadas) ha hecho este reportero?
+            report.reporter_toxic_level = ModerationLog.query.filter_by(reporter_id=report.user_id, action='dismissed_report').count()
+            
+        # ¿Cuántas veces hemos rechazado ya denuncias contra esta misma opinión?
+        r.previous_rejections = ModerationLog.query.filter_by(review_id=r.id, action='dismissed_report').count()
+        r.previous_approvals = ModerationLog.query.filter_by(review_id=r.id, action='approved_after_filter').count()
+        
+    return render_template('admin_reviews.html', reviews=reviews_to_moderate)
+
+# ACCIÓN: ACEPTAR REPORTE (Borrar opinión e historial)
+@app.route('/admin/review/<int:review_id>/accept_report', methods=['POST'])
+@login_required
+@admin_required
+def admin_accept_report(review_id):
+    review = Review.query.get_or_404(review_id)
+    # 1. Registrar la acción para el historial (El autor recibe un strike)
+    for report in review.reports:
+         log = ModerationLog(
+             author_id=review.user_id, 
+             reporter_id=report.user_id, 
+             review_id=review.id, 
+             review_content_snapshot=review.comment, # CAPTURA FORENSE
+             action='deleted_review', 
+             reason='user_report'
+         )
+         db.session.add(log)
+    
+    # Si viene por filtro automático (no hay reporteros)
+    if not review.reports:
+        log = ModerationLog(
+            author_id=review.user_id, 
+            review_id=review.id, 
+            review_content_snapshot=review.comment, # CAPTURA FORENSE
+            action='deleted_review', 
+            reason='auto_filter'
+        )
+        db.session.add(log)
+
+    db.session.delete(review)
+    db.session.commit()
+    return redirect(url_for('admin_reviews'))
+
+# ACCIÓN: RECHAZAR REPORTE (Mantener opinión y marcar reportero como "tóxico")
+@app.route('/admin/review/<int:review_id>/reject_report', methods=['POST'])
+@login_required
+@admin_required
+def admin_reject_report(review_id):
+    review = Review.query.get_or_404(review_id)
+    
+    # Marcamos a todos los que denunciaron esta reseña con un "fallo" (falsas denuncias)
+    for report in review.reports:
+        log = ModerationLog(
+            author_id=review.user_id, # "VÍCTIMA" del reporte falso
+            reporter_id=report.user_id, # "PENSADOR" del reporte falso
+            review_id=review.id, 
+            review_content_snapshot=review.comment, # CAPTURA para ver qué denunció injustamente
+            action='dismissed_report', 
+            reason='user_report'
+        )
+        db.session.add(log)
+    
+    # Si viene por filtro (limpiar filtro de palabras)
+    if not review.reports:
+        log = ModerationLog(
+            author_id=review.user_id, 
+            review_id=review.id, 
+            action='approved_after_filter', 
+            reason='auto_filter'
+        )
+        db.session.add(log)
+
+    review.status = 'approved'
+    review.report_count = 0
+    # Borrar los reportes físicos ya procesados
+    ReviewReport.query.filter_by(review_id=review_id).delete()
+    
+    db.session.commit()
+    return redirect(url_for('admin_reviews'))
+
+
+@app.route('/admin/user/<int:user_id>/history')
+@login_required
+@admin_required
+def admin_user_history(user_id):
+    target_user = User.query.get_or_404(user_id)
+    
+    # 1. Opiniones Aceptadas (Vivas actualmente)
+    approved_reviews_count = Review.query.filter_by(user_id=user_id).count()
+    
+    # 2. Opiniones Borradas (Strikes)
+    author_logs = ModerationLog.query.filter_by(author_id=user_id, action='deleted_review').order_by(ModerationLog.created_at.desc()).all()
+    deleted_reviews_count = len(author_logs)
+    
+    # 3. Denuncias Aceptadas (Aciertos del usuario como reportero)
+    accepted_reports_count = ModerationLog.query.filter_by(reporter_id=user_id, action='deleted_review').count()
+    
+    # 4. Denuncias Rechazadas (Toxicidad del usuario como reportero)
+    reporter_logs = ModerationLog.query.filter_by(reporter_id=user_id, action='dismissed_report').order_by(ModerationLog.created_at.desc()).all()
+    rejected_reports_count = len(reporter_logs)
+    
+    return render_template('admin_user_history.html', 
+                           target_user=target_user, 
+                           author_logs=author_logs, 
+                           reporter_logs=reporter_logs,
+                           approved_reviews_count=approved_reviews_count,
+                           deleted_reviews_count=deleted_reviews_count,
+                           accepted_reports_count=accepted_reports_count,
+                           rejected_reports_count=rejected_reports_count)
+
+
+# ACCIÓN: BANEAR / DESBANEAR USUARIO (Bloqueos definitivos con limpieza de datos)
+@app.route('/admin/user/<int:user_id>/toggle_ban', methods=['POST'])
+@login_required
+@admin_required
+def admin_toggle_ban(user_id):
+    target_user = User.query.get_or_404(user_id)
+    
+    # 0. Evitar que el admin se banee a sí mismo
+    if target_user.id == current_user.id:
+        flash("🛑 No puedes banearte a ti mismo, Sensei.", "error")
+        return redirect(url_for('admin_user_history', user_id=user_id))
+
+    new_status = not target_user.is_banned
+    target_user.is_banned = new_status
+    
+    # --- SI SE BANEA, PURGAMOS TODO SU CONTENIDO REGISTRANDO EVIDENCIA ---
+    if new_status:
+        try:
+            # 1. Borrar Colecciones
+            CollectionItem.query.filter_by(user_id=user_id).delete()
+            # 2. Borrar Votos y Reportes HECHOS por él
+            ReviewVote.query.filter_by(user_id=user_id).delete()
+            ReviewReport.query.filter_by(user_id=user_id).delete()
+            
+            # 3. Borrar sus Opiniones LOGUEÁNDOLAS antes (Para el expediente)
+            user_reviews = Review.query.filter_by(user_id=user_id).all()
+            for r in user_reviews:
+                log = ModerationLog(
+                    author_id=user_id, 
+                    review_id=r.id, 
+                    review_content_snapshot=r.comment, 
+                    action='deleted_review', 
+                    reason='ban_cleanup'
+                )
+                db.session.add(log)
+                db.session.delete(r) # Borrado individual para cascade
+            
+            message = f"PURGA COMPLETADA. El usuario {target_user.username} ha sido BANEADO y su historial guardado."
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'category': 'error', 'message': f"Error en la purga: {str(e)}"}), 500
+    else:
+        # Si se desbanea, simplemente lo activamos
+        message = f"Usuario {target_user.username} reactivado."
+
+    db.session.commit()
+    return jsonify({
+        'category': 'success',
+        'message': message,
+        'is_banned': target_user.is_banned
+    })
+
+
+@app.route('/admin/banned_users')
+@login_required
+@admin_required
+def admin_banned_list():
+    banned_users = User.query.filter_by(is_banned=True).order_by(User.username).all()
+    return render_template('admin_banned_list.html', banned_users=banned_users)
+
+
 @app.route('/media/<media_type>/<int:media_id>/review', methods=['POST'])
 @login_required
 def post_review(media_type, media_id):
-    rating = request.form.get('rating', type=float)
+    rating = request.form.get('rating', type=float) # Restaurado Float para 7.5, etc.
     comment = request.form.get('comment', '').strip()
     
+    # Validamos que esté en rango (incluyendo 0.0)
     if rating is None or rating < 0 or rating > 10.0:
-        return jsonify({'message': 'La puntuación debe estar entre 1 y 10.', 'category': 'error'}), 400
+        return jsonify({'message': 'La puntuación debe estar entre 0 y 10.', 'category': 'error'}), 400
 
     # --- FILTRO AUTOMÁTICO DE PALABRAS ---
     BAD_WORDS = ["insulto1", "insulto2", "spam", "foll", "mierd", "put", "idiot"]

@@ -13,8 +13,11 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(128))
     region = db.Column(db.String(10), nullable=True) # Código ISO del país (ej: 'ES', 'MX')
     profile_image = db.Column(db.String(255), nullable=True) # Ruta de la foto
-    bio = db.Column(db.String(500), nullable=True) # Biografía personalizada
+    is_admin = db.Column(db.Boolean, default=False)
+    is_banned = db.Column(db.Boolean, default=False) # Protocolo de Baneo Shiori
     collections = db.relationship('CollectionItem', backref='user', lazy=True)
+    # Relación para ver todos los reportes hechos POR este usuario
+    reports_made = db.relationship('ReviewReport', backref='reporter', lazy=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -54,6 +57,8 @@ class Review(db.Model):
     user = db.relationship('User', backref=db.backref('reviews', lazy=True))
     # Relación para votos
     votes_objs = db.relationship('ReviewVote', backref='review', cascade='all, delete-orphan', lazy=True)
+    # Relación para reportes (para ver quién denunció)
+    reports = db.relationship('ReviewReport', backref='review_obj', cascade='all, delete-orphan', lazy=True)
 
 class ReviewVote(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -70,3 +75,17 @@ class ReviewReport(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     __table_args__ = (db.UniqueConstraint('user_id', 'review_id', name='unique_user_review_report'),)
+
+class ModerationLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True) # Autor de la reseña
+    reporter_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True) # Quien denunció (si hubo)
+    review_id = db.Column(db.Integer, nullable=True) # ID de la reseña moderada
+    review_content_snapshot = db.Column(db.Text, nullable=True) # MEMORIA FORENSE: Lo que escribió
+    action = db.Column(db.String(50)) # 'deleted_review', 'dismissed_report'
+    reason = db.Column(db.String(50)) # 'auto_filter', 'user_report'
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relaciones para estadísticas rápidas
+    author = db.relationship('User', foreign_keys=[author_id], backref=db.backref('moderation_history', lazy=True))
+    reporter_user = db.relationship('User', foreign_keys=[reporter_id], backref=db.backref('reports_history', lazy=True))

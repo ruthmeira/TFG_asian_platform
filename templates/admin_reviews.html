@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shiori_admin.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-reviews-page">
+    <!-- CABECERA ESTÁNDAR SHIORI -->
+    <div class="prime-header">
+        <div class="prime-header-content">
+            <h1 class="prime-title">Moderación de Élite</h1>
+            <p class="prime-subtitle">Control total sobre la comunidad: se vigila a los infractores y a los denunciantes tóxicos 🏮</p>
+            <div class="prime-header-actions" style="margin-top: 20px;">
+                <a href="{{ url_for('admin_banned_list') }}" class="btn-shiori-banned-list">
+                    <i class="fas fa-user-slash"></i> Gestión de Usuarios Baneados
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- LISTADO DE RESEÑAS -->
+    <div class="admin-reviews-grid">
+        {% if reviews %}
+        {% for review in reviews %}
+        <div
+            class="admin-review-card {% if review.report_count > 0 %}status-reported{% elif review.status == 'pending' %}status-pending{% endif %}">
+
+            <!-- INFO DEL AUTOR (EXPEDIENTE) -->
+            <div class="author-dossier">
+                <div class="reviewer-meta">
+                    {% if review.user.profile_image %}
+                    <img src="{{ url_for('static', filename=review.user.profile_image) }}" class="admin-avatar-thumb">
+                    {% else %}
+                    <div class="admin-avatar-initial">{{ review.user.username[0]|upper }}</div>
+                    {% endif %}
+                    <div class="reviewer-texts">
+                        <a href="{{ url_for('admin_user_history', user_id=review.user_id) }}" class="admin-user-link">
+                            <strong>{{ review.user.username }}</strong>
+                        </a>
+                        <span class="author-strikes {% if review.author_strikes > 0 %}caution{% endif %}">
+                            <i class="fas fa-history"></i> {{ review.author_strikes }} opiniones borradas anteriormente
+                        </span>
+                    </div>
+                </div>
+                <div class="review-target">
+                    <a href="{{ url_for('media_detail', media_id=review.media_id, media_type=review.media_type) }}" class="admin-media-link" target="_blank">
+                        <span class="badge-shiori-media">{{ review.media_type|upper }} #{{ review.media_id }}</span>
+                    </a>
+                    <div class="review-rating-badge">❤️ {{ review.rating }}</div>
+                </div>
+            </div>
+
+            <!-- CONTENIDO DE LA RESEÑA -->
+            <div class="admin-review-body">
+                <div class="comment-bubble">
+                    <p>"{{ review.comment }}"</p>
+                    <small>{{ review.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
+                </div>
+            </div>
+
+            <!-- LISTADO DE DENUNCIANTES (QUIÉN Y FIABILIDAD) -->
+            {% if review.reports %}
+            <div class="reporters-section">
+                <h4><i class="fas fa-bullhorn"></i> Denunciada por:</h4>
+                <div class="reporters-list">
+                    {% for rep in review.reports %}
+                    <a href="{{ url_for('admin_user_history', user_id=rep.user_id) }}"
+                        class="reporter-tag {% if rep.reporter_toxic_level > 2 %}toxic-alert{% endif %}">
+                        <strong>{{ rep.reporter.username }}</strong>
+                        <span title="Denuncias que este usuario hizo y tú rechazaste">
+                            ({{ rep.reporter_toxic_level }} reportes rechazados anteriormente)
+                        </span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="alert-shiori-mini pending">
+                <i class="fas fa-robot"></i> Retenida automáticamente por lenguaje inadecuado.
+            </div>
+            {% endif %}
+
+            {% if review.previous_rejections > 0 or review.previous_approvals > 0 %}
+            <div class="alert-shiori-mini history-warning">
+                <i class="fas fa-history"></i>
+                <span>ADMIN: Esta opinión ya fue revisada y mantenida <strong>{{ review.previous_rejections + review.previous_approvals }}</strong> veces anteriormente.</span>
+            </div>
+            {% endif %}
+
+            <!-- ACCIONES DE MANDO -->
+            <div class="admin-review-actions-dual">
+                <form action="{{ url_for('admin_accept_report', review_id=review.id) }}" method="POST">
+                    <button type="submit" class="btn-admin-action accept-d" title="Confirmar borrado de opinión">
+                        <i class="fas fa-trash-alt"></i>
+                        {{ 'Eliminar Opinión' if not review.reports else 'Aceptar Denuncia (Eliminar)' }}
+                    </button>
+                </form>
+                <form action="{{ url_for('admin_reject_report', review_id=review.id) }}" method="POST">
+                    <button type="submit" class="btn-admin-action reject-d"
+                        title="Mantener opinión y marcar reportes como basura">
+                        <i class="{{ 'fas fa-check' if not review.reports else 'fas fa-times' }}"></i>
+                        {{ 'Aprobar Opinión' if not review.reports else 'Rechazar Denuncia (Mantener)' }}
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="admin-empty-state">
+            <i class="fas fa-shield-alt"></i>
+            <h2>Comunidad en Armonía</h2>
+            <p>No hay opiniones pendientes de revisión ni denuncias activas en este momento.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

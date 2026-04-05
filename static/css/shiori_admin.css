@@ -1,0 +1,962 @@
+.admin-history-page {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0px 0 20px 0px;
+    min-height: 85vh;
+}
+
+.admin-reviews-page {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 30px 0 20px 0px;
+    min-height: 85vh;
+}
+
+.admin-banned-page {
+    padding-top: 0px !important;
+    margin-top: -15px !important;
+}
+
+.admin-header-wrapper {
+    padding: 0;
+    width: 100%;
+}
+
+/* GRID Y TARJETAS */
+.admin-reviews-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 30px;
+    width: 100%;
+}
+
+.admin-review-card {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 35px;
+    padding: 35px;
+    backdrop-filter: blur(25px);
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    transition: 0.4s;
+    border-top: 4px solid transparent;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+
+
+.admin-review-card.status-reported {
+    border-top-color: #ff4757;
+}
+
+.admin-review-card.status-pending {
+    border-top-color: #ffa502;
+}
+
+/* DOSSIER AUTOR */
+.author-dossier {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.admin-media-link {
+    text-decoration: none !important;
+    color: inherit !important;
+}
+
+.reviewer-meta {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.admin-avatar-initial {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--primary-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.admin-avatar-thumb {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+}
+
+.author-strikes {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    display: block;
+    margin-top: 3px;
+}
+
+.author-strikes.caution {
+    color: #ffa502;
+    font-weight: 700;
+}
+
+.review-rating-badge {
+    color: var(--primary);
+    font-weight: 900;
+    font-size: 1.3rem;
+}
+
+/* CUERPO DE LA RESEÑA */
+.comment-bubble {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 20px;
+}
+
+.comment-bubble p {
+    color: #fff;
+    font-style: italic;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.comment-bubble small {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.75rem;
+}
+
+/* SECCIÓN DENUNCIANTES */
+.reporters-section h4 {
+    color: #fff;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    opacity: 0.7;
+}
+
+.reporters-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.reporter-tag {
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    color: #fff !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: 0.3s ease;
+}
+
+.reporter-tag:hover {
+    background: var(--primary);
+    color: #fff !important;
+    border-color: var(--primary);
+}
+
+.reporter-tag.toxic-alert {
+    background: rgba(255, 71, 87, 0.1);
+    border-color: rgba(255, 71, 87, 0.2);
+    color: #ff4757;
+}
+
+.reporter-tag span {
+    font-size: 0.75rem;
+    opacity: 0.6;
+    margin-left: 5px;
+}
+
+/* ACCIONES DUALES */
+.admin-review-actions-dual {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: auto;
+}
+
+.alert-shiori-mini {
+    padding: 20px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+}
+
+.alert-shiori-mini.pending {
+    background: rgba(255, 165, 0, 0.1);
+    color: #ffa500;
+}
+
+.alert-shiori-mini.history-warning {
+    background: rgba(0, 162, 255, 0.1);
+    color: #00a2ff;
+    border: 1px solid rgba(0, 162, 255, 0.2);
+}
+
+.alert-shiori-mini i {
+    font-size: 1.2rem;
+}
+
+.btn-admin-action {
+    width: 100%;
+    padding: 14px;
+    border-radius: 18px;
+    border: none;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 0.85rem;
+}
+
+.btn-admin-action.accept-d {
+    background: rgba(255, 71, 87, 0.1);
+    color: #ff4757;
+    border: 1px solid rgba(255, 71, 87, 0.1);
+}
+
+.btn-admin-action.accept-d:hover {
+    background: #ff4757;
+    color: #fff;
+    box-shadow: 0 10px 20px rgba(255, 71, 87, 0.3);
+}
+
+.btn-admin-action.reject-d {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.btn-admin-action.reject-d:hover {
+    background: #fff;
+    color: #000;
+    box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+}
+
+.admin-user-link,
+.admin-user-link:visited,
+.admin-user-link:any-link {
+    text-decoration: none;
+    color: #fff !important;
+    font-weight: 850;
+    transition: 0.3s;
+    display: inline-block;
+}
+
+.admin-user-link:hover {
+    transform: scale(1.05);
+    color: var(--primary) !important;
+}
+
+.admin-empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 100px 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 2px dashed rgba(255, 255, 255, 0.05);
+    border-radius: 40px;
+}
+
+.admin-empty-state i {
+    font-size: 5rem;
+    color: rgba(255, 255, 255, 0.1);
+    margin-bottom: 30px;
+}
+
+/* ESTILOS EXPEDIENTE SHIORI (Admin user history) */
+.history-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    margin-top: 50px;
+}
+
+.reputation-summary-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 40px;
+    padding: 40px;
+    backdrop-filter: blur(20px);
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.stats-box {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.stat-item {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-val {
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 10px;
+    display: block;
+    line-height: 1;
+}
+
+/* COLORES TÁCTICOS SHIORI */
+.text-success {
+    color: #2ed573;
+    text-shadow: 0 0 20px rgba(46, 213, 115, 0.3);
+}
+
+.text-info {
+    color: #1e90ff;
+    text-shadow: 0 0 20px rgba(30, 144, 255, 0.3);
+}
+
+.strike .stat-val {
+    color: #ff4757;
+    text-shadow: 0 0 20px rgba(255, 71, 87, 0.3);
+}
+
+.toxic .stat-val {
+    color: #ffa502;
+    text-shadow: 0 0 20px rgba(255, 165, 2, 0.3);
+}
+
+.stat-lbl {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 5px;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.logs-container {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+}
+
+.log-section h2 {
+    color: #fff;
+    font-size: 1.4rem;
+    margin-bottom: 25px;
+    border-left: 4px solid var(--primary);
+    padding-left: 20px;
+}
+
+.log-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.log-entry {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.log-meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 150px;
+}
+
+.log-date {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.log-badge {
+    font-size: 0.65rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px 10px;
+    border-radius: 6px;
+    width: fit-content;
+    margin-top: 5px;
+}
+
+.strike-entry {
+    border-left: 4px solid #ff4757;
+}
+
+.toxic-entry {
+    border-left: 4px solid #ffa502;
+}
+
+.log-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.log-content p {
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+}
+
+.log-reason-tag {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.empty-log {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* PANEL ACCIONES ADMINISTRATIVAS SHIORI */
+.admin-user-actions {
+    width: 100%;
+    margin-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.admin-user-actions form {
+    width: 100%;
+}
+
+.btn-shiori-ban {
+    width: 100%;
+    background: rgba(255, 71, 87, 0.08);
+    color: #ff4757;
+    border: 1px solid rgba(255, 71, 87, 0.25);
+    padding: 18px;
+    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: 850;
+    cursor: pointer;
+    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.btn-shiori-ban:hover {
+    background: #ff4757;
+    color: #fff;
+    box-shadow: 0 15px 40px rgba(255, 71, 87, 0.4);
+    transform: translateY(-3px);
+}
+
+.btn-shiori-ban.is-banned {
+    background: rgba(46, 213, 115, 0.08);
+    color: #2ed573;
+    border-color: rgba(46, 213, 115, 0.25);
+}
+
+.btn-shiori-ban.is-banned:hover {
+    background: #2ed573;
+    color: #fff;
+    box-shadow: 0 15px 40px rgba(46, 213, 115, 0.4);
+    transform: translateY(-3px);
+}
+
+.btn-nuclear-purge-mini {
+    width: 100%;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.3);
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    padding: 12px;
+    border-radius: 15px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+    letter-spacing: 1px;
+}
+
+.btn-nuclear-purge-mini:hover {
+    color: #fff;
+    border-color: #ff4757;
+    border-style: solid;
+    background: rgba(255, 71, 87, 0.05);
+}
+
+/* HISTORIAL FORENSE SHIORI */
+.forensic-snapshot {
+    background: rgba(255, 255, 255, 0.03);
+    border-left: 4px solid #ff4757;
+    padding: 15px 20px;
+    border-radius: 0 15px 15px 0;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 15px 0;
+    font-size: 0.92rem;
+    position: relative;
+    line-height: 1.5;
+}
+
+.forensic-snapshot i {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    opacity: 0.1;
+    font-size: 2rem;
+}
+
+.no-snapshot {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    padding: 10px;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    text-align: center;
+}
+
+.victim-dossier-mini {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.victim-dossier-mini span {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.victim-tag {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px 18px;
+    border-radius: 40px;
+    width: fit-content;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mini-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.mini-initial {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1e90ff, #70a1ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: #fff;
+}
+
+.forensic-snapshot-mini {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    font-style: italic;
+    padding-left: 15px;
+    border-left: 2px solid rgba(255, 255, 255, 0.1);
+    margin: 5px 0;
+}
+
+/* --- OPTIMIZACIÓN TÁCTICA SHIORI (600px) --- */
+@media (max-width: 600px) {
+    .reputation-summary-card {
+        padding: 20px;
+        border-radius: 25px;
+    }
+
+    .stats-box {
+        gap: 12px;
+    }
+
+    .stat-item {
+        padding: 20px 10px;
+        border-radius: 18px;
+    }
+
+    .stat-val {
+        font-size: 2.4rem;
+        margin-bottom: 5px;
+    }
+
+    .stat-lbl {
+        font-size: 0.62rem;
+        font-weight: 850;
+        text-align: center;
+        max-width: 80px;
+        line-height: 1.2;
+    }
+
+    .log-list {
+        gap: 20px;
+    }
+
+    .log-entry {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 25px 20px;
+    }
+
+    .log-meta {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        min-width: auto;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding-bottom: 12px;
+    }
+
+    .log-badge {
+        margin-top: 0;
+    }
+
+    .log-content {
+        width: 100%;
+    }
+
+    .victim-tag {
+        flex-wrap: wrap;
+        padding: 8px 15px;
+    }
+
+    .btn-shiori-ban {
+        padding: 22px;
+        font-size: 0.9rem;
+    }
+
+    .log-section h2 {
+        font-size: 1.2rem;
+        padding-left: 15px;
+    }
+
+    .admin-review-card {
+        gap: 12px;
+        padding: 25px;
+    }
+
+    .author-dossier {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .review-target {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 15px;
+        padding: 0;
+        width: fit-content;
+        margin-left: 65px;
+        /* Alineado con el nombre */
+    }
+
+    .badge-shiori-media {
+        font-size: 0.72rem;
+        /* Miniaturización Shiori */
+    }
+
+    .review-rating-badge {
+        font-size: 1.1rem;
+        /* Más equilibrado */
+    }
+
+    .admin-review-actions-dual {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}
+
+/* --- MODAL DE CONFIRMACIÓN SHIORI (CLON DE ÉLITE) --- */
+.shiori-confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(12px);
+    z-index: 5000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.shiori-confirm-overlay.show {
+    display: flex;
+    opacity: 1;
+}
+
+.shiori-confirm-box {
+    background: rgba(20, 20, 20, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 35px;
+    padding: 40px;
+    width: 420px;
+    max-width: 90%;
+    text-align: center;
+    transform: scale(0.9);
+    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9);
+}
+
+.shiori-confirm-overlay.show .shiori-confirm-box {
+    transform: scale(1);
+}
+
+.confirm-icon {
+    font-size: 3.5rem;
+    color: #ff4757;
+    margin-bottom: 25px;
+}
+
+.shiori-confirm-box h3 {
+    color: #fff;
+    margin-bottom: 15px;
+    font-size: 1.6rem;
+    font-weight: 900;
+}
+
+.shiori-confirm-box p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 35px;
+    text-align: center;
+}
+
+.shiori-confirm-box p strong {
+    color: #ff4757;
+    font-weight: 800;
+}
+
+.confirm-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.confirm-btn {
+    flex: 1;
+    padding: 16px;
+    border-radius: 20px;
+    border: none;
+    font-weight: 850;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.confirm-btn.shiori-cancel {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.confirm-btn.shiori-ban-action {
+    background: #ff4757;
+    color: #fff;
+    box-shadow: 0 10px 25px rgba(255, 71, 87, 0.3);
+}
+
+.confirm-btn.shiori-cancel:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.confirm-btn.shiori-ban-action:hover {
+    background: #ff6b81;
+    color: #fff;
+    box-shadow: 0 15px 35px rgba(255, 71, 87, 0.5);
+    transform: translateY(-2px);
+}
+
+.icon-success-shiori {
+    color: #2ed573 !important;
+}
+
+.icon-info-shiori {
+    color: #1e90ff !important;
+}
+
+/* NAVEGACIÓN ADMINISTRATIVA SHIORI */
+.btn-shiori-banned-list {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 71, 87, 0.1);
+    color: #ff4757;
+    padding: 12px 25px;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 71, 87, 0.2);
+    font-weight: 850;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.btn-shiori-banned-list:hover {
+    background: #ff4757;
+    color: #fff;
+    box-shadow: 0 10px 25px rgba(255, 71, 87, 0.3);
+    transform: translateY(-2px);
+}
+
+/* REJILLA DE BANEADOS (PRISON) */
+.banned-users-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+    margin-top: 40px;
+}
+
+.banned-user-card {
+    background: rgba(20, 20, 20, 0.6);
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 35px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.banned-user-avatar {
+    position: relative;
+    width: 100px;
+    height: 100px;
+}
+
+.admin-avatar-main,
+.admin-avatar-fallback {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 71, 87, 0.5);
+}
+
+.admin-avatar-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(45deg, #ff4757, #ff6b81);
+    color: #fff;
+    font-size: 2.5rem;
+    font-weight: 900;
+}
+
+.ban-badge-overlay {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 35px;
+    height: 35px;
+    background: #ff4757;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    border: 3px solid #141414;
+    font-size: 0.8rem;
+}
+
+.banned-user-info h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 900;
+}
+
+.banned-email {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+    margin: 5px 0 15px 0;
+}
+
+.banned-meta-tags {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.tag-shiori {
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 850;
+    text-transform: uppercase;
+}
+
+.tag-shiori.banned {
+    background: rgba(255, 71, 87, 0.15);
+    color: #ff4757;
+}
+
+.tag-shiori.forensic {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.btn-examine-dossier {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    padding: 15px;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-weight: 850;
+    text-decoration: none;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-examine-dossier:hover {
+    background: #fff;
+    color: #000;
+}
+
+.prison-empty {
+    grid-column: 1 / -1;
+    padding: 100px 20px;
+    margin-bottom: 20px;
+}
