@@ -654,7 +654,7 @@
 /* SECCIÓN DE RESEÑAS SHIORI (ESTILO GLASS REFORMADO) */
 /* ===================================================== */
 .reviews-shiori-section {
-    margin: 40px auto 60px;
+    margin: 20px auto 20px;
     padding: clamp(30px, 5vw, 50px);
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -679,17 +679,17 @@
 }
 
 .reviews-shiori-header h2 {
-    font-size: clamp(1.4rem, 2.5vw, 2.2rem) !important;
+    font-size: clamp(1.3rem, 2.5vw, 2.2rem) !important;
     margin: 0 !important;
     color: #fff !important;
     font-weight: 800;
 }
 
 .shiori-count {
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: var(--text-muted);
     font-weight: 400;
-    margin-left: 10px;
+    margin-left: 3px;
 }
 
 /* BOTONES DE ACCIÓN */
