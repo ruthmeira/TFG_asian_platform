@@ -4,16 +4,16 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    
+
     // 1. IMAGE PREVIEW (Real-time avatar update)
     // Only handles the specific preview on Edit Profile
     const profileInput = document.getElementById('profile_image');
     if (profileInput) {
-        profileInput.addEventListener('change', function(e) {
+        profileInput.addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(event) {
+                reader.onload = function (event) {
                     const preview = document.getElementById('avatarPreview');
                     if (!preview) return;
 
@@ -39,17 +39,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const charCounter = document.querySelector('.char-counter');
     if (bioTextarea && charCounter) {
         const updateCounter = () => {
-             const length = bioTextarea.value.length;
-             charCounter.textContent = `${length} / 500 caracteres`;
-             if (length > 450) {
-                 charCounter.style.color = 'var(--primary)';
-             } else {
-                 charCounter.style.color = 'rgba(255, 255, 255, 0.3)';
-             }
+            const length = bioTextarea.value.length;
+            charCounter.textContent = `${length} / 500 caracteres`;
+            if (length > 450) {
+                charCounter.style.color = 'var(--primary)';
+            } else {
+                charCounter.style.color = 'rgba(255, 255, 255, 0.3)';
+            }
         };
 
         bioTextarea.addEventListener('input', updateCounter);
-        updateCounter(); 
+        updateCounter();
+    }
+
+    // 3. DELETE ACCOUNT MODAL (Profile Actions)
+    const openDelBtn = document.getElementById('open-delete-account-btn');
+    const delModal = document.getElementById('delete-account-modal');
+    const cancelDelBtn = document.getElementById('cancel-delete-account-btn');
+
+    if (openDelBtn && delModal) {
+        openDelBtn.addEventListener('click', () => {
+            delModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; 
+        });
+
+        const closeDel = () => {
+            delModal.classList.add('hidden');
+            document.body.style.overflow = '';
+        };
+
+        if (cancelDelBtn) cancelDelBtn.addEventListener('click', closeDel);
+
+        delModal.addEventListener('click', (e) => {
+            if (e.target === delModal) closeDel();
+        });
     }
 
     // NOTE: Password toggle and CapsLock warning are handled globally in main.js

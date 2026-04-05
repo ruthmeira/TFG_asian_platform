@@ -1415,6 +1415,37 @@ def admin_banned_list():
     return render_template('admin_banned_list.html', banned_users=banned_users)
 
 
+@app.route('/delete_account', methods=['POST'])
+@login_required
+def delete_account():
+    user_id = current_user.id
+    try:
+        # 1. Borrar Colecciones
+        CollectionItem.query.filter_by(user_id=user_id).delete()
+        
+        # 2. Borrar Votos y Reportes HECHOS por el usuario
+        ReviewVote.query.filter_by(user_id=user_id).delete()
+        ReviewReport.query.filter_by(user_id=user_id).delete()
+        
+        # 3. Borrar sus Opiniones (Y por cascada en models.py, sus votos y reportes recibidos)
+        user_reviews = Review.query.filter_by(user_id=user_id).all()
+        for r in user_reviews:
+            db.session.delete(r)
+        
+        # 4. Borrar el Usuario
+        user = User.query.get(user_id)
+        db.session.delete(user)
+        db.session.commit()
+        
+        # 5. Cerrar Sesión
+        logout_user()
+        return redirect(url_for('home'))
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Error al eliminar la cuenta: {str(e)}", "error")
+        return redirect(url_for('profile'))
+
+
 @app.route('/media/<media_type>/<int:media_id>/review', methods=['POST'])
 @login_required
 def post_review(media_type, media_id):
