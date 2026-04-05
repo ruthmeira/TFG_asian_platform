@@ -1188,7 +1188,8 @@ def vote_review(review_id):
 @login_required
 def delete_review(review_id):
     review = Review.query.get_or_404(review_id)
-    if review.user_id != current_user.id:
+    # El Administrador Shiori puede borrar cualquier opinión
+    if review.user_id != current_user.id and not current_user.is_admin:
         return jsonify({'message': 'No tienes permiso para borrar esta opinión.', 'category': 'error'}), 403
     
     db.session.delete(review)

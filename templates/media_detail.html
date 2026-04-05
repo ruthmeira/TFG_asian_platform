@@ -454,14 +454,16 @@
                         </button>
                     </div>
 
-                    {% if current_user.is_authenticated and current_user.id == r.user_id %}
-                    <button class="btn-delete-shiori-btn" data-id="{{ r.id }}" title="Eliminar mi opinión">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                    {% elif current_user.is_authenticated %}
-                    <button class="btn-report-shiori-btn" data-id="{{ r.id }}" title="Reportar esta opinión">
-                        <i class="fas fa-flag"></i>
-                    </button>
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.id == r.user_id or current_user.is_admin %}
+                        <button class="btn-delete-shiori-btn" data-id="{{ r.id }}" title="{{ 'Eliminar esta opinión (Admin)' if current_user.is_admin else 'Eliminar mi opinión' }}">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                        {% else %}
+                        <button class="btn-report-shiori-btn" data-id="{{ r.id }}" title="Reportar esta opinión">
+                            <i class="fas fa-flag"></i>
+                        </button>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>
