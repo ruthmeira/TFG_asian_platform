@@ -147,6 +147,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const label = cat === 'movie' ? 'Película' : (cat === 'program' ? 'Programa' : 'Serie');
         const poster = item.image || '/static/img/no-poster.png';
 
+        // Rating de comunidad Shiori (Permanente)
+        const sRating = (item.shiori_rating || 0).toFixed(1);
+        const shioriRatingHTML = `<span class="shiori-rating"><i class="fas fa-heart"></i> ${sRating}</span>`;
+
         link.innerHTML = `
             <div class="card">
                 <div class="badge">${label.toUpperCase()}</div>
@@ -155,7 +159,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <h4>${item.title}</h4>
                     <h6>${item.original_title || ''}</h6>
                     <div class="card-meta">
-                        <span class="rating">⭐ ${item.rating ? item.rating.toFixed(1) : '0.0'}</span>
+                        <div style="display: flex; gap: 8px;">
+                            <span class="rating">⭐ ${item.rating ? item.rating.toFixed(1) : '0.0'}</span>
+                            ${shioriRatingHTML}
+                        </div>
                         ${item.flag ? `<span class="lang">${item.flag}</span>` : ''}
                     </div>
                 </div>

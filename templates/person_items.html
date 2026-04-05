@@ -8,7 +8,10 @@
             <h4>{{ work.display_title }}</h4>
             <h6>{{ work.original_title_h6 }}</h6>
             <div class="card-meta">
-                <span class="rating">⭐ {{ (work.vote_average or 0)|round(1) }}</span>
+                <div style="display: flex; gap: 8px;">
+                    <span class="rating">⭐ {{ (work.vote_average or 0)|round(1) }}</span>
+                    <span class="shiori-rating"><i class="fas fa-heart"></i> {{ (work.shiori_rating or 0.0)|round(1) }}</span>
+                </div>
                 <span class="lang">{{ work.flag }}</span>
             </div>
         </div>

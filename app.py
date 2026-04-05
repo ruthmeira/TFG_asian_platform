@@ -99,54 +99,7 @@ GENRES_BY_TYPE = {
 # --- UTILIDADES MAESTRAS ---
 tmdb_session = requests.Session()
 
-def fetch_json(url):
-    try:
-        response = tmdb_session.get(url, timeout=5)
-        return response.json() if response.status_code == 200 else {}
-    except:
-        return {}
 
-def get_media_summary(m_id, m_type, country_hint=None):
-    """
-    Obtiene los datos base (tarjeta) de un medio usando la jerarquía ES/MX/EN.
-    Optimizado: 1 sola llamada usando append_to_response=translations.
-    """
-    api_key = os.getenv("TMDB_API_KEY")
-    url = f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=es-ES&append_to_response=translations"
-    
-    res_es = fetch_json(url)
-    if not res_es or not res_es.get('id'): return None
-    
-    # Extraer traducciones (Solo ES, MX y Salvavidas EN)
-    trans = res_es.get('translations', {}).get('translations', [])
-    t_es = next((x['data'] for x in trans if x['iso_3166_1'] == 'ES'), {})
-    t_mx = next((x['data'] for x in trans if x['iso_3166_1'] == 'MX'), {})
-    t_en = next((x['data'] for x in trans if x['iso_639_1'] == 'en'), {})
-
-    # REGLA DE 3 (ES > MX > EN > Original)
-    # Buscamos ES/MX, si no EN, y si todo falla, el Título Original (para evitar None)
-    best_title = t_es.get('title') or t_es.get('name') or \
-                 t_mx.get('title') or t_mx.get('name') or \
-                 t_en.get('title') or t_en.get('name') or \
-                 res_es.get('original_title') or res_es.get('original_name') or "-"
-
-    summary = {
-        'id': res_es.get('id'),
-        'title': best_title,
-        'poster_path': res_es.get('poster_path'),
-        'vote_average': res_es.get('vote_average', 0),
-        'original_title': res_es.get('original_title' if m_type=='movie' else 'original_name'),
-        'flag': get_media_flag(res_es, res_es, country_hint=country_hint)
-    }
-    
-    genre_ids = [g.get('id') for g in res_es.get('genres', [])]
-    if m_type == 'movie':
-        summary['media_subtype'] = 'Película'
-    else:
-        is_prod = any(gid in GENRES_PROGRAMAS for gid in genre_ids)
-        summary['media_subtype'] = 'Programa' if is_prod else 'Serie'
-    
-    return summary
 
 def sync_collections():
     """
@@ -421,6 +374,72 @@ def cleanup_user_caches():
         keys_to_del = list(USER_CONTEXT_CACHES.keys())[:100]
         for k in keys_to_del:
             USER_CONTEXT_CACHES.pop(k, None)
+
+
+def fetch_json(url):
+    try:
+        response = tmdb_session.get(url, timeout=5)
+        return response.json() if response.status_code == 200 else {}
+    except:
+        return {}
+
+def get_media_summary(m_id, m_type, country_hint=None):
+    """
+    Obtiene los datos base (tarjeta) de un medio usando la jerarquía ES/MX/EN.
+    Optimizado: 1 sola llamada usando append_to_response=translations.
+    """
+    api_key = os.getenv("TMDB_API_KEY")
+    url = f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=es-ES&append_to_response=translations"
+    
+    res_es = fetch_json(url)
+    if not res_es or not res_es.get('id'): return None
+    
+    # Extraer traducciones (Solo ES, MX y Salvavidas EN)
+    trans = res_es.get('translations', {}).get('translations', [])
+    t_es = next((x['data'] for x in trans if x['iso_3166_1'] == 'ES'), {})
+    t_mx = next((x['data'] for x in trans if x['iso_3166_1'] == 'MX'), {})
+    t_en = next((x['data'] for x in trans if x['iso_639_1'] == 'en'), {})
+
+    # REGLA DE 3 (ES > MX > EN > Original)
+    best_title = t_es.get('title') or t_es.get('name') or \
+                 t_mx.get('title') or t_mx.get('name') or \
+                 t_en.get('title') or t_en.get('name') or \
+                 res_es.get('original_title') or res_es.get('original_name') or "-"
+
+    summary = {
+        'id': res_es.get('id'),
+        'title': best_title,
+        'poster_path': res_es.get('poster_path'),
+        'vote_average': res_es.get('vote_average', 0),
+        'original_title': res_es.get('original_title' if m_type=='movie' else 'original_name'),
+        'flag': get_media_flag(res_es, res_es, country_hint=country_hint)
+    }
+    
+    genre_ids = [g.get('id') for g in res_es.get('genres', [])]
+    if m_type == 'movie':
+        summary['media_subtype'] = 'Película'
+    else:
+        is_prod = any(gid in GENRES_PROGRAMAS for gid in genre_ids)
+        summary['media_subtype'] = 'Programa' if is_prod else 'Serie'
+    
+    # Puntuación de Shiori (Comunidad)
+    try:
+        from models import Review
+        with app.app_context():
+            s_rating = db.session.query(db.func.avg(Review.rating)).filter_by(
+                media_id=m_id, media_type=m_type, status='approved'
+            ).scalar() or 0
+            s_count = Review.query.filter_by(
+                media_id=m_id, media_type=m_type, status='approved'
+            ).count()
+            summary['shiori_rating'] = round(float(s_rating), 1)
+            summary['shiori_count'] = s_count
+    except Exception as e:
+        summary['shiori_rating'] = 0
+        summary['shiori_count'] = 0
+        print(f"⚠️ Error cargando rating Shiori para {m_id}: {e}")
+        
+    return summary
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -817,8 +836,20 @@ def collections():
         user_collections[status] = CollectionItem.query.filter_by(
             user_id=current_user.id, status=status
         ).order_by(CollectionItem.created_at.desc()).limit(10).all()
+        # Enriquecer cada item del bloque
+        for item in user_collections[status]:
+            s_rating = db.session.query(db.func.avg(Review.rating)).filter_by(
+                media_id=item.media_id, media_type=item.media_type, status='approved'
+            ).scalar() or 0
+            item.shiori_rating = round(float(s_rating), 1)
 
     favorites = CollectionItem.query.filter_by(user_id=current_user.id, is_favorite=True).order_by(CollectionItem.created_at.desc()).limit(10).all()
+    for item in favorites:
+        s_rating = db.session.query(db.func.avg(Review.rating)).filter_by(
+            media_id=item.media_id, media_type=item.media_type, status='approved'
+        ).scalar() or 0
+        item.shiori_rating = round(float(s_rating), 1)
+
     return render_template('collections.html', collections=user_collections, favorites=favorites)
 
 
@@ -841,6 +872,13 @@ def view_collection(status):
 
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     items = pagination.items
+
+    # Enriquecer con rating Shiori dinámico
+    for item in items:
+        s_rating = db.session.query(db.func.avg(Review.rating)).filter_by(
+            media_id=item.media_id, media_type=item.media_type, status='approved'
+        ).scalar() or 0
+        item.shiori_rating = round(float(s_rating), 1)
 
     # SI ES AJAX, ENVIAMOS SOLO LA REJILLA (Sin cabecera ni navbar)
     if ajax:
@@ -2191,6 +2229,8 @@ def api_search_unified():
                                 'original_title': summary.get('original_title', ""),
                                 'image': f"https://image.tmdb.org/t/p/w300{summary['poster_path']}" if summary['poster_path'] else None,
                                 'rating': summary.get('vote_average', 0), 
+                                'shiori_rating': summary.get('shiori_rating', 0),
+                                'shiori_count': summary.get('shiori_count', 0),
                                 'flag': summary.get('flag', '🌏')
                             }, ensure_ascii=False) + '\n'
 
