@@ -38,3 +38,35 @@ class CollectionItem(db.Model):
     is_favorite = db.Column(db.Boolean, default=False)
     media_subtype = db.Column(db.String(20)) # 'Serie' o 'Programa'
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Review(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    media_id = db.Column(db.Integer, nullable=False)
+    media_type = db.Column(db.String(10), nullable=False) # 'movie' o 'tv'
+    rating = db.Column(db.Float) # Se cambió de Integer a Float para permitir 9.5, etc.
+    comment = db.Column(db.Text) # Opinión larga
+    status = db.Column(db.String(20), default='approved') # 'approved' por defecto ahora
+    report_count = db.Column(db.Integer, default=0) # Contador de denuncias
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relación para acceder al usuario autor de la reseña
+    user = db.relationship('User', backref=db.backref('reviews', lazy=True))
+    # Relación para votos
+    votes_objs = db.relationship('ReviewVote', backref='review', cascade='all, delete-orphan', lazy=True)
+
+class ReviewVote(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    review_id = db.Column(db.Integer, db.ForeignKey('review.id'), nullable=False)
+    vote_type = db.Column(db.String(10), nullable=False) # 'like' o 'dislike'
+    
+    __table_args__ = (db.UniqueConstraint('user_id', 'review_id', name='unique_user_review_vote'),)
+
+class ReviewReport(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    review_id = db.Column(db.Integer, db.ForeignKey('review.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    __table_args__ = (db.UniqueConstraint('user_id', 'review_id', name='unique_user_review_report'),)

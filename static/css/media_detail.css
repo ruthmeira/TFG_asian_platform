@@ -11,7 +11,8 @@
     /* View-specific animations now handled globally in style.css */
     animation: fadeIn 0.4s ease;
     width: 100%;
-    min-height: 800px; /* Safety for dropdown menus vs footer */
+    min-height: 800px;
+    /* Safety for dropdown menus vs footer */
 }
 
 .media-poster {
@@ -89,7 +90,8 @@
     justify-content: center;
     align-items: center;
     gap: 15px;
-    margin-bottom: 0; /* Espaciado controlado por el gap del padre */
+    margin-bottom: 0;
+    /* Espaciado controlado por el gap del padre */
 }
 
 .links-group {
@@ -152,7 +154,8 @@
     margin-bottom: 25px;
     letter-spacing: -1px;
     line-height: 1.2;
-    display: block; /* Contenedor */
+    display: block;
+    /* Contenedor */
 }
 
 .detail-year {
@@ -160,7 +163,8 @@
     font-weight: 300;
     font-size: clamp(1.2rem, 3vw, 2rem);
     margin-left: 10px;
-    display: inline; /* Flujo natural de texto */
+    display: inline;
+    /* Flujo natural de texto */
     vertical-align: baseline;
     white-space: nowrap;
 }
@@ -210,7 +214,8 @@
     font-size: clamp(1.1rem, 2.5vw, 1.5rem);
     color: var(--primary);
     display: block;
-    margin-bottom: 10px; /* Reducido */
+    margin-bottom: 10px;
+    /* Reducido */
 }
 
 .overview-text {
@@ -316,7 +321,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px; /* Reducido */
+    margin-bottom: 10px;
+    /* Reducido */
 }
 
 .season-card-full {
@@ -361,19 +367,22 @@
     align-items: center;
     margin-bottom: clamp(4px, 1vw, 8px);
     width: 100%;
-    gap: clamp(8px, 1.5vw, 15px); /* Espacio elástico */
+    gap: clamp(8px, 1.5vw, 15px);
+    /* Espacio elástico */
     /* Quitamos flex-wrap para que se queden siempre juntos */
 }
 
 .season-title-row h3 {
-    font-size: clamp(0.95rem, 1.6vw, 1.5rem); /* Tamaño mínimo legible */
+    font-size: clamp(0.95rem, 1.6vw, 1.5rem);
+    /* Tamaño mínimo legible */
     color: #fff;
     font-weight: 800;
     margin: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-width: 0; /* Permite que Flexbox lo encoja de verdad */
+    min-width: 0;
+    /* Permite que Flexbox lo encoja de verdad */
 }
 
 .season-rating {
@@ -382,13 +391,15 @@
     padding: clamp(4px, 0.6vw, 6px) clamp(8px, 1vw, 14px);
     border-radius: 50px;
     font-weight: 800;
-    font-size: clamp(11px, 0.8vw, 13px); /* Tamaño elástico sincronizado */
+    font-size: clamp(11px, 0.8vw, 13px);
+    /* Tamaño elástico sincronizado */
     border: 1px solid rgba(255, 69, 0, 0.25);
     box-shadow: 0 0 15px rgba(255, 69, 0, 0.15);
     display: flex;
     align-items: center;
     gap: 6px;
-    flex-shrink: 0; /* No permitir que se aplaste demasiado, solo que se encoja */
+    flex-shrink: 0;
+    /* No permitir que se aplaste demasiado, solo que se encoja */
 }
 
 .season-rating i {
@@ -438,7 +449,8 @@
 }
 
 .detail-watch p:first-child {
-    margin-bottom: 10px; /* Reducido */
+    margin-bottom: 10px;
+    /* Reducido */
     color: var(--primary);
     font-size: clamp(1.1rem, 2.5vw, 1.5rem);
     font-weight: 700;
@@ -496,20 +508,24 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px; /* Reducido */
+    margin-bottom: 10px;
+    /* Reducido */
 }
 
 .cast-scroll-container {
     display: flex;
     gap: clamp(15px, 2vw, 25px);
     overflow-x: auto;
-    padding: 15px 5px 10px 5px; /* Added top padding for the bar */
+    padding: 15px 5px 10px 5px;
+    /* Added top padding for the bar */
     scroll-behavior: smooth;
     width: 100%;
     /* Mirror technique to put scrollbar on top */
     transform: rotateX(180deg);
-    -ms-transform: rotateX(180deg); /* IE 9 */
-    -webkit-transform: rotateX(180deg); /* Safari and Chrome */
+    -ms-transform: rotateX(180deg);
+    /* IE 9 */
+    -webkit-transform: rotateX(180deg);
+    /* Safari and Chrome */
 }
 
 /* Custom scrollbar for better UX */
@@ -585,7 +601,8 @@
     font-size: clamp(1.1rem, 2.5vw, 1.5rem);
     color: var(--primary);
     display: block;
-    margin-bottom: 10px; /* Reducido */
+    margin-bottom: 10px;
+    /* Reducido */
 }
 
 .keywords-list-wrapper {
@@ -632,8 +649,707 @@
 }
 
 
+
 /* ===================================================== */
-/* TABLET (601px - 1024px) - AJUSTES DE ESTRUCTURA */
+/* SECCIÓN DE RESEÑAS SHIORI (ESTILO GLASS REFORMADO) */
+/* ===================================================== */
+.reviews-shiori-section {
+    margin: 40px auto 60px;
+    padding: clamp(30px, 5vw, 50px);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 35px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.3);
+}
+
+.reviews-shiori-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.shiori-reviews-toolbar {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.reviews-shiori-header h2 {
+    font-size: clamp(1.4rem, 2.5vw, 2.2rem) !important;
+    margin: 0 !important;
+    color: #fff !important;
+    font-weight: 800;
+}
+
+.shiori-count {
+    font-size: 1rem;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-left: 10px;
+}
+
+/* BOTONES DE ACCIÓN */
+.btn-review-primary {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 10px 20px rgba(255, 69, 0, 0.3);
+}
+
+.btn-review-primary:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 15px 30px rgba(255, 69, 0, 0.5);
+}
+
+.btn-review-muted {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    text-decoration: none;
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: var(--transition);
+}
+
+.btn-review-muted:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.no-reviews-placeholder {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.015);
+    border: 2px dashed rgba(255, 255, 255, 0.04);
+    border-radius: 25px;
+}
+
+.no-reviews-placeholder i {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    opacity: 0.2;
+}
+
+/* ===================================================== */
+/* MODAL DE RESEÑA (LIMPIEZA FINAL DE CÓDIGO)         */
+/* ===================================================== */
+.modal-overlay-shiori {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(12px);
+    z-index: 5000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-container-glass {
+    width: 95%;
+    max-width: 480px;
+    background: rgba(20, 20, 20, 1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 40px;
+    padding: 35px;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.9);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #fff;
+}
+
+.btn-close-modal {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 2rem;
+    cursor: pointer;
+    opacity: 0.4;
+    transition: 0.3s;
+}
+
+.btn-close-modal:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+
+/* Puntuación (MÁS COMPACTA) */
+.rating-display-header {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+#rating-value-shiori {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--primary);
+    line-height: 1;
+}
+
+.rating-dynamic-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.range-shiori-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    max-width: 360px;
+    margin: 15px auto 30px;
+    /* BARRA MÁS LARGA */
+}
+
+.range-shiori-container i {
+    color: var(--text-muted);
+    opacity: 0.6;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.range-shiori-container i:hover {
+    color: var(--primary);
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.range-shiori-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+#rating-range-shiori {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    outline: none;
+    cursor: pointer;
+}
+
+#rating-range-shiori::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    background: #fff;
+    border: 4px solid var(--primary);
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(255, 69, 0, 0.5);
+}
+
+/* Comentario (MÁS GRANDE) */
+.comment-group {
+    margin-top: 30px;
+}
+
+.comment-group label {
+    display: block;
+    font-weight: 800;
+    color: var(--primary);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    margin-bottom: 12px !important;
+}
+
+#review-comment {
+    width: 100%;
+    height: 180px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 18px;
+    color: #fff;
+    font-family: inherit;
+    resize: none;
+    outline: none;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* REDUCCIÓN DINÁMICA DE SHIORI (Para no alargar el modal) */
+#shiori-review-form.has-alert #review-comment {
+    height: 110px;
+}
+
+/* Scrollbar Shiori (Equilibrio de Grosor y Seguridad) */
+#review-comment::-webkit-scrollbar {
+    width: 10px;
+    /* Más grueso y visible */
+}
+
+#review-comment::-webkit-scrollbar-thumb {
+    background-color: var(--primary);
+    background-clip: content-box;
+    border: 2px solid transparent;
+    /* Crea el aire para no salirse */
+    border-radius: 10px;
+}
+
+#review-comment::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 10px 0;
+}
+
+#review-comment:focus {
+    border-color: var(--primary);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.char-counter {
+    text-align: right;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+/* Botón Final */
+.btn-submit-full-shiori {
+    width: 100%;
+    padding: 18px;
+    margin-top: 40px;
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-submit-full-shiori:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(255, 69, 0, 0.4);
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Tarjetas de Opinión */
+.shiori-reviews-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+.shiori-review-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 25px 25px 12px 25px;
+    /* Reducido abajo */
+    transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.review-body-shiori {
+    margin-top: 15px;
+    /* Más espacio desde foto y nombre */
+}
+
+/* MODAL DE CONFIRMACIÓN CUSTOM SHIORI */
+.shiori-confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.shiori-confirm-overlay.show {
+    display: flex;
+    opacity: 1;
+}
+
+.shiori-confirm-box {
+    background: rgba(25, 25, 25, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 28px;
+    padding: 30px;
+    width: 350px;
+    max-width: 90%;
+    text-align: center;
+    transform: scale(0.9);
+    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+.shiori-confirm-overlay.show .shiori-confirm-box {
+    transform: scale(1);
+}
+
+.confirm-icon {
+    font-size: 2.8rem;
+    color: #ff4757;
+    margin-bottom: 20px;
+}
+
+.shiori-confirm-box h3 {
+    color: #fff;
+    margin-bottom: 12px;
+    font-size: 1.4rem;
+    font-weight: 800;
+}
+
+.shiori-confirm-box p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 30px;
+}
+
+.confirm-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.confirm-btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 16px;
+    border: none;
+    font-weight: 850;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.confirm-btn.shiori-cancel {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.confirm-btn.shiori-delete {
+    background: #ff4757;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
+}
+
+.confirm-btn.shiori-cancel:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.confirm-btn.shiori-delete:hover {
+    background: #ff6b81;
+    box-shadow: 0 8px 25px rgba(255, 71, 87, 0.5);
+    transform: translateY(-2px);
+}
+
+.review-footer-shiori {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    /* Línea divisoria suave */
+}
+
+.review-engagement-shiori {
+    display: flex;
+    gap: 15px;
+}
+
+.engagement-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    padding: 6px 12px;
+    border-radius: 12px;
+}
+
+.engagement-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.like-btn.active {
+    color: #00d2ff !important;
+    background: rgba(0, 210, 255, 0.1) !important;
+    text-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
+}
+
+.dislike-btn.active {
+    color: #ff4757 !important;
+    background: rgba(255, 71, 87, 0.1) !important;
+    text-shadow: 0 0 10px rgba(255, 71, 87, 0.3);
+}
+
+.btn-delete-shiori-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 8px;
+    border-radius: 10px;
+    display: flex;
+}
+
+.btn-delete-shiori-btn:hover {
+    color: #ff4757;
+    background: rgba(255, 71, 87, 0.1);
+    transform: scale(1.1);
+}
+
+.shiori-review-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px; /* DISTANCIA DE SEGURIDAD */
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1; /* TOMA EL ESPACIO SOBRANTE */
+    min-width: 0; /* PERMITE QUE EL TEXTO RECORTE */
+}
+
+.user-avatar-shiori {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    flex-shrink: 0; /* PROHIBIDO DEFORMARSE */
+    aspect-ratio: 1 / 1;
+}
+
+.user-avatar-initial-shiori {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--primary-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: white;
+    font-size: 1rem;
+    box-shadow: 0 4px 10px rgba(255, 69, 0, 0.3);
+    flex-shrink: 0; /* PROHIBIDO DEFORMARSE */
+    aspect-ratio: 1 / 1;
+}
+
+.user-text-shiori {
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* CRUCIAL PARA EL ELLIPSIS */
+}
+
+.user-name {
+    font-weight: 700;
+    color: #fff;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.review-date-shiori {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.review-rating-shiori {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0; /* NO SE MUEVE NI SE PISA */
+}
+
+.shiori-heart-rating {
+    color: #ff4757;
+    /* Rojo vibrante Shiori */
+    filter: drop-shadow(0 0 5px rgba(255, 71, 87, 0.4));
+    margin-right: 8px;
+    font-size: 1.1rem;
+}
+
+
+
+.rating-num-shiori {
+    font-size: 1.15rem;
+    font-weight: 850;
+    color: var(--primary);
+    line-height: 1;
+}
+
+.rating-text-shiori {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-top: 4px;
+}
+
+.review-body-shiori p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.75);
+    margin: 0;
+    font-style: italic;
+    overflow-wrap: break-word;
+    /* Fuerza el salto en textos largos */
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+/* BOTÓN DE REPORTE SHIORI */
+.btn-report-shiori-btn {
+    background: transparent;
+    color: var(--text-muted);
+    border: none;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: 0.3s;
+    opacity: 0.7;
+    margin-left: 10px;
+}
+
+.btn-report-shiori-btn:hover {
+    color: #ffa502;
+    transform: scale(1.15);
+    opacity: 1;
+}
+
+.shiori-report {
+    background: #ffa502 !important;
+    color: #fff !important;
+    box-shadow: 0 4px 15px rgba(255, 165, 2, 0.4) !important;
+}
+
+.shiori-report:hover {
+    background: #ffbc4d !important;
+    box-shadow: 0 8px 25px rgba(255, 165, 2, 0.6) !important;
+}
+
+.report-icon {
+    color: #ffa502 !important;
+}
+
+/* CLASES DE ESTADO SHIORI PARA ICONOS Y MODALES */
+.icon-success-shiori {
+    color: #2ed573 !important;
+}
+
+.icon-info-shiori {
+    color: #1e90ff !important;
+}
+
+.icon-error-shiori {
+    color: #ff4757 !important;
+}
+
+/* ALERTAS FLOTANTES SHIORI (ULTRA-PREMIUM) */
+.shiori-floating-alert {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: rgba(20, 20, 20, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 16px 30px;
+    border-radius: 50px;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    font-weight: 700;
+    font-size: 0.95rem;
+    animation: alertPopIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.shiori-floating-alert.success {
+    border-color: #2ed573;
+    box-shadow: 0 10px 30px rgba(46, 213, 115, 0.2);
+}
+
+.shiori-floating-alert.info {
+    border-color: #1e90ff;
+    box-shadow: 0 10px 30px rgba(30, 144, 255, 0.2);
+}
+
+.shiori-floating-alert.error {
+    border-color: #ff4757;
+    box-shadow: 0 10px 30px rgba(255, 71, 87, 0.2);
+}
+
+@keyframes alertPopIn {
+    to {
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* ===================================================== */
+/* RESPONSIVE QUERIES SHIORI (BOTTOM)                   */
 /* ===================================================== */
 @media (min-width: 601px) and (max-width: 1024px) {
     .media-detail-container {
@@ -670,12 +1386,14 @@
         top: 0 !important;
         align-items: center;
         text-align: center;
-        gap: 15px; /* ESPACIO RESTAURADO PARA QUE RESPIRE */
+        gap: 15px;
+        /* ESPACIO RESTAURADO PARA QUE RESPIRE */
     }
 
     .media-poster img {
         max-width: clamp(200px, 60vw, 250px);
-        margin-bottom: 0px; /* MARGEN ELIMINADO PARA PEGAR LAS REDES */
+        margin-bottom: 0px;
+        /* MARGEN ELIMINADO PARA PEGAR LAS REDES */
     }
 
     .media-info {

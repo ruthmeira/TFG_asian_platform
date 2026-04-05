@@ -17,7 +17,7 @@ window.MediaDetail = (() => {
         const iframe = trailerModal.querySelector('#trailer-iframe');
         const closeModal = trailerModal.querySelector('#close-modal');
         const overlay = trailerModal.querySelector('.modal-overlay');
-        
+
         // The key is usually in a data attribute for modularity
         const key = trailerBtn.dataset.key;
 
@@ -37,7 +37,7 @@ window.MediaDetail = (() => {
         trailerBtn.onclick = open;
         if (closeModal) closeModal.onclick = close;
         if (overlay) overlay.onclick = close;
-        
+
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && !trailerModal.classList.contains('hidden')) close();
         });
@@ -127,9 +127,9 @@ window.addEventListener('load', () => {
     setTimeout(() => {
         const path = window.location.pathname;
         if (path.includes('/media/')) {
-            fetch(path + '/cast').catch(() => {});
+            fetch(path + '/cast').catch(() => { });
             if (path.includes('/tv/')) {
-                fetch(path + '/seasons').catch(() => {});
+                fetch(path + '/seasons').catch(() => { });
             }
         }
     }, 1500);

@@ -521,10 +521,12 @@ main {
         gap: 20px;
         padding-bottom: 25px;
     }
+
     .prime-header-content {
         align-items: center;
         text-align: center;
     }
+
     .prime-header-actions {
         width: 100%;
         justify-content: center;
@@ -997,9 +999,9 @@ main {
     }
 
     /* OPTIMIZACIÓN SELECTIVA DE SCROLL (SIN ROMPER RENDERIZADO) */
-    .media-carousel, 
-    .cast-scroll-container, 
-    .known-for-grid, 
+    .media-carousel,
+    .cast-scroll-container,
+    .known-for-grid,
     .collection-grid-premium {
         -webkit-overflow-scrolling: touch;
         scroll-snap-type: x mandatory;
@@ -1317,20 +1319,24 @@ main {
 /* GLOBAL PROVIDER ICONS OVERRIDES                       */
 /* ===================================================== */
 /* Scale horizontal logos for better legibility */
-div[data-id="344"] svg, div[data-provider-id="344"] svg,
-div[data-id="1773"] svg, div[data-provider-id="1773"] svg {
+div[data-id="344"] svg,
+div[data-provider-id="344"] svg,
+div[data-id="1773"] svg,
+div[data-provider-id="1773"] svg {
     transform: scale(1.3);
 }
 
 /* Hover effects for all provider circles */
-.platform-circle:hover svg, 
+.platform-circle:hover svg,
 .platform-circle-detail:hover svg {
     transform: scale(1.1);
 }
 
 /* Specific hover for the horizontal ones */
-div[data-id="344"]:hover svg, div[data-provider-id="344"]:hover svg,
-div[data-id="1773"]:hover svg, div[data-provider-id="1773"]:hover svg {
+div[data-id="344"]:hover svg,
+div[data-provider-id="344"]:hover svg,
+div[data-id="1773"]:hover svg,
+div[data-provider-id="1773"]:hover svg {
     transform: scale(1.4);
 }
 
@@ -1345,7 +1351,8 @@ div[data-id="1773"]:hover svg, div[data-provider-id="1773"]:hover svg {
     -webkit-backdrop-filter: blur(25px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     padding: 15px 0;
-    margin: -15px -15px 25px -15px; /* Pull up to stick and give space below */
+    margin: -15px -15px 25px -15px;
+    /* Pull up to stick and give space below */
     width: calc(100% + 30px);
     display: flex;
     justify-content: center;
@@ -1420,21 +1427,21 @@ div[data-id="1773"]:hover svg, div[data-provider-id="1773"]:hover svg {
     .home-hero-search {
         margin-bottom: 0;
     }
-    
+
     .search-sub-nav {
         padding: 0 15px;
     }
-    
+
     .search-bar-inline {
         padding: 1px 4px 1px 15px;
     }
-    
+
     .search-btn-mini {
         padding: 6px 15px;
         font-size: 0.8rem;
     }
-    
+
     #home-search-input {
         font-size: 0.85rem;
     }
-}
+}

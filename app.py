@@ -5,7 +5,7 @@ from flask_mail import Mail, Message
 from authlib.integrations.flask_client import OAuth  # Nueva importación
 from deep_translator import GoogleTranslator
 from dotenv import load_dotenv
-from models import db, User, CollectionItem
+from models import db, User, CollectionItem, Review, ReviewVote, ReviewReport
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
@@ -943,6 +943,15 @@ def media_detail(media_type, media_id):
         item = CollectionItem.query.filter_by(user_id=current_user.id, media_id=media_id, media_type=media_type).first()
         if item: current_status, is_favorite = item.status, item.is_favorite
 
+    # DATOS DE SHIORI (Rating y Opiniones de la comunidad)
+    shiori_rating = db.session.query(db.func.avg(Review.rating)).filter_by(media_id=media_id, media_type=media_type, status='approved').scalar() or 0
+    shiori_count = Review.query.filter_by(media_id=media_id, media_type=media_type, status='approved').count()
+    approved_reviews = Review.query.filter_by(media_id=media_id, media_type=media_type, status='approved').order_by(Review.created_at.desc()).all()
+    
+    user_review = None
+    if current_user.is_authenticated:
+        user_review = Review.query.filter_by(user_id=current_user.id, media_id=media_id, media_type=media_type).first()
+
     if cached:
         # Pre-procesar providers si la región cambió o no estaban
         if cached.get('cached_user_region') != user_region:
@@ -961,7 +970,11 @@ def media_detail(media_type, media_id):
                                keywords=cached.get('keywords_processed', []), 
                                real_media_type='movie' if media_type == 'movie' else ('show' if cached.get('media_subtype') == 'Programa' else 'tv'), 
                                cast=cached.get('cast_processed', []), 
-                               crew=cached.get('crew_processed', []))
+                               crew=cached.get('crew_processed', []),
+                               shiori_rating=shiori_rating,
+                               shiori_count=shiori_count,
+                               reviews=approved_reviews,
+                               user_review=user_review)
 
     api_key = os.getenv("TMDB_API_KEY")
     is_tv = media_type == 'tv' or ('show' in request.path)
@@ -1119,7 +1132,120 @@ def media_detail(media_type, media_id):
                            keywords=res.get('keywords_processed', []), 
                            real_media_type='movie' if media_type == 'movie' else ('show' if res.get('media_subtype') == 'Programa' else 'tv'), 
                            cast=res.get('cast_processed', []), 
-                           crew=res.get('crew_processed', []))
+                           crew=res.get('crew_processed', []),
+                           shiori_rating=shiori_rating,
+                           shiori_count=shiori_count,
+                           reviews=approved_reviews,
+                           user_review=user_review)
+
+
+@app.route('/review/<int:review_id>/vote', methods=['POST'])
+@login_required
+def vote_review(review_id):
+    data = request.get_json() or {}
+    vote_type = data.get('vote_type') # 'like' o 'dislike'
+    if vote_type not in ['like', 'dislike']:
+        return jsonify({'message': 'Voto no válido'}), 400
+    
+    existing_vote = ReviewVote.query.filter_by(user_id=current_user.id, review_id=review_id).first()
+    
+    if existing_vote:
+        if existing_vote.vote_type == vote_type:
+            db.session.delete(existing_vote)
+            action = 'removed'
+        else:
+            existing_vote.vote_type = vote_type
+            action = 'changed'
+    else:
+        new_vote = ReviewVote(user_id=current_user.id, review_id=review_id, vote_type=vote_type)
+        db.session.add(new_vote)
+        action = 'added'
+        
+    db.session.commit()
+    
+    likes = ReviewVote.query.filter_by(review_id=review_id, vote_type='like').count()
+    dislikes = ReviewVote.query.filter_by(review_id=review_id, vote_type='dislike').count()
+    
+    return jsonify({
+        'action': action,
+        'likes': likes,
+        'dislikes': dislikes,
+        'current_vote': vote_type if action != 'removed' else None
+    })
+
+
+@app.route('/review/<int:review_id>/delete', methods=['POST'])
+@login_required
+def delete_review(review_id):
+    review = Review.query.get_or_404(review_id)
+    if review.user_id != current_user.id:
+        return jsonify({'message': 'No tienes permiso para borrar esta opinión.', 'category': 'error'}), 403
+    
+    db.session.delete(review)
+    db.session.commit()
+    return jsonify({'message': 'Opinión borrada con éxito.', 'category': 'success'}), 200
+
+@app.route('/review/<int:review_id>/report', methods=['POST'])
+@login_required
+def report_review(review_id):
+    review = Review.query.get_or_404(review_id)
+    if review.user_id == current_user.id:
+        return jsonify({'category': 'error', 'message': 'No puedes reportar tu propia opinión.'}), 400
+    existing_report = ReviewReport.query.filter_by(user_id=current_user.id, review_id=review_id).first()
+    if existing_report:
+        return jsonify({'category': 'info', 'message': 'Ya has reportado esta opinión anteriormente.'}), 200
+    try:
+        report = ReviewReport(user_id=current_user.id, review_id=review_id)
+        review.report_count += 1
+        db.session.add(report)
+        db.session.commit()
+        return jsonify({'category': 'success', 'message': 'Opinión reportada correctamente. El equipo la revisará pronto.'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'category': 'error', 'message': 'Error al procesar el reporte.'}), 500
+
+
+@app.route('/media/<media_type>/<int:media_id>/review', methods=['POST'])
+@login_required
+def post_review(media_type, media_id):
+    rating = request.form.get('rating', type=float)
+    comment = request.form.get('comment', '').strip()
+    
+    if rating is None or rating < 0 or rating > 10.0:
+        return jsonify({'message': 'La puntuación debe estar entre 1 y 10.', 'category': 'error'}), 400
+
+    # --- FILTRO AUTOMÁTICO DE PALABRAS ---
+    BAD_WORDS = ["insulto1", "insulto2", "spam", "foll", "mierd", "put", "idiot"]
+    final_status = 'approved'
+    for word in BAD_WORDS:
+        if word in comment.lower():
+            final_status = 'pending'
+            break
+
+    review = Review.query.filter_by(user_id=current_user.id, media_id=media_id, media_type=media_type).first()
+    
+    if review:
+        review.rating = rating
+        review.comment = comment
+        review.status = final_status
+        review.created_at = datetime.utcnow()
+        msg = "Tu opinión ha sido actualizada." if final_status == 'approved' else "Tu opinión contiene palabras sensibles y será revisada."
+        response_cat = 'success'
+    else:
+        new_review = Review(
+            user_id=current_user.id,
+            media_id=media_id,
+            media_type=media_type,
+            rating=rating,
+            comment=comment,
+            status=final_status
+        )
+        db.session.add(new_review)
+        msg = "¡Gracias por votar en Shiori! ❤️" if final_status == 'approved' else "Tu reseña será revisada antes de publicarse."
+        response_cat = 'success'
+    
+    db.session.commit()
+    return jsonify({'message': msg, 'category': response_cat})
 
 
 @app.route('/media/tv/<int:media_id>/seasons')
