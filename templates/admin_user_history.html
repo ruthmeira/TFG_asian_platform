@@ -28,9 +28,9 @@
             <form id="ban-user-form" action="{{ url_for('admin_toggle_ban', user_id=target_user.id) }}" method="POST" class="nuclear-form" data-is-banned="{{ 'true' if target_user.is_banned else 'false' }}" onsubmit="event.preventDefault();">
                 <button type="button" id="ban-toggle-btn" class="btn-shiori-ban {% if target_user.is_banned %}is-banned{% endif %}">
                     {% if target_user.is_banned %}
-                        <i class="fas fa-unlock"></i> QUITAR BLOQUEO / VOLVER A ACTIVAR
+                        <i class="fas fa-unlock"></i> QUITAR BLOQUEO
                     {% else %}
-                        <i class="fas fa-user-slash"></i> BANEAR USUARIO Y BORRAR TODO
+                        <i class="fas fa-user-slash"></i> BANEAR USUARIO
                     {% endif %}
                 </button>
             </form>
