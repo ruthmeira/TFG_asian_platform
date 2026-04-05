@@ -1112,16 +1112,17 @@ def media_detail(media_type, media_id):
         a = a_orig.copy()
         if is_tv and a.get('roles'):
             roles = sorted(a['roles'], key=lambda x: x.get('episode_count', 0), reverse=True)
-            valid_roles = [r for r in roles if r.get('character')]
-            if valid_roles:
-                first = valid_roles[0]
-                char_text = f"{first['character']} <small style='opacity:0.6'>({first['episode_count']} episodio{'s' if first['episode_count']!=1 else ''})</small>"
-                if len(valid_roles) > 1:
-                    char_text += f"<br>y {len(valid_roles)-1} más..."
+            if roles:
+                first = roles[0]
+                char_name = first.get('character', '').strip() or "—"
+                char_text = f"{char_name} <small style='opacity:0.6'>({first['episode_count']} episodio{'s' if first['episode_count']!=1 else ''})</small>"
+                if len(roles) > 1:
+                    char_text += f"<br>y {len(roles)-1} más..."
                 a['character'] = char_text
-            else: a['character'] = "N/A"
+            else:
+                a['character'] = ""
         else:
-            a['character'] = a.get('character', 'N/A')
+            a['character'] = a.get('character', '').strip() or ""
             
         final_cast_preview.append(a)
     res['cast_processed'] = final_cast_preview
@@ -1613,6 +1614,7 @@ def media_cast(media_type, media_id):
             futures = {name: executor.submit(fetch_json, url) for name, url in urls.items()}
             raw = {name: future.result() for name, future in futures.items()}
         # Títulos con Fallback centralizado
+        res = raw['es']
         res['display_title'] = get_tiered_field(raw, 'title', media_type)
         res['raw_data'] = raw
 
@@ -1645,27 +1647,36 @@ def media_cast(media_type, media_id):
             a = a_orig.copy()
             if a.get('roles'):
                 sorted_roles = sorted(a['roles'], key=lambda x: x.get('episode_count', 0), reverse=True)
-                valid_roles = [r for r in sorted_roles if r.get('character')]
                 
-                if valid_roles:
-                    parts = []
-                    for r in valid_roles:
-                        parts.append(f"{r['character']} <small style='opacity:0.6'>({r['episode_count']} episodio{'s' if r['episode_count']!=1 else ''})</small>")
-                    a['character'] = ", ".join(parts)
-                else: a['character'] = "N/A"
+                parts = []
+                for r in sorted_roles:
+                    char_name = r.get('character', '').strip() or "—"
+                    parts.append(f"{char_name} <small style='opacity:0.6'>({r['episode_count']} episodio{'s' if r['episode_count']!=1 else ''})</small>")
+                
+                a['character'] = ", ".join(parts)
                 final_cast_display.append(a)
             else:
                 final_cast_display.append(a_orig)
         
         for m_orig in final_crew:
             m = m_orig.copy()
+            if m.get('jobs'):
+                sorted_jobs = sorted(m['jobs'], key=lambda x: x.get('episode_count', 0), reverse=True)
+                
+                parts = []
+                for j in sorted_jobs:
+                    job_name = j.get('job', '').strip() or "Staff"
+                    # Mapeo sutil si es necesario, pero TMDB suele darlos en inglés o según el idioma de la api
+                    parts.append(f"{job_name} <small style='opacity:0.6'>({j['episode_count']} episodio{'s' if j['episode_count']!=1 else ''})</small>")
+                
+                m['job'] = ", ".join(parts)
             final_crew_display.append(m)
     else:
         # PELÍCULAS: Reparto estándar desde la mejor fuente
         for a_orig in final_cast:
             a = a_orig.copy()
-            a['name'] = a.get('name', 'N/A')
-            a['character'] = a.get('character', 'N/A')
+            a['name'] = a.get('name', '')
+            a['character'] = a.get('character', '')
             final_cast_display.append(a)
             
         final_crew_display = final_crew
