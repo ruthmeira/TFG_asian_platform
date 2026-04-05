@@ -56,12 +56,12 @@
 
             <div class="info-item">
                 <strong>Sexo:</strong>
-                <span>{{ person.gender_name }}</span>
+                <span>{{ person.gender_name if person.gender_name else '-' }}</span>
             </div>
 
             <div class="info-item">
                 <strong>Nacimiento:</strong>
-                <span>{{ person.birthday }}</span>
+                <span>{{ person.birthday if person.birthday else '-' }}</span>
             </div>
 
             {% if person.deathday %}
@@ -73,7 +73,7 @@
 
             <div class="info-item">
                 <strong>Lugar de nacimiento:</strong>
-                <span>{{ person.place_of_birth }}</span>
+                <span>{{ person.place_of_birth if person.place_of_birth else '-' }}</span>
             </div>
 
             <div class="info-item">

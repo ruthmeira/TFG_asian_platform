@@ -392,7 +392,8 @@ main {
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 10px; /* Reducción táctica para que quepa todo */
+    gap: 10px;
+    /* Reducción táctica para que quepa todo */
 }
 
 .nav-links a {
@@ -404,7 +405,8 @@ main {
     display: flex;
     align-items: center;
     gap: 5px;
-    white-space: nowrap; /* PROHIBIDO ROMPERSE EN DOS LÍNEAS */
+    white-space: nowrap;
+    /* PROHIBIDO ROMPERSE EN DOS LÍNEAS */
 }
 
 .nav-links a:hover,
@@ -472,7 +474,8 @@ main {
     border-bottom: 1px solid var(--glass-border);
     padding-bottom: 25px;
     width: 100%;
-    gap: 20px; /* Evitar colisión entre texto y botones */
+    gap: 20px;
+    /* Evitar colisión entre texto y botones */
 }
 
 .prime-header.no-border {
@@ -486,7 +489,8 @@ main {
     gap: clamp(6px, 1vw, 10px);
     text-align: left;
     flex: 1;
-    min-width: 0; /* Permitir que el texto se ajuste si es necesario */
+    min-width: 0;
+    /* Permitir que el texto se ajuste si es necesario */
 }
 
 .prime-title {
@@ -515,7 +519,8 @@ main {
     display: flex;
     align-items: center;
     gap: 12px;
-    flex-shrink: 0; /* Impedir que los botones se encojan */
+    flex-shrink: 0;
+    /* Impedir que los botones se encojan */
 }
 
 @media (max-width: 600px) {

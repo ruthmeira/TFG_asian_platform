@@ -34,6 +34,20 @@
     transition: transform 0.3s ease;
 }
 
+.no-photo-person {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #222;
+    color: #555;
+}
+
+.no-photo-person i {
+    font-size: 8rem;
+}
+
 /* Redes Sociales */
 .person-socials {
     display: flex;
@@ -157,8 +171,10 @@
     font-size: 0.95rem;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     margin-top: 5px;
+    width: 100%;
 }
 
 .known-for-grid {
@@ -173,6 +189,7 @@
     width: 175px;
     flex: 0 0 175px;
 }
+
 .show-more-container {
     display: flex;
     justify-content: center;
@@ -282,11 +299,11 @@
     }
 
     .bio-text {
-        text-align: left;
+        text-align: center;
     }
 
     .btn-read-more {
-        justify-content: flex-start;
+        justify-content: center;
     }
 
     /* Grid centrado con cards a 145px */
@@ -300,7 +317,10 @@
         min-width: 145px !important;
         max-width: 145px !important;
     }
-    .projects-loader { height: 250px; }
+
+    .projects-loader {
+        height: 250px;
+    }
 }
 
 /* ===================================================== */
@@ -321,19 +341,24 @@
     margin-bottom: 25px;
 }
 
-.projects-loader .matrix-container { 
+.projects-loader .matrix-container {
     top: -50px;
     height: 120%;
 }
 
-.projects-loader .loading-content { z-index: 2; text-align: center; }
-.projects-loader .shimmer-text { 
+.projects-loader .loading-content {
+    z-index: 2;
+    text-align: center;
+}
+
+.projects-loader .shimmer-text {
     font-family: 'Outfit', sans-serif;
-    font-size: clamp(0.7rem, 8vw, 1.4rem); 
-    font-weight: 700; color: var(--primary); 
+    font-size: clamp(0.7rem, 8vw, 1.4rem);
+    font-weight: 700;
+    color: var(--primary);
     letter-spacing: 0.5px;
     text-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
-    margin-bottom: 5px; 
+    margin-bottom: 5px;
 }
 
 .loading-dots-glow {
@@ -349,10 +374,55 @@
     text-shadow: 0 0 10px var(--primary);
 }
 
-.loading-dots-glow span:nth-child(2) { animation-delay: 0.2s; }
-.loading-dots-glow span:nth-child(3) { animation-delay: 0.4s; }
+.loading-dots-glow span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.loading-dots-glow span:nth-child(3) {
+    animation-delay: 0.4s;
+}
 
 @keyframes bounceOpacity {
-    0%, 100% { opacity: 0.3; transform: translateY(0); }
-    50% { opacity: 1; transform: translateY(-5px); text-shadow: 0 0 20px var(--primary); }
+
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: translateY(0);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateY(-5px);
+        text-shadow: 0 0 20px var(--primary);
+    }
+}
+
+/* Fallback Proyectos Vacíos */
+.no-projects-msg {
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 60px 40px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.02);
+    border: 2px dashed rgba(255, 255, 255, 0.08);
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.no-projects-msg i {
+    font-size: 3.5rem;
+    color: var(--primary);
+    opacity: 0.3;
+}
+
+.no-projects-msg p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    margin: 0;
+    font-weight: 500;
 }
