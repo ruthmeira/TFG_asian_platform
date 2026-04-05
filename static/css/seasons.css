@@ -101,6 +101,17 @@
     object-fit: cover;
 }
 
+.no-avatar {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #222;
+    color: #555;
+    font-size: 2.5rem;
+}
+
 .season-info-mini {
     flex: 1;
     min-width: 0;
@@ -203,7 +214,8 @@
         overflow: visible !important;
     }
 
-    .season-poster-mini img {
+    .season-poster-mini img,
+    .season-poster-mini .no-avatar {
         width: 120px !important;
         height: 180px !important;
         object-fit: cover;
