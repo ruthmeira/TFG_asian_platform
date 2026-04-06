@@ -103,7 +103,7 @@
             
             <div class="confirm-actions">
                 <button type="button" id="cancel-delete-account-btn" class="confirm-btn shiori-cancel">Cancelar</button>
-                <form action="{{ url_for('delete_account') }}" method="POST" style="flex: 1;">
+                <form action="{{ url_for('delete_account') }}" method="POST" class="shiori-confirm-form">
                     <button type="submit" class="confirm-btn shiori-confirm">Confirmar Eliminación</button>
                 </form>
             </div>

@@ -677,6 +677,12 @@ main {
     gap: 4px;
 }
 
+.ratings-group {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
 .lang {
     font-family: 'Noto Color Emoji', sans-serif;
     background: rgba(255, 255, 255, 0.1);

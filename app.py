@@ -424,7 +424,6 @@ def get_media_summary(m_id, m_type, country_hint=None):
     
     # Puntuación de Shiori (Comunidad)
     try:
-        from models import Review
         with app.app_context():
             s_rating = db.session.query(db.func.avg(Review.rating)).filter_by(
                 media_id=m_id, media_type=m_type, status='approved'

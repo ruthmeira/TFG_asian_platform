@@ -133,7 +133,7 @@
             {% if media.overview %}
             <p class="overview-text">{{ media.overview }}</p>
             {% else %}
-            <div class="no-platforms" style="font-size: clamp(15px, 1.1vw, 17px);">
+            <div class="no-data-container">
                 <i class="fas fa-info-circle"></i>
                 <p class="no-data-msg">No se ha añadido la sinopsis de momento.</p>
             </div>
@@ -250,9 +250,9 @@
                 {% endfor %}
             </div>
             {% else %}
-            <div class="no-platforms">
+            <div class="no-data-container">
                 <i class="fas fa-times-circle"></i>
-                No disponible en tu región.
+                <p class="no-data-msg">No disponible en tu región.</p>
             </div>
             {% endif %}
             {% endif %}
@@ -290,7 +290,7 @@
                 {% endfor %}
             </div>
             {% else %}
-            <div class="no-platforms">
+            <div class="no-data-container">
                 <i class="fas fa-info-circle"></i>
                 <p class="no-data-msg">No se ha añadido información del reparto de momento.</p>
             </div>
@@ -346,7 +346,7 @@
                     {% if media.last_season.overview %}
                     <p class="season-overview-mini">{{ media.last_season.overview }}</p>
                     {% else %}
-                    <div class="no-platforms" style="margin-top: 10px; font-size: clamp(13px, 1.1vw, 15px);">
+                    <div class="no-data-container-mini">
                         <i class="fas fa-info-circle"></i>
                         <p class="no-data-msg">No hay disponible sinopsis en esta temporada.</p>
                     </div>
@@ -367,7 +367,7 @@
                 </a>
                 {% endfor %}
                 {% else %}
-                <div class="no-platforms">
+                <div class="no-data-container">
                     <i class="fas fa-info-circle"></i>
                     <p class="no-data-msg">No tiene palabras clave de momento.</p>
                 </div>

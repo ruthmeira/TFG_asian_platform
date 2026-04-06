@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <h4>${item.title}</h4>
                     <h6>${item.original_title || ''}</h6>
                     <div class="card-meta">
-                        <div style="display: flex; gap: 8px;">
+                        <div class="ratings-group">
                             <span class="rating">⭐ ${item.rating ? item.rating.toFixed(1) : '0.0'}</span>
                             ${shioriRatingHTML}
                         </div>

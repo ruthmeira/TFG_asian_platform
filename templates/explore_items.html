@@ -7,7 +7,7 @@
             <h4>{{ item.display_title }}</h4>
             <h6>{{ item.original_title_h6 }}</h6>
             <div class="card-meta">
-                <div style="display: flex; gap: 8px;">
+                <div class="ratings-group">
                     <span class="rating">⭐ {{ item.vote_average|round(1) }}</span>
                     <span class="shiori-rating"><i class="fas fa-heart"></i> {{ (item.shiori_rating or 0.0)|round(1) }}</span>
                 </div>
