@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Calendario de Estrenos - SHIORI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/calendar.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="calendar-container">
+    
+    <header class="prime-header">
+        <div class="prime-header-content">
+            <h1 class="prime-title">Calendario</h1>
+            <p class="prime-subtitle">Explora los próximos estrenos y actualizaciones del contenido de tus colecciones 🏮</p>
+        </div>
+    </header>
+
+    <div class="calendar-header">
+        <h2 id="monthTitle" class="current-month">Cargando...</h2>
+        <div class="calendar-nav">
+            <button class="nav-btn" onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+            <button class="nav-btn" onclick="resetToToday()" title="Ir a hoy"><i class="fas fa-calendar-day"></i></button>
+            <button class="nav-btn" onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <div style="position: relative;">
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="spinner"></div>
+        </div>
+        
+        <div class="calendar-grid">
+            <div class="weekday">Lun</div>
+            <div class="weekday">Mar</div>
+            <div class="weekday">Mié</div>
+            <div class="weekday">Jue</div>
+            <div class="weekday">Vie</div>
+            <div class="weekday">Sáb</div>
+            <div class="weekday">Dom</div>
+            
+            <div id="calendarDays" style="display: contents;">
+                <!-- Días inyectados por JS -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para ver eventos del día -->
+<div id="dayModal" class="day-modal" onclick="closeModal(event)">
+    <div class="day-modal-content">
+        <div class="day-modal-header">
+            <h3 id="modalDateTitle">Eventos</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div id="modalEventsList" class="daily-events-list">
+            <!-- Eventos inyectados -->
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
+{% endblock %}

@@ -976,6 +976,167 @@ def toggle_status():
     return jsonify({'current_status': item.status})
 
 
+# --- CALENDAR (Asian Monthly Calendar) ---
+
+def fetch_media_release_events(item, target_month, target_year, user_region='ES'):
+    """
+    Obtiene los eventos de estreno usando la TRIPLE CONFIRMACIÓN (ES > MX > EN).
+    Sigue el estándar de Shiori de títulos y fechas garantizadas.
+    """
+    api_key = os.getenv("TMDB_API_KEY")
+    m_id, m_type = item.media_id, item.media_type
+    events = []
+
+    try:
+        # --- ONDA 1: DATOS MAESTROS (ES, MX, EN) ---
+        urls = {
+            'es': f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=es-ES&append_to_response=release_dates",
+            'mx': f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=es-MX&append_to_response=release_dates",
+            'en': f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=en-US&append_to_response=release_dates"
+        }
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            f_to_n = {executor.submit(fetch_json, url): name for name, url in urls.items()}
+            raw = {f_to_n[f]: f.result() for f in f_to_n}
+
+        # Título y póster (REGLA DE 3: ES > MX > EN)
+        best_title = get_tiered_field(raw, 'title', m_type)
+        latest_poster = raw['es'].get('poster_path') or raw['mx'].get('poster_path') or raw['en'].get('poster_path') or item.poster_path
+
+
+        if m_type == 'movie':
+            category = "Película"
+            found_events = []
+            priority_names = {'ES': 'España', 'MX': 'México', 'US': 'EE. UU.'}
+            
+            for lang in ['es', 'mx', 'en']:
+                r_data = raw[lang]
+                # 1. Fecha raíz (Original)
+                rd_global = r_data.get('release_date')
+                if rd_global:
+                    found_events.append({'date': rd_global, 'label': f"{category}: Estreno Original"})
+                
+                # 2. Fechas por país (Locales)
+                for res in r_data.get('release_dates', {}).get('results', []):
+                    iso = res.get('iso_3166_1', '').upper()
+                    if iso in priority_names or iso == user_region:
+                        name = priority_names.get(iso, iso)
+                        label = f"{category}: Estreno en {name}"
+                        for rd_obj in res.get('release_dates', []):
+                            d_only = rd_obj.get('release_date', '').split('T')[0]
+                            if d_only: found_events.append({'date': d_only, 'label': label})
+                
+            # Filtro del mes solicitado
+            for ev in found_events:
+                try:
+                    dt = datetime.strptime(ev['date'], '%Y-%m-%d')
+                    if dt.month == target_month and dt.year == target_year:
+                        events.append({
+                            'id': m_id, 'type': 'movie', 'title': best_title,
+                            'date': ev['date'], 'poster': latest_poster,
+                            'event_type': ev['label'], 'subtype': 'movie'
+                        })
+                        break
+                except: continue
+        else:
+            # SERIES/PROGRAMAS: Buscar episodios en el mes solicitado
+            genres = raw['es'].get('genres') or raw['en'].get('genres') or []
+            is_variety = any(g.get('id') in GENRES_PROGRAMAS for g in genres)
+            category = "Programa" if is_variety else "Serie"
+            
+            seasons = raw['es'].get('seasons') or raw['en'].get('seasons') or []
+            if not seasons: return events
+            
+            valid_seasons = [s for s in seasons if s.get('season_number', 0) > 0]
+            if not valid_seasons: valid_seasons = seasons 
+            
+            last_season_meta = valid_seasons[-1]
+            s_num = last_season_meta.get('season_number')
+            
+            # --- ONDA 2: EPISODIOS DE TEMPORADA (ES, MX, EN) ---
+            s_urls = {
+                'es': f"https://api.themoviedb.org/3/tv/{m_id}/season/{s_num}?api_key={api_key}&language=es-ES",
+                'mx': f"https://api.themoviedb.org/3/tv/{m_id}/season/{s_num}?api_key={api_key}&language=es-MX",
+                'en': f"https://api.themoviedb.org/3/tv/{m_id}/season/{s_num}?api_key={api_key}&language=en-US"
+            }
+            with ThreadPoolExecutor(max_workers=3) as s_executor:
+                s_futures = {s_executor.submit(fetch_json, url): name for name, url in s_urls.items()}
+                s_raw = {s_futures[f]: f.result() for f in s_futures}
+
+            # Prioridad de póster Localizado
+            season_poster = s_raw['es'].get('poster_path') or s_raw['mx'].get('poster_path') or s_raw['en'].get('poster_path')
+            final_tv_poster = season_poster if season_poster else latest_poster
+
+            episodes = s_raw['en'].get('episodes') or s_raw['es'].get('episodes') or []
+            
+            for ep in episodes:
+                air_date = ep.get('air_date')
+                if air_date:
+                    try:
+                        dt = datetime.strptime(air_date, '%Y-%m-%d')
+                        if dt.month == target_month and dt.year == target_year:
+                            is_first_ep = (ep.get('episode_number') == 1 and s_num == 1)
+                            is_first_of_season = (ep.get('episode_number') == 1)
+                            
+                            if is_first_ep:
+                                e_type = f"{category}: Estreno"
+                            elif is_first_of_season:
+                                e_type = f"{category}: Nueva Temporada T{s_num}"
+                            else:
+                                e_type = f"{category}: T{s_num} E{ep.get('episode_number')}"
+                                
+                            events.append({
+                                'id': m_id, 'type': 'tv', 'title': best_title,
+                                'date': air_date, 'poster': final_tv_poster,
+                                'episode_number': ep.get('episode_number'), 'season_number': s_num,
+                                'event_type': e_type, 'subtype': 'tv'
+                            })
+                    except: continue
+    except Exception as e:
+        print(f"Error fetching calendar events for {m_id} [Rule of 3]: {e}")
+        
+    return events
+
+@app.route('/calendar')
+@login_required
+def calendar_view():
+    return render_template('calendar.html')
+
+@app.route('/api/calendar/events')
+@login_required
+def api_calendar_events():
+    month = request.args.get('month', datetime.now().month, type=int)
+    year = request.args.get('year', datetime.now().year, type=int)
+    
+    # Obtenemos items de la colección del usuario que NO sean 'Vistos' (salvo que tengan algo nuevo)
+    # Para ser exhaustivos pero eficientes, filtramos por estados activos o favoritos
+    collection_items = CollectionItem.query.filter(
+        CollectionItem.user_id == current_user.id,
+        db.or_(
+            CollectionItem.status != 'Abandonado',
+            CollectionItem.status.is_(None)
+        )
+    ).all()
+    
+    if not collection_items:
+        return jsonify([])
+
+    all_events = []
+    u_region = current_user.region or 'ES'
+    
+    # Paralelizamos las peticiones a TMDB para no morir en el intento
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = [executor.submit(fetch_media_release_events, item, month, year, u_region) for item in collection_items]
+        for future in futures:
+            res = future.result()
+            if res:
+                all_events.extend(res)
+    
+    # Ordenar por fecha para facilitar al frontend
+    all_events.sort(key=lambda x: x['date'])
+    
+    return jsonify(all_events)
+
+
 # --- RUTAS DE MEDIA (REFACTORIZADAS) ---
 @app.route('/media/<media_type>/<int:media_id>')
 def media_detail(media_type, media_id):
