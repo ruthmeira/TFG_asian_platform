@@ -33,25 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 2. CHARACTER COUNTER (Biography limit display)
-    // Unique to the edit profile bio textarea
-    const bioTextarea = document.querySelector('textarea[name="bio"]');
-    const charCounter = document.querySelector('.char-counter');
-    if (bioTextarea && charCounter) {
-        const updateCounter = () => {
-            const length = bioTextarea.value.length;
-            charCounter.textContent = `${length} / 500 caracteres`;
-            if (length > 450) {
-                charCounter.style.color = 'var(--primary)';
-            } else {
-                charCounter.style.color = 'rgba(255, 255, 255, 0.3)';
-            }
-        };
-
-        bioTextarea.addEventListener('input', updateCounter);
-        updateCounter();
-    }
-
     // 3. DELETE ACCOUNT MODAL (Profile Actions)
     const openDelBtn = document.getElementById('open-delete-account-btn');
     const delModal = document.getElementById('delete-account-modal');

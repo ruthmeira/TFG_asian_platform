@@ -90,15 +90,6 @@ main.container {
     -webkit-text-fill-color: transparent;
 }
 
-.user-bio {
-    color: var(--text-muted);
-    font-size: 16px;
-    font-style: italic;
-    opacity: 0.9;
-    max-width: 600px;
-    line-height: 1.4;
-}
-
 /* Stats Grid (Crystal Cards) */
 .stats-grid {
     display: grid;
@@ -388,7 +379,7 @@ main.container {
 /* Avatar Preview Section */
 .avatar-edit-wrapper {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: clamp(20px, 5vw, 50px);
     width: 100%;
 }

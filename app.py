@@ -805,7 +805,6 @@ def edit_profile():
         current_user.username = username
         current_user.email = email
         current_user.region = region
-        current_user.bio = request.form.get('bio') # Actualizar Bio
 
         # --- Lógica de Foto de Perfil ---
         file = request.files.get('profile_image')
