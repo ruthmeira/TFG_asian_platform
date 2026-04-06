@@ -25,7 +25,7 @@
         <!-- RESUMEN DE REPUTACIÓN SOLAMENTE NÚMEROS -->
         <div class="reputation-summary-card">
             <!-- ACCIÓN ÚNICA DE BANEO Y LIMPIEZA SHIORI -->
-            <form id="ban-user-form" action="{{ url_for('admin_toggle_ban', user_id=target_user.id) }}" method="POST" class="nuclear-form" data-is-banned="{{ 'true' if target_user.is_banned else 'false' }}" onsubmit="event.preventDefault();">
+            <form id="ban-user-form" action="{{ url_for('admin_toggle_ban', user_id=target_user.id) }}" method="POST" class="nuclear-form" data-is-banned="{{ 'true' if target_user.is_banned else 'false' }}">
                 <button type="button" id="ban-toggle-btn" class="btn-shiori-ban {% if target_user.is_banned %}is-banned{% endif %}">
                     {% if target_user.is_banned %}
                         <i class="fas fa-unlock"></i> QUITAR BLOQUEO

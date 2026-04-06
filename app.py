@@ -2239,10 +2239,6 @@ def api_search_unified():
             print(f"❌ Error en Stream de Búsqueda: {str(e)}")
             yield json.dumps({'done': True, 'error': str(e)}) + '\n'
 
-        except Exception as e:
-            print(f"❌ Error en Stream de Búsqueda: {str(e)}")
-            yield json.dumps({'done': True, 'error': str(e)}) + '\n'
-
     return Response(stream_with_context(generate()), mimetype='application/x-ndjson')
 
 

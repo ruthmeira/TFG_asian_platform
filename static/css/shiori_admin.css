@@ -12,6 +12,10 @@
     min-height: 85vh;
 }
 
+.admin-header-spacing {
+    margin-top: 20px;
+}
+
 .admin-banned-page {
     padding-top: 0px !important;
     margin-top: -15px !important;
