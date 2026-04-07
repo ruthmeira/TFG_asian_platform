@@ -829,24 +829,26 @@ def edit_profile():
 def collections():
     statuses = ['Viendo', 'Visto', 'Pendiente', 'Abandonado']
     user_collections = {}
+    all_viewable_items = []
 
     for status in statuses:
-        user_collections[status] = CollectionItem.query.filter_by(
-            user_id=current_user.id, status=status
-        ).order_by(CollectionItem.created_at.desc()).limit(10).all()
-        # Enriquecer cada item del bloque
-        for item in user_collections[status]:
-            s_rating = db.session.query(db.func.avg(Review.rating)).filter_by(
-                media_id=item.media_id, media_type=item.media_type, status='approved'
-            ).scalar() or 0
-            item.shiori_rating = round(float(s_rating), 1)
+        items = CollectionItem.query.filter_by(user_id=current_user.id, status=status).order_by(CollectionItem.created_at.desc()).limit(15).all()
+        user_collections[status] = items
+        all_viewable_items.extend(items)
 
-    favorites = CollectionItem.query.filter_by(user_id=current_user.id, is_favorite=True).order_by(CollectionItem.created_at.desc()).limit(10).all()
-    for item in favorites:
-        s_rating = db.session.query(db.func.avg(Review.rating)).filter_by(
-            media_id=item.media_id, media_type=item.media_type, status='approved'
-        ).scalar() or 0
-        item.shiori_rating = round(float(s_rating), 1)
+    favorites = CollectionItem.query.filter_by(user_id=current_user.id, is_favorite=True).order_by(CollectionItem.created_at.desc()).limit(15).all()
+    all_viewable_items.extend(favorites)
+
+    # MOTOR DE RATINGS EN BLOQUE (Evitamos el problema N+1)
+    if all_viewable_items:
+        ratings_raw = db.session.query(
+            Review.media_id, Review.media_type, db.func.avg(Review.rating)
+        ).filter_by(status='approved').group_by(Review.media_id, Review.media_type).all()
+        
+        ratings_map = {(r[0], r[1]): round(float(r[2]), 1) for r in ratings_raw}
+        
+        for item in all_viewable_items:
+            item.shiori_rating = ratings_map.get((item.media_id, item.media_type), 0)
 
     return render_template('collections.html', collections=user_collections, favorites=favorites)
 
@@ -1151,9 +1153,12 @@ def media_detail(media_type, media_id):
         if item: current_status, is_favorite = item.status, item.is_favorite
 
     # DATOS DE SHIORI (Rating y Opiniones de la comunidad)
+    from sqlalchemy.orm import joinedload, subqueryload
     shiori_rating = db.session.query(db.func.avg(Review.rating)).filter_by(media_id=media_id, media_type=media_type, status='approved').scalar() or 0
     shiori_count = Review.query.filter_by(media_id=media_id, media_type=media_type, status='approved').count()
-    approved_reviews = Review.query.filter_by(media_id=media_id, media_type=media_type, status='approved').order_by(Review.created_at.desc()).all()
+    approved_reviews = Review.query.filter_by(media_id=media_id, media_type=media_type, status='approved')\
+        .options(joinedload(Review.user), subqueryload(Review.votes_objs))\
+        .order_by(Review.created_at.desc()).all()
     
     user_review = None
     if current_user.is_authenticated:
