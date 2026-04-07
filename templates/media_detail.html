@@ -379,6 +379,36 @@
 
 </div>
 
+<!-- SECCIÓN RECOMENDADOS (Carrusel unificado con la home) -->
+{% if recommendations %}
+<div class="reviews-shiori-section">
+    <div class="reviews-shiori-header">
+        <h2>Si te gusta {{ media.display_title }}, te recomendamos... 🏮</h2>
+    </div>
+    <div class="media-carousel" style="padding: 10px 5px 25px 0px;">
+        {% for item in recommendations %}
+        <a href="{{ url_for('media_detail', media_type=item.media_type_fixed, media_id=item.id) }}" class="card-link">
+            <div class="card">
+                <div class="badge">{{ item.tipo_label }}</div>
+                <img src="{% if item.poster_path %}https://image.tmdb.org/t/p/w185{{ item.poster_path }}{% else %}{{ url_for('static', filename='img/no-poster.png') }}{% endif %}" alt="{{ item.display_title }}">
+                <div class="card-body">
+                    <h4>{{ item.display_title }}</h4>
+                    <h6>{{ item.original_title_h6 }}</h6>
+                    <div class="card-meta">
+                        <div class="ratings-group">
+                            <span class="rating">⭐ {{ item.vote_average|round(1) }}</span>
+                            <span class="shiori-rating"><i class="fas fa-heart"></i> {{ (item.shiori_rating or 0.0)|round(1) }}</span>
+                        </div>
+                        <span class="lang">{{ item.flag }}</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
 <!-- SECCIÓN DE OPINIONES DE LA COMUNIDAD (ANCHO COMPLETO) -->
 <div class="reviews-shiori-section">
     <div class="reviews-shiori-header">

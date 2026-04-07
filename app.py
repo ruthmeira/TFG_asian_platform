@@ -1186,13 +1186,14 @@ def media_detail(media_type, media_id):
                                shiori_rating=shiori_rating,
                                shiori_count=shiori_count,
                                reviews=approved_reviews,
-                               user_review=user_review)
+                               user_review=user_review,
+                               recommendations=cached.get('recommendations_processed', []))
 
     api_key = os.getenv("TMDB_API_KEY")
     is_tv = media_type == 'tv' or ('show' in request.path)
     
     # 2. ÚNICA OLEADA DE PETICIONES (Sin cascada)
-    append_base = "external_ids,videos,keywords,watch/providers,translations"
+    append_base = "external_ids,videos,keywords,watch/providers,translations,recommendations"
     append_credits = ",aggregate_credits" if is_tv else ",credits"
     
     urls = {
@@ -1244,6 +1245,45 @@ def media_detail(media_type, media_id):
     res['media_subtype'] = 'Programa' if (media_type == 'tv' and any(g['name'] in ['Reality', 'Talk Show', 'Documental', 'Noticias'] for g in res.get('genres', []))) else 'Serie'
     
     res['flag'] = get_media_flag(res, res)
+
+    # RECOMENDACIONES FILTRADAS (Asian Only & Enriquecidas con Paridad de Card)
+    recs_raw = res.get('recommendations', {}).get('results', [])
+    asia_recs = []
+    for r in recs_raw:
+        r_lang = r.get('original_language', '').lower()
+        r_countries = [c.upper() for c in r.get('origin_country', [])]
+        is_r_asian = r_lang in ASIA_LANGUAGES or any(c in ASIA_COUNTRIES for c in r_countries)
+        
+        if is_r_asian and r.get('poster_path'):
+            m_type_r = 'movie' if (media_type == 'movie' and r.get('title')) else 'tv'
+            r['media_type_fixed'] = m_type_r
+            r['display_title'] = r.get('title') or r.get('name')
+            r['original_title_h6'] = r.get('original_title') or r.get('original_name')
+            r['flag'] = get_media_flag(r, r)
+            
+            # Etiqueta de Subtipo para compatibilidad con CSS .card .badge
+            if m_type_r == 'movie':
+                r['tipo_label'] = 'Película'
+            else:
+                r_genre_ids = r.get('genre_ids', [])
+                is_prod = any(gid in GENRES_PROGRAMAS for gid in r_genre_ids)
+                r['tipo_label'] = 'Programa' if is_prod else 'Serie'
+                
+            asia_recs.append(r)
+        if len(asia_recs) >= 8: break
+    
+    # Motor de Ratings en Bloque para Recommendations
+    if asia_recs:
+        rec_ids = [it['id'] for it in asia_recs]
+        rec_ratings = db.session.query(
+            Review.media_id, Review.media_type, db.func.avg(Review.rating)
+        ).filter(Review.status == 'approved', Review.media_id.in_(rec_ids)).group_by(Review.media_id, Review.media_type).all()
+        
+        rec_ratings_map = {(r[0], r[1]): round(float(r[2]), 1) for r in rec_ratings}
+        for it in asia_recs:
+            it['shiori_rating'] = rec_ratings_map.get((it['id'], it['media_type_fixed']), 0)
+
+    res['recommendations_processed'] = asia_recs
 
     # TEMPORADAS (Usa info de Wave 1)
     last_season = None
@@ -1349,7 +1389,8 @@ def media_detail(media_type, media_id):
                            shiori_rating=shiori_rating,
                            shiori_count=shiori_count,
                            reviews=approved_reviews,
-                           user_review=user_review)
+                           user_review=user_review,
+                           recommendations=res.get('recommendations_processed', []))
 
 
 @app.route('/review/<int:review_id>/vote', methods=['POST'])

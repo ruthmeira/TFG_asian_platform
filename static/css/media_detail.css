@@ -1375,26 +1375,6 @@
 /* ===================================================== */
 /* RESPONSIVE QUERIES SHIORI (BOTTOM)                   */
 /* ===================================================== */
-@media (min-width: 601px) and (max-width: 1024px) {
-    .media-detail-container {
-        gap: 20px;
-    }
-
-    .media-poster {
-        flex: 0 0 30%;
-        /* Proportional width to avoid squeeze */
-        max-width: 250px;
-        min-width: 180px;
-    }
-
-    .media-info {
-        padding: clamp(20px, 4vw, 30px);
-    }
-
-    .media-info h1 {
-        font-size: 2.2rem;
-    }
-}
 
 @media (max-width: 600px) {
 
