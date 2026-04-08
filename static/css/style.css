@@ -264,6 +264,14 @@ main {
     box-shadow: 0 10px 20px rgba(255, 69, 0, 0.2);
 }
 
+.show-more-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 30px;
+    margin-bottom: 20px;
+}
+
 /* Modal Tráiler (Global) */
 .trailer-modal {
     position: fixed;
@@ -1423,10 +1431,18 @@ div[data-provider-id="1773"]:hover svg {
 /* ===================================================== */
 .search-grid,
 .collection-grid,
-.collection-grid-premium,
-.known-for-grid {
+.collection-grid-premium {
     display: grid !important;
     grid-template-columns: repeat(auto-fit, 175px);
+    gap: 10px;
+    justify-content: center !important;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.known-for-grid {
+    display: flex !important;
+    flex-wrap: wrap;
     gap: 10px;
     justify-content: center !important;
     width: 100%;

@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 worksGrid.innerHTML = html;
                 const items = worksGrid.querySelectorAll('.card-link');
-                
+
                 // Mantenemos tu lógica de 8 iniciales
                 items.forEach((item, index) => {
                     if (index >= 8) {
