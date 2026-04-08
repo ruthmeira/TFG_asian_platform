@@ -71,10 +71,10 @@
 /* ===================================================== */
 .matrix-container {
     position: absolute;
-    top: 0;
+    top: -50px; /* Offset para que la lluvia nazca desde arriba */
     left: 0;
-    width: 105%;
-    height: 100%;
+    width: 100%;
+    height: 125%;
     display: flex;
     justify-content: space-between;
     opacity: 0.4;
@@ -122,6 +122,46 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* ===================================================== */
+/* GLOBAL LOADERS (Matrix & Shimmer Effect)              */
+/* ===================================================== */
+.shimmer-text {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(0.7rem, 8vw, 1.4rem);
+    font-weight: 700;
+    color: var(--primary);
+    text-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+    z-index: 2;
+}
+
+.loading-dots-glow {
+    margin-top: 5px;
+    z-index: 2;
+}
+
+.loading-dots-glow span {
+    color: var(--primary);
+    font-size: 2.22rem;
+    font-weight: 900;
+    display: inline-block;
+    animation: bounceOpacity 1.2s infinite;
+    text-shadow: 0 0 10px var(--primary);
+}
+
+.loading-dots-glow span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots-glow span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounceOpacity {
+    0%, 100% { opacity: 0.3; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(-5px); text-shadow: 0 0 20px var(--primary); }
+}
+
+.loading-content {
+    z-index: 10;
+    text-align: center;
+    position: relative;
 }
 
 html,
@@ -1016,10 +1056,19 @@ main {
         justify-content: center;
     }
 
-    .media-carousel .card-link {
-        width: 145px;
-        min-width: 145px;
-        max-width: 145px;
+    .media-carousel .card-link,
+    .search-grid .card-link,
+    .collection-grid .card-link {
+        width: 145px !important;
+        min-width: 145px !important;
+        max-width: 145px !important;
+    }
+
+    .search-grid,
+    .collection-grid {
+        grid-template-columns: repeat(auto-fill, 145px) !important;
+        gap: 15px !important;
+        justify-content: center !important;
     }
 
     /* OPTIMIZACIÓN SELECTIVA DE SCROLL (SIN ROMPER RENDERIZADO) */

@@ -145,11 +145,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         link.className = 'card-link animate__animated animate__fadeInUp';
 
         const label = cat === 'movie' ? 'Película' : (cat === 'program' ? 'Programa' : 'Serie');
-        const poster = item.image || '/static/img/no-poster.png';
+        
+        // Optimización Shiori: Calidad w342 para nitidez total
+        let poster = item.image || '/static/img/no-poster.png';
+        if (poster.includes('/w185/')) {
+            poster = poster.replace('/w185/', '/w342/');
+        }
 
-        // Rating de comunidad Shiori (Permanente)
         const sRating = (item.shiori_rating || 0).toFixed(1);
-        const shioriRatingHTML = `<span class="shiori-rating"><i class="fas fa-heart"></i> ${sRating}</span>`;
 
         link.innerHTML = `
             <div class="card">
@@ -161,7 +164,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div class="card-meta">
                         <div class="ratings-group">
                             <span class="rating">⭐ ${item.rating ? item.rating.toFixed(1) : '0.0'}</span>
-                            ${shioriRatingHTML}
+                            <span class="shiori-rating"><i class="fas fa-heart"></i> ${sRating}</span>
                         </div>
                         ${item.flag ? `<span class="lang">${item.flag}</span>` : ''}
                     </div>

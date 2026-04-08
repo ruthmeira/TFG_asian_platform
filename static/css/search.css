@@ -147,9 +147,7 @@
     grid-template-columns: 1fr;
 }
 
-/* ===================================================== */
-/* SEARCH LOADER (Premium Matrix & Glassmorphism)        */
-/* ===================================================== */
+/* --- SEARCH LOADER (Layout ONLY, styles are global) --- */
 .search-loader {
     grid-column: 1 / -1;
     width: 100%;
@@ -164,62 +162,6 @@
     justify-content: center;
     border: 1.5px solid rgba(255, 69, 0, 0.3);
     margin-bottom: 25px;
-}
-
-.search-loader .matrix-container {
-    top: -50px;
-    height: 120%;
-}
-
-.search-loader .loading-content {
-    z-index: 2;
-    text-align: center;
-}
-
-.search-loader .shimmer-text {
-    font-family: 'Outfit', sans-serif;
-    font-size: clamp(0.7rem, 8vw, 1.4rem);
-    font-weight: 700;
-    color: var(--primary);
-    letter-spacing: 0.5px;
-    text-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
-    margin-bottom: 5px;
-}
-
-.search-loader .loading-dots-glow {
-    margin-top: 5px;
-}
-
-.search-loader .loading-dots-glow span {
-    color: var(--primary);
-    font-size: 2.22rem;
-    font-weight: 900;
-    display: inline-block;
-    animation: bounceOpacitySearch 1.2s infinite;
-    text-shadow: 0 0 10px var(--primary);
-}
-
-.search-loader .loading-dots-glow span:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.search-loader .loading-dots-glow span:nth-child(3) {
-    animation-delay: 0.4s;
-}
-
-@keyframes bounceOpacitySearch {
-
-    0%,
-    100% {
-        opacity: 0.3;
-        transform: translateY(0);
-    }
-
-    50% {
-        opacity: 1;
-        transform: translateY(-5px);
-        text-shadow: 0 0 20px var(--primary);
-    }
 }
 
 
@@ -373,22 +315,19 @@
     .search-layout-wrapper {
         flex-direction: column;
         padding: 15px 12px;
-        /* Margen para que se vean las curvas de la caja */
         gap: 20px;
         max-width: 100%;
         width: 100%;
     }
 
-    /* Caja de búsqueda estilo Explorar: Muy redondeada */
+    /*Sidebar estilo Explorar */
     .classic-sidebar-style {
         width: 100%;
         position: relative;
         top: 0;
         border-radius: 25px;
-        /* Puntas muy redondeadas */
         margin-bottom: 0;
         border: 1px solid rgba(255, 255, 255, 0.08);
-        /* Recuperamos borde para definir la curva */
     }
 
     .sidebar-header-blue {
@@ -412,43 +351,9 @@
     .search-header-info h2 {
         font-size: 1.6rem;
         text-align: center;
-        /* Título centrado solo en móvil */
     }
 
-    /* Grid de tarjetas de 145px - Fluye según el ancho de pantalla */
-    .search-grid,
-    #search-results-grid {
-        display: grid !important;
-        grid-template-columns: repeat(auto-fill, 145px) !important;
-        gap: 15px;
-        width: 100%;
-        justify-content: center;
-    }
-
-    .search-grid.list-layout,
-    .search-grid:has(.search-loader),
-    #search-results-grid.list-layout,
-    #search-results-grid:has(.search-loader) {
-        grid-template-columns: 1fr !important;
-    }
-
-    /* FORZADO ABSOLUTO CON SELECTORES REALES */
-    #search-results-grid .card-link,
-    #search-results-grid .card {
-        width: 100% !important;
-        min-width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 auto;
-    }
-
-    #search-results-grid .card img {
-        width: 100% !important;
-        aspect-ratio: 2 / 3;
-        height: auto !important;
-        object-fit: cover;
-    }
-
-    /* Filas de personas y keywords: EXCEPCIÓN para que sigan siendo 100% */
+    /* Filas de personas y keywords: sigan siendo 100% */
     #search-results-grid .person-row-link,
     #search-results-grid .keyword-row {
         width: 100% !important;
