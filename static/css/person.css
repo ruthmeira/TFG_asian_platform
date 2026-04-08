@@ -177,29 +177,6 @@
     width: 100%;
 }
 
-.known-for-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
-.known-for-grid .card-link {
-    width: 175px;
-    flex: 0 0 175px;
-}
-
-.show-more-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-}
-
-.hidden-work {
-    display: none !important;
-}
-
 /* ===================================================== */
 /* RESPONSIVE DESIGN (Móvil hasta 600px) */
 /* ===================================================== */
@@ -219,7 +196,6 @@
     .person-photo {
         order: 1;
         max-width: clamp(200px, 60vw, 250px);
-        /* EXACTO COMO EN MEDIA_DETAIL */
         margin: 0 auto;
     }
 
@@ -227,7 +203,6 @@
         order: 2;
         justify-content: center;
         margin-top: -8px;
-        /* ESPACIO EQUILIBRADO RELAJADO */
     }
 
     .person-name {
@@ -235,7 +210,6 @@
         width: 100%;
         text-align: center;
         font-size: 2.2rem;
-        /* EXACTO COMO EN MEDIA_DETAIL MOVIL */
     }
 
     .biography-section {
@@ -243,27 +217,23 @@
         width: 100%;
     }
 
-    /* INFO PERSONAL LADO A LADO CON AKA AL FINAL */
     .person-info-sidebar {
         order: 5;
         width: 100%;
         display: flex;
         flex-wrap: wrap;
         gap: 15px 25px;
-        /* Espacio horizontal generoso */
         justify-content: center;
     }
 
     .info-item {
         flex: 1 1 auto;
-        /* Items base se reparten el espacio */
         min-width: 120px;
         align-items: center;
         text-align: center;
         margin-bottom: 0px;
     }
 
-    /* Especial para AKA: Ocupa toda la fila al final */
     .info-item:has(.aka-tag-box) {
         flex: 1 1 100%;
         order: 10;
@@ -271,19 +241,6 @@
         flex-direction: column;
         align-items: center;
         margin-top: 10px;
-    }
-
-    .info-item:has(.aka-tag-box) strong {
-        margin-bottom: 15px;
-        width: 100%;
-    }
-
-    /* Los AKA fluyen horizontalmente (Tags) */
-    .aka-tag-box {
-        display: inline-block !important;
-        /* Salen de la columna vertical */
-        margin: 4px !important;
-        width: auto !important;
     }
 
     .known-for-section {
@@ -304,18 +261,6 @@
 
     .btn-read-more {
         justify-content: center;
-    }
-
-    /* Grid centrado con cards a 145px */
-    .known-for-grid {
-        gap: 15px;
-        justify-content: center;
-    }
-
-    .known-for-grid .card-link {
-        width: 145px !important;
-        min-width: 145px !important;
-        max-width: 145px !important;
     }
 
     .projects-loader {
