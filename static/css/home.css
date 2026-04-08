@@ -1,24 +1,20 @@
 /* ===================================================== */
-/* HOME PAGE - ESTILOS MODULARES */
+/* HOME PAGE - ESTILOS MODULARES (Exclusivos)           */
 /* ===================================================== */
 
-
-
 .content-section {
-    margin-bottom: 30px; /* Separación general entre secciones */
+    margin-bottom: 30px;
 }
 
 .content-section:last-of-type {
-    margin-bottom: 20px; /* Margen final sincronizado con el footer */
+    margin-bottom: 20px;
 }
 
 .content-section h2 {
     margin-bottom: 0px;
-    /* Pegado al carrusel */
 }
 
-/* Carousel and Card animations are now global in style.css */
-/* FILTER BUTTONS (Home only) */
+/* FILTER BUTTONS (Exclusivo Home) */
 .filter-controls {
     display: flex;
     gap: 12px;
@@ -28,17 +24,16 @@
     text-decoration: none;
     color: var(--text-muted);
     background: #111;
-    padding: 10px 20px;
+    padding: 10px 22px;
     border-radius: 50px;
     font-size: 14px;
     font-weight: 500;
     transition: var(--transition);
     border: 1px solid #222;
-    min-width: 130px;
-    /* Slimmer and more modern for 175px layout */
     display: inline-flex;
     justify-content: center;
     align-items: center;
+    white-space: nowrap; /* Prohibido romperse */
 }
 
 .filter-btn:hover {
@@ -55,16 +50,11 @@
     box-shadow: 0 5px 15px rgba(255, 69, 0, 0.3);
 }
 
-/* Carousel and Card animations are now global in style.css */
-
-/* CAROUSEL LOADER (Premium Matrix & Glassmorphism) */
+/* CAROUSEL LOADER (Matrix Animation) */
 .carousel-loader {
     width: 100%;
     height: 350px;
-    /* PC height */
     background: transparent;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
     border-radius: 28px;
     position: relative;
     overflow: hidden;
@@ -73,122 +63,40 @@
     align-items: center;
     justify-content: center;
     border: 1.5px solid rgba(255, 69, 0, 0.3);
-    /* Keep sutil orange border */
-}
-
-.matrix-container {
-    top: -50px;
-    height: 120%;
-}
-
-.loading-content {
-    z-index: 1;
-    text-align: center;
-    padding: 0 10px;
-    /* Reduced padding on mini screens */
 }
 
 .shimmer-text {
     font-family: 'Outfit', sans-serif;
     font-size: clamp(0.7rem, 8vw, 1.4rem);
-    /* More aggressive scaling to fit narrow widths */
     font-weight: 700;
-    text-transform: none;
-    letter-spacing: 0.5px;
     color: var(--primary);
     text-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
-}
-
-/* Mobile adjustments for the box */
-@media (max-width: 600px) {
-    .carousel-loader {
-        height: 250px;
-        /* Shorter height on mobile */
-    }
-}
-
-@keyframes shimmerFlow {
-    0% {
-        background-position: 200% center;
-    }
-
-    100% {
-        background-position: -200% center;
-    }
-}
-
-.loading-dots-glow {
-    margin-top: 5px;
 }
 
 .loading-dots-glow span {
     color: var(--primary);
     font-size: 2.22rem;
-    /* A bit bigger for impact */
     font-weight: 900;
     display: inline-block;
     animation: bounceOpacity 1.2s infinite;
     text-shadow: 0 0 10px var(--primary);
 }
 
-.loading-dots-glow span:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.loading-dots-glow span:nth-child(3) {
-    animation-delay: 0.4s;
-}
+.loading-dots-glow span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots-glow span:nth-child(3) { animation-delay: 0.4s; }
 
 @keyframes bounceOpacity {
-
-    0%,
-    100% {
-        opacity: 0.3;
-        transform: translateY(0);
-    }
-
-    50% {
-        opacity: 1;
-        transform: translateY(-5px);
-        text-shadow: 0 0 20px var(--primary);
-    }
+    0%, 100% { opacity: 0.3; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(-5px); text-shadow: 0 0 20px var(--primary); }
 }
 
-/* ===================================================== */
-/* MOBILE MEDIA QUERIES (Up to 600px) */
-/* ===================================================== */
 @media (max-width: 600px) {
-    .filter-controls {
-        justify-content: center;
-        flex-wrap: wrap;
-        width: 100%;
-        gap: 10px;
+    .carousel-loader { height: 250px; }
+    .filter-controls { justify-content: center; flex-wrap: wrap; width: 100%; gap: 10px; }
+    .filter-btn { 
+        padding: 8px 18px; 
+        font-size: 13px;
+        width: auto !important;
+        min-width: 100px;
     }
-
-    .filter-btn {
-        width: clamp(95px, 30vw, 130px) !important;
-        min-width: 0 !important;
-        padding: clamp(6px, 1.5vw, 10px) 0 !important;
-        font-size: clamp(12px, 3vw, 14px) !important;
-        text-align: center;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    /* Gaining side space in mobile devices */
-    .container {
-        padding-left: 15px !important;
-        padding-right: 15px !important;
-    }
-
-    /* Avoiding title wrapping in 280px-375px screens */
-    .content-section h2 {
-        font-size: clamp(1rem, 6vw, 1.25rem) !important;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    /* Media cards are now global in style.css */
-}
+}

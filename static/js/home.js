@@ -110,12 +110,15 @@ window.HomeApp = (() => {
             <a href="/media/${type}/${item.id}" class="card-link">
                 <div class="card">
                     <div class="badge">${label}</div>
-                    <img src="https://image.tmdb.org/t/p/w500${item.poster_path}" alt="${item.name || item.title}">
+                    <img src="https://image.tmdb.org/t/p/w342${item.poster_path}" alt="${item.name || item.title}">
                     <div class="card-body">
                         <h4>${item.name || item.title}</h4>
                         <h6>${item.original_name || item.original_title}</h6>
                         <div class="card-meta">
-                            <span class="rating">⭐ ${parseFloat(item.vote_average || 0).toFixed(1)}</span>
+                            <div class="ratings-group">
+                                <span class="rating">⭐ ${parseFloat(item.vote_average || 0).toFixed(1)}</span>
+                                <span class="shiori-rating"><i class="fas fa-heart"></i> ${parseFloat(item.shiori_rating || 0).toFixed(1)}</span>
+                            </div>
                             <span class="lang">${item.flag || '🌏'}</span>
                         </div>
                     </div>
