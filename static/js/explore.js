@@ -9,7 +9,7 @@ window.ExploreApp = (() => {
         genresByType: {},
         filters: {},
         currentPage: 1,
-        totalPages: 500,
+        totalPages: Infinity,
         pageCache: {}, // { 1: { html: '...', done: false } }
         apiPageMap: { 1: { page: 1, skip: 0 } },
         fetchingPages: new Set(),
@@ -35,7 +35,7 @@ window.ExploreApp = (() => {
         kwHiddenInput: '#keywords-input',
         detailLayer: '#spa-detail-layer',
         detailContent: '#spa-detail-content',
-        scrollTopBtn: '#scroll-top-btn'
+        scrollTopBtn: '#scroll-to-top'
     };
 
     function init(config) {
@@ -109,15 +109,15 @@ window.ExploreApp = (() => {
         setupFilterChips('chips-status', statusInput, 'status', toggleStatus, { multi: false });
         setupFilterChips('chips-country', countryInput, 'lang', toggleCountry, { multi: true });
         setupFilterChips('chips-sort', sortInput, 'sort_by', toggleSort, { multi: false });
-        setupFilterChips('genre-chips-include', genreInputInclude, 'genre', toggleInclude, { 
-            multi: true, 
+        setupFilterChips('genre-chips-include', genreInputInclude, 'genre', toggleInclude, {
+            multi: true,
             defaultText: 'Todos',
-            allowEmpty: true 
+            allowEmpty: true
         });
-        setupFilterChips('genre-chips-exclude', genreInputExclude, 'without_genre', toggleExclude, { 
-            multi: true, 
+        setupFilterChips('genre-chips-exclude', genreInputExclude, 'without_genre', toggleExclude, {
+            multi: true,
             defaultText: 'Ninguno',
-            allowEmpty: true 
+            allowEmpty: true
         });
 
         // Platforms logic
@@ -235,10 +235,10 @@ window.ExploreApp = (() => {
                 chip.textContent = name;
                 container.appendChild(chip);
             });
-            setupFilterChips(container.id, input, filterKey, toggleBtn, { 
-                multi: true, 
+            setupFilterChips(container.id, input, filterKey, toggleBtn, {
+                multi: true,
                 defaultText: def,
-                allowEmpty: true 
+                allowEmpty: true
             });
         };
 
@@ -332,7 +332,7 @@ window.ExploreApp = (() => {
     function initYearFilter() {
         const yearInput = document.getElementById('year-input');
         if (!yearInput) return;
-        
+
         // Initial value if exists
         if (yearInput.value) state.filters.year = yearInput.value.trim();
 
@@ -347,7 +347,8 @@ window.ExploreApp = (() => {
         if (!trigger) return;
 
         const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting && !state.isLoadingMore) {
+            if (entries[0].isIntersecting && !state.isLoadingMore && state.currentPage < state.totalPages && state.currentPage < state.autoLimit) {
+                state.isLoadingMore = true; // Reserva inmediata
                 loadItems(state.currentPage + 1);
             }
         }, { rootMargin: '400px' });
@@ -371,6 +372,7 @@ window.ExploreApp = (() => {
         state.fetchingPages.clear();
         state.pageCache = {};
         state.apiPageMap = { 1: { page: 1, skip: 0 } };
+        state.totalPages = Infinity; // Reset para nuevos filtros sin límites fijos
         loadItems(page);
     }
 
@@ -452,16 +454,21 @@ window.ExploreApp = (() => {
     }
 
     function handleBatchLoadEnd(page) {
+        const trigger = document.getElementById('infinite-scroll-trigger');
+
         if (page < state.totalPages && page < state.autoLimit) {
             setTimeout(() => loadItems(page + 1), 50);
         } else if (page >= state.autoLimit && page < state.totalPages) {
             state.isLoadingMore = false;
             const wrapper = document.querySelector(selectors.autoLoadWrapper);
             if (wrapper) wrapper.style.display = 'flex';
+            if (trigger) trigger.style.display = 'block';
         } else {
             state.isLoadingMore = false;
             const wrapper = document.querySelector(selectors.autoLoadWrapper);
             if (wrapper) wrapper.style.display = 'none';
+            // Si ya no hay más páginas, ocultamos el trigger para evitar bucles
+            if (trigger) trigger.style.display = 'none';
         }
     }
 
