@@ -1048,51 +1048,46 @@ def fetch_media_release_events(item, target_month, target_year, user_region='ES'
             seasons = raw['es'].get('seasons') or raw['en'].get('seasons') or []
             if not seasons: return events
             
+            # Miramos las últimas 3 temporadas para capturar episodios activos (ej. T3 emitiendo con T4 ya anunciada)
             valid_seasons = [s for s in seasons if s.get('season_number', 0) > 0]
-            if not valid_seasons: valid_seasons = seasons 
+            if not valid_seasons and seasons: valid_seasons = [seasons[0]] # Fallback a S0 si no hay más
             
-            last_season_meta = valid_seasons[-1]
-            s_num = last_season_meta.get('season_number')
-            
-            # --- ONDA 2: EPISODIOS DE TEMPORADA (ES, MX, EN) ---
-            s_urls = {
-                'es': f"https://api.themoviedb.org/3/tv/{m_id}/season/{s_num}?api_key={api_key}&language=es-ES",
-                'mx': f"https://api.themoviedb.org/3/tv/{m_id}/season/{s_num}?api_key={api_key}&language=es-MX",
-                'en': f"https://api.themoviedb.org/3/tv/{m_id}/season/{s_num}?api_key={api_key}&language=en-US"
-            }
-            with ThreadPoolExecutor(max_workers=3) as s_executor:
-                s_futures = {s_executor.submit(fetch_json, url): name for name, url in s_urls.items()}
-                s_raw = {s_futures[f]: f.result() for f in s_futures}
+            for target_season_meta in valid_seasons[-3:]:
+                s_num = target_season_meta.get('season_number')
+                
+                # --- ONDA 2: EPISODIOS (Fetch en EN para máxima velocidad y fiabilidad de fechas) ---
+                s_url = f"https://api.themoviedb.org/3/tv/{m_id}/season/{s_num}?api_key={api_key}&language=en-US"
+                s_data = fetch_json(s_url)
+                
+                episodes = s_data.get('episodes', [])
+                if not episodes: continue
+                
+                # Poster de temporada (Prioridad Onda 1 o el de este meta)
+                final_tv_poster = target_season_meta.get('poster_path') or latest_poster
 
-            # Prioridad de póster Localizado
-            season_poster = s_raw['es'].get('poster_path') or s_raw['mx'].get('poster_path') or s_raw['en'].get('poster_path')
-            final_tv_poster = season_poster if season_poster else latest_poster
-
-            episodes = s_raw['en'].get('episodes') or s_raw['es'].get('episodes') or []
-            
-            for ep in episodes:
-                air_date = ep.get('air_date')
-                if air_date:
-                    try:
-                        dt = datetime.strptime(air_date, '%Y-%m-%d')
-                        if dt.month == target_month and dt.year == target_year:
-                            is_first_ep = (ep.get('episode_number') == 1 and s_num == 1)
-                            is_first_of_season = (ep.get('episode_number') == 1)
-                            
-                            if is_first_ep:
-                                e_type = f"{category}: Estreno"
-                            elif is_first_of_season:
-                                e_type = f"{category}: Nueva Temporada T{s_num}"
-                            else:
-                                e_type = f"{category}: T{s_num} E{ep.get('episode_number')}"
+                for ep in episodes:
+                    air_date = ep.get('air_date')
+                    if air_date:
+                        try:
+                            dt = datetime.strptime(air_date, '%Y-%m-%d')
+                            if dt.month == target_month and dt.year == target_year:
+                                is_first_ep = (ep.get('episode_number') == 1 and s_num == 1)
+                                is_first_of_season = (ep.get('episode_number') == 1)
                                 
-                            events.append({
-                                'id': m_id, 'type': 'tv', 'title': best_title,
-                                'date': air_date, 'poster': final_tv_poster,
-                                'episode_number': ep.get('episode_number'), 'season_number': s_num,
-                                'event_type': e_type, 'subtype': 'tv'
-                            })
-                    except: continue
+                                if is_first_ep:
+                                    e_type = f"{category}: Estreno"
+                                elif is_first_of_season:
+                                    e_type = f"{category}: Nueva Temporada T{s_num}"
+                                else:
+                                    e_type = f"{category}: T{s_num} E{ep.get('episode_number')}"
+                                    
+                                events.append({
+                                    'id': m_id, 'type': 'tv', 'title': best_title,
+                                    'date': air_date, 'poster': final_tv_poster,
+                                    'episode_number': ep.get('episode_number'), 'season_number': s_num,
+                                    'event_type': e_type, 'subtype': 'tv'
+                                })
+                        except: continue
     except Exception as e:
         print(f"Error fetching calendar events for {m_id} [Rule of 3]: {e}")
         
