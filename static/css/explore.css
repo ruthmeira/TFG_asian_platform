@@ -479,22 +479,6 @@
         width: 100%;
     }
 
-    .collection-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, 145px); /* Misma medida que en Inicio */
-        gap: 15px;
-        justify-content: center;
-        margin: 0 auto;
-    }
-
-    /* Forzamos el tamaño para que sea idéntico al de Inicio */
-    .collection-grid .card,
-    .collection-grid .card-link {
-        width: 145px !important;
-        min-width: 145px !important;
-        max-width: 145px !important;
-    }
-
     .results-meta {
         justify-content: center;
         text-align: center;
