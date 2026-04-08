@@ -51,28 +51,11 @@
 /* 3. GRID SYSTEM & DYNAMICS */
 .collection-grid-premium {
     display: grid !important;
-    /* Tamaño de tarjetas optimizado: 175px escritorio, 140px móvil fallback */
-    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)) !important;
-
-    /* Espaciado fijo en píxeles */
-    column-gap: 14px !important;
-    row-gap: 45px !important;
-
     width: 100% !important;
     margin-bottom: 20px;
 }
 
 /* Card Architecture is now global in style.css */
-/* Layout overrides only */
-.collection-grid-premium .card-link {
-    width: 100% !important;
-    max-width: none !important;
-}
-
-.collection-grid-premium .card {
-    width: 100% !important;
-    max-width: none !important;
-}
 
 /* 7. PAGINATION */
 .pagination-controls-numbers {
@@ -156,11 +139,6 @@
 
     .subtitle-premium {
         font-size: 14px;
-    }
-
-    .collection-grid-premium {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
-        row-gap: 30px !important;
     }
 
     /* Ajuste de Paginación para móviles */
