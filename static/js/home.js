@@ -33,34 +33,31 @@ window.HomeApp = (() => {
     function setupEventListeners() {
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.onclick = (e) => {
-                const url = new URL(btn.href);
-                const newWindow = url.searchParams.get('window') || 'day';
+                const newWindow = btn.dataset.window || 'day';
                 if (newWindow === currentWindow) {
-                    e.preventDefault();
                     return;
                 }
-                e.preventDefault();
-                switchWindow(newWindow, btn.href);
+                switchWindow(newWindow, null, false);
             };
         });
     }
 
     function setupPopState() {
         window.addEventListener('popstate', e => {
-            if (e.state && e.state.window) switchWindow(e.state.window, location.href, false);
+            if (e.state && e.state.window) switchWindow(e.state.window, null, false);
         });
     }
 
-    function switchWindow(windowType, url, push = true) {
+    function switchWindow(windowType, url, push = false) {
         currentWindow = windowType;
         
         // Update UI buttons
         document.querySelectorAll('.filter-btn').forEach(btn => {
-            const btnWindow = new URL(btn.href).searchParams.get('window') || 'day';
+            const btnWindow = btn.dataset.window || 'day';
             btn.classList.toggle('active', btnWindow === windowType);
         });
 
-        if (push) history.pushState({ window: windowType }, '', url);
+        // if (push) history.pushState({ window: windowType }, '', url); // Línea eliminada para mantener URL limpia
 
         if (trendingCache[windowType]) {
             renderFromCache(trendingCache[windowType]);

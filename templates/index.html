@@ -26,8 +26,8 @@
     </div>
     <div class="prime-header-actions">
         <div class="filter-controls">
-            <a href="{{ url_for('home', window='day') }}" class="filter-btn {{ 'active' if active_window == 'day' }}">Hoy</a>
-            <a href="{{ url_for('home', window='week') }}" class="filter-btn {{ 'active' if active_window == 'week' }}">Esta Semana</a>
+            <a href="javascript:void(0)" data-window="day" class="filter-btn {{ 'active' if active_window == 'day' }}">Hoy</a>
+            <a href="javascript:void(0)" data-window="week" class="filter-btn {{ 'active' if active_window == 'week' }}">Esta Semana</a>
         </div>
     </div>
 </div>
