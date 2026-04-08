@@ -1211,6 +1211,10 @@ def media_detail(media_type, media_id):
         res = raw['mx'] if (raw['mx'] and 'id' in raw['mx']) else raw['en']
     if not res: return "Error cargando medios", 404
 
+    # Paridad de Portada: Si ES no tiene portada, buscamos en MX o EN
+    if not res.get('poster_path'):
+        res['poster_path'] = raw['mx'].get('poster_path') or raw['en'].get('poster_path')
+
     lang = res.get('original_language', '').lower()
     # PROCESAMIENTO TÍTULO / OVERVIEW
     res['display_title'] = get_tiered_field(raw, 'title', 'movie' if media_type == 'movie' else 'tv')
@@ -1247,29 +1251,52 @@ def media_detail(media_type, media_id):
     res['flag'] = get_media_flag(res, res)
 
     # RECOMENDACIONES FILTRADAS (Asian Only & Enriquecidas con Paridad de Card)
-    recs_raw = res.get('recommendations', {}).get('results', [])
+    recs_es = raw['es'].get('recommendations', {}).get('results', [])
+    recs_mx = raw['mx'].get('recommendations', {}).get('results', [])
+    recs_en = raw['en'].get('recommendations', {}).get('results', [])
+    
+    mx_map = {r['id']: r for r in recs_mx}
+    en_map = {r['id']: r for r in recs_en}
+
     asia_recs = []
-    for r in recs_raw:
+    for r in recs_es:
+        rid = r['id']
         r_lang = r.get('original_language', '').lower()
         r_countries = [c.upper() for c in r.get('origin_country', [])]
         is_r_asian = r_lang in ASIA_LANGUAGES or any(c in ASIA_COUNTRIES for c in r_countries)
         
-        if is_r_asian and r.get('poster_path'):
-            m_type_r = 'movie' if (media_type == 'movie' and r.get('title')) else 'tv'
-            r['media_type_fixed'] = m_type_r
-            r['display_title'] = r.get('title') or r.get('name')
-            r['original_title_h6'] = r.get('original_title') or r.get('original_name')
-            r['flag'] = get_media_flag(r, r)
+        # Paridad de Datos (Regla de 3)
+        r_mx = mx_map.get(rid, {})
+        r_en = en_map.get(rid, {})
+        
+        if is_r_asian:
+            # Sincronizar Poster y Título con el resto de la web
+            r['poster_path'] = r.get('poster_path') or r_mx.get('poster_path') or r_en.get('poster_path')
             
-            # Etiqueta de Subtipo para compatibilidad con CSS .card .badge
-            if m_type_r == 'movie':
-                r['tipo_label'] = 'Película'
-            else:
-                r_genre_ids = r.get('genre_ids', [])
-                is_prod = any(gid in GENRES_PROGRAMAS for gid in r_genre_ids)
-                r['tipo_label'] = 'Programa' if is_prod else 'Serie'
+            if r['poster_path']: # Solo si tenemos imagen
+                m_type_r = r.get('media_type') or ('movie' if (r.get('title') or r_mx.get('title')) else 'tv')
+                r['media_type_fixed'] = m_type_r
                 
-            asia_recs.append(r)
+                # Título: ES > MX > EN
+                r['display_title'] = r.get('title') or r.get('name') or \
+                                     r_mx.get('title') or r_mx.get('name') or \
+                                     r_en.get('title') or r_en.get('name') or "-"
+                
+                # Subtítulo original
+                r['original_title_h6'] = r.get('original_title') or r.get('original_name') or \
+                                         r_mx.get('original_title') or r_mx.get('original_name') or "-"
+                
+                r['flag'] = get_media_flag(r, r)
+                
+                # Etiqueta de Subtipo
+                if m_type_r == 'movie':
+                    r['tipo_label'] = 'Película'
+                else:
+                    r_genre_ids = r.get('genre_ids', [])
+                    is_prod = any(gid in GENRES_PROGRAMAS for gid in r_genre_ids)
+                    r['tipo_label'] = 'Programa' if is_prod else 'Serie'
+                    
+                asia_recs.append(r)
         if len(asia_recs) >= 8: break
     
     # Motor de Ratings en Bloque para Recommendations
