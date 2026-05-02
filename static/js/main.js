@@ -212,7 +212,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Interceptar envíos de formularios (ej. búsqueda)
     document.addEventListener('submit', (e) => {
         const form = e.target;
-        if (form.getAttribute('target') === '_blank') return;
+        if (form.getAttribute('target') === '_blank' || form.classList.contains('no-loader')) return;
         startLoader();
     });
 

@@ -154,13 +154,38 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // GESTIÓN DE BORRADOS
-    if (cancelDeleteBtn) {
-        cancelDeleteBtn.addEventListener('click', () => {
-            deleteConfirmModal.classList.remove('show');
-            reviewIdToDelete = null;
-        });
-    }
+    // FUNCIÓN DE REFRESCO UNIVERSAL (Para que todo se actualice sin recargar)
+    const refreshShioriData = async () => {
+        try {
+            const refreshRes = await fetch(window.location.href);
+            const refreshHTML = await refreshRes.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(refreshHTML, 'text/html');
+            
+            // 1. Rejilla de opiniones
+            const newGrid = doc.querySelector('.reviews-shiori-grid');
+            const currentGrid = document.querySelector('.reviews-shiori-grid');
+            if (newGrid && currentGrid) {
+                currentGrid.innerHTML = newGrid.innerHTML;
+                attachShioriEvents(); // Volvemos a vincular eventos a los nuevos elementos
+            }
+
+            // 2. Actualizar Nota Media en la Cabecera
+            const newRating = doc.getElementById('shiori-rating-val');
+            const currentRating = document.getElementById('shiori-rating-val');
+            if (newRating && currentRating) {
+                currentRating.textContent = newRating.textContent;
+            }
+
+            // 3. Actualizar Contador de Opiniones
+            const newCount = doc.querySelector('.shiori-count');
+            const currentCount = document.querySelector('.shiori-count');
+            if (newCount && currentCount) {
+                currentCount.textContent = newCount.textContent;
+            }
+
+        } catch (e) { console.error("Error al refrescar datos Shiori:", e); }
+    };
 
     if (confirmDeleteBtn) {
         confirmDeleteBtn.addEventListener('click', async function () {
@@ -172,30 +197,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     if (result.category === 'success') {
                         deleteConfirmModal.classList.remove('show');
-                        card.style.opacity = '0';
-                        card.style.transform = 'scale(0.95)';
-                        setTimeout(() => {
-                            card.remove();
-                            const reviewsLeft = document.querySelectorAll('.shiori-review-card').length;
-                            const countDisplay = document.querySelector('.shiori-count');
-                            if (countDisplay) countDisplay.textContent = `(${reviewsLeft})`;
-
-                            if (reviewsLeft === 0) {
-                                const grid = document.querySelector('.reviews-shiori-grid');
-                                grid.innerHTML = `<div class="no-reviews-placeholder">
-                                    <i class="fas fa-comment-medical"></i>
-                                    <p>La comunidad aún no ha opinado. ¡Cuéntanos qué te ha parecido!</p>
-                                </div>`;
-                            }
-
+                        if (card) {
+                            card.style.opacity = '0';
+                            card.style.transform = 'scale(0.95)';
+                        }
+                        setTimeout(async () => {
+                            await refreshShioriData();
                             if (writeReviewBtn) writeReviewBtn.innerHTML = '<i class="fas fa-pen"></i> Añadir Opinión';
-                            
                             if (reviewForm) {
                                 reviewForm.reset();
                                 const commentArea = document.getElementById('review-comment');
                                 if (commentArea) commentArea.value = '';
-                                const charCounter = reviewForm.querySelector('.char-counter');
-                                if (charCounter) charCounter.textContent = '0 / 1000 caracteres';
                                 if (alertContainer) alertContainer.innerHTML = '';
                                 const modalSubmitBtn = reviewForm.querySelector('.btn-submit-full-shiori');
                                 if (modalSubmitBtn) modalSubmitBtn.textContent = 'Publicar Opinión';
@@ -278,7 +290,6 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             if (submitBtn) submitBtn.disabled = true;
             const formData = new FormData(reviewForm);
-            // La URL se obtiene directamente del action del form (donde Jinja ya inyectó la ruta)
             const postUrl = reviewForm.getAttribute('action');
 
             try {
@@ -303,22 +314,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         submitBtn.innerHTML = 'Guardar Opinión';
                         submitBtn.disabled = false;
                     }
-                    
-                    try {
-                        const refreshRes = await fetch(window.location.href);
-                        const refreshHTML = await refreshRes.text();
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(refreshHTML, 'text/html');
-                        const newGrid = doc.querySelector('.reviews-shiori-grid');
-                        const currentGrid = document.querySelector('.reviews-shiori-grid');
-                        const newCount = doc.querySelector('.shiori-count');
-                        const currentCount = document.querySelector('.shiori-count');
-                        if (newGrid && currentGrid) {
-                            currentGrid.innerHTML = newGrid.innerHTML;
-                            if (currentCount && newCount) currentCount.textContent = newCount.textContent;
-                            attachShioriEvents(); 
-                        }
-                    } catch (e) { console.error("Error al refrescar listado:", e); }
+                    await refreshShioriData();
                 } else {
                     if (submitBtn) {
                         submitBtn.disabled = false;

@@ -108,8 +108,8 @@
         </h1>
 
         <div class="detail-meta">
-            <p><strong>Rating:</strong> ⭐ {{ media.vote_average|round(1) }}</p>
-            <p><strong>Comunidad:</strong> ❤️ {{ shiori_rating|round(1) if shiori_rating > 0 else 0 }}</p>
+            <p><strong>Rating:</strong> ⭐ <span id="tmdb-rating-val">{{ media.vote_average|round(1) }}</span></p>
+            <p><strong>Comunidad:</strong> ❤️ <span id="shiori-rating-val">{{ shiori_rating|round(1) if shiori_rating > 0 else 0 }}</span></p>
             <p><strong>Título original:</strong> {{ media.original_title or media.original_name }}</p>
             <p><strong>Idioma original:</strong> {{ media.original_language_name }}</p>
             <p><strong>Estado:</strong> {{ media.status }}</p>
@@ -519,7 +519,7 @@
 
         <div id="review-alert-container"></div>
 
-        <form id="shiori-review-form" method="POST" action="{{ url_for('post_review', media_type=('tv' if media.name else 'movie'), media_id=media.id) }}">
+        <form id="shiori-review-form" class="no-loader" method="POST" action="{{ url_for('post_review', media_type=('tv' if media.name else 'movie'), media_id=media.id) }}">
             <!-- Deslizador de Nota Reformado (Más Intuitivo) -->
             <div class="rating-slider-group">
                 <div class="rating-display-header">
