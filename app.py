@@ -1568,8 +1568,7 @@ def admin_reject_report(review_id):
     # Marcamos a todos los que denunciaron esta reseña con un "fallo" (falsas denuncias)
     for report in review.reports:
         log = ModerationLog(
-            author_id=review.user_id, # "VÍCTIMA" del reporte falso
-            reporter_id=report.user_id, # "PENSADOR" del reporte falso
+            reporter_id=report.user_id, # Solo guardamos al "PENSADOR" del reporte falso para su castigo
             review_id=review.id, 
             review_content_snapshot=review.comment, # CAPTURA para ver qué denunció injustamente
             action='dismissed_report', 

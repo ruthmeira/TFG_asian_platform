@@ -25,7 +25,7 @@
         <!-- RESUMEN DE REPUTACIÓN SOLAMENTE NÚMEROS -->
         <div class="reputation-summary-card">
             <!-- ACCIÓN ÚNICA DE BANEO Y LIMPIEZA SHIORI -->
-            <form id="ban-user-form" action="{{ url_for('admin_toggle_ban', user_id=target_user.id) }}" method="POST" class="nuclear-form" data-is-banned="{{ 'true' if target_user.is_banned else 'false' }}">
+            <form id="ban-user-form" action="{{ url_for('admin_toggle_ban', user_id=target_user.id) }}" method="POST" class="nuclear-form no-loader" data-is-banned="{{ 'true' if target_user.is_banned else 'false' }}">
                 <button type="button" id="ban-toggle-btn" class="btn-shiori-ban {% if target_user.is_banned %}is-banned{% endif %}">
                     {% if target_user.is_banned %}
                         <i class="fas fa-unlock"></i> QUITAR BLOQUEO
@@ -102,17 +102,6 @@
                                     <span class="log-badge">Denuncia Falsa</span>
                                 </div>
                                 <div class="log-content">
-                                    <div class="victim-dossier-mini">
-                                        <span>Denunció a:</span>
-                                        <div class="victim-tag">
-                                            {% if log.author and log.author.profile_image %}
-                                                <img src="{{ url_for('static', filename=log.author.profile_image) }}" class="mini-avatar">
-                                            {% else %}
-                                                <div class="mini-initial">{{ log.author.username[0]|upper if log.author else '?' }}</div>
-                                            {% endif %}
-                                            <strong>{{ log.author.username if log.author else '[Usuario eliminado]' }}</strong>
-                                        </div>
-                                    </div>
                                     {% if log.review_content_snapshot %}
                                         <div class="forensic-snapshot-mini">
                                             "{{ log.review_content_snapshot[:100] }}..."
