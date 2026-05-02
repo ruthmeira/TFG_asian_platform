@@ -142,6 +142,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function createMediaCard(item, cat) {
         const link = document.createElement('a');
         link.href = `/media/${item.type}/${item.id}`;
+        link.target = '_blank';
         link.className = 'card-link animate__animated animate__fadeInUp';
 
         const label = cat === 'movie' ? 'Película' : (cat === 'program' ? 'Programa' : 'Serie');
@@ -177,6 +178,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function createPersonCard(person) {
         const link = document.createElement('a');
         link.href = `/person/${person.id}`;
+        link.target = '_blank';
         link.className = 'person-row-link animate__animated animate__fadeInUp';
 
         const department = person.department || 'Talento';
@@ -211,6 +213,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function createKeywordItem(kw) {
         const link = document.createElement('a');
         link.href = `/explore?keywords=${kw.id}_${kw.title.toLowerCase()}`;
+        link.target = '_blank';
         link.className = 'keyword-row animate__animated animate__fadeIn';
         link.innerHTML = `
             <i class="fas fa-hashtag keyword-icon"></i>
