@@ -2027,6 +2027,12 @@ def api_explore():
     genres_programas_or = "|".join(map(str, GENRES_PROGRAMAS))
     genres_programas_and = ",".join(map(str, GENRES_PROGRAMAS))
 
+    # Normalización de sort_by para evitar errores entre Movie/TV
+    if target_type == 'movie' and 'first_air_date' in sort_by:
+        sort_by = sort_by.replace('first_air_date', 'primary_release_date')
+    elif target_type == 'tv' and 'primary_release_date' in sort_by:
+        sort_by = sort_by.replace('primary_release_date', 'first_air_date')
+
     def generate():
         final_items_count = 0
         seen_ids = set() # Escudo anti-duplicados
@@ -2041,7 +2047,7 @@ def api_explore():
         
         while final_items_count < 20 and current_api_page < max_pages_to_scan:
             url = f"https://api.themoviedb.org/3/discover/{target_type}?api_key={api_key}&language=es-ES&page={current_api_page}&sort_by={sort_by}"
-            if 'vote_average' in sort_by: url += "&vote_count.gte=100"
+            if 'vote_average' in sort_by: url += "&vote_count.gte=10"
             if target_type == 'tv':
                 url += f"&first_air_date.lte={today}"
                 if status_id: url += f"&with_status={status_id}"
