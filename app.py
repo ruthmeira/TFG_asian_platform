@@ -1488,6 +1488,33 @@ def report_review(review_id):
         return jsonify({'category': 'error', 'message': 'Error al procesar el reporte.'}), 500
 
 
+@app.route('/media/<media_type>/<int:media_id>/report_data', methods=['POST'])
+@login_required
+def report_media_data(media_type, media_id):
+    field_type = request.form.get('field_type')
+    description = request.form.get('description')
+    
+    if not field_type or not description:
+        flash('Por favor, rellena todos los campos del reporte.', 'error')
+        return redirect(url_for('media_detail', media_type=media_type, media_id=media_id))
+    
+    try:
+        report = MediaReport(
+            user_id=current_user.id,
+            media_id=media_id,
+            media_type=media_type,
+            field_type=field_type,
+            description=description
+        )
+        db.session.add(report)
+        db.session.commit()
+        return jsonify({'category': 'success', 'message': '¡Hecho! Shiori revisará tu reporte pronto para mejorar la base de datos.'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'category': 'error', 'message': 'Hubo un error al enviar el reporte. Inténtalo de nuevo.'}), 500
+
+
+
 from functools import wraps
 
 def admin_required(f):

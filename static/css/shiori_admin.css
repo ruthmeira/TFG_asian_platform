@@ -985,3 +985,32 @@
     padding: 100px 20px;
     margin-bottom: 20px;
 }
+
+/* BOTÓN DE REPORTE DE DATOS (Ficha Media) */
+.btn-report-data-premium {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    padding: 10px 18px;
+    border-radius: 14px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    width: fit-content;
+}
+
+.btn-report-data-premium:hover {
+    background: rgba(255, 69, 0, 0.1);
+    border-color: rgba(255, 69, 0, 0.3);
+    color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.btn-report-data-premium i {
+    font-size: 0.9rem;
+}

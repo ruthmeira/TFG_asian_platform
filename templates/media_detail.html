@@ -3,7 +3,7 @@
 {% block title %}{{ media.display_title }} - SHIORI{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/media_detail.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/media_detail.css') }}?v=1.9">
 {% endblock %}
 
 {% block content %}
@@ -91,6 +91,12 @@
                     {% endfor %}
                 </div>
             </div>
+
+            {# BOTÓN DE REPORTE DE DATOS #}
+            <button id="open-report-modal-btn" class="btn-report-data-premium" title="Reportar error en los datos">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Reportar Error</span>
+            </button>
         </div>
     </div>
 
@@ -109,7 +115,8 @@
 
         <div class="detail-meta">
             <p><strong>Rating:</strong> ⭐ <span id="tmdb-rating-val">{{ media.vote_average|round(1) }}</span></p>
-            <p><strong>Comunidad:</strong> ❤️ <span id="shiori-rating-val">{{ shiori_rating|round(1) if shiori_rating > 0 else 0 }}</span></p>
+            <p><strong>Comunidad:</strong> ❤️ <span id="shiori-rating-val">{{ shiori_rating|round(1) if shiori_rating >
+                    0 else 0 }}</span></p>
             <p><strong>Título original:</strong> {{ media.original_title or media.original_name }}</p>
             <p><strong>Idioma original:</strong> {{ media.original_language_name }}</p>
             <p><strong>Estado:</strong> {{ media.status }}</p>
@@ -390,14 +397,16 @@
         <a href="{{ url_for('media_detail', media_type=item.media_type_fixed, media_id=item.id) }}" class="card-link">
             <div class="card">
                 <div class="badge">{{ item.tipo_label }}</div>
-                <img src="{% if item.poster_path %}https://image.tmdb.org/t/p/w342{{ item.poster_path }}{% else %}{{ url_for('static', filename='img/no-poster.png') }}{% endif %}" alt="{{ item.display_title }}">
+                <img src="{% if item.poster_path %}https://image.tmdb.org/t/p/w342{{ item.poster_path }}{% else %}{{ url_for('static', filename='img/no-poster.png') }}{% endif %}"
+                    alt="{{ item.display_title }}">
                 <div class="card-body">
                     <h4>{{ item.display_title }}</h4>
                     <h6>{{ item.original_title_h6 }}</h6>
                     <div class="card-meta">
                         <div class="ratings-group">
                             <span class="rating">⭐ {{ item.vote_average|round(1) }}</span>
-                            <span class="shiori-rating"><i class="fas fa-heart"></i> {{ (item.shiori_rating or 0.0)|round(1) }}</span>
+                            <span class="shiori-rating"><i class="fas fa-heart"></i> {{ (item.shiori_rating or
+                                0.0)|round(1) }}</span>
                         </div>
                         <span class="lang">{{ item.flag }}</span>
                     </div>
@@ -485,15 +494,16 @@
                     </div>
 
                     {% if current_user.is_authenticated %}
-                        {% if current_user.id == r.user_id or current_user.is_admin %}
-                        <button class="btn-delete-shiori-btn" data-id="{{ r.id }}" title="{{ 'Eliminar esta opinión (Admin)' if current_user.is_admin else 'Eliminar mi opinión' }}">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                        {% else %}
-                        <button class="btn-report-shiori-btn" data-id="{{ r.id }}" title="Reportar esta opinión">
-                            <i class="fas fa-flag"></i>
-                        </button>
-                        {% endif %}
+                    {% if current_user.id == r.user_id or current_user.is_admin %}
+                    <button class="btn-delete-shiori-btn" data-id="{{ r.id }}"
+                        title="{{ 'Eliminar esta opinión (Admin)' if current_user.is_admin else 'Eliminar mi opinión' }}">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    {% else %}
+                    <button class="btn-report-shiori-btn" data-id="{{ r.id }}" title="Reportar esta opinión">
+                        <i class="fas fa-flag"></i>
+                    </button>
+                    {% endif %}
                     {% endif %}
                 </div>
             </div>
@@ -519,25 +529,26 @@
 
         <div id="review-alert-container"></div>
 
-        <form id="shiori-review-form" class="no-loader" method="POST" action="{{ url_for('post_review', media_type=('tv' if media.name else 'movie'), media_id=media.id) }}">
+        <form id="shiori-review-form" class="no-loader" method="POST"
+            action="{{ url_for('post_review', media_type=('tv' if media.name else 'movie'), media_id=media.id) }}">
             <!-- Deslizador de Nota Reformado (Más Intuitivo) -->
             <div class="rating-slider-group">
                 <div class="rating-display-header">
                     <span id="rating-value-shiori">{{ user_review.rating if user_review else '5.0' }}</span>
                     <div id="rating-label-shiori" class="rating-dynamic-label">
                         {% if user_review %}
-                        {% if user_review.rating <= 0 %}Horrible... 🏮🏮 {% elif user_review.rating <= 2 %}No me ha gustado 🏮 {% elif user_review.rating <= 4 %}Un poco
-                            aburrida 🥱 {% elif user_review.rating <=5.5 %}Es pasable 🤔 {% elif user_review.rating <=7
-                            %}Me ha gustado 👍 {% elif user_review.rating <=8.5 %}¡Muy buena! 🔥 {% elif
-                            user_review.rating < 10 %}¡Increíble! ✨ {% else %}¡OBRA MAESTRA! ❤️ {% endif %} {% else %}
-                            Es pasable 🤔 {% endif %} </div>
+                        {% if user_review.rating <= 0 %}Horrible... 🏮🏮 {% elif user_review.rating <=2 %}No me ha
+                            gustado 🏮 {% elif user_review.rating <=4 %}Un poco aburrida 🥱 {% elif user_review.rating
+                            <=5.5 %}Es pasable 🤔 {% elif user_review.rating <=7 %}Me ha gustado 👍 {% elif
+                            user_review.rating <=8.5 %}¡Muy buena! 🔥 {% elif user_review.rating < 10 %}¡Increíble! ✨ {%
+                            else %}¡OBRA MAESTRA! ❤️ {% endif %} {% else %} Es pasable 🤔 {% endif %} </div>
                     </div>
 
                     <div class="range-shiori-container">
                         <i class="far fa-star star-icon-min"></i>
                         <div class="range-shiori-wrapper">
                             <input type="range" id="rating-range-shiori" name="rating" min="0" max="10" step="0.5"
-                        value="{{ user_review.rating if user_review else '5.0' }}" class="shiori-range">
+                                value="{{ user_review.rating if user_review else '5.0' }}" class="shiori-range">
                         </div>
                         <i class="fas fa-star star-icon-max"></i>
                     </div>
@@ -589,7 +600,64 @@
 </div>
 {% endif %}
 
-    <!-- LÓGICA DE GESTIÓN SHIORI (OPINIONES, VOTOS, REPORTES) -->
-    <script src="{{ url_for('static', filename='js/shiori_reviews.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/media_detail.js') }}"></script>
+<!-- MODAL DE REPORTE DE DATOS (TMDB SYNC) -->
+<div class="shiori-confirm-overlay" id="data-report-modal">
+    <div class="shiori-confirm-box">
+        <div class="data-report-header">
+            <div class="confirm-icon data-icon">
+                <i class="fas fa-database"></i>
+            </div>
+            <h3>Corregir datos de Shiori</h3>
+        </div>
+        <p class="data-report-info">¿Has detectado un error? Ayúdanos a mejorar informando qué campo está incorrecto en
+            TMDB.</p>
+
+        <div id="data-report-alert-container"></div>
+
+        <form action="{{ url_for('report_media_data', media_type=real_media_type, media_id=media.id) }}" method="POST"
+            id="data-report-form" class="no-loader">
+
+
+            <input type="hidden" name="field_type" id="selected-field-type" required>
+
+            <div class="form-group-shiori">
+                <label>Selecciona la sección con el error:</label>
+
+                <div class="report-options-list">
+                    {% for opt in ["Título", "Título Original", "Sinopsis", "Fecha de Estreno", "Estado", "Temporadas",
+                    "Géneros", "Palabras Clave", "Tráiler", "Póster", "Reparto / Equipo", "Links / Web Oficial",
+                    "Otros"] %}
+                    <div class="report-option-item" onclick="selectReportOption(this, '{{ opt }}')">
+                        <div class="radio-circle"></div>
+                        <span class="report-option-text">{{ opt }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <script>
+                function selectReportOption(element, value) {
+                    document.querySelectorAll('.report-option-item').forEach(el => el.classList.remove('selected'));
+                    element.classList.add('selected');
+                    document.getElementById('selected-field-type').value = value;
+                }
+            </script>
+
+            <div class="form-group-shiori">
+                <label>Mensaje o información correcta</label>
+                <textarea name="description" id="report-description-area" class="shiori-textarea-premium"
+                    placeholder="Ej: El título correcto es X, falta la temporada 2..." required></textarea>
+            </div>
+
+            <div class="confirm-actions">
+                <button type="button" class="confirm-btn shiori-cancel" id="close-data-modal">Cancelar</button>
+                <button type="submit" class="confirm-btn confirm-btn-submit">Enviar Reporte</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- LÓGICA DE GESTIÓN SHIORI (OPINIONES, VOTOS, REPORTES) -->
+<script src="{{ url_for('static', filename='js/shiori_reviews.js') }}"></script>
+<script src="{{ url_for('static', filename='js/media_detail.js') }}"></script>
 {% endblock %}

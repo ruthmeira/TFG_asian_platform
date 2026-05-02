@@ -101,3 +101,15 @@ class ModerationLog(db.Model):
     # Relaciones para estadísticas rápidas
     author = db.relationship('User', foreign_keys=[author_id], backref=db.backref('moderation_history', lazy=True))
     reporter_user = db.relationship('User', foreign_keys=[reporter_id], backref=db.backref('reports_history', lazy=True))
+
+class MediaReport(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    media_id = db.Column(db.Integer, nullable=False)
+    media_type = db.Column(db.String(20), nullable=False) # 'movie' o 'tv'
+    field_type = db.Column(db.String(50), nullable=False) # La sección (Título, Sinopsis, etc.)
+    description = db.Column(db.Text, nullable=False)      # El mensaje del usuario
+    status = db.Column(db.String(20), default='pending') # 'pending', 'resolved', 'ignored'
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref='data_reports')
