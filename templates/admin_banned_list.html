@@ -19,6 +19,14 @@
         </div>
     </div>
 
+    <!-- BUSCADOR DE PRISIONEROS (LIMPIO) -->
+    <div class="admin-header-spacing" style="margin-bottom: 30px;">
+        <div class="search-bar-inline" style="max-width: 600px; margin: 0 auto; padding-right: 20px;">
+            <i class="fas fa-search search-icon-mini"></i>
+            <input type="text" id="prison-search-input" placeholder="Buscar por username o correo..." autocomplete="off">
+        </div>
+    </div>
+
     <div class="banned-users-grid">
         {% if banned_users %}
         {% for user in banned_users %}
@@ -55,4 +63,8 @@
         {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/shiori_admin.js') }}"></script>
 {% endblock %}

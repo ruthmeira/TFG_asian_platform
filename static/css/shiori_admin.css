@@ -817,6 +817,11 @@
 }
 
 /* NAVEGACIÓN ADMINISTRATIVA SHIORI */
+.admin-reviews-page .prime-header-actions {
+    justify-content: center;
+    margin-top: 25px;
+}
+
 .btn-shiori-banned-list {
     display: inline-flex;
     align-items: center;
@@ -836,6 +841,22 @@
     color: #fff;
     box-shadow: 0 10px 25px rgba(255, 71, 87, 0.3);
     transform: translateY(-2px);
+}
+
+/* BUSCADOR DE LA CÁRCEL (CLON HOME) */
+#prison-search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 10px 15px;
+    color: white;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+}
+
+#prison-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
 }
 
 /* REJILLA DE BANEADOS (PRISON) */

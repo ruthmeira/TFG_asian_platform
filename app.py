@@ -1601,8 +1601,8 @@ def admin_reject_report(review_id):
 def admin_user_history(user_id):
     target_user = User.query.get_or_404(user_id)
     
-    # 1. Opiniones Aceptadas (Vivas actualmente)
-    approved_reviews_count = Review.query.filter_by(user_id=user_id).count()
+    # 1. Opiniones Aceptadas (Vivas y aprobadas actualmente)
+    approved_reviews_count = Review.query.filter_by(user_id=user_id, status='approved').count()
     
     # 2. Opiniones Borradas (Strikes)
     author_logs = ModerationLog.query.filter_by(author_id=user_id, action='deleted_review').order_by(ModerationLog.created_at.desc()).all()

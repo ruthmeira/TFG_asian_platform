@@ -25,12 +25,14 @@
         <!-- RESUMEN DE REPUTACIÓN SOLAMENTE NÚMEROS -->
         <div class="reputation-summary-card">
             <!-- ACCIÓN ÚNICA DE BANEO Y LIMPIEZA SHIORI -->
-            <form id="ban-user-form" action="{{ url_for('admin_toggle_ban', user_id=target_user.id) }}" method="POST" class="nuclear-form no-loader" data-is-banned="{{ 'true' if target_user.is_banned else 'false' }}">
-                <button type="button" id="ban-toggle-btn" class="btn-shiori-ban {% if target_user.is_banned %}is-banned{% endif %}">
+            <form id="ban-user-form" action="{{ url_for('admin_toggle_ban', user_id=target_user.id) }}" method="POST"
+                class="nuclear-form no-loader" data-is-banned="{{ 'true' if target_user.is_banned else 'false' }}">
+                <button type="button" id="ban-toggle-btn"
+                    class="btn-shiori-ban {% if target_user.is_banned %}is-banned{% endif %}">
                     {% if target_user.is_banned %}
-                        <i class="fas fa-unlock"></i> QUITAR BLOQUEO
+                    <i class="fas fa-unlock"></i> QUITAR BLOQUEO
                     {% else %}
-                        <i class="fas fa-user-slash"></i> BANEAR USUARIO
+                    <i class="fas fa-user-slash"></i> BANEAR USUARIO
                     {% endif %}
                 </button>
             </form>
@@ -45,7 +47,7 @@
                     <span class="stat-val">{{ deleted_reviews_count }}</span>
                     <span class="stat-lbl">Opiniones Borradas</span>
                 </div>
-                
+
                 <!-- FILA 2: DENUNCIAS -->
                 <div class="stat-item reporter-accepted">
                     <span class="stat-val text-info">{{ accepted_reports_count }}</span>
@@ -64,29 +66,31 @@
             <div class="log-section">
                 <h2><i class="fas fa-trash-alt"></i> Historial de Opiniones Borradas</h2>
                 {% if author_logs %}
-                    <div class="log-list">
-                        {% for log in author_logs %}
-                            <div class="log-entry strike-entry">
-                                <div class="log-meta">
-                                    <span class="log-date">{{ log.created_at.strftime('%d/%m/%Y %H:%M') }}</span>
-                                    <span class="log-badge">Sanción</span>
-                                </div>
-                                <div class="log-content">
-                                    <p>Opinión eliminada:</p>
-                                    {% if log.review_content_snapshot %}
-                                        <div class="forensic-snapshot-mini">
-                                            "{{ log.review_content_snapshot }}"
-                                        </div>
-                                    {% else %}
-                                        <p class="no-snapshot">Sin captura previa (log antiguo)</p>
-                                    {% endif %}
-                                    <p class="log-reason-tag">Razón: <strong>{% if log.reason == 'auto_filter' %}Filtro Automático{% elif log.reason == 'ban_cleanup' %}Limpieza por Baneo{% else %}Denuncia de Usuario{% endif %}</strong></p>
-                                </div>
+                <div class="log-list">
+                    {% for log in author_logs %}
+                    <div class="log-entry strike-entry">
+                        <div class="log-meta">
+                            <span class="log-date">{{ log.created_at.strftime('%d/%m/%Y %H:%M') }}</span>
+                            <span class="log-badge">Sanción</span>
+                        </div>
+                        <div class="log-content">
+                            <p>Opinión eliminada:</p>
+                            {% if log.review_content_snapshot %}
+                            <div class="forensic-snapshot-mini">
+                                "{{ log.review_content_snapshot }}"
                             </div>
-                        {% endfor %}
+                            {% else %}
+                            <p class="no-snapshot">Sin captura previa (log antiguo)</p>
+                            {% endif %}
+                            <p class="log-reason-tag">Razón: <strong>{% if log.reason == 'auto_filter' %}Filtro
+                                    Automático{% elif log.reason == 'ban_cleanup' %}Limpieza por Baneo{% else %}Denuncia
+                                    de Usuario{% endif %}</strong></p>
+                        </div>
                     </div>
+                    {% endfor %}
+                </div>
                 {% else %}
-                    <p class="empty-log">Este usuario no tiene opiniones borradas en su expediente.</p>
+                <p class="empty-log">Este usuario no tiene opiniones borradas en su expediente.</p>
                 {% endif %}
             </div>
 
@@ -94,25 +98,25 @@
             <div class="log-section">
                 <h2><i class="fas fa-exclamation-triangle"></i> Historial de Denuncias Rechazadas</h2>
                 {% if reporter_logs %}
-                    <div class="log-list">
-                        {% for log in reporter_logs %}
-                            <div class="log-entry toxic-entry">
-                                <div class="log-meta">
-                                    <span class="log-date">{{ log.created_at.strftime('%d/%m/%Y %H:%M') }}</span>
-                                    <span class="log-badge">Denuncia Falsa</span>
-                                </div>
-                                <div class="log-content">
-                                    {% if log.review_content_snapshot %}
-                                        <div class="forensic-snapshot-mini">
-                                            "{{ log.review_content_snapshot[:100] }}..."
-                                        </div>
-                                    {% endif %}
-                                </div>
+                <div class="log-list">
+                    {% for log in reporter_logs %}
+                    <div class="log-entry toxic-entry">
+                        <div class="log-meta">
+                            <span class="log-date">{{ log.created_at.strftime('%d/%m/%Y %H:%M') }}</span>
+                            <span class="log-badge">Denuncia Falsa</span>
+                        </div>
+                        <div class="log-content">
+                            {% if log.review_content_snapshot %}
+                            <div class="forensic-snapshot-mini">
+                                "{{ log.review_content_snapshot[:100] }}..."
                             </div>
-                        {% endfor %}
+                            {% endif %}
+                        </div>
                     </div>
+                    {% endfor %}
+                </div>
                 {% else %}
-                    <p class="empty-log">Este usuario no tiene registros de denuncias malintencionadas / rechazadas.</p>
+                <p class="empty-log">Este usuario no tiene registros de denuncias malintencionadas / rechazadas.</p>
                 {% endif %}
             </div>
         </div>
