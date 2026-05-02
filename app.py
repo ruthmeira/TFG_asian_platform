@@ -439,7 +439,7 @@ def login():
         if user and user.check_password(password):
             # --- VERIFICACIÓN DE BANEO SHIORI ---
             if user.is_banned:
-                flash("Tu cuenta ha sido bloqueada permanentemente por administración de Shiori. Acceso denegado.", "error")
+                flash("Tu cuenta ha sido bloqueada permanentemente por administración de Shiori. Acceso denegado. Si crees que es un error, contacta con contacto.shiori@gmail.com", "error")
                 return redirect(url_for('login'))
                 
             remember = True if request.form.get('remember') else False
@@ -502,7 +502,7 @@ def google_authorize():
                 return redirect(url_for('login'))
         
         if user and user.is_banned:
-            flash("Esta cuenta ha sido bloqueada permanentemente de Shiori. Acceso denegado.", "error")
+            flash("Esta cuenta ha sido bloqueada permanentemente de Shiori. Acceso denegado. Si crees que es un error, contacta con contacto.shiori@gmail.com", "error")
             return redirect(url_for('login'))
 
         # Loguear al usuario existente con sesión persistente (por comodidad)
@@ -1640,16 +1640,14 @@ def admin_toggle_ban(user_id):
     new_status = not target_user.is_banned
     target_user.is_banned = new_status
     
-    # --- SI SE BANEA, PURGAMOS TODO SU CONTENIDO REGISTRANDO EVIDENCIA ---
+    # --- SI SE BANEA, PURGAMOS SU ACTIVIDAD PÚBLICA PERO MANTENEMOS SU BIBLIOTECA (COLECCIONES) ---
     if new_status:
         try:
-            # 1. Borrar Colecciones
-            CollectionItem.query.filter_by(user_id=user_id).delete()
-            # 2. Borrar Votos y Reportes HECHOS por él
+            # 1. Borrar Votos y Reportes HECHOS por él (Limpieza de ruido en el sistema)
             ReviewVote.query.filter_by(user_id=user_id).delete()
             ReviewReport.query.filter_by(user_id=user_id).delete()
             
-            # 3. Borrar sus Opiniones LOGUEÁNDOLAS antes (Para el expediente)
+            # 2. Borrar sus Opiniones (Y registrar evidencia en ModerationLog antes de borrar)
             user_reviews = Review.query.filter_by(user_id=user_id).all()
             for r in user_reviews:
                 log = ModerationLog(
@@ -1660,15 +1658,15 @@ def admin_toggle_ban(user_id):
                     reason='ban_cleanup'
                 )
                 db.session.add(log)
-                db.session.delete(r) # Borrado individual para cascade
+                db.session.delete(r) 
             
-            message = f"PURGA COMPLETADA. El usuario {target_user.username} ha sido BANEADO y su historial guardado."
+            message = f"BANEO APLICADO. Se ha purgado la actividad pública de {target_user.username}. Sus colecciones y calendario se han preservado."
         except Exception as e:
             db.session.rollback()
             return jsonify({'category': 'error', 'message': f"Error en la purga: {str(e)}"}), 500
     else:
         # Si se desbanea, simplemente lo activamos
-        message = f"Usuario {target_user.username} reactivado."
+        message = f"Usuario {target_user.username} reactivado. Su biblioteca personal está intacta."
 
     db.session.commit()
     return jsonify({
