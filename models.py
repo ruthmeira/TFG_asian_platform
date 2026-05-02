@@ -64,6 +64,12 @@ class Review(db.Model):
     status = db.Column(db.String(20), default='approved') # 'approved' por defecto ahora
     report_count = db.Column(db.Integer, default=0) # Contador de denuncias
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # --- Datos de caché para administración y listados rápidos ---
+    media_title = db.Column(db.String(255))
+    # -----------------------------------------------------------
+
+
 
     # Relación para acceder al usuario autor de la reseña
     user = db.relationship('User', backref=db.backref('reviews', lazy=True))
@@ -107,6 +113,7 @@ class MediaReport(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     media_id = db.Column(db.Integer, nullable=False)
     media_type = db.Column(db.String(20), nullable=False) # 'movie' o 'tv'
+    media_title = db.Column(db.String(255), nullable=True) # Nombre guardado para el admin
     field_type = db.Column(db.String(50), nullable=False) # La sección (Título, Sinopsis, etc.)
     description = db.Column(db.Text, nullable=False)      # El mensaje del usuario
     status = db.Column(db.String(20), default='pending') # 'pending', 'resolved', 'ignored'

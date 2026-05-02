@@ -531,7 +531,12 @@
 
         <form id="shiori-review-form" class="no-loader" method="POST"
             action="{{ url_for('post_review', media_type=('tv' if media.name else 'movie'), media_id=media.id) }}">
+            
+            <input type="hidden" name="media_title" value="{{ media.name if media.name else media.title }}">
+
             <!-- Deslizador de Nota Reformado (Más Intuitivo) -->
+
+
             <div class="rating-slider-group">
                 <div class="rating-display-header">
                     <span id="rating-value-shiori">{{ user_review.rating if user_review else '5.0' }}</span>
@@ -619,6 +624,7 @@
 
 
             <input type="hidden" name="field_type" id="selected-field-type" required>
+            <input type="hidden" name="media_title" value="{{ media.name if media.name else media.title }}">
 
             <div class="form-group-shiori">
                 <label>Selecciona la sección con el error:</label>
@@ -660,4 +666,9 @@
 <!-- LÓGICA DE GESTIÓN SHIORI (OPINIONES, VOTOS, REPORTES) -->
 <script src="{{ url_for('static', filename='js/shiori_reviews.js') }}"></script>
 <script src="{{ url_for('static', filename='js/media_detail.js') }}"></script>
-{% endblock %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        MediaDetail.init();
+    });
+</script>
+{% endblock %}

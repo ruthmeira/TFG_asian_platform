@@ -5,7 +5,7 @@ from flask_mail import Mail, Message
 from authlib.integrations.flask_client import OAuth  # Nueva importación
 from deep_translator import GoogleTranslator
 from dotenv import load_dotenv
-from models import db, User, CollectionItem, Review, ReviewVote, ReviewReport, ModerationLog, MediaEvent
+from models import db, User, CollectionItem, Review, ReviewVote, ReviewReport, ModerationLog, MediaEvent, MediaReport
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
@@ -1210,7 +1210,10 @@ def media_detail(media_type, media_id):
     res = raw['es']
     if not res or 'id' not in res:
         res = raw['mx'] if (raw['mx'] and 'id' in raw['mx']) else raw['en']
+    
     if not res: return "Error cargando medios", 404
+
+
 
     # Paridad de Portada: Si ES no tiene portada, buscamos en MX o EN
     if not res.get('poster_path'):
@@ -1493,25 +1496,39 @@ def report_review(review_id):
 def report_media_data(media_type, media_id):
     field_type = request.form.get('field_type')
     description = request.form.get('description')
+    media_title = request.form.get('media_title')
     
     if not field_type or not description:
         flash('Por favor, rellena todos los campos del reporte.', 'error')
         return redirect(url_for('media_detail', media_type=media_type, media_id=media_id))
     
     try:
+        # Si no viene en el form, intentamos buscarlo
+        if not media_title:
+            cached = get_cached_media(media_id, media_type)
+            if cached:
+                media_title = cached.get('display_title') or cached.get('title')
+            else:
+                summary = get_media_summary(media_id, media_type, include_db=False)
+                if summary:
+                    media_title = summary.get('title')
+
         report = MediaReport(
             user_id=current_user.id,
             media_id=media_id,
             media_type=media_type,
+            media_title=media_title,
             field_type=field_type,
             description=description
         )
+
         db.session.add(report)
         db.session.commit()
         return jsonify({'category': 'success', 'message': '¡Hecho! Shiori revisará tu reporte pronto para mejorar la base de datos.'})
     except Exception as e:
         db.session.rollback()
         return jsonify({'category': 'error', 'message': 'Hubo un error al enviar el reporte. Inténtalo de nuevo.'}), 500
+
 
 
 
@@ -1642,6 +1659,12 @@ def admin_user_history(user_id):
     reporter_logs = ModerationLog.query.filter_by(reporter_id=user_id, action='dismissed_report').order_by(ModerationLog.created_at.desc()).all()
     rejected_reports_count = len(reporter_logs)
     
+    # 5. Reportes de Datos Resueltos (Aciertos en corrección de BD)
+    data_reports_resolved = MediaReport.query.filter_by(user_id=user_id, status='resolved').count()
+    
+    # 6. Reportes de Datos Ignorados (Errores o ruido)
+    data_reports_ignored = MediaReport.query.filter_by(user_id=user_id, status='ignored').count()
+    
     return render_template('admin_user_history.html', 
                            target_user=target_user, 
                            author_logs=author_logs, 
@@ -1649,7 +1672,10 @@ def admin_user_history(user_id):
                            approved_reviews_count=approved_reviews_count,
                            deleted_reviews_count=deleted_reviews_count,
                            accepted_reports_count=accepted_reports_count,
-                           rejected_reports_count=rejected_reports_count)
+                           rejected_reports_count=rejected_reports_count,
+                           data_reports_resolved=data_reports_resolved,
+                           data_reports_ignored=data_reports_ignored)
+
 
 
 # ACCIÓN: BANEAR / DESBANEAR USUARIO (Bloqueos definitivos con limpieza de datos)
@@ -1702,13 +1728,44 @@ def admin_toggle_ban(user_id):
         'is_banned': target_user.is_banned
     })
 
-
 @app.route('/admin/banned_users')
 @login_required
 @admin_required
 def admin_banned_list():
     banned_users = User.query.filter_by(is_banned=True).order_by(User.username).all()
     return render_template('admin_banned_list.html', banned_users=banned_users)
+
+
+@app.route('/admin/data-reports')
+
+@login_required
+@admin_required
+def admin_data_reports():
+    # Recuperamos solo los reportes pendientes
+    reports = MediaReport.query.filter_by(status='pending').order_by(MediaReport.created_at.desc()).all()
+    return render_template('admin_data_reports.html', reports=reports)
+
+
+
+@app.route('/admin/data-report/<int:report_id>/resolve', methods=['POST'])
+@login_required
+@admin_required
+def resolve_data_report(report_id):
+    report = MediaReport.query.get_or_404(report_id)
+    report.status = 'resolved'
+    db.session.commit()
+    return jsonify({'category': 'success', 'message': 'Reporte marcado como resuelto.'})
+
+@app.route('/admin/data-report/<int:report_id>/dismiss', methods=['POST'])
+@login_required
+@admin_required
+def dismiss_data_report(report_id):
+    report = MediaReport.query.get_or_404(report_id)
+    report.status = 'ignored'
+    db.session.commit()
+    return jsonify({'category': 'success', 'message': 'Reporte ignorado.'})
+
+
 
 
 @app.route('/delete_account', methods=['POST'])
@@ -1736,6 +1793,7 @@ def delete_account():
         
         # 4. Borrar el Usuario
         user = User.query.get(user_id)
+
         db.session.delete(user)
         db.session.commit()
         
@@ -1766,12 +1824,15 @@ def post_review(media_type, media_id):
             final_status = 'pending'
             break
 
+    media_title = request.form.get('media_title')
+
     review = Review.query.filter_by(user_id=current_user.id, media_id=media_id, media_type=media_type).first()
     
     if review:
         review.rating = rating
         review.comment = comment
         review.status = final_status
+        review.media_title = media_title
         review.created_at = datetime.utcnow()
         msg = "Tu opinión ha sido actualizada." if final_status == 'approved' else "Tu opinión contiene palabras sensibles y será revisada."
         response_cat = 'success'
@@ -1782,9 +1843,12 @@ def post_review(media_type, media_id):
             media_type=media_type,
             rating=rating,
             comment=comment,
-            status=final_status
+            status=final_status,
+            media_title=media_title
         )
         db.session.add(new_review)
+
+
         msg = "¡Gracias por votar en Shiori! ❤️" if final_status == 'approved' else "Tu reseña será revisada antes de publicarse."
         response_cat = 'success'
     

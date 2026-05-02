@@ -181,3 +181,77 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// GESTIÓN DE REPORTES DE DATOS (AJAX)
+window.resolveReport = async function(reportId) {
+    const card = document.getElementById(`report-${reportId}`);
+    const btn = card.querySelector('.resolve-d');
+    const originalText = btn.innerHTML;
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+    try {
+        const response = await fetch(`/admin/data-report/${reportId}/resolve`, { method: 'POST' });
+        const result = await response.json();
+
+        if (result.category === 'success') {
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.95)';
+            card.style.transition = 'all 0.4s ease';
+            
+            setTimeout(() => {
+                card.remove();
+                // Verificar si quedan reportes
+                if (document.querySelectorAll('.report-card').length === 0) {
+                    location.reload(); // Recargamos para mostrar el empty state
+                }
+            }, 400);
+        } else {
+            alert("Error: " + result.message);
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    } catch (error) {
+        console.error("Error al resolver reporte:", error);
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+};
+
+window.dismissReport = async function(reportId) {
+    const card = document.getElementById(`report-${reportId}`);
+    const btn = card.querySelector('.reject-d');
+    const originalText = btn.innerHTML;
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+    try {
+        const response = await fetch(`/admin/data-report/${reportId}/dismiss`, { method: 'POST' });
+        const result = await response.json();
+
+        if (result.category === 'success') {
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.95)';
+            card.style.transition = 'all 0.4s ease';
+            
+            setTimeout(() => {
+                card.remove();
+                if (document.querySelectorAll('.report-card').length === 0) {
+                    location.reload();
+                }
+            }, 400);
+        } else {
+            alert("Error: " + result.message);
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    } catch (error) {
+        console.error("Error al ignorar reporte:", error);
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+};
+
+

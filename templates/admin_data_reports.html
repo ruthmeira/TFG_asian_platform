@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes de Datos - Panel Shiori{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shiori_admin.css') }}?v=1.1">
+{% endblock %}
+
+{% block content %}
+<div class="admin-reviews-page">
+    <!-- CABECERA ESTÁNDAR SHIORI -->
+    <div class="prime-header">
+        <div class="prime-header-content">
+            <h1 class="prime-title">Reportes de Datos</h1>
+            <p class="prime-subtitle">Gestiona las correcciones enviadas por la comunidad para mejorar Shiori. 🏮</p>
+            <div class="prime-header-actions admin-header-spacing">
+                <a href="{{ url_for('admin_banned_list') }}" class="btn-shiori-banned-list">
+                    <i class="fas fa-user-slash"></i> Gestión de Usuarios Baneados
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- PESTAÑAS DE NAVEGACIÓN TÁCTICA -->
+    <div class="admin-nav-tabs">
+        <a href="{{ url_for('admin_reviews') }}" class="admin-nav-link">
+            <i class="fas fa-comments"></i> Moderación de Opiniones
+        </a>
+        <a href="{{ url_for('admin_data_reports') }}" class="admin-nav-link active">
+            <i class="fas fa-database"></i> Reportes de Datos
+        </a>
+    </div>
+
+
+    <div class="reports-grid">
+        {% if reports %}
+        {% for r in reports %}
+        <div class="report-card {{ r.media_type }}" id="report-{{ r.id }}">
+
+            <div class="report-main" style="padding: 35px; width: 100%;">
+
+                <div class="report-header-premium">
+
+
+                    <!-- IZQUIERDA: EL PROBLEMA -->
+                    <div class="report-problem-focus">
+                        <span class="field-label-premium">Campo a corregir:</span>
+                        <span class="field-val-premium">{{ r.field_type }}</span>
+                    </div>
+
+                    <!-- DERECHA: LA OBRA Y FECHA -->
+                    <div class="report-media-meta">
+                        <div class="media-title-link-premium">
+                            <a href="https://www.themoviedb.org/{{ r.media_type }}/{{ r.media_id }}" target="_blank">
+                                {{ r.media_title }}
+                            </a>
+                            <i class="fas fa-external-link-alt" style="font-size: 0.8rem; opacity: 0.5;"></i>
+                        </div>
+                        <span class="report-date-premium"
+                            style="display: block; font-size: 0.85rem; opacity: 0.5; margin-top: 5px;">
+                            {{ r.created_at.strftime('%d/%m/%Y %H:%M') }}
+                        </span>
+                    </div>
+                </div>
+
+
+                <div class="report-description" style="margin-bottom: 10px;">
+                    <p>{{ r.description }}</p>
+                </div>
+
+
+                <div class="reporters-section" style="margin-top: 5px;">
+
+                    <h4><i class="fas fa-bullhorn"></i> Reportado por:</h4>
+                    <div class="reporters-list">
+                        <a href="{{ url_for('admin_user_history', user_id=r.user_id) }}" class="reporter-tag">
+                            <strong>{{ r.user.username if r.user else '[Usuario eliminado]' }}</strong>
+                        </a>
+                    </div>
+                </div>
+
+
+
+                <div class="admin-review-actions-dual" style="margin-top: 25px;">
+                    <button class="btn-admin-action resolve-d" onclick="resolveReport({{ r.id }})">
+                        <i class="fas fa-check"></i> Marcar como Resuelto
+                    </button>
+                    <button class="btn-admin-action reject-d" onclick="dismissReport({{ r.id }})">
+                        <i class="fas fa-times"></i> Ignorar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="admin-empty-state">
+            <i class="fas fa-clipboard-check"></i>
+            <h2>Base de Datos Impecable</h2>
+            <p>No hay reportes de datos pendientes. ¡Shiori está al día y sin errores!</p>
+        </div>
+
+        {% endif %}
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/shiori_admin.js') }}"></script>
+{% endblock %}
+{% endblock %}

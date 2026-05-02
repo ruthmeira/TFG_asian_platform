@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/shiori_admin.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/shiori_admin.css') }}?v=1.1">
 {% endblock %}
 
 {% block content %}
@@ -19,6 +19,17 @@
             </div>
         </div>
     </div>
+
+    <!-- PESTAÑAS DE NAVEGACIÓN TÁCTICA -->
+    <div class="admin-nav-tabs">
+        <a href="{{ url_for('admin_reviews') }}" class="admin-nav-link active">
+            <i class="fas fa-comments"></i> Moderación de Opiniones
+        </a>
+        <a href="{{ url_for('admin_data_reports') }}" class="admin-nav-link">
+            <i class="fas fa-database"></i> Reportes de Datos
+        </a>
+    </div>
+
 
     <!-- LISTADO DE RESEÑAS -->
     <div class="admin-reviews-grid">
@@ -45,12 +56,17 @@
                     </div>
                 </div>
                 <div class="review-target">
-                    <a href="{{ url_for('media_detail', media_id=review.media_id, media_type=review.media_type) }}"
-                        class="admin-media-link" target="_blank">
-                        <span class="badge-shiori-media">{{ review.media_type|upper }} #{{ review.media_id }}</span>
-                    </a>
-                    <div class="review-rating-badge">❤️ {{ review.rating }}</div>
+                    <h3 class="media-title-link-premium">
+                        <a href="{{ url_for('media_detail', media_id=review.media_id, media_type=review.media_type) }}" target="_blank">
+                            {{ review.media_title if review.media_title else (review.media_type|upper ~ ' #' ~ review.media_id) }}
+                        </a>
+                        <i class="fas fa-external-link-alt" style="font-size: 0.8rem; opacity: 0.5;"></i>
+
+                        <span class="review-rating-badge">❤️ {{ review.rating }}</span>
+                    </h3>
                 </div>
+
+
             </div>
 
             <!-- CONTENIDO DE LA RESEÑA -->
