@@ -91,7 +91,7 @@ function showDayEvents(day, month, year, events) {
     list.innerHTML = events.map(e => {
         const posterUrl = e.poster ? `https://image.tmdb.org/t/p/w200${e.poster}` : placeholder;
         return `
-            <a href="/media/${e.subtype || e.type}/${e.id}" class="daily-event-card">
+            <a href="/media/${e.type}/${e.id}" class="daily-event-card">
                 <img src="${posterUrl}" 
                      class="daily-event-poster" 
                      alt="${e.title}"

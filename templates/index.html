@@ -51,7 +51,7 @@
         <div id="carousel-{{ type_key }}" class="media-carousel">
             {% if items and items|length > 0 %}
                 {% for item in items %}
-                    <a href="/media/{{ type_map[type_key] }}/{{ item.id }}" class="card-link">
+                    <a href="{{ url_for('media_detail', media_type=type_map[type_key], media_id=item.id) }}" class="card-link">
                         <div class="card">
                             <div class="badge">{{ label_map[type_key] }}</div>
                             <img src="{% if item.poster_path %}https://image.tmdb.org/t/p/w342{{ item.poster_path }}{% else %}{{ url_for('static', filename='img/no-poster.png') }}{% endif %}" alt="{{ item.name or item.title }}">

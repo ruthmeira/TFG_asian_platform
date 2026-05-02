@@ -15,7 +15,7 @@ class User(db.Model, UserMixin):
     profile_image = db.Column(db.String(255), nullable=True) # Ruta de la foto
     is_admin = db.Column(db.Boolean, default=False)
     is_banned = db.Column(db.Boolean, default=False) # Protocolo de Baneo Shiori
-    collections = db.relationship('CollectionItem', backref='user', lazy=True)
+    collections = db.relationship('CollectionItem', backref='user', cascade='all, delete-orphan', lazy=True)
     # Relación para ver todos los reportes hechos POR este usuario
     reports_made = db.relationship('ReviewReport', backref='reporter', lazy=True)
 
@@ -41,6 +41,18 @@ class CollectionItem(db.Model):
     is_favorite = db.Column(db.Boolean, default=False)
     media_subtype = db.Column(db.String(20)) # 'Serie' o 'Programa'
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relación con el calendario (Libreta de fechas)
+    events = db.relationship('MediaEvent', backref='collection_item', cascade='all, delete-orphan', lazy=True)
+
+class MediaEvent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    collection_item_id = db.Column(db.Integer, db.ForeignKey('collection_item.id'), nullable=False)
+    event_type = db.Column(db.String(100)) # Ej: 'Estreno Original', 'Estreno España', 'T1 E5'
+    event_date = db.Column(db.Date, nullable=False)
+    season_number = db.Column(db.Integer, nullable=True)
+    episode_number = db.Column(db.Integer, nullable=True)
+    last_updated = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
