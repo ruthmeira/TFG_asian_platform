@@ -29,14 +29,14 @@
             <!-- INFO DEL AUTOR (EXPEDIENTE) -->
             <div class="author-dossier">
                 <div class="reviewer-meta">
-                    {% if review.user.profile_image %}
+                    {% if review.user and review.user.profile_image %}
                     <img src="{{ url_for('static', filename=review.user.profile_image) }}" class="admin-avatar-thumb">
                     {% else %}
-                    <div class="admin-avatar-initial">{{ review.user.username[0]|upper }}</div>
+                    <div class="admin-avatar-initial">{{ review.user.username[0]|upper if review.user else '?' }}</div>
                     {% endif %}
                     <div class="reviewer-texts">
                         <a href="{{ url_for('admin_user_history', user_id=review.user_id) }}" class="admin-user-link">
-                            <strong>{{ review.user.username }}</strong>
+                            <strong>{{ review.user.username if review.user else '[Usuario eliminado]' }}</strong>
                         </a>
                         <span class="author-strikes {% if review.author_strikes > 0 %}caution{% endif %}">
                             <i class="fas fa-history"></i> {{ review.author_strikes }} opiniones borradas anteriormente
@@ -67,7 +67,7 @@
                     {% for rep in review.reports %}
                     <a href="{{ url_for('admin_user_history', user_id=rep.user_id) }}"
                         class="reporter-tag {% if rep.reporter_toxic_level > 2 %}toxic-alert{% endif %}">
-                        <strong>{{ rep.reporter.username }}</strong>
+                        <strong>{{ rep.reporter.username if rep.reporter else '[Usuario eliminado]' }}</strong>
                         <span title="Denuncias que este usuario hizo y tú rechazaste">
                             ({{ rep.reporter_toxic_level }} reportes rechazados anteriormente)
                         </span>

@@ -105,12 +105,12 @@
                                     <div class="victim-dossier-mini">
                                         <span>Denunció a:</span>
                                         <div class="victim-tag">
-                                            {% if log.author.profile_image %}
+                                            {% if log.author and log.author.profile_image %}
                                                 <img src="{{ url_for('static', filename=log.author.profile_image) }}" class="mini-avatar">
                                             {% else %}
-                                                <div class="mini-initial">{{ log.author.username[0]|upper }}</div>
+                                                <div class="mini-initial">{{ log.author.username[0]|upper if log.author else '?' }}</div>
                                             {% endif %}
-                                            <strong>{{ log.author.username }}</strong>
+                                            <strong>{{ log.author.username if log.author else '[Usuario eliminado]' }}</strong>
                                         </div>
                                     </div>
                                     {% if log.review_content_snapshot %}
