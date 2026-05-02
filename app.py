@@ -1503,8 +1503,24 @@ def report_media_data(media_type, media_id):
         return redirect(url_for('media_detail', media_type=media_type, media_id=media_id))
     
     try:
+        # VALIDACIÓN: No permitir más de un reporte PENDIENTE del mismo usuario para la misma sección de esta media
+        existing_report = MediaReport.query.filter_by(
+            user_id=current_user.id,
+            media_id=media_id,
+            media_type=media_type,
+            field_type=field_type,
+            status='pending'
+        ).first()
+
+        if existing_report:
+            return jsonify({
+                'category': 'info', 
+                'message': f'Ya has enviado un reporte para la sección "{field_type}" de esta obra que está pendiente de revisión.'
+            })
+
         # Si no viene en el form, intentamos buscarlo
         if not media_title:
+
             cached = get_cached_media(media_id, media_type)
             if cached:
                 media_title = cached.get('display_title') or cached.get('title')

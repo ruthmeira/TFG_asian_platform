@@ -20,6 +20,8 @@ window.MediaDetail = (() => {
         if (!openBtn || !modal || !form || !confirmBox) return;
 
         const originalContent = confirmBox.innerHTML;
+        modal.dataset.originalHtml = originalContent;
+
 
         openBtn.onclick = () => {
             modal.classList.add('show');
@@ -37,62 +39,93 @@ window.MediaDetail = (() => {
         modal.onclick = (e) => {
             if (e.target === modal) close();
         };
+    }
+    
+    // DELEGACIÓN DE EVENTOS GLOBAL PARA EL FORMULARIO (Fuera de init para evitar duplicados)
+    document.addEventListener('submit', async (e) => {
+        if (e.target.id !== 'data-report-form') return;
+        
+        e.preventDefault();
+        const reportForm = e.target;
+        const submitBtn = reportForm.querySelector('.confirm-btn-submit');
+        const alertContainer = document.getElementById('data-report-alert-container');
+        
+        // Buscamos el confirmBox dentro del modal activo
+        const modal = document.getElementById('data-report-modal');
+        const confirmBox = modal ? modal.querySelector('.shiori-confirm-box') : null;
+        if (!confirmBox) return;
 
-        // DELEGACIÓN DE EVENTOS PARA EL FORMULARIO (Arregla el bug del JSON)
-        document.addEventListener('submit', async (e) => {
-            if (e.target.id !== 'data-report-form') return;
-            
-            e.preventDefault();
-            const reportForm = e.target;
-            const submitBtn = reportForm.querySelector('.confirm-btn-submit');
-            const alertContainer = document.getElementById('data-report-alert-container');
-            
-            if (submitBtn) submitBtn.disabled = true;
-            if (alertContainer) alertContainer.innerHTML = '';
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        }
+        if (alertContainer) alertContainer.innerHTML = '';
 
-            try {
-                const formData = new FormData(reportForm);
-                const res = await fetch(reportForm.action, {
-                    method: 'POST',
-                    body: formData
-                });
-                const result = await res.json();
+        try {
+            const formData = new FormData(reportForm);
+            const res = await fetch(reportForm.action, {
+                method: 'POST',
+                body: formData
+            });
+            const result = await res.json();
 
-                if (result.category === 'success') {
-                    // METAMORFOSIS AL ESTILO SHIORI
-                    confirmBox.innerHTML = `
-                        <div class="confirm-icon icon-success-shiori">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <h3>¡Hecho!</h3>
-                        <p>${result.message}</p>
-                        <div class="confirm-actions">
-                            <button class="confirm-btn shiori-cancel" id="finish-data-report" style="flex: 1; margin-top: 20px;">Entendido</button>
+            if (result.category === 'success' || result.category === 'info') {
+                // METAMORFOSIS AL ESTILO SHIORI (Para Éxito o Info)
+                const isSuccess = result.category === 'success';
+                const iconClass = isSuccess ? 'check-circle' : 'info-circle';
+                const statusClass = isSuccess ? 'icon-success-shiori' : 'icon-info-shiori';
+                const titleText = isSuccess ? '¡Hecho!' : 'Aviso';
+
+                confirmBox.innerHTML = `
+                    <div class="confirm-icon ${statusClass}">
+                        <i class="fas fa-${iconClass}"></i>
+                    </div>
+                    <h3>${titleText}</h3>
+                    <p>${result.message}</p>
+                    <div class="confirm-actions">
+                        <button class="confirm-btn shiori-cancel" id="finish-data-report" style="flex: 1; margin-top: 20px;">Entendido</button>
+                    </div>
+                `;
+
+                // Función de cierre y restauración
+                const finishBtn = document.getElementById('finish-data-report');
+                if (finishBtn) {
+                    finishBtn.onclick = () => {
+                        modal.classList.remove('show');
+                        document.body.style.overflow = '';
+                        // Restauramos el formulario para la próxima vez
+                        const originalHtml = modal.dataset.originalHtml;
+                        if (originalHtml) {
+                            setTimeout(() => { confirmBox.innerHTML = originalHtml; }, 300);
+                        }
+                    };
+                }
+            } else {
+
+                if (alertContainer) {
+                    alertContainer.innerHTML = `
+                        <div class="alert-error" style="margin-bottom: 20px;">
+                            <i class="fas fa-exclamation-circle"></i> ${result.message}
                         </div>
                     `;
-
-                    document.getElementById('finish-data-report').onclick = close;
-                } else {
-                    // ALERTA INTERNA SHIORI (ERRORES)
-                    if (alertContainer) {
-                        const alertDiv = document.createElement('div');
-                        alertDiv.className = `alert-error`;
-                        alertDiv.style.marginBottom = "20px";
-                        alertDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${result.message}`;
-                        alertContainer.appendChild(alertDiv);
-                    }
-                    if (submitBtn) submitBtn.disabled = false;
                 }
-            } catch (err) {
-                console.error("Error en reporte:", err);
-                if (alertContainer) {
-                    alertContainer.innerHTML = `<div class="alert-error" style="margin-bottom:20px;"><i class="fas fa-exclamation-circle"></i> Error de conexión.</div>`;
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Enviar Reporte';
                 }
-                if (submitBtn) submitBtn.disabled = false;
             }
-        });
 
-    }
+        } catch (err) {
+            console.error("Error en reporte:", err);
+            if (alertContainer) {
+                alertContainer.innerHTML = `<div class="alert-error" style="margin-bottom:20px;"><i class="fas fa-exclamation-circle"></i> Error de conexión.</div>`;
+            }
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Enviar Reporte';
+            }
+        }
+    });
 
     function initTrailer(container) {
         const trailerBtn = container.querySelector('#trailer-btn');
