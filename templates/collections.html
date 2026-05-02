@@ -18,7 +18,7 @@
     <section class="collection-section">
         <h2 class="section-title">
             <div class="title-main-info">
-                <i class="fas fa-heart"></i> Favoritos <span>({{ favorites|length }})</span>
+                <i class="fas fa-heart"></i> Favoritos <span>({{ counts['favoritos'] }})</span>
             </div>
             <a href="{{ url_for('view_collection', status='favoritos') }}" class="view-all-link">Ver todo ></a>
         </h2>
@@ -61,7 +61,7 @@
     <section class="collection-section">
         <h2 class="section-title">
             <div class="title-main-info">
-                <i class="fas {{ icon_map.get(status.lower(), 'fa-th-list') }}"></i> {{ status|title }} <span>({{ items|length }})</span>
+                <i class="fas {{ icon_map.get(status.lower(), 'fa-th-list') }}"></i> {{ status|title }} <span>({{ counts.get(status, 0) }})</span>
             </div>
             {% if items %}
                 <a href="{{ url_for('view_collection', status=status) }}" class="view-all-link">Ver todo ></a>

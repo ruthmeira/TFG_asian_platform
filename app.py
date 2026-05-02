@@ -101,54 +101,8 @@ tmdb_session = requests.Session()
 
 
 
-def sync_collections():
-    """
-    Vigila los cambios globales en TMDB y actualiza nuestra caché local de colecciones.
-    """
-    with app.app_context():
-        api_key = os.getenv("TMDB_API_KEY")
-        if not api_key: return
 
-        try:
-            # 1. Lista de cambios globales
-            movie_changes = fetch_json(f"https://api.themoviedb.org/3/movie/changes?api_key={api_key}").get('results', [])
-            tv_changes = fetch_json(f"https://api.themoviedb.org/3/tv/changes?api_key={api_key}").get('results', [])
-            
-            changed_ids = {
-                'movie': {x['id'] for x in movie_changes},
-                'tv': {x['id'] for x in tv_changes}
-            }
-            
-            # 2. Cruce con DB
-            all_media_ids = db.session.query(CollectionItem.media_id, CollectionItem.media_type).distinct().all()
-            to_refresh = [(m_id, m_type) for m_id, m_type in all_media_ids if m_id in changed_ids.get(m_type, {})]
-            
-            if not to_refresh: return
 
-            # 3. Refresco rápido usando el nuevo helper
-            for m_id, m_type in to_refresh:
-                new_data = get_media_summary(m_id, m_type)
-                if not new_data: continue
-
-                items_in_db = CollectionItem.query.filter_by(media_id=m_id, media_type=m_type).all()
-                for item in items_in_db:
-                    item.title = new_data['title']
-                    item.poster_path = new_data['poster_path']
-                    item.vote_average = new_data['vote_average']
-                    item.flag = new_data['flag']
-                    item.original_title = new_data['original_title']
-                    item.media_subtype = new_data['media_subtype']
-                
-                db.session.commit()
-                time.sleep(0.2) 
-                
-        except Exception as e:
-            print(f"[Sync] Error: {str(e)}")
-
-# Configuración del Scheduler
-scheduler = BackgroundScheduler()
-scheduler.add_job(func=sync_collections, trigger="interval", hours=24)
-# ------------------------------------------------------------
 
 
 def clean_overview(text):
@@ -777,14 +731,14 @@ def api_trending():
 @app.route('/profile')
 @login_required
 def profile():
-    counts = {
+    t_counts = {
         'favoritos': CollectionItem.query.filter_by(user_id=current_user.id, is_favorite=True).count(),
         'viendo': CollectionItem.query.filter_by(user_id=current_user.id, status='Viendo').count(),
         'vistos': CollectionItem.query.filter_by(user_id=current_user.id, status='Visto').count(),
         'pendientes': CollectionItem.query.filter_by(user_id=current_user.id, status='Pendiente').count(),
         'abandonados': CollectionItem.query.filter_by(user_id=current_user.id, status='Abandonado').count()
     }
-    return render_template('profile.html', counts=counts)
+    return render_template('profile.html', counts=t_counts)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
@@ -823,34 +777,64 @@ def edit_profile():
     
     return render_template('edit_profile.html', countries_list=GLOBAL_COUNTRIES_LIST, regions_map=REGIONS_MAP)
 
+# --- HELPER DE HIDRATACIÓN (Tu idea de carga por ID) ---
+def hydrate_collection_items(items):
+    """
+    Toma una lista de CollectionItems y busca su info REAL en TMDB en paralelo.
+    Esto garantiza que posters y títulos estén siempre actualizados.
+    """
+    if not items: return []
+    
+    def fetch_and_update(item):
+        # Usamos tu función get_media_summary que ya gestiona banderas e idiomas
+        summary = get_media_summary(item.media_id, item.media_type)
+        if summary:
+            item.title = summary['title']
+            item.poster_path = summary['poster_path']
+            item.vote_average = summary['vote_average']
+            item.flag = summary['flag']
+            item.media_subtype = summary['media_subtype']
+        return item
+
+    # Ejecutamos en paralelo para que 18 items carguen en < 0.5s
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        return list(executor.map(fetch_and_update, items))
+
 # --- COLLECTIONS ---
 @app.route('/collections')
 @login_required
 def collections():
     statuses = ['Viendo', 'Visto', 'Pendiente', 'Abandonado']
     user_collections = {}
-    all_viewable_items = []
-
+    t_counts = {} # Usamos un nombre más único: t_counts (total counts)
+    
+    # 1. Cargamos favoritos
+    fav_query = CollectionItem.query.filter_by(user_id=current_user.id, is_favorite=True)
+    t_counts['favoritos'] = fav_query.count()
+    favorites = fav_query.order_by(CollectionItem.created_at.desc()).limit(16).all()
+    hydrate_collection_items(favorites)
+    
+    # 2. Cargamos el resto por estados
     for status in statuses:
-        items = CollectionItem.query.filter_by(user_id=current_user.id, status=status).order_by(CollectionItem.created_at.desc()).limit(15).all()
+        status_query = CollectionItem.query.filter_by(user_id=current_user.id, status=status)
+        t_counts[status] = status_query.count()
+        items = status_query.order_by(CollectionItem.created_at.desc()).limit(16).all()
+        hydrate_collection_items(items)
         user_collections[status] = items
-        all_viewable_items.extend(items)
 
-    favorites = CollectionItem.query.filter_by(user_id=current_user.id, is_favorite=True).order_by(CollectionItem.created_at.desc()).limit(15).all()
-    all_viewable_items.extend(favorites)
-
-    # MOTOR DE RATINGS EN BLOQUE (Evitamos el problema N+1)
-    if all_viewable_items:
+    # 3. Ratings de Shiori (Optimizado en bloque)
+    all_items = favorites + [item for sublist in user_collections.values() for item in sublist]
+    if all_items:
         ratings_raw = db.session.query(
             Review.media_id, Review.media_type, db.func.avg(Review.rating)
         ).filter_by(status='approved').group_by(Review.media_id, Review.media_type).all()
         
         ratings_map = {(r[0], r[1]): round(float(r[2]), 1) for r in ratings_raw}
         
-        for item in all_viewable_items:
+        for item in all_items:
             item.shiori_rating = ratings_map.get((item.media_id, item.media_type), 0)
 
-    return render_template('collections.html', collections=user_collections, favorites=favorites)
+    return render_template('collections.html', collections=user_collections, favorites=favorites, counts=t_counts)
 
 
 
@@ -858,7 +842,7 @@ def collections():
 @login_required
 def view_collection(status):
     page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 18, type=int)
+    per_page = request.args.get('per_page', 16, type=int)
     ajax = request.args.get('ajax', 0, type=int)
     
     query = CollectionItem.query.filter_by(user_id=current_user.id).order_by(CollectionItem.created_at.desc())
@@ -873,12 +857,18 @@ def view_collection(status):
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     items = pagination.items
 
-    # Enriquecer con rating Shiori dinámico
-    for item in items:
-        s_rating = db.session.query(db.func.avg(Review.rating)).filter_by(
-            media_id=item.media_id, media_type=item.media_type, status='approved'
-        ).scalar() or 0
-        item.shiori_rating = round(float(s_rating), 1)
+    # HIDRATACIÓN: Aquí es donde ocurre la magia de tu idea
+    # Pedimos los 16 de esta página a TMDB para que estén actualizados
+    hydrate_collection_items(items)
+
+    # Ratings Shiori (Optimizado)
+    if items:
+        ratings_raw = db.session.query(
+            Review.media_id, Review.media_type, db.func.avg(Review.rating)
+        ).filter_by(status='approved').group_by(Review.media_id, Review.media_type).all()
+        ratings_map = {(r[0], r[1]): round(float(r[2]), 1) for r in ratings_raw}
+        for item in items:
+            item.shiori_rating = ratings_map.get((item.media_id, item.media_type), 0)
 
     # SI ES AJAX, ENVIAMOS SOLO LA REJILLA (Sin cabecera ni navbar)
     if ajax:

@@ -26,6 +26,10 @@ async function loadCollectionPage(page = 1, perPage = null, useAnimation = true,
     gridContainer.style.pointerEvents = 'none';
     const status = window.location.pathname.split('/').filter(p => p).pop();
 
+    // LIMPIEZA ATÓMICA: Borramos el contenido viejo ANTES de la petición
+    // Esto evita el efecto de "fantasmas" de la página anterior
+    gridContainer.innerHTML = ''; 
+
     try {
         const response = await fetch(`/collections/${status}?page=${page}&per_page=${perPage}&ajax=1`);
         const html = await response.text();
@@ -53,21 +57,26 @@ async function loadCollectionPage(page = 1, perPage = null, useAnimation = true,
  */
 function calculateIdealPerPage() {
     const grid = document.querySelector('.collection-grid-premium');
-    if (!grid) return 18;
+    if (!grid) return 16; // Objetivo base: 16
 
     const computedStyle = window.getComputedStyle(grid);
     const gridTemplateColumns = computedStyle.getPropertyValue('grid-template-columns');
     const columns = gridTemplateColumns.trim().split(/\s+/).length;
 
-    if (columns <= 0) return 18;
+    if (columns <= 0) return 16;
 
-    let rows = Math.round(18 / columns);
-    // En pantallas muy grandes (ej 10 cols), no permitas una sola fila
-    if (rows < 2 && columns >= 9) rows = 2;
-    // En móviles, permite scroll más largo
-    if (columns <= 3) rows = Math.max(6, rows);
+    // Calculamos las filas necesarias para acercarnos lo más posible a 16
+    let rows = Math.round(16 / columns);
 
-    return columns * Math.max(1, rows);
+    // Ajustes de UX:
+    // 1. En móviles (1 o 2 cols), forzamos más filas para que el scroll valga la pena
+    if (columns <= 2) rows = Math.max(8, rows);
+    // 2. En escritorio, al menos 3 filas para que se vea lleno
+    else if (columns >= 3 && columns <= 5) rows = Math.max(4, rows);
+    // 3. En pantallas gigantes, al menos 2 filas
+    else rows = Math.max(2, rows);
+
+    return columns * rows;
 }
 
 /**
@@ -129,7 +138,7 @@ window.addEventListener('load', () => {
     window.addEventListener('popstate', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const page = urlParams.get('page') || 1;
-        const perPage = urlParams.get('per_page') || 18;
+        const perPage = urlParams.get('per_page') || 16;
         // Al navegar por historial, usamos replaceHistory=true para no crear bucles
         loadCollectionPage(page, perPage, true, true);
     });
