@@ -142,6 +142,89 @@ document.addEventListener("DOMContentLoaded", function () {
             if (e.key === 'Enter') performSearch();
         });
     }
+
+    // --- GLOBAL NAVIGATION LOADER ---
+    const loaderBar = document.getElementById('global-loader-bar');
+    let loaderTimeout;
+
+    function startLoader() {
+        if (!loaderBar) return;
+        clearTimeout(loaderTimeout);
+        loaderBar.classList.remove('complete');
+        loaderBar.classList.add('loading');
+        loaderBar.style.width = '0%';
+        
+        // Simulación de progreso inicial
+        setTimeout(() => {
+            loaderBar.style.width = '30%';
+        }, 50);
+
+        setTimeout(() => {
+            loaderBar.style.width = '70%';
+        }, 400);
+
+        // Seguir subiendo muy lento hasta el final
+        let progress = 70;
+        const interval = setInterval(() => {
+            if (progress < 95) {
+                progress += 0.5;
+                loaderBar.style.width = progress + '%';
+            } else {
+                clearInterval(interval);
+            }
+        }, 200);
+    }
+
+    function completeLoader() {
+        if (!loaderBar) return;
+        loaderBar.classList.add('complete');
+        loaderBar.classList.remove('loading');
+        
+        setTimeout(() => {
+            loaderBar.classList.add('fade-out');
+            setTimeout(() => {
+                loaderBar.style.width = '0%';
+                loaderBar.classList.remove('complete', 'fade-out');
+            }, 400);
+        }, 300);
+    }
+
+    // Interceptar clicks en enlaces
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('a');
+        if (!link) return;
+
+        // Reglas para ignorar
+        const href = link.getAttribute('href');
+        const target = link.getAttribute('target');
+        const isExternal = href && (href.startsWith('http') && !href.includes(window.location.host));
+        const isAction = !href || href.startsWith('#') || href.startsWith('javascript:');
+        const isDownload = link.hasAttribute('download');
+
+        if (target === '_blank' || isExternal || isAction || isDownload) {
+            return;
+        }
+
+        // Si es un enlace interno, mostrar cargador
+        startLoader();
+    });
+
+    // Interceptar envíos de formularios (ej. búsqueda)
+    document.addEventListener('submit', (e) => {
+        const form = e.target;
+        if (form.getAttribute('target') === '_blank') return;
+        startLoader();
+    });
+
+    // Ocultar al volver atrás (cache del navegador)
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted) {
+            completeLoader();
+        }
+    });
+
+    // Asegurar que está oculto al inicio
+    completeLoader();
 });
 
 /**
