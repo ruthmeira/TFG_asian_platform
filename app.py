@@ -675,6 +675,31 @@ with app.app_context():
         threading.Thread(target=refresh_trending_cache, args=['day']).start()
         threading.Thread(target=refresh_trending_cache, args=['week']).start()
  
+# --- HYDRATION HELPERS ---
+def hydrate_trending_ratings(items):
+    """
+    Actualiza las notas de Shiori en tiempo real para una lista de items de tendencias.
+    """
+    if not items:
+        return
+    
+    media_ids = [it.get('id') for it in items if it.get('id')]
+    
+    if media_ids:
+        ratings_raw = db.session.query(
+            Review.media_id, Review.media_type, db.func.avg(Review.rating)
+        ).filter(
+            Review.media_id.in_(media_ids),
+            Review.status == 'approved'
+        ).group_by(Review.media_id, Review.media_type).all()
+        
+        ratings_map = {(r[0], r[1]): round(float(r[2]), 1) for r in ratings_raw}
+        
+        for it in items:
+            m_id = it.get('id')
+            m_type = it.get('type')
+            it['shiori_rating'] = ratings_map.get((m_id, m_type), 0.0)
+
 @app.route('/')
 def home():
     window = request.args.get('window', 'day')
@@ -691,6 +716,10 @@ def home():
         'movies': cache.get('movies', []),
         'shows': cache.get('shows', [])
     }
+    
+    # Hidratamos ratings en tiempo real para el SSR inicial
+    for cat in trending_data:
+        hydrate_trending_ratings(trending_data[cat])
     
     return render_template('index.html', 
                            active_window=window, 
@@ -723,8 +752,11 @@ def api_trending():
         cache['last_updated'] = current_time
     
     # Devolvemos solo lo solicitado para optimizar carga paralela
+    items = cache.get(media_type, [])
+    hydrate_trending_ratings(items) # Hidratación en tiempo real
+
     return jsonify({
-        media_type: cache.get(media_type, [])
+        media_type: items
     })
 
 # --- PROFILE ---
