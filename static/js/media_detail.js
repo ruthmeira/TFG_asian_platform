@@ -16,7 +16,7 @@ window.MediaDetail = (() => {
         const closeBtn = document.getElementById('close-data-modal');
         const form = document.getElementById('data-report-form');
         const confirmBox = modal ? modal.querySelector('.shiori-confirm-box') : null;
-        
+
         if (!openBtn || !modal || !form || !confirmBox) return;
 
         const originalContent = confirmBox.innerHTML;
@@ -38,18 +38,21 @@ window.MediaDetail = (() => {
             if (e.target === modal) close();
         };
 
-        // ENVIAR POR AJAX Y MOSTRAR ÉXITO / ALERTA
-        form.onsubmit = async (e) => {
+        // DELEGACIÓN DE EVENTOS PARA EL FORMULARIO (Arregla el bug del JSON)
+        document.addEventListener('submit', async (e) => {
+            if (e.target.id !== 'data-report-form') return;
+            
             e.preventDefault();
-            const submitBtn = form.querySelector('.confirm-btn-submit');
+            const reportForm = e.target;
+            const submitBtn = reportForm.querySelector('.confirm-btn-submit');
             const alertContainer = document.getElementById('data-report-alert-container');
             
             if (submitBtn) submitBtn.disabled = true;
             if (alertContainer) alertContainer.innerHTML = '';
 
             try {
-                const formData = new FormData(form);
-                const res = await fetch(form.action, {
+                const formData = new FormData(reportForm);
+                const res = await fetch(reportForm.action, {
                     method: 'POST',
                     body: formData
                 });
@@ -67,10 +70,10 @@ window.MediaDetail = (() => {
                             <button class="confirm-btn shiori-cancel" id="finish-data-report" style="flex: 1; margin-top: 20px;">Entendido</button>
                         </div>
                     `;
-                    
+
                     document.getElementById('finish-data-report').onclick = close;
                 } else {
-                    // ALERTA INTERNA SHIORI (IGUAL QUE EN OPINIONES)
+                    // ALERTA INTERNA SHIORI (ERRORES)
                     if (alertContainer) {
                         const alertDiv = document.createElement('div');
                         alertDiv.className = `alert-error`;
@@ -87,7 +90,8 @@ window.MediaDetail = (() => {
                 }
                 if (submitBtn) submitBtn.disabled = false;
             }
-        };
+        });
+
     }
 
     function initTrailer(container) {
