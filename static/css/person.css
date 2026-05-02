@@ -205,20 +205,29 @@
         margin-top: -8px;
     }
 
-    .person-name {
+    .person-report-container {
         order: 3;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: -8px; /* Pegado a las redes */
+        margin-bottom: 10px;
+    }
+
+    .person-name {
+        order: 4;
         width: 100%;
         text-align: center;
         font-size: 2.2rem;
     }
 
     .biography-section {
-        order: 4;
+        order: 5;
         width: 100%;
     }
 
     .person-info-sidebar {
-        order: 5;
+        order: 6;
         width: 100%;
         display: flex;
         flex-wrap: wrap;
@@ -244,9 +253,10 @@
     }
 
     .known-for-section {
-        order: 6;
+        order: 7;
         width: 100%;
     }
+
 
     /* CENTRADO DE TÍTULOS NECESARIOS EN MÓVIL */
     .biography-section h2,

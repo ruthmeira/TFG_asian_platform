@@ -50,7 +50,16 @@
         </div>
         {% endif %}
 
+        {# BOTÓN DE REPORTE DE DATOS #}
+        <div class="person-report-container" style="margin-top: -2px; padding: 0 10px;">
+            <button id="open-report-modal-btn" class="btn-report-data-premium" title="Reportar error en los datos" style="width: 100%; justify-content: center; height: 42px;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Reportar Error</span>
+            </button>
+        </div>
+
         <div class="person-info-sidebar">
+
             <h3>Información Personal</h3>
 
 
@@ -91,12 +100,13 @@
         <h1 class="person-name">{{ person.name }}</h1>
 
         <section class="biography-section">
-            <h2>Biografía</h2>
+            <h2>Biografía</h2> 
             <div class="bio-wrapper">
                 <p class="bio-text" id="bio-text">
-                    {% if 'No tenemos una biografía' in person.biography %}
+                    {% if person.biography and 'No tenemos una biografía' in person.biography %}
                     <i class="fas fa-info-circle bio-info-icon"></i>
                     {% endif %}
+
                     {{ person.biography | safe }}
                 </p>
             </div>
@@ -138,7 +148,65 @@
         </section>
     </main>
 </div>
+
+<!-- MODAL DE REPORTE DE DATOS (PERSON SYNC) -->
+<div class="shiori-confirm-overlay" id="data-report-modal">
+    <div class="shiori-confirm-box">
+        <div class="data-report-header">
+            <div class="confirm-icon data-icon">
+                <i class="fas fa-database"></i>
+            </div>
+            <h3>Corregir datos de Persona</h3>
+        </div>
+        <p class="data-report-info">¿Has detectado un error? Ayúdanos a mejorar informando qué campo está incorrecto en TMDB.</p>
+
+        <div id="data-report-alert-container"></div>
+
+        <form action="{{ url_for('report_media_data', media_type='person', media_id=person.id) }}" method="POST" id="data-report-form" class="no-loader">
+            
+            <input type="hidden" name="field_type" id="selected-field-type" required>
+            <input type="hidden" name="media_title" value="{{ person.name }}">
+
+            <div class="form-group-shiori">
+                <label>Selecciona la sección con el error:</label>
+
+                <div class="report-options-list">
+                    {% for opt in ["Nombre", "Biografía", "Redes Sociales", "Sexo", "Nacimiento", "También conocido como", "Fecha de muerte", "Link oficial"] %}
+                    <div class="report-option-item" onclick="selectReportOption(this, '{{ opt }}')">
+                        <div class="radio-circle"></div>
+                        <span class="report-option-text">{{ opt }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <script>
+                function selectReportOption(element, value) {
+                    // Limpiar seleccionados previos
+                    document.querySelectorAll('.report-option-item').forEach(el => el.classList.remove('selected'));
+                    // Marcar actual
+                    element.classList.add('selected');
+                    // Actualizar campo oculto
+                    document.getElementById('selected-field-type').value = value;
+                }
+            </script>
+
+            <div class="form-group-shiori">
+                <label>Mensaje o información correcta</label>
+                <textarea name="description" id="report-description-area" class="shiori-textarea-premium" 
+                          placeholder="Ej: El nombre correcto es X, la fecha de nacimiento está mal..." required></textarea>
+            </div>
+
+            <div class="confirm-actions">
+                <button type="button" class="confirm-btn shiori-cancel" id="close-data-modal">Cancelar</button>
+                <button type="submit" class="confirm-btn confirm-btn-submit">Enviar Reporte</button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
+
+
 
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/person.js') }}"></script>

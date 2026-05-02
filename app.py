@@ -2339,6 +2339,7 @@ def person_detail(person_id):
     res_en = results["en"]
     if not res or 'id' not in res: return "Error", 404
 
+
     # --- NOMBRE (Directamente del inglés como fuente maestra) ---
     res['name'] = res_en.get('name') or res.get('name') or "-"
 

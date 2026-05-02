@@ -225,6 +225,91 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Asegurar que está oculto al inicio
     completeLoader();
+
+    // DELEGACIÓN DE EVENTOS GLOBAL PARA EL FORMULARIO DE REPORTES (SHIORI SYNC)
+    document.addEventListener('submit', async (e) => {
+        if (e.target.id !== 'data-report-form') return;
+        
+        e.preventDefault();
+        const reportForm = e.target;
+        const submitBtn = reportForm.querySelector('.confirm-btn-submit');
+        const alertContainer = document.getElementById('data-report-alert-container');
+        
+        // Buscamos el confirmBox dentro del modal activo
+        const modal = document.getElementById('data-report-modal');
+        const confirmBox = modal ? modal.querySelector('.shiori-confirm-box') : null;
+        if (!confirmBox) return;
+
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        }
+        if (alertContainer) alertContainer.innerHTML = '';
+
+        try {
+            const formData = new FormData(reportForm);
+            const res = await fetch(reportForm.action, {
+                method: 'POST',
+                body: formData
+            });
+            const result = await res.json();
+
+            if (result.category === 'success' || result.category === 'info') {
+                // METAMORFOSIS AL ESTILO SHIORI (Para Éxito o Info)
+                const isSuccess = result.category === 'success';
+                const iconClass = isSuccess ? 'check-circle' : 'info-circle';
+                const statusClass = isSuccess ? 'icon-success-shiori' : 'icon-info-shiori';
+                const titleText = isSuccess ? '¡Hecho!' : 'Aviso';
+
+                confirmBox.innerHTML = `
+                    <div class="confirm-icon ${statusClass}">
+                        <i class="fas fa-${iconClass}"></i>
+                    </div>
+                    <h3>${titleText}</h3>
+                    <p>${result.message}</p>
+                    <div class="confirm-actions">
+                        <button class="confirm-btn shiori-cancel" id="finish-data-report" style="flex: 1; margin-top: 20px;">Entendido</button>
+                    </div>
+                `;
+
+                // Función de cierre y restauración
+                const finishBtn = document.getElementById('finish-data-report');
+                if (finishBtn) {
+                    finishBtn.onclick = () => {
+                        modal.classList.remove('show');
+                        document.body.style.overflow = '';
+                        // Restauramos el formulario para la próxima vez desde el dataset
+                        const originalHtml = modal.dataset.originalHtml;
+                        if (originalHtml) {
+                            setTimeout(() => { confirmBox.innerHTML = originalHtml; }, 300);
+                        }
+                    };
+                }
+            } else {
+                if (alertContainer) {
+                    alertContainer.innerHTML = `
+                        <div class="alert-error" style="margin-bottom: 20px;">
+                            <i class="fas fa-exclamation-circle"></i> ${result.message}
+                        </div>
+                    `;
+                }
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Enviar Reporte';
+                }
+            }
+
+        } catch (err) {
+            console.error("Error en reporte:", err);
+            if (alertContainer) {
+                alertContainer.innerHTML = `<div class="alert-error" style="margin-bottom:20px;"><i class="fas fa-exclamation-circle"></i> Error de conexión.</div>`;
+            }
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Enviar Reporte';
+            }
+        }
+    });
 });
 
 /**

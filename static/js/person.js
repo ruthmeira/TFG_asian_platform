@@ -52,21 +52,55 @@ document.addEventListener('DOMContentLoaded', function () {
     const bioText = document.getElementById('bio-text');
     const toggleBtn = document.getElementById('bio-toggle');
 
-    if (!bioText || !toggleBtn) return;
+    if (bioText && toggleBtn) {
+        if (bioText.scrollHeight > bioText.clientHeight + 20) {
+            toggleBtn.style.display = 'flex';
+        }
 
-    if (bioText.scrollHeight > bioText.clientHeight + 20) {
-        toggleBtn.style.display = 'flex';
+        toggleBtn.addEventListener('click', function () {
+            if (bioText.classList.contains('expanded')) {
+                bioText.style.maxHeight = '150px';
+                bioText.classList.remove('expanded');
+                toggleBtn.innerHTML = 'Leer más <i class="fas fa-chevron-down"></i>';
+            } else {
+                bioText.style.maxHeight = bioText.scrollHeight + 'px';
+                bioText.classList.add('expanded');
+                toggleBtn.innerHTML = 'Leer menos <i class="fas fa-chevron-up"></i>';
+            }
+        });
     }
 
-    toggleBtn.addEventListener('click', function () {
-        if (bioText.classList.contains('expanded')) {
-            bioText.style.maxHeight = '150px';
-            bioText.classList.remove('expanded');
-            toggleBtn.innerHTML = 'Leer más <i class="fas fa-chevron-down"></i>';
-        } else {
-            bioText.style.maxHeight = bioText.scrollHeight + 'px';
-            bioText.classList.add('expanded');
-            toggleBtn.innerHTML = 'Leer menos <i class="fas fa-chevron-up"></i>';
-        }
-    });
+    // 4. REPORTE DE DATOS
+    function initDataReport() {
+        const openBtn = document.getElementById('open-report-modal-btn');
+        const modal = document.getElementById('data-report-modal');
+        const closeBtn = document.getElementById('close-data-modal');
+        const confirmBox = modal ? modal.querySelector('.shiori-confirm-box') : null;
+
+        if (!openBtn || !modal || !confirmBox) return;
+
+        // Guardamos el HTML original para restaurar tras éxito/cierre
+        const originalContent = confirmBox.innerHTML;
+        modal.dataset.originalHtml = originalContent;
+
+        openBtn.onclick = () => {
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        };
+
+        const close = () => {
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+            // Restauramos el contenido original después de cerrar (delay para la animación)
+            setTimeout(() => { confirmBox.innerHTML = originalContent; }, 300);
+        };
+
+        if (closeBtn) closeBtn.onclick = close;
+        modal.onclick = (e) => {
+            if (e.target === modal) close();
+        };
+    }
+
+    initDataReport();
 });
+

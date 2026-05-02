@@ -51,11 +51,12 @@
                     <!-- DERECHA: LA OBRA Y FECHA -->
                     <div class="report-media-meta">
                         <div class="media-title-link-premium">
-                            <a href="https://www.themoviedb.org/{{ r.media_type }}/{{ r.media_id }}" target="_blank">
+                            <a href="{% if r.media_type == 'person' %}{{ url_for('person_detail', person_id=r.media_id) }}{% else %}{{ url_for('media_detail', media_type=r.media_type, media_id=r.media_id) }}{% endif %}" target="_blank" title="Ver en Shiori">
                                 {{ r.media_title }}
                             </a>
-                            <i class="fas fa-external-link-alt" style="font-size: 0.8rem; opacity: 0.5;"></i>
+                            <i class="fas fa-external-link-alt" style="font-size: 0.8rem; opacity: 0.5; margin-left: 5px;"></i>
                         </div>
+
                         <span class="report-date-premium"
                             style="display: block; font-size: 0.85rem; opacity: 0.5; margin-top: 5px;">
                             {{ r.created_at.strftime('%d/%m/%Y %H:%M') }}
