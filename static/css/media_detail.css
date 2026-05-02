@@ -160,6 +160,14 @@
     color: var(--primary);
 }
 
+.poster-actions .btn-report-data-premium {
+    width: 100%;
+}
+
+.media-carousel {
+    padding: 10px 5px 25px 0px;
+}
+
 /* Info Principal */
 .media-info {
     flex: 1;

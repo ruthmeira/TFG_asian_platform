@@ -93,7 +93,7 @@
             </div>
 
             {# BOTÓN DE REPORTE DE DATOS #}
-            <button id="open-report-modal-btn" class="btn-report-data-premium" title="Reportar error en los datos" style="width: 100%;">
+            <button id="open-report-modal-btn" class="btn-report-data-premium" title="Reportar error en los datos">
                 <i class="fas fa-exclamation-triangle"></i>
                 <span>Reportar Error</span>
             </button>
@@ -392,7 +392,7 @@
     <div class="reviews-shiori-header">
         <h2>Si te gusta {{ media.display_title }}, te recomendamos... 🏮</h2>
     </div>
-    <div class="media-carousel" style="padding: 10px 5px 25px 0px;">
+    <div class="media-carousel">
         {% for item in recommendations %}
         <a href="{{ url_for('media_detail', media_type=item.media_type_fixed, media_id=item.id) }}" class="card-link">
             <div class="card">
@@ -641,14 +641,6 @@
                 </div>
             </div>
 
-            <script>
-                function selectReportOption(element, value) {
-                    document.querySelectorAll('.report-option-item').forEach(el => el.classList.remove('selected'));
-                    element.classList.add('selected');
-                    document.getElementById('selected-field-type').value = value;
-                }
-            </script>
-
             <div class="form-group-shiori">
                 <label>Mensaje o información correcta</label>
                 <textarea name="description" id="report-description-area" class="shiori-textarea-premium"
@@ -666,9 +658,4 @@
 <!-- LÓGICA DE GESTIÓN SHIORI (OPINIONES, VOTOS, REPORTES) -->
 <script src="{{ url_for('static', filename='js/shiori_reviews.js') }}"></script>
 <script src="{{ url_for('static', filename='js/media_detail.js') }}"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        MediaDetail.init();
-    });
-</script>
 {% endblock %}

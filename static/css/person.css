@@ -71,6 +71,21 @@
     display: none !important;
 }
 
+/* Report Button Container */
+.person-report-container {
+    width: 100%;
+    margin-top: -2px;
+    padding: 0 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.person-report-container .btn-report-data-premium {
+    width: 100%;
+    justify-content: center;
+    height: 42px;
+}
+
 /* Info Sidebar */
 .person-info-sidebar h3 {
     margin-top: 0;

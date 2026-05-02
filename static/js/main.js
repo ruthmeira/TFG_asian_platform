@@ -310,7 +310,52 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     });
+
+    // --- LÓGICA DE INICIALIZACIÓN DE REPORTE DE DATOS (GLOBAL) ---
+    function initDataReport() {
+        const openBtn = document.getElementById('open-report-modal-btn');
+        const modal = document.getElementById('data-report-modal');
+        const closeBtn = document.getElementById('close-data-modal');
+        const confirmBox = modal ? modal.querySelector('.shiori-confirm-box') : null;
+
+        if (!openBtn || !modal || !confirmBox) return;
+
+        // Guardamos el HTML original para restaurar tras éxito/cierre
+        const originalContent = confirmBox.innerHTML;
+        modal.dataset.originalHtml = originalContent;
+
+        openBtn.onclick = (e) => {
+            e.preventDefault();
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        };
+
+        const close = () => {
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+            // Restauramos el contenido original después de cerrar (delay para la animación)
+            setTimeout(() => { confirmBox.innerHTML = originalContent; }, 300);
+        };
+
+        if (closeBtn) closeBtn.onclick = close;
+        modal.onclick = (e) => {
+            if (e.target === modal) close();
+        };
+    }
+
+    initDataReport();
 });
+
+/**
+ * GLOBAL HELPER FUNCTIONS
+ */
+window.selectReportOption = function(element, value) {
+    const parent = element.closest('.report-options-list') || document;
+    parent.querySelectorAll('.report-option-item').forEach(el => el.classList.remove('selected'));
+    element.classList.add('selected');
+    const hiddenInput = document.getElementById('selected-field-type');
+    if (hiddenInput) hiddenInput.value = value;
+};
 
 /**
  * SHIORI GLOBAL UTILITIES

@@ -69,38 +69,5 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-
-    // 4. REPORTE DE DATOS
-    function initDataReport() {
-        const openBtn = document.getElementById('open-report-modal-btn');
-        const modal = document.getElementById('data-report-modal');
-        const closeBtn = document.getElementById('close-data-modal');
-        const confirmBox = modal ? modal.querySelector('.shiori-confirm-box') : null;
-
-        if (!openBtn || !modal || !confirmBox) return;
-
-        // Guardamos el HTML original para restaurar tras éxito/cierre
-        const originalContent = confirmBox.innerHTML;
-        modal.dataset.originalHtml = originalContent;
-
-        openBtn.onclick = () => {
-            modal.classList.add('show');
-            document.body.style.overflow = 'hidden';
-        };
-
-        const close = () => {
-            modal.classList.remove('show');
-            document.body.style.overflow = '';
-            // Restauramos el contenido original después de cerrar (delay para la animación)
-            setTimeout(() => { confirmBox.innerHTML = originalContent; }, 300);
-        };
-
-        if (closeBtn) closeBtn.onclick = close;
-        modal.onclick = (e) => {
-            if (e.target === modal) close();
-        };
-    }
-
-    initDataReport();
 });
 

@@ -7,40 +7,8 @@ window.MediaDetail = (() => {
     function init(container = document) {
         initTrailer(container);
         initActions(container);
-        initDataReport(container);
     }
 
-    function initDataReport(container) {
-        const openBtn = container.querySelector('#open-report-modal-btn');
-        const modal = document.getElementById('data-report-modal');
-        const closeBtn = document.getElementById('close-data-modal');
-        const form = document.getElementById('data-report-form');
-        const confirmBox = modal ? modal.querySelector('.shiori-confirm-box') : null;
-
-        if (!openBtn || !modal || !form || !confirmBox) return;
-
-        const originalContent = confirmBox.innerHTML;
-        modal.dataset.originalHtml = originalContent;
-
-
-        openBtn.onclick = () => {
-            modal.classList.add('show');
-            document.body.style.overflow = 'hidden';
-        };
-
-        const close = () => {
-            modal.classList.remove('show');
-            document.body.style.overflow = '';
-            // Restauramos el contenido original después de cerrar
-            setTimeout(() => { confirmBox.innerHTML = originalContent; }, 300);
-        };
-
-        if (closeBtn) closeBtn.onclick = close;
-        modal.onclick = (e) => {
-            if (e.target === modal) close();
-        };
-    }
-    
     function initTrailer(container) {
         const trailerBtn = container.querySelector('#trailer-btn');
         const trailerModal = document.getElementById('trailer-modal');

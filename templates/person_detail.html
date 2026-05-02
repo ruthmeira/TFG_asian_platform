@@ -51,8 +51,8 @@
         {% endif %}
 
         {# BOTÓN DE REPORTE DE DATOS #}
-        <div class="person-report-container" style="margin-top: -2px; padding: 0 10px;">
-            <button id="open-report-modal-btn" class="btn-report-data-premium" title="Reportar error en los datos" style="width: 100%; justify-content: center; height: 42px;">
+        <div class="person-report-container">
+            <button id="open-report-modal-btn" class="btn-report-data-premium" title="Reportar error en los datos">
                 <i class="fas fa-exclamation-triangle"></i>
                 <span>Reportar Error</span>
             </button>
@@ -110,7 +110,7 @@
                     {{ person.biography | safe }}
                 </p>
             </div>
-            <button id="bio-toggle" class="btn-read-more" style="display: none;">Leer más <i
+            <button id="bio-toggle" class="btn-read-more">Leer más <i
                     class="fas fa-chevron-down"></i></button>
         </section>
 
@@ -179,17 +179,6 @@
                     {% endfor %}
                 </div>
             </div>
-
-            <script>
-                function selectReportOption(element, value) {
-                    // Limpiar seleccionados previos
-                    document.querySelectorAll('.report-option-item').forEach(el => el.classList.remove('selected'));
-                    // Marcar actual
-                    element.classList.add('selected');
-                    // Actualizar campo oculto
-                    document.getElementById('selected-field-type').value = value;
-                }
-            </script>
 
             <div class="form-group-shiori">
                 <label>Mensaje o información correcta</label>
