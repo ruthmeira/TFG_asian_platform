@@ -60,7 +60,7 @@
                         <a href="{{ url_for('media_detail', media_id=review.media_id, media_type=review.media_type) }}" target="_blank">
                             {{ review.media_title if review.media_title else (review.media_type|upper ~ ' #' ~ review.media_id) }}
                         </a>
-                        <i class="fas fa-external-link-alt" style="font-size: 0.8rem; opacity: 0.5;"></i>
+                        <i class="fas fa-external-link-alt external-link-icon-subtle"></i>
 
                         <span class="review-rating-badge">❤️ {{ review.rating }}</span>
                     </h3>

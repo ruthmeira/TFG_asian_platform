@@ -106,6 +106,47 @@
     border-top-color: #ffa502;
 }
 
+/* UTILS - MIGRATED FROM INLINE STYLES */
+.report-main-premium {
+    padding: 35px;
+    width: 100%;
+}
+
+.external-link-icon-subtle {
+    font-size: 0.8rem;
+    opacity: 0.5;
+    margin-left: 5px;
+}
+
+.report-date-premium-sub {
+    display: block;
+    font-size: 0.85rem;
+    opacity: 0.5;
+    margin-top: 5px;
+}
+
+.report-description-spacing {
+    margin-bottom: 10px;
+}
+
+.reporters-section-spacing {
+    margin-top: 5px;
+}
+
+.admin-actions-spacing-top {
+    margin-top: 25px;
+}
+
+.admin-search-container {
+    margin-bottom: 30px;
+}
+
+.search-bar-inline-premium {
+    max-width: 600px;
+    margin: 0 auto;
+    padding-right: 20px;
+}
+
 /* DOSSIER AUTOR */
 .author-dossier {
     display: flex;

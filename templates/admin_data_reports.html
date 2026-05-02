@@ -37,7 +37,7 @@
         {% for r in reports %}
         <div class="report-card {{ r.media_type }}" id="report-{{ r.id }}">
 
-            <div class="report-main" style="padding: 35px; width: 100%;">
+            <div class="report-main report-main-premium">
 
                 <div class="report-header-premium">
 
@@ -54,23 +54,22 @@
                             <a href="{% if r.media_type == 'person' %}{{ url_for('person_detail', person_id=r.media_id) }}{% else %}{{ url_for('media_detail', media_type=r.media_type, media_id=r.media_id) }}{% endif %}" target="_blank" title="Ver en Shiori">
                                 {{ r.media_title }}
                             </a>
-                            <i class="fas fa-external-link-alt" style="font-size: 0.8rem; opacity: 0.5; margin-left: 5px;"></i>
+                            <i class="fas fa-external-link-alt external-link-icon-subtle"></i>
                         </div>
 
-                        <span class="report-date-premium"
-                            style="display: block; font-size: 0.85rem; opacity: 0.5; margin-top: 5px;">
+                        <span class="report-date-premium report-date-premium-sub">
                             {{ r.created_at.strftime('%d/%m/%Y %H:%M') }}
                         </span>
                     </div>
                 </div>
 
 
-                <div class="report-description" style="margin-bottom: 10px;">
+                <div class="report-description report-description-spacing">
                     <p>{{ r.description }}</p>
                 </div>
 
 
-                <div class="reporters-section" style="margin-top: 5px;">
+                <div class="reporters-section reporters-section-spacing">
 
                     <h4><i class="fas fa-bullhorn"></i> Reportado por:</h4>
                     <div class="reporters-list">
@@ -82,7 +81,7 @@
 
 
 
-                <div class="admin-review-actions-dual" style="margin-top: 25px;">
+                <div class="admin-review-actions-dual admin-actions-spacing-top">
                     <button class="btn-admin-action resolve-d" onclick="resolveReport({{ r.id }})">
                         <i class="fas fa-check"></i> Marcar como Resuelto
                     </button>
