@@ -337,7 +337,7 @@ def fetch_json(url):
     except:
         return {}
 
-def get_media_summary(m_id, m_type, country_hint=None):
+def get_media_summary(m_id, m_type, country_hint=None, include_db=True):
     """
     Obtiene los datos base (tarjeta) de un medio usando la jerarquía ES/MX/EN.
     Optimizado: 1 sola llamada usando append_to_response=translations.
@@ -377,20 +377,25 @@ def get_media_summary(m_id, m_type, country_hint=None):
         summary['media_subtype'] = 'Programa' if is_prod else 'Serie'
     
     # Puntuación de Shiori (Comunidad)
-    try:
-        with app.app_context():
-            s_rating = db.session.query(db.func.avg(Review.rating)).filter_by(
-                media_id=m_id, media_type=m_type, status='approved'
-            ).scalar() or 0
-            s_count = Review.query.filter_by(
-                media_id=m_id, media_type=m_type, status='approved'
-            ).count()
-            summary['shiori_rating'] = round(float(s_rating), 1)
-            summary['shiori_count'] = s_count
-    except Exception as e:
+    if include_db:
+        try:
+            with app.app_context():
+                s_rating = db.session.query(db.func.avg(Review.rating)).filter_by(
+                    media_id=m_id, media_type=m_type, status='approved'
+                ).scalar() or 0
+                s_count = Review.query.filter_by(
+                    media_id=m_id, media_type=m_type, status='approved'
+                ).count()
+                summary['shiori_rating'] = round(float(s_rating), 1)
+                summary['shiori_count'] = s_count
+        except Exception as e:
+            summary['shiori_rating'] = 0
+            summary['shiori_count'] = 0
+            print(f"⚠️ Error cargando rating Shiori para {m_id}: {e}")
+    else:
+        # Valores por defecto para ser llenados por el batch
         summary['shiori_rating'] = 0
         summary['shiori_count'] = 0
-        print(f"⚠️ Error cargando rating Shiori para {m_id}: {e}")
         
     return summary
 
@@ -2441,8 +2446,9 @@ def api_search_unified():
                     res = futures['t'] if current_page == 1 else futures['t'].result()
                     media_batch.extend([(item, 'tv') for item in res.get('results', [])])
 
-                # Filtrado asiático
-                asian_items_batch = []
+                # Filtrado asiático y recolección de IDs para el Batch Query
+                asian_items_to_process = []
+                asian_ids = []
                 for item, m_type in media_batch:
                     m_id = item.get('id')
                     if m_id in seen_media_ids: continue
@@ -2450,16 +2456,35 @@ def api_search_unified():
                     countries = [c.upper() for c in item.get('origin_country', [])]
                     if lang in ASIA_LANGUAGES or any(c in ASIA_COUNTRIES for c in countries):
                         seen_media_ids.add(m_id)
-                        asian_items_batch.append((item, m_type))
+                        asian_items_to_process.append((item, m_type))
+                        asian_ids.append(m_id)
 
-                if asian_items_batch:
+                if asian_items_to_process:
+                    # 1. BATCH QUERY: Traer todas las notas Shiori de esta página de golpe
+                    with app.app_context():
+                        ratings_data = db.session.query(
+                            Review.media_id, 
+                            Review.media_type, 
+                            db.func.avg(Review.rating), 
+                            db.func.count(Review.id)
+                        ).filter(
+                            Review.media_id.in_(asian_ids),
+                            Review.status == 'approved'
+                        ).group_by(Review.media_id, Review.media_type).all()
+                        
+                        # Mapa rápido para acceso instantáneo
+                        ratings_map = {(r[0], r[1]): {'avg': round(float(r[2]), 1), 'count': r[3]} for r in ratings_data}
+
+                    # 2. ENRIQUECER CON TRADUCCIONES (Mantenemos tu Regla de 3 intacta)
                     with ThreadPoolExecutor(max_workers=10) as t_executor:
-                        # Usar la FUNCIÓN MAESTRA para consistencia total
-                        # Pasamos 'id' a get_media_summary
-                        enriched = list(t_executor.map(lambda x: (get_media_summary(x[0]['id'], x[1]), x[1], x[0]['id']), asian_items_batch))
+                        # Pasamos include_db=False porque ya tenemos las notas en el ratings_map
+                        enriched = list(t_executor.map(lambda x: (get_media_summary(x[0]['id'], x[1], include_db=False), x[1], x[0]['id']), asian_items_to_process))
                         
                         for summary, original_m_type, it_id in enriched:
                             if not summary: continue
+                            
+                            # Inyectar la nota del batch query
+                            shiori = ratings_map.get((it_id, original_m_type), {'avg': 0, 'count': 0})
                             
                             yield json.dumps({
                                 'category': summary['media_subtype'].lower().replace('película', 'movie').replace('serie', 'series').replace('programa', 'program'),
@@ -2469,8 +2494,8 @@ def api_search_unified():
                                 'original_title': summary.get('original_title', ""),
                                 'image': f"https://image.tmdb.org/t/p/w300{summary['poster_path']}" if summary['poster_path'] else None,
                                 'rating': summary.get('vote_average', 0), 
-                                'shiori_rating': summary.get('shiori_rating', 0),
-                                'shiori_count': summary.get('shiori_count', 0),
+                                'shiori_rating': shiori['avg'],
+                                'shiori_count': shiori['count'],
                                 'flag': summary.get('flag', '🌏')
                             }, ensure_ascii=False) + '\n'
 
