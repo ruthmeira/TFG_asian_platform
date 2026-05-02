@@ -2119,9 +2119,35 @@ def api_explore():
                     yield json.dumps({'total_results': total_results, 'total_pages': total_pages}) + '\n'
                     total_metadata_sent = True
                 
-                # PARALELIZACIÓN MAESTRA (Máxima velocidad SHIORI)
+                # 1. BATCH QUERY DE NOTAS SHIORI (Para toda la página actual)
+                page_ids = [it.get('id') for it in results if it.get('id')]
+                ratings_map = {}
+                if page_ids:
+                    with app.app_context():
+                        ratings_data = db.session.query(
+                            Review.media_id, 
+                            Review.media_type, 
+                            db.func.avg(Review.rating), 
+                            db.func.count(Review.id)
+                        ).filter(
+                            Review.media_id.in_(page_ids), 
+                            Review.media_type == target_type, 
+                            Review.status == 'approved'
+                        ).group_by(Review.media_id, Review.media_type).all()
+                        
+                        ratings_map = {r[0]: {'avg': round(float(r[2]), 1), 'count': r[3]} for r in ratings_data}
+
+                # 2. ENRIQUECER CON TRADUCCIONES (Mantenemos tu Regla de 3)
+                # Pasamos include_db=False porque ya tenemos las notas en el ratings_map
                 with ThreadPoolExecutor(max_workers=20) as executor:
-                    full_summaries = list(executor.map(lambda x: get_media_summary(x.get('id'), target_type), results))
+                    full_summaries = list(executor.map(lambda x: get_media_summary(x.get('id'), target_type, include_db=False), results))
+                
+                # 3. INYECTAR NOTAS DEL BATCH QUERY
+                for s in full_summaries:
+                    if s:
+                        r_data = ratings_map.get(s['id'], {'avg': 0, 'count': 0})
+                        s['shiori_rating'] = r_data['avg']
+                        s['shiori_count'] = r_data['count']
 
                 items_processed_in_this_page = 0
             except Exception as e: 
