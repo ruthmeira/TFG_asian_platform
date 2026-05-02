@@ -26,8 +26,7 @@ async function loadCollectionPage(page = 1, perPage = null, useAnimation = true,
     gridContainer.style.pointerEvents = 'none';
     const status = window.location.pathname.split('/').filter(p => p).pop();
 
-    // LIMPIEZA ATÓMICA: Borramos el contenido viejo ANTES de la petición
-    // Esto evita el efecto de "fantasmas" de la página anterior
+    // LIMPIEZA ATÓMICA
     gridContainer.innerHTML = ''; 
 
     try {
@@ -36,7 +35,14 @@ async function loadCollectionPage(page = 1, perPage = null, useAnimation = true,
 
         gridContainer.innerHTML = html;
 
-        const newUrl = `/collections/${status}?page=${page}&per_page=${perPage}`;
+        // AUTO-SCROLL: Subimos al inicio para ver las nuevas tarjetas
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // CONSTRUCCIÓN DE URL LIMPIA
+        let newUrl = `/collections/${status}`;
+        if (parseInt(page) > 1) {
+            newUrl += `?page=${page}`;
+        }
 
         // GESTIÓN DE HISTORIAL PROFESIONAL
         if (replaceHistory) {
@@ -57,7 +63,7 @@ async function loadCollectionPage(page = 1, perPage = null, useAnimation = true,
  */
 function calculateIdealPerPage() {
     const grid = document.querySelector('.collection-grid-premium');
-    if (!grid) return 16; // Objetivo base: 16
+    if (!grid) return 16; 
 
     const computedStyle = window.getComputedStyle(grid);
     const gridTemplateColumns = computedStyle.getPropertyValue('grid-template-columns');
@@ -65,22 +71,16 @@ function calculateIdealPerPage() {
 
     if (columns <= 0) return 16;
 
-    // Calculamos las filas necesarias para acercarnos lo más posible a 16
     let rows = Math.round(16 / columns);
-
-    // Ajustes de UX:
-    // 1. En móviles (1 o 2 cols), forzamos más filas para que el scroll valga la pena
     if (columns <= 2) rows = Math.max(8, rows);
-    // 2. En escritorio, al menos 3 filas para que se vea lleno
     else if (columns >= 3 && columns <= 5) rows = Math.max(4, rows);
-    // 3. En pantallas gigantes, al menos 2 filas
     else rows = Math.max(2, rows);
 
     return columns * rows;
 }
 
 /**
- * Radar de cambio de columnas (Sincronizado con Historial)
+ * Radar de cambio de columnas
  */
 function monitorGridResize() {
     clearTimeout(resizeTimeout);
@@ -93,11 +93,8 @@ function monitorGridResize() {
         const newColumns = gridTemplateColumns.trim().split(/\s+/).length;
 
         if (newColumns !== currentColumns && currentColumns !== -1) {
-            console.log(`Grid cambio detectado: de ${currentColumns} a ${newColumns}.`);
             const urlParams = new URLSearchParams(window.location.search);
             const currentPage = urlParams.get('page') || 1;
-
-            // Usamos replaceHistory=true para que el resize no ensucie el botón Atrás
             loadCollectionPage(currentPage, null, false, true);
         }
         currentColumns = newColumns;
@@ -108,18 +105,15 @@ function monitorGridResize() {
 window.addEventListener('load', () => {
     window.addEventListener('resize', monitorGridResize);
 
-    // ESCUCHADOR MAESTRO PARA PAGINACIÓN
     document.addEventListener('click', (e) => {
         const link = e.target.closest('.ajax-page-link');
         if (link) {
             e.preventDefault();
             const page = link.getAttribute('data-page');
-            // Navegación Manual: Usamos pushState (replaceHistory=false)
             loadCollectionPage(page, null, true, false);
         }
     });
 
-    // Guardamos las columnas iniciales
     const grid = document.querySelector('.collection-grid-premium');
     if (grid) {
         const computedStyle = window.getComputedStyle(grid);
@@ -128,18 +122,20 @@ window.addEventListener('load', () => {
 
         const urlParams = new URLSearchParams(window.location.search);
         const ideal = calculateIdealPerPage();
-        if (!urlParams.has('per_page') || parseInt(urlParams.get('per_page')) !== ideal) {
-            // Ajuste inicial: replaceHistory=true
-            loadCollectionPage(1, ideal, false, true);
+        const currentCards = document.querySelectorAll('.card-link').length;
+        
+        // CORRECCIÓN DE REJILLA PERFECTA:
+        // Si el número de tarjetas actual no es múltiplo de las columnas (el ideal),
+        // recargamos por AJAX para que la rejilla se vea siempre completa.
+        if (currentCards !== ideal && currentCards > 0) {
+             const currentPage = urlParams.get('page') || 1;
+             loadCollectionPage(currentPage, ideal, false, true);
         }
     }
 
-    // RADAR DE NAVEGACIÓN (popstate): Sincroniza el botón Atrás/Adelante
     window.addEventListener('popstate', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const page = urlParams.get('page') || 1;
-        const perPage = urlParams.get('per_page') || 16;
-        // Al navegar por historial, usamos replaceHistory=true para no crear bucles
-        loadCollectionPage(page, perPage, true, true);
+        loadCollectionPage(page, null, true, true);
     });
 });
