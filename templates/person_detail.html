@@ -51,12 +51,14 @@
         {% endif %}
 
         {# BOTÓN DE REPORTE DE DATOS #}
+        {% if current_user.is_authenticated %}
         <div class="person-report-container">
             <button id="open-report-modal-btn" class="btn-report-data-premium" title="Reportar error en los datos">
                 <i class="fas fa-exclamation-triangle"></i>
                 <span>Reportar Error</span>
             </button>
         </div>
+        {% endif %}
 
         <div class="person-info-sidebar">
 

@@ -67,6 +67,7 @@
                 <span>Ver Tráiler</span>
             </button>
             {% endif %}
+            {% if current_user.is_authenticated %}
             <button id="favorite-btn" class="fav-btn-action {% if is_favorite %}active{% endif %}"
                 data-id="{{ media.id }}" data-type="{{ 'tv' if media.name else 'movie' }}"
                 data-media-subtype="{{ media.media_subtype }}" data-title="{{ media.display_title }}"
@@ -97,6 +98,7 @@
                 <i class="fas fa-exclamation-triangle"></i>
                 <span>Reportar Error</span>
             </button>
+            {% endif %}
         </div>
     </div>
 
