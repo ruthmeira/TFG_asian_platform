@@ -65,7 +65,7 @@
 /* Contact Specific Styles */
 .contact-box {
     background: rgba(255, 69, 0, 0.1);
-    min-height: 100px; /* Force a minimum height to see the centering clearly */
+    min-height: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -95,10 +95,10 @@
         font-size: 1.8rem;
     }
     .contact-email {
-        font-size: 1.1rem !important; /* Smaller font on mobile */
-        word-break: break-all; /* Prevent overflow on very small screens */
+        font-size: 1.1rem !important;
+        word-break: break-all;
     }
     .contact-email::before {
-        display: none; /* Remove emoji on mobile to save space */
+        display: none;
     }
 }

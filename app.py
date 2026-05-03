@@ -6,10 +6,13 @@ from flask_mail import Mail, Message
 from authlib.integrations.flask_client import OAuth
 from deep_translator import GoogleTranslator
 from dotenv import load_dotenv
-from models import db, User, CollectionItem, Review, ReviewVote, ReviewReport, ModerationLog, MediaReport
-from datetime import datetime, timezone
+from models import db, User, CollectionItem, Review, ReviewVote, ReviewReport, ModerationLog, MediaReport, GlobalEpisode
+from datetime import datetime, timezone, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
+import calendar
+from sqlalchemy.orm import joinedload, subqueryload
+from urllib.parse import quote
 import os
 import time
 import uuid
@@ -630,20 +633,17 @@ def sync_all_media_changes():
 
     print("[SYNC-GLOBAL] Iniciando sincronización diaria con TMDB...")
     
-    # 1. Obtener lista de IDs únicos en Shiori
     with app.app_context():
         unique_medias = db.session.query(CollectionItem.media_id, CollectionItem.media_type).distinct().all()
     
     if not unique_medias: return
 
-    # 2. Obtener IDs que han cambiado en TMDB en las últimas 24h
     changed_ids = set()
     for m_type in ['movie', 'tv']:
         res = fetch_json(f"https://api.themoviedb.org/3/{m_type}/changes?api_key={api_key}")
         for item in res.get('results', []):
             changed_ids.add((item['id'], m_type))
 
-    # 3. Cruzar datos: ¿Ha cambiado algo de lo que tenemos nosotros?
     to_update = [m for m in unique_medias if (m.media_id, m.media_type) in changed_ids]
     
     if not to_update:
@@ -668,12 +668,10 @@ def sync_all_media_changes():
                 db.session.commit()
                 db.session.remove()
                 
-        # 4. También actualizamos los episodios del calendario (en segundo plano)
         sync_media_calendar_data(m_id, m_type)
     
     print("[SYNC-GLOBAL] Sincronización finalizada con éxito.")
 
-# Programar el sincronizador para que corra una vez al día (cada 86400 segundos)
 scheduler.add_job(
     func=sync_all_media_changes,
     trigger="interval",
@@ -844,19 +842,16 @@ def collections():
         items = status_query.order_by(CollectionItem.created_at.desc()).limit(16).all()
         user_collections[status] = items
 
-    # 1. Obtener todos los IDs de la colección para una sola consulta de ratings
     all_raw_items = favorites + [item for sublist in user_collections.values() for item in sublist]
     all_ids = [it.media_id for it in all_raw_items]
     
     ratings_map = {}
     if all_ids:
-        # Una sola consulta para TODA la página
         ratings_raw = db.session.query(
             Review.media_id, Review.media_type, db.func.avg(Review.rating), db.func.count(Review.id)
         ).filter(Review.media_id.in_(all_ids), Review.status == 'approved').group_by(Review.media_id, Review.media_type).all()
         ratings_map = {(r[0], r[1]): {'avg': round(float(r[2]), 1), 'count': r[3]} for r in ratings_raw}
 
-        # Inyectamos los resultados en cada item
         for item in all_raw_items:
             r_info = ratings_map.get((item.media_id, item.media_type), {'avg': 0, 'count': 0})
             item.shiori_rating = r_info['avg']
@@ -997,18 +992,14 @@ def sync_media_calendar_data(m_id, m_type):
     Si ya existen y son recientes, no hace nada (ahorro de API).
     """
     with app.app_context():
-        from models import GlobalEpisode
-        from datetime import timedelta
-        
-        # 1. ¿Ya tenemos los episodios y están frescos (menos de 24h)?
-        existing = GlobalEpisode.query.filter_by(media_id=m_id, media_type=m_type).first()
-        if existing and (datetime.now(timezone.utc) - existing.last_updated.replace(tzinfo=timezone.utc)) < timedelta(hours=24):
-            return 
-
-        print(f"[CALENDAR-SYNC] 🔄 Actualizando episodios globales para {m_type} {m_id}...")
-        api_key = os.getenv("TMDB_API_KEY")
-        
         try:
+            existing = GlobalEpisode.query.filter_by(media_id=m_id, media_type=m_type).first()
+            if existing and (datetime.now(timezone.utc) - existing.last_updated.replace(tzinfo=timezone.utc)) < timedelta(hours=24):
+                return 
+
+            print(f"[CALENDAR-SYNC] 🔄 Actualizando episodios globales para {m_type} {m_id}...")
+            api_key = os.getenv("TMDB_API_KEY")
+            
             # Borramos lo viejo para esta serie específica en la tabla global
             GlobalEpisode.query.filter_by(media_id=m_id, media_type=m_type).delete()
             
@@ -1066,8 +1057,6 @@ def api_calendar_events():
     month = request.args.get('month', datetime.now().month, type=int)
     year = request.args.get('year', datetime.now().year, type=int)
     
-    import calendar
-    from models import GlobalEpisode
     last_day = calendar.monthrange(year, month)[1]
     start_date = datetime(year, month, 1).date()
     end_date = datetime(year, month, last_day).date()
@@ -1115,7 +1104,6 @@ def media_detail(media_type, media_id):
         item = CollectionItem.query.filter_by(user_id=current_user.id, media_id=media_id, media_type=media_type).first()
         if item: current_status, is_favorite = item.status, item.is_favorite
 
-    from sqlalchemy.orm import joinedload, subqueryload
     shiori_rating = db.session.query(db.func.avg(Review.rating)).filter_by(media_id=media_id, media_type=media_type, status='approved').scalar() or 0
     shiori_count = Review.query.filter_by(media_id=media_id, media_type=media_type, status='approved').count()
     approved_reviews = Review.query.filter_by(media_id=media_id, media_type=media_type, status='approved')\
@@ -1627,14 +1615,11 @@ def admin_toggle_ban(user_id):
     
     if new_status:
         try:
-            # 1. Borrar votos y reportes de reseñas
             ReviewVote.query.filter_by(user_id=user_id).delete()
             ReviewReport.query.filter_by(user_id=user_id).delete()
             
-            # 2. Borrar colecciones (al borrarlas, el calendario ya no mostrará nada para este usuario)
             CollectionItem.query.filter_by(user_id=user_id).delete(synchronize_session=False)
             
-            # 3. Borrar reseñas y guardar log de moderación
             user_reviews = Review.query.filter_by(user_id=user_id).all()
             for r in user_reviews:
                 log = ModerationLog(
@@ -2315,7 +2300,6 @@ def search():
 
 @app.route('/api/search/unified')
 def api_search_unified():
-    from urllib.parse import quote
     api_key = os.getenv("TMDB_API_KEY")
     query = request.args.get('q', '')
     if not query:
