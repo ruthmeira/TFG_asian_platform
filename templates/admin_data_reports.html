@@ -8,7 +8,7 @@
 
 {% block content %}
 <div class="admin-reviews-page">
-    <!-- CABECERA ESTÁNDAR SHIORI -->
+    
     <div class="prime-header">
         <div class="prime-header-content">
             <h1 class="prime-title">Reportes de Datos</h1>
@@ -21,7 +21,7 @@
         </div>
     </div>
 
-    <!-- PESTAÑAS DE NAVEGACIÓN TÁCTICA -->
+    
     <div class="admin-nav-tabs">
         <a href="{{ url_for('admin_reviews') }}" class="admin-nav-link">
             <i class="fas fa-comments"></i> Moderación de Opiniones
@@ -42,13 +42,13 @@
                 <div class="report-header-premium">
 
 
-                    <!-- IZQUIERDA: EL PROBLEMA -->
+                    
                     <div class="report-problem-focus">
                         <span class="field-label-premium">Campo a corregir:</span>
                         <span class="field-val-premium">{{ r.field_type }}</span>
                     </div>
 
-                    <!-- DERECHA: LA OBRA Y FECHA -->
+                    
                     <div class="report-media-meta">
                         <div class="media-title-link-premium">
                             <a href="{% if r.media_type == 'person' %}{{ url_for('person_detail', person_id=r.media_id) }}{% else %}{{ url_for('media_detail', media_type=r.media_type, media_id=r.media_id) }}{% endif %}" target="_blank" title="Ver en Shiori">

@@ -6,12 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}SHIORI{% endblock %}</title>
 
-    <!-- Google Fonts: Outfit & Noto Color Emoji -->
+    
     <link
         href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Color+Emoji&display=swap"
         rel="stylesheet">
 
-    <!-- Font Awesome for Icons -->
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -22,7 +22,7 @@
     <div id="global-loader-bar" class="loader-bar"></div>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
-    <!-- TRAILER MODAL (Global) -->
+    
     <div id="trailer-modal" class="trailer-modal hidden">
         <div class="modal-overlay"></div>
         <div class="modal-content">
@@ -35,7 +35,7 @@
         </div>
     </div>
 
-    <!-- NAVBAR -->
+    
     <header class="navbar">
         <div class="navbar-wrapper">
             <div class="logo">
@@ -70,14 +70,14 @@
         </div>
     </header>
 
-    <!-- CONTENIDO DINÁMICO -->
+    
     <main
         class="{{ 'auth-page-wrapper' if request.endpoint in ['login', 'register', 'forgot_password', 'reset_password', 'edit_profile'] else 'container' }}">
         {% block content %}
         {% endblock %}
     </main>
 
-    <!-- FOOTER SIMPLE -->
+    
     <footer class="footer">
         <div class="footer-simple">
             <div class="logo">

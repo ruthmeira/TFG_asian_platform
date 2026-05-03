@@ -12,7 +12,7 @@
         </a>
     </div>
 
-    <!-- CABECERA ESTÁNDAR SHIORI -->
+    
     <div class="prime-header">
         <div class="prime-header-content">
             <h1 class="prime-title">Expediente de {{ target_user.username }}</h1>
@@ -21,10 +21,10 @@
     </div>
 
     <div class="history-grid">
-        <!-- RESUMEN DE REPUTACIÓN -->
-        <!-- RESUMEN DE REPUTACIÓN SOLAMENTE NÚMEROS -->
+        
+        
         <div class="reputation-summary-card">
-            <!-- ACCIÓN ÚNICA DE BANEO Y LIMPIEZA SHIORI -->
+            
             <form id="ban-user-form" action="{{ url_for('admin_toggle_ban', user_id=target_user.id) }}" method="POST"
                 class="nuclear-form no-loader" data-is-banned="{{ 'true' if target_user.is_banned else 'false' }}">
                 <button type="button" id="ban-toggle-btn"
@@ -38,7 +38,7 @@
             </form>
 
             <div class="stats-box">
-                <!-- FILA 1: OPINIONES -->
+                
                 <div class="stat-item approved">
                     <span class="stat-val text-success">{{ approved_reviews_count }}</span>
                     <span class="stat-lbl">Opiniones Aceptadas</span>
@@ -48,7 +48,7 @@
                     <span class="stat-lbl">Opiniones Borradas</span>
                 </div>
 
-                <!-- FILA 2: DENUNCIAS -->
+                
                 <div class="stat-item reporter-accepted">
                     <span class="stat-val text-info">{{ accepted_reports_count }}</span>
                     <span class="stat-lbl">Denuncias Aceptadas</span>
@@ -58,7 +58,7 @@
                     <span class="stat-lbl">Denuncias Rechazadas</span>
                 </div>
 
-                <!-- FILA 3: REPORTES DE DATOS -->
+                
 
                 <div class="stat-item data-resolved">
                     <span class="stat-val">{{ data_reports_resolved }}</span>
@@ -72,9 +72,9 @@
 
         </div>
 
-        <!-- LISTADOS DETALLADOS -->
+        
         <div class="logs-container">
-            <!-- SECCIÓN AUTOR: STRIKES -->
+            
             <div class="log-section">
                 <h2><i class="fas fa-trash-alt"></i> Historial de Opiniones Borradas</h2>
                 {% if author_logs %}
@@ -106,7 +106,7 @@
                 {% endif %}
             </div>
 
-            <!-- SECCIÓN REPORTERO: TOXICIDAD -->
+            
             <div class="log-section">
                 <h2><i class="fas fa-exclamation-triangle"></i> Historial de Denuncias Rechazadas</h2>
                 {% if reporter_logs %}
@@ -134,7 +134,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE CONFIRMACIÓN SHIORI (BANEO NUCLEAR) -->
+    
     <div class="shiori-confirm-overlay" id="ban-confirm-modal">
         <div class="shiori-confirm-box">
             <div class="confirm-icon">
@@ -155,7 +155,7 @@
         </div>
     </div>
 
-    <!-- CARGA DE MANDO SHIORI EXTERNA -->
+    
     <script src="{{ url_for('static', filename='js/shiori_admin.js') }}"></script>
 </div>
 {% endblock %}

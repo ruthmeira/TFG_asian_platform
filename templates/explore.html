@@ -12,7 +12,7 @@
             <div class="filter-group keyword-tagging-group">
                 <label><i class="fas fa-search"></i> Palabras clave</label>
                 <div class="keyword-tags-container" id="keyword-tags-list">
-                    <!-- Los chips se insertarán aquí dinámicamente -->
+                    
                     <input type="text" id="keyword-search-input" placeholder="Ej: vampiros, escolar..."
                         autocomplete="off">
                 </div>
@@ -135,7 +135,7 @@
                 <input type="hidden" name="sort_by" id="sort-input" value="{{ current_sort }}">
             </div>
 
-            <!-- PLATAFORMAS (Rediseño Premium - Iconos Oficiales) -->
+            
             <div class="filter-group streaming-group">
                 <label><i class="fas fa-play-circle"></i> ¿Dónde quieres ver?</label>
 
@@ -164,14 +164,14 @@
                             </div>
                             <div class="region-list-container">
                                 <ul class="region-list" id="region-list">
-                                    <!-- JS fills -->
+                                    
                                 </ul>
                             </div>
                         </div>
                     </div>
 
 
-                    <!-- Script movido a static/js/explore.js -->
+                    
 
 
                     <div class="platform-circles-row" id="chips-providers">
@@ -279,7 +279,7 @@
                             </svg>
                         </div>
                     </div>
-                </div> <!-- /genre-collapsible-content -->
+                </div> 
             </div>
 
             <div class="filter-group">
@@ -305,7 +305,7 @@
 
 
         <div id="items-container" class="collection-grid">
-            <!-- Los items se cargarán por AJAX -->
+            
         </div>
 
         <div id="auto-load-container" class="load-more-wrapper">
@@ -317,17 +317,17 @@
         <div id="infinite-scroll-trigger"></div>
 
         <div id="pagination-wrapper" class="pagination-controls-numbers">
-            <!-- Desactivado por scroll infinito -->
+            
         </div>
     </div>
 </div>
 
-<!-- Botón Subir Rápido (Global) -->
+
 <button id="scroll-to-top" class="scroll-to-top" title="Volver Arriba">
     <i class="fas fa-chevron-up"></i>
 </button>
 
-<!-- Scripts moved to static/js/explore.js -->
+
 <script src="{{ url_for('static', filename='js/explore.js') }}"></script>
 <script id="explore-data" type="application/json">
         {

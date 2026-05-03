@@ -22,7 +22,7 @@
         {% if person.socials and (person.socials.instagram or person.socials.twitter or person.socials.tiktok or
         person.socials.facebook or person.socials.youtube or person.socials.homepage) %}
         <div class="person-socials">
-            {# Grupo 1: Redes #}
+            
             <div class="social-group">
                 {% for platform, url in person.socials.items() %}
                 {% if url and platform != 'homepage' %}
@@ -33,13 +33,13 @@
                 {% endfor %}
             </div>
 
-            {# Divisor #}
+            
             {% if (person.socials.instagram or person.socials.twitter or person.socials.tiktok or
             person.socials.facebook or person.socials.youtube) and person.socials.homepage %}
             <span class="link-divider">|</span>
             {% endif %}
 
-            {# Grupo 2: Homepage #}
+            
             {% if person.socials.homepage %}
             <div class="social-group">
                 <a href="{{ person.socials.homepage }}" target="_blank" class="social-btn" title="Sitio Web Oficial">
@@ -50,7 +50,7 @@
         </div>
         {% endif %}
 
-        {# BOTÓN DE REPORTE DE DATOS #}
+        
         {% if current_user.is_authenticated %}
         <div class="person-report-container">
             <button id="open-report-modal-btn" class="btn-report-data-premium" title="Reportar error en los datos">
@@ -141,7 +141,7 @@
             </div>
 
             <div class="known-for-grid" id="works-grid" data-person-id="{{ person.id }}" data-country-hint="{{ person.country_hint }}">
-                {# Los proyectos aparecerán aquí en segundos para no retrasar la Bio #}
+                
             </div>
 
             <div id="show-more-container" style="display: none;" class="show-more-container">
@@ -151,7 +151,7 @@
     </main>
 </div>
 
-<!-- MODAL DE REPORTE DE DATOS (PERSON SYNC) -->
+
 <div class="shiori-confirm-overlay" id="data-report-modal">
     <div class="shiori-confirm-box">
         <div class="data-report-header">

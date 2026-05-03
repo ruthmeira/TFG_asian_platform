@@ -52,7 +52,7 @@
             <i class="fas fa-lock main-icon"></i>
             <input type="password" name="password" id="password" class="password-input" placeholder="Contraseña" required spellcheck="false">
             <i class="fas fa-eye password-toggle" id="togglePassword"></i>
-            <!-- CAPS LOCK INDICATOR -->
+            
             <div id="capslock-warning" class="caps-warning">
                 <i class="fas fa-arrow-up"></i> Mayúsculas Activas
             </div>
@@ -72,7 +72,7 @@
         <span>o continua con</span>
     </div>
 
-    <!-- GOOGLE LOGIN (Below Form) -->
+    
     <div class="social-login">
         <a href="{{ url_for('login_google', next=request.args.get('next')) }}" class="google-btn">
             <svg viewBox="0 0 24 24" class="google-icon">
