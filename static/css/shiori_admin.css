@@ -281,7 +281,7 @@
     transition: 0.3s ease;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .reporter-tag:hover {
         background: var(--primary);
         color: #fff !important;
@@ -307,7 +307,7 @@
     border: 1px solid rgba(46, 213, 115, 0.2);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .btn-admin-action.resolve-d:hover {
         background: #2ed573;
         color: #fff !important;
@@ -365,7 +365,7 @@
     border: 1px solid rgba(255, 71, 87, 0.1);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .btn-admin-action.accept-d:hover {
         background: #ff4757;
         color: #fff;
@@ -379,7 +379,7 @@
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .btn-admin-action.reject-d:hover {
         background: #fff;
         color: #000;
@@ -397,7 +397,7 @@
     display: inline-block;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .admin-user-link:hover {
         transform: scale(1.05);
         color: var(--primary) !important;
@@ -617,7 +617,7 @@
     gap: 15px;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .btn-shiori-ban:hover {
         background: #ff4757;
         color: #fff;
@@ -632,7 +632,7 @@
     border-color: rgba(46, 213, 115, 0.25);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .btn-shiori-ban.is-banned:hover {
         background: #2ed573;
         color: #fff;
@@ -655,7 +655,7 @@
     letter-spacing: 1px;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .btn-nuclear-purge-mini:hover {
         color: #fff;
         border-color: #ff4757;
@@ -960,7 +960,7 @@
     box-shadow: 0 10px 25px rgba(255, 71, 87, 0.3);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .confirm-btn.shiori-cancel:hover {
         background: rgba(255, 255, 255, 0.15);
         color: #fff;
@@ -968,7 +968,7 @@
     }
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .confirm-btn.shiori-ban-action:hover {
         background: #ff6b81;
         color: #fff;
@@ -1004,7 +1004,7 @@
     transition: 0.3s;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .btn-shiori-banned-list:hover {
         background: #ff4757;
         color: #fff;
@@ -1143,7 +1143,7 @@
     gap: 10px;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .btn-examine-dossier:hover {
         background: #fff;
         color: #000;
@@ -1173,7 +1173,7 @@
     width: fit-content;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .btn-report-data-premium:hover {
         background: rgba(255, 69, 0, 0.1);
         border-color: rgba(255, 69, 0, 0.3);
@@ -1205,7 +1205,7 @@
     border: 1px solid transparent;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .admin-nav-link:hover {
         color: #fff;
         background: rgba(255, 255, 255, 0.05);
@@ -1253,7 +1253,7 @@
 }
 
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .media-title-link-premium a:hover {
         color: var(--primary);
     }
@@ -1357,7 +1357,7 @@
     transition: 0.3s;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .media-title-link a:hover {
         color: var(--primary);
     }
@@ -1420,7 +1420,7 @@
     border: 1px solid rgba(46, 213, 115, 0.1);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .btn-resolve:hover {
         background: #2ed573;
         color: #fff;
@@ -1433,7 +1433,7 @@
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .btn-dismiss:hover {
         background: rgba(255, 255, 255, 0.1);
         color: #fff;

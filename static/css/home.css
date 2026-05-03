@@ -31,7 +31,7 @@
     white-space: nowrap;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .filter-btn:hover {
         background: #1a1a1a;
         color: var(--text-main);

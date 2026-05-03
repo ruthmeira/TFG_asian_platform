@@ -210,14 +210,14 @@ main.container {
     
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .stat-crystal-link:hover .stat-crystal {
         background: rgba(255, 255, 255, 0.12);
         border-color: rgba(255, 255, 255, 0.25);
     }
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .stat-crystal-link:hover i {
         transform: scale(1.05);
         background: var(--primary-gradient);
@@ -271,7 +271,7 @@ main.container {
     box-shadow: 0 10px 20px rgba(255, 69, 0, 0.2);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .profile-btn.highlight:hover {
         transform: translateY(-3px);
         background: rgba(255, 255, 255, 0.15) !important;
@@ -287,7 +287,7 @@ main.container {
     box-shadow: 0 10px 20px rgba(255, 69, 0, 0.3);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .profile-btn.outline:hover {
         transform: translateY(-3px);
         box-shadow: 0 15px 30px rgba(255, 69, 0, 0.5);
@@ -303,7 +303,7 @@ main.container {
     backdrop-filter: blur(10px);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .profile-btn.danger:hover {
         background: rgba(255, 255, 255, 0.15);
         color: var(--primary);
@@ -451,7 +451,7 @@ main.container {
     gap: 8px;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .change-photo-btn:hover {
         background: var(--primary);
         transform: translateY(-2px);
@@ -564,7 +564,7 @@ main.container {
     transition: color 0.3s;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .edit-mode .input-group .password-toggle:hover {
         color: var(--primary);
     }
@@ -674,7 +674,7 @@ main.container {
     box-shadow: 0 10px 20px rgba(255, 69, 0, 0.3);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .save-profile-btn:hover {
         transform: translateY(-3px);
         box-shadow: 0 15px 30px rgba(255, 69, 0, 0.5);
@@ -1132,8 +1132,10 @@ main.container {
     color: #fff;
 }
 
-.shiori-cancel:hover {
-    background: rgba(255,255,255,0.2);
+@media (hover: hover) and (pointer: fine) {
+    .shiori-cancel:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
 }
 
 
@@ -1146,11 +1148,13 @@ main.container {
     border: 1px solid rgba(255, 77, 77, 0.2) !important;
 }
 
-.delete-account-shiori-btn:hover {
-    background: #ff4d4d !important;
-    color: white !important;
-    box-shadow: 0 5px 20px rgba(255, 77, 77, 0.4);
-    transform: translateY(-3px);
+@media (hover: hover) and (pointer: fine) {
+    .delete-account-shiori-btn:hover {
+        background: #ff4d4d !important;
+        color: white !important;
+        box-shadow: 0 5px 20px rgba(255, 77, 77, 0.4);
+        transform: translateY(-3px);
+    }
 }
 
 .shiori-confirm-box.danger-modal {
@@ -1167,9 +1171,11 @@ main.container {
     color: #fff;
 }
 
-.shiori-confirm-box.danger-modal .confirm-btn.shiori-confirm:hover {
-    background: #cc0000 !important;
-    box-shadow: 0 5px 15px rgba(255, 77, 77, 0.4);
+@media (hover: hover) and (pointer: fine) {
+    .shiori-confirm-box.danger-modal .confirm-btn.shiori-confirm:hover {
+        background: #cc0000 !important;
+        box-shadow: 0 5px 15px rgba(255, 77, 77, 0.4);
+    }
 }
 
 .shiori-confirm-form {

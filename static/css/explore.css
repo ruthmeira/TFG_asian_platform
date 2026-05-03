@@ -137,7 +137,7 @@
     transition: all 0.3s;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .genre-collapsible-btn:hover {
         border-color: rgba(255, 255, 255, 0.2);
         background: rgba(255, 255, 255, 0.05);
@@ -301,7 +301,7 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .page-number:hover,
     .page-btn-nav:hover {
         background: rgba(255, 255, 255, 0.1);
@@ -394,7 +394,7 @@
     box-shadow: 0 10px 20px rgba(255, 69, 0, 0.2);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .apply-filters-btn:hover {
         transform: translateY(-3px);
         box-shadow: 0 15px 30px rgba(255, 69, 0, 0.4);
@@ -420,7 +420,7 @@
     gap: 8px;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .clear-filters-btn:hover {
         background: rgba(255, 69, 0, 0.1);
         border-color: var(--primary);

@@ -139,7 +139,7 @@
     will-change: transform;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .credit-info-row .name:hover {
         color: var(--primary);
     }
@@ -175,7 +175,7 @@
     user-select: none;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .dept-subtitle:hover {
         background: linear-gradient(90deg, rgba(255, 69, 0, 0.2) 0%, transparent 100%);
     }

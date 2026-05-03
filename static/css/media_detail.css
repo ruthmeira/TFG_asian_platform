@@ -91,7 +91,7 @@
     transition: var(--transition);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .fav-btn-action:hover {
         background: rgba(255, 255, 255, 0.15);
         transform: translateY(-3px);
@@ -152,7 +152,7 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .btn-trailer:hover {
         background: rgba(255, 255, 255, 0.15);
         transform: translateY(-3px);
@@ -289,7 +289,7 @@
     box-shadow: 0 10px 20px rgba(255, 69, 0, 0.3);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     #collection-toggle:hover {
         transform: translateY(-3px);
         box-shadow: 0 15px 30px rgba(255, 69, 0, 0.5);
@@ -339,7 +339,7 @@
     font-weight: 500;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .collection-option:hover {
         background: rgba(255, 255, 255, 0.1);
         color: white;
@@ -670,7 +670,7 @@
     text-transform: capitalize;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .keyword-tag:hover {
         background: rgba(255, 69, 0, 0.1);
         color: var(--primary);
@@ -757,7 +757,7 @@
     box-shadow: 0 10px 20px rgba(255, 69, 0, 0.3);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .btn-review-primary:hover {
         transform: translateY(-4px) scale(1.05);
         box-shadow: 0 15px 30px rgba(255, 69, 0, 0.5);
@@ -776,7 +776,7 @@
     transition: var(--transition);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .btn-review-muted:hover {
         background: rgba(255, 255, 255, 0.15);
     }
@@ -847,7 +847,7 @@
     transition: 0.3s;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .btn-close-modal:hover {
         opacity: 1;
         transform: rotate(90deg);
@@ -891,7 +891,7 @@
     transition: 0.2s;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .range-shiori-container i:hover {
         color: var(--primary);
         opacity: 1;
@@ -986,7 +986,7 @@
     transition: 0.3s;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .btn-submit-full-shiori:hover {
         transform: translateY(-3px);
         box-shadow: 0 10px 30px rgba(255, 69, 0, 0.4);
@@ -1055,7 +1055,7 @@
     border-radius: 12px;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .engagement-btn:hover {
         color: #fff;
         background: rgba(255, 255, 255, 0.05);
@@ -1086,7 +1086,7 @@
     display: flex;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .btn-delete-shiori-btn:hover {
         color: #ff4757;
         background: rgba(255, 71, 87, 0.1);
@@ -1094,7 +1094,7 @@
     }
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .shiori-review-card:hover {
         background: rgba(255, 255, 255, 0.05);
         border-color: rgba(255, 255, 255, 0.15);
@@ -1227,7 +1227,7 @@
     margin-left: 10px;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .btn-report-shiori-btn:hover {
         color: #ffa502;
         transform: scale(1.15);
@@ -1241,7 +1241,7 @@
     box-shadow: 0 4px 15px rgba(255, 165, 2, 0.4) !important;
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
     .shiori-report:hover {
         background: #ffbc4d !important;
         box-shadow: 0 8px 25px rgba(255, 165, 2, 0.6) !important;
