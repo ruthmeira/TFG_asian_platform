@@ -1690,11 +1690,6 @@ def dismiss_data_report(report_id):
 def delete_account():
     user_id = current_user.id
     try:
-        c_items = CollectionItem.query.filter_by(user_id=user_id).all()
-        c_ids = [item.id for item in c_items]
-        if c_ids:
-            MediaEvent.query.filter(MediaEvent.collection_item_id.in_(c_ids)).delete(synchronize_session=False)
-
         CollectionItem.query.filter_by(user_id=user_id).delete(synchronize_session=False)
         
         ReviewVote.query.filter_by(user_id=user_id).delete()
