@@ -1,6 +1,6 @@
-/* ===================================================== */
-/* PROFILE PAGE - ESTILOS MODULARES */
-/* ===================================================== */
+
+
+
 
 .container-profile {
     max-width: 100%;
@@ -11,7 +11,7 @@
     animation: profileFadeIn 0.8s ease;
 }
 
-/* Neutralizar el estiramiento global del main para el perfil */
+
 main.container {
     min-height: 0 !important;
     padding-bottom: 0 !important;
@@ -30,7 +30,7 @@ main.container {
     }
 }
 
-/* Banner & Header */
+
 .profile-user-info-clean {
     display: flex;
     align-items: center;
@@ -54,14 +54,14 @@ main.container {
     box-shadow: 0 15px 35px rgba(255, 69, 0, 0.3);
     border: 4px solid rgba(255, 255, 255, 0.1);
     overflow: hidden;
-    /* IMPORTANTE: Para que la imagen no se salga del círculo */
+    
 }
 
 .avatar-img-clean {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* Ajuste perfecto de la foto */
+    
 }
 
 .user-titles h1 {
@@ -90,13 +90,13 @@ main.container {
     -webkit-text-fill-color: transparent;
 }
 
-/* Stats Grid (Crystal Cards) */
+
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: clamp(15px, 3vw, 40px);
     margin-bottom: 25px;
-    /* Reducción de 50px a 25px */
+    
     width: 100%;
     justify-content: center;
 }
@@ -106,7 +106,7 @@ main.container {
     color: inherit;
     min-width: 0;
     max-width: 260px;
-    /* EVITA QUE SE HAGAN GIGANTES EN 100% */
+    
     width: 100%;
     margin: 0 auto;
     animation: statEntrance 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
@@ -147,9 +147,9 @@ main.container {
 .stat-crystal {
     padding: clamp(15px, 2vw, 25px) 10px;
     background: rgba(255, 255, 255, 0.08);
-    /* Más visible que el glass estándar */
+    
     border: 1px solid rgba(255, 255, 255, 0.15);
-    /* Borde más definido */
+    
     backdrop-filter: blur(15px);
     border-radius: 24px;
     display: flex;
@@ -193,7 +193,7 @@ main.container {
 
 .stat-data h3 {
     font-size: clamp(1.2rem, 2vw, 2rem);
-    /* Números más armónicos */
+    
     font-weight: 800;
     margin-bottom: 2px;
     color: #fff;
@@ -201,40 +201,40 @@ main.container {
 
 .stat-data p {
     font-size: clamp(8px, 1.1vw, 11px);
-    /* Escalado inteligente en escritorio también */
+    
     text-transform: uppercase;
     font-weight: 700;
     color: var(--text-muted);
     letter-spacing: clamp(0.5px, 0.2vw, 2px);
     white-space: nowrap;
-    /* Evita que salte de línea */
+    
 }
 
 .stat-crystal-link:hover .stat-crystal {
     background: rgba(255, 255, 255, 0.12);
-    /* Brillo sutil de fondo */
+    
     border-color: rgba(255, 255, 255, 0.25);
-    /* Se nota más el borde pero sigue blanco/cristal */
+    
 }
 
 .stat-crystal-link:hover i {
     transform: scale(1.05);
-    /* Solo un toque de escala en el icono, nada de movimiento total */
+    
     background: var(--primary-gradient);
     color: white;
 }
 
-/* Profile Actions */
+
 .profile-actions-main {
     display: flex;
     justify-content: flex-end;
-    /* ALINEACIÓN A LA DERECHA */
+    
     gap: 10px;
     margin-top: 20px;
     padding-top: 0;
     width: 100%;
     flex-wrap: nowrap;
-    /* PROHIBIDO APILARSE EN ESCRITORIO */
+    
 }
 
 .profile-btn {
@@ -242,13 +242,13 @@ main.container {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    /* Gap más cerrado */
+    
     padding: 8px 24px;
-    /* Padding FIJO y FINO para evitar el look gordito */
+    
     border-radius: 50px;
     font-weight: 700;
     font-size: 14px;
-    /* Fuente fija y elegante */
+    
     text-decoration: none;
     transition: var(--transition);
     cursor: pointer;
@@ -261,7 +261,7 @@ main.container {
     font-size: 1.1rem;
 }
 
-/* Profile Button Interactive States */
+
 .profile-btn.highlight {
     background: rgba(255, 255, 255, 0.08) !important;
     color: var(--primary) !important;
@@ -306,9 +306,9 @@ main.container {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* ===================================================== */
-/* RESPONSIVE DESIGN - PROFILE VIEW (600px) */
-/* ===================================================== */
+
+
+
 
 
 
@@ -326,9 +326,9 @@ main.container {
     }
 }
 
-/* ===================================================== */
-/* EDIT PROFILE - PREMIUM SETTINGS STYLES */
-/* ===================================================== */
+
+
+
 
 .container-profile.edit-mode {
     width: 100%;
@@ -370,13 +370,13 @@ main.container {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
     transition: transform 0.3s;
 
-    /* Espaciado interno consistente para los hijos */
+    
     display: flex;
     flex-direction: column;
     gap: 25px;
 }
 
-/* Avatar Preview Section */
+
 .avatar-edit-wrapper {
     display: flex;
     align-items: center;
@@ -420,7 +420,7 @@ main.container {
     padding-right: 50px !important;
 }
 
-/* El overlay de cámara solo aparece cuando pasamos el ratón por el BOTÓN */
+
 .avatar-edit-wrapper:has(.change-photo-btn:hover) .upload-overlay {
     opacity: 1;
 }
@@ -450,13 +450,13 @@ main.container {
     box-shadow: 0 5px 15px rgba(255, 69, 0, 0.3);
 }
 
-/* Fields & Groups */
+
 .identity-fields {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 25px;
-    /* Standarized gap */
+    
     min-width: 0;
 }
 
@@ -464,7 +464,7 @@ main.container {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    /* Espacio etiqueta-input */
+    
     width: 100%;
 }
 
@@ -505,7 +505,7 @@ main.container {
     width: 100% !important;
     height: 52px;
     background: rgba(0, 0, 0, 0.2) !important;
-    /* Mismo color que la región */
+    
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 12px !important;
     color: #ffffff !important;
@@ -516,7 +516,7 @@ main.container {
     box-shadow: none !important;
 }
 
-/* Autofill Fix for Glassmorphism inputs (Sincronizado con Auth) */
+
 .edit-mode .input-group input:-webkit-autofill,
 .edit-mode .input-group input:-webkit-autofill:hover {
     -webkit-box-shadow: 0 0 0 1000px #0a0a0a inset !important;
@@ -532,17 +532,17 @@ main.container {
     -webkit-text-fill-color: #ffffff !important;
 }
 
-/* Si el input tiene un icono principal (i.main-icon), le damos padding extra a la izquierda */
+
 .edit-mode .input-group i.main-icon+input {
     padding-left: 50px !important;
 }
 
-/* Si el input tiene toggle de contraseña, le damos padding extra a la derecha */
+
 .edit-mode .input-group:has(.password-toggle) input {
     padding-right: 50px !important;
 }
 
-/* Password Toggle */
+
 .edit-mode .input-group .password-toggle {
     position: absolute;
     right: 18px;
@@ -563,7 +563,7 @@ main.container {
     outline: none;
     border-color: var(--primary) !important;
     background: #2a1a15 !important;
-    /* El tono exacto de Auth */
+    
     box-shadow: 0 0 15px rgba(255, 69, 0, 0.15) !important;
 }
 
@@ -573,7 +573,7 @@ main.container {
     line-height: 1.6;
     padding: 15px 18px !important;
     background: rgba(0, 0, 0, 0.2) !important;
-    /* Coherencia con los inputs */
+    
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     color: white;
@@ -594,13 +594,13 @@ main.container {
     color: rgba(255, 255, 255, 0.3);
     text-align: right;
     margin-top: -5px;
-    /* Pegar más al input */
+    
 }
 
 .section-title {
     font-size: 1.2rem;
     margin-bottom: 0;
-    /* Ya lo maneja el gap del glass-panel */
+    
     display: flex;
     align-items: center;
     gap: 12px;
@@ -623,15 +623,15 @@ main.container {
     font-size: 0.8rem;
     color: rgba(255, 255, 255, 0.4);
     margin-top: 0;
-    /* Ya lo maneja el gap del input-field */
+    
     font-style: italic;
 }
 
-/* Actions Footer */
+
 .form-footer-actions {
     display: flex;
     flex-direction: column;
-    /* Apilar en vertical */
+    
     align-items: center;
     justify-content: center;
     gap: 15px;
@@ -651,7 +651,7 @@ main.container {
     background: var(--primary-gradient) !important;
     color: #fff !important;
     padding: 12px 44px;
-    /* Un poco más grande como se solicitó */
+    
     border-radius: 50px;
     font-weight: 700;
     font-size: 15px;
@@ -671,13 +671,13 @@ main.container {
     transform: scale(0.98);
 }
 
-/* Alerts container in Edit Mode */
+
 .alerts-container {
     max-width: 1000px;
     margin: 0 auto 20px auto;
 }
 
-/* Redefining Region Dropdown for this page slightly */
+
 .edit-mode .custom-region-dropdown .region-dropdown-btn {
     height: 52px;
     background: rgba(0, 0, 0, 0.2);
@@ -689,16 +689,16 @@ main.container {
     background: rgba(255, 69, 0, 0.05);
 }
 
-/* ===================================================== */
-/* RESPONSIVE QUERY - 600px (MOBILE) */
-/* ===================================================== */
+
+
+
 
 @media (max-width: 600px) {
-    /* ========================================== */
-    /* 1. SECCIÓN PERFIL (VISTA)                 */
-    /* ========================================== */
+    
+    
+    
 
-    /* Cabecera Apilada */
+    
     .profile-user-info-clean {
         flex-direction: column;
         text-align: center;
@@ -709,7 +709,7 @@ main.container {
 
     .avatar-circle-clean {
         margin: 0 auto;
-        /* Avatar fluido: se achica en 180px */
+        
         width: clamp(70px, 30vw, 100px);
         height: clamp(70px, 30vw, 100px);
         font-size: clamp(1.8rem, 10vw, 2.5rem);
@@ -723,8 +723,8 @@ main.container {
 
     .user-titles h1 {
         justify-content: center;
-        /* SOLUCIÓN: Centrar el flex en el móvil */
-        /* Prevención de desbordamiento de nombre */
+        
+        
         overflow-wrap: break-word;
         word-wrap: break-word;
         hyphens: auto;
@@ -732,9 +732,9 @@ main.container {
         font-size: clamp(1.2rem, 10vw, 1.8rem);
     }
 
-    /* Grid Atómico 3 + 2 (Se ajusta solo por debajo de 600px) */
+    
     .stats-grid {
-        /* Cambio a 1 columna en pantallas ultra-estrechas (< 280px) */
+        
         grid-template-columns: repeat(6, 1fr);
         gap: 8px;
         margin-bottom: 25px;
@@ -753,9 +753,9 @@ main.container {
 
     .stat-crystal {
         padding: clamp(15px, 4vw, 30px) 5px;
-        /* Más aireado como escritorio */
+        
         border-radius: 28px;
-        /* Radio de escritorio */
+        
         gap: 15px;
     }
 
@@ -768,13 +768,13 @@ main.container {
 
     .stat-data h3 {
         font-size: clamp(1.1rem, 6vw, 2.2rem);
-        /* Mínimo más bajo para ahorrar espacio */
+        
         margin-bottom: 5px;
     }
 
     .stat-data p {
         font-size: clamp(4.5px, 2.5vw, 11px);
-        /* Mínimo extremo para 180px */
+        
         letter-spacing: clamp(0px, 0.5vw, 2px);
         text-transform: uppercase;
         white-space: nowrap;
@@ -783,12 +783,12 @@ main.container {
         opacity: 0.85;
     }
 
-    /* Acciones Táctiles en una línea si es posible */
+    
     .profile-actions-main {
         flex-direction: row;
-        /* Intentar fila primero */
+        
         flex-wrap: wrap;
-        /* Pero envolver si es físicamente imposible */
+        
         justify-content: center;
         width: 100%;
         gap: 8px;
@@ -797,25 +797,25 @@ main.container {
     .profile-btn {
         flex: 1;
         min-width: 120px;
-        /* Tamaño mínimo para no romperse */
+        
         white-space: nowrap;
-        /* PROHIBIDO SALTAR DE LÍNEA */
+        
         padding: 12px clamp(10px, 4vw, 15px);
         font-size: clamp(10px, 4vw, 13px);
-        /* Fuente más pequeña para que quepa */
+        
         gap: 8px;
-        /* Espacio más ajustado */
+        
     }
 
     .profile-btn i {
         font-size: clamp(0.9rem, 4vw, 1.1rem);
-        /* Icono proporcional a la frase */
+        
     }
 
-    /* ========================================== */
-    /* 2. SECCIÓN EDITAR PERFIL                  */
-    /* ========================================== */
-    /* Reset total para forzar que nada rompa contenedores */
+    
+    
+    
+    
     * {
         box-sizing: border-box !important;
     }
@@ -838,7 +838,7 @@ main.container {
         font-size: clamp(0.9rem, 4.5vw, 1.1rem);
     }
 
-    /* Layout Global Containers */
+    
     .edit-profile-form {
         gap: 15px;
     }
@@ -848,25 +848,25 @@ main.container {
         gap: 15px;
     }
 
-    /* Mantener estilo estético del ordenador (Paddings y Bordes) */
+    
     .glass-panel {
         padding: clamp(15px, 5vw, 35px);
         gap: clamp(25px, 6vw, 30px);
-        /* Espacio generoso entre grupos */
+        
         width: 100%;
         min-width: 0 !important;
         border-radius: 24px !important;
-        /* Bordes redondeados del escritorio */
+        
     }
 
-    /* Ajustes de Títulos de Sección */
+    
     .section-title {
         font-size: clamp(1.1rem, 5.5vw, 1.2rem);
         padding-bottom: 12px;
         gap: 10px;
     }
 
-    /* Sección Principal (Avatar + Datos) */
+    
     .avatar-edit-wrapper {
         flex-direction: column;
         align-items: center;
@@ -884,7 +884,7 @@ main.container {
         height: clamp(110px, 40vw, 140px);
     }
 
-    /* Campos y Grupos recalibrados */
+    
     .identity-fields {
         width: 100%;
         gap: 12px;
@@ -894,7 +894,7 @@ main.container {
         font-size: clamp(0.85rem, 4vw, 0.95rem);
         gap: 8px;
         margin-bottom: 0 !important;
-        /* Eliminado el margen extra que rompía la jerarquía visual */
+        
     }
 
     .edit-mode .input-group input {
@@ -915,7 +915,7 @@ main.container {
         padding-left: 45px !important;
     }
 
-    /* Password Toggle en móvil */
+    
     .edit-mode .input-group .password-toggle {
         right: 15px;
         font-size: 1.05rem;
@@ -933,7 +933,7 @@ main.container {
         min-width: 0 !important;
     }
 
-    /* Región / Selector (Restaurado estilo premium) */
+    
     .edit-mode .custom-region-dropdown .region-dropdown-btn {
         height: 48px;
         padding: 0 15px 0 45px !important;
@@ -950,7 +950,7 @@ main.container {
         margin-right: 2px;
     }
 
-    /* RESPONSIVE ACCORDION STYLE FOR DROPDOWN (Smoother growth) */
+    
     .region-dropdown-menu {
         position: relative !important;
         top: 0px !important;
@@ -969,7 +969,7 @@ main.container {
 
     .custom-region-dropdown.open .region-dropdown-menu {
         max-height: 500px;
-        /* Más aire para los países */
+        
         opacity: 1;
         visibility: visible;
         transform: translateY(0) !important;
@@ -983,7 +983,7 @@ main.container {
         max-height: 250px;
     }
 
-    /* Botones Adaptables (Recuperado el estilo de ORDERNADOR + Fluidez) */
+    
     .change-photo-btn {
         padding: clamp(6px, 2vw, 8px) clamp(12px, 4vw, 18px);
         font-size: clamp(11px, 3.5vw, 13px);
@@ -1012,7 +1012,7 @@ main.container {
         font-size: 11px;
     }
 
-    /* RESTRICCIÓN TÁCTICA PARA BOTONES DE PERFIL */
+    
     .profile-actions-main {
         display: grid !important;
         grid-template-columns: 1fr 1fr;
@@ -1028,9 +1028,9 @@ main.container {
     }
 }
 
-/* ===================================================== */
-/* ESTRUCTURA DE MODAL SHIORI (RECONSTRUCCIÓN)           */
-/* ===================================================== */
+
+
+
 
 .modal-overlay-shiori {
     position: fixed !important;
@@ -1121,9 +1121,9 @@ main.container {
     background: rgba(255,255,255,0.2);
 }
 
-/* ===================================================== */
-/* DANGER ACTIONS - ACCOUNT TERMINATION (PREMIUM RED)    */
-/* ===================================================== */
+
+
+
 
 .delete-account-shiori-btn {
     background: rgba(255, 77, 77, 0.1) !important;

@@ -64,7 +64,6 @@
     box-shadow: 0 0 15px rgba(255, 69, 0, 0.3);
 }
 
-/* GRID */
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -123,7 +122,6 @@
     transition: var(--transition);
 }
 
-/* EVENTS */
 .event-list {
     display: flex;
     flex-direction: column;
@@ -160,13 +158,11 @@
     box-shadow: 0 0 5px var(--primary);
 }
 
-/* EMPTY DAY */
 .calendar-day.empty {
     opacity: 0.2;
     cursor: default;
 }
 
-/* LOADING OVERLAY */
 .loading-overlay {
     position: absolute;
     top: 0;
@@ -199,7 +195,6 @@
     to { transform: rotate(360deg); }
 }
 
-/* MODAL DE EVENTOS DEL DÍA */
 .day-modal {
     position: fixed;
     top: 0;
@@ -276,7 +271,6 @@
     padding-right: 12px;
 }
 
-/* Scrollbar Sólida y sin flechas estilo Shiori */
 .daily-events-list::-webkit-scrollbar {
     width: 4px;
 }
@@ -291,7 +285,7 @@
 }
 
 .daily-events-list::-webkit-scrollbar-thumb:hover {
-    background: var(--primary); /* Sin cambio al pasar el ratón */
+    background: var(--primary);
 }
 
 .daily-event-card {
@@ -352,7 +346,7 @@
 @media (max-width: 600px) {
     .calendar-grid { 
         grid-template-columns: repeat(7, 1fr); 
-        padding: 8px; /* Slightly tighter than 10 */
+        padding: 8px;
         gap: 4px;
     }
     .calendar-day { min-height: 70px; padding: 5px; }
@@ -363,7 +357,6 @@
 }
 
 @media (max-width: 380px) {
-    /* Specialized for Galaxy Z / Slim phones */
     .calendar-grid { 
         padding: 5px; 
         gap: 3px; 

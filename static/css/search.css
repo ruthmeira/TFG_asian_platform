@@ -6,7 +6,6 @@
     align-items: flex-start;
 }
 
-/* SIDEBAR SHIORI STYLE (Clean List Edition) */
 .classic-sidebar-style {
     width: 280px;
     background: rgba(255, 255, 255, 0.03);
@@ -23,7 +22,6 @@
 
 .sidebar-header-blue {
     background: rgba(255, 255, 255, 0.05);
-    /* No más azul, estilo Shiori */
     padding: 25px 20px;
     color: white;
     display: flex;
@@ -48,7 +46,6 @@
 .sidebar-list-white {
     list-style: none;
     padding: 0;
-    /* Sin huecos laterales */
     margin: 0;
 }
 
@@ -57,7 +54,6 @@
     justify-content: space-between;
     align-items: center;
     padding: 18px 25px;
-    /* Más espacio interno para confort */
     cursor: pointer;
     transition: all 0.2s ease;
     color: rgba(255, 255, 255, 0.6);
@@ -72,14 +68,12 @@
 .sidebar-item:hover {
     background: rgba(255, 255, 255, 0.05);
     color: #fff;
-    /* transform eliminado */
 }
 
 .sidebar-item.active {
     background: var(--primary-gradient);
     color: white;
     font-weight: 700;
-    /* Eliminada la sombra para un look íntegro */
 }
 
 .count-pill {
@@ -112,7 +106,6 @@
     opacity: 1;
 }
 
-/* MAIN CONTENT STYLES */
 .search-results-main {
     flex: 1;
     min-width: 0;
@@ -120,7 +113,6 @@
 
 .search-header-info {
     margin-top: 15px;
-    /* Ajuste preciso para alinear con el texto del sidebar */
 }
 
 .search-header-info h2 {
@@ -134,7 +126,6 @@
     color: var(--primary);
 }
 
-/* --- SEARCH LOADER (Layout ONLY, styles are global) --- */
 .search-loader {
     grid-column: 1 / -1;
     width: 100%;
@@ -152,10 +143,7 @@
 }
 
 
-/* Base styles for people and keywords grid might change later */
 
-/* PERSON CARD STYLES */
-/* PERSON ROW STYLE (Image 10 Match) */
 .person-row-link {
     grid-column: 1 / -1;
     min-width: 0;
@@ -167,7 +155,6 @@
     display: flex;
     align-items: center;
     background: rgba(255, 255, 255, 0.05);
-    /* Color de sección */
     padding: 15px 25px;
     border-radius: 18px;
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -190,10 +177,8 @@
     border: 3px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     background: #1a1a1a;
-    /* Fondo base para placeholders */
 }
 
-/* PLACEHOLDER STYLE (Image 13) */
 .person-placeholder {
     width: 100%;
     height: 100%;
@@ -293,7 +278,6 @@
     flex-shrink: 0;
 }
 
-/* RESPONSIVE DESIGN (600px or less) */
 @media (max-width: 600px) {
     .search-loader {
         height: 250px;
@@ -307,7 +291,6 @@
         width: 100%;
     }
 
-    /*Sidebar estilo Explorar */
     .classic-sidebar-style {
         width: 100%;
         position: relative;
@@ -340,7 +323,6 @@
         text-align: center;
     }
 
-    /* Filas de personas y keywords: sigan siendo 100% */
     #search-results-grid .person-row-link,
     #search-results-grid .keyword-row {
         width: 100% !important;

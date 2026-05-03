@@ -26,7 +26,6 @@
     width: 100%;
 }
 
-/* GRID Y TARJETAS */
 .admin-reviews-grid {
     display: flex;
     flex-direction: column;
@@ -35,7 +34,6 @@
     width: 100%;
 }
 
-/* ESTILOS REPORTE DATA PREMIUM */
 .report-problem-focus {
     flex-shrink: 0;
 }
@@ -106,7 +104,6 @@
     border-top-color: #ffa502;
 }
 
-/* UTILS - MIGRATED FROM INLINE STYLES */
 .report-main-premium {
     padding: 35px;
     width: 100%;
@@ -147,7 +144,6 @@
     padding-right: 20px;
 }
 
-/* DOSSIER AUTOR */
 .author-dossier {
     display: flex;
     justify-content: space-between;
@@ -243,8 +239,6 @@
 }
 
 
-
-/* CUERPO DE LA RESEÑA */
 .comment-bubble {
     background: rgba(0, 0, 0, 0.3);
     padding: 20px;
@@ -263,7 +257,6 @@
     font-size: 0.75rem;
 }
 
-/* SECCIÓN DENUNCIANTES */
 .reporters-section h4 {
     color: #fff;
     font-size: 0.9rem;
@@ -416,7 +409,6 @@
     margin-bottom: 30px;
 }
 
-/* ESTILOS EXPEDIENTE SHIORI (Admin user history) */
 .history-grid {
     display: flex;
     flex-direction: column;
@@ -462,7 +454,6 @@
     line-height: 1;
 }
 
-/* COLORES TÁCTICOS SHIORI */
 .text-success {
     color: #2ed573;
     text-shadow: 0 0 20px rgba(46, 213, 115, 0.3);
@@ -587,7 +578,6 @@
     font-style: italic;
 }
 
-/* PANEL ACCIONES ADMINISTRATIVAS SHIORI */
 .admin-user-actions {
     width: 100%;
     margin-bottom: 40px;
@@ -658,7 +648,6 @@
     background: rgba(255, 71, 87, 0.05);
 }
 
-/* HISTORIAL FORENSE SHIORI */
 .forensic-snapshot {
     background: rgba(255, 255, 255, 0.03);
     border-left: 4px solid #ff4757;
@@ -744,7 +733,6 @@
     margin: 5px 0;
 }
 
-/* --- OPTIMIZACIÓN TÁCTICA SHIORI (600px) --- */
 @media (max-width: 600px) {
     .reputation-summary-card {
         padding: 20px;
@@ -837,7 +825,6 @@
 
     .media-title-link-premium {
         justify-content: flex-start;
-        /* Izquierda en móvil */
     }
 
     .review-target {
@@ -852,7 +839,6 @@
 
     .badge-shiori-media {
         font-size: 0.72rem;
-        /* Miniaturización Shiori */
     }
 
     .review-rating-badge {
@@ -866,7 +852,6 @@
     }
 }
 
-/* --- MODAL DE CONFIRMACIÓN SHIORI (CLON DE ÉLITE) --- */
 .shiori-confirm-overlay {
     position: fixed;
     top: 0;
@@ -980,7 +965,6 @@
     color: #1e90ff !important;
 }
 
-/* NAVEGACIÓN ADMINISTRATIVA SHIORI */
 .admin-reviews-page .prime-header-actions {
     justify-content: center;
     margin-top: 25px;
@@ -1007,7 +991,6 @@
     transform: translateY(-2px);
 }
 
-/* BUSCADOR DE LA CÁRCEL (CLON HOME) */
 #prison-search-input {
     flex: 1;
     background: transparent;
@@ -1023,7 +1006,6 @@
     color: rgba(255, 255, 255, 0.3);
 }
 
-/* REJILLA DE BANEADOS (PRISON) */
 .banned-users-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -1150,7 +1132,6 @@
     margin-bottom: 20px;
 }
 
-/* BOTÓN DE REPORTE DE DATOS (Ficha Media) */
 .btn-report-data-premium {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1175,7 +1156,6 @@
     transform: translateY(-2px);
 }
 
-/* --- NAVEGACIÓN PANEL ADMINISTRACIÓN (TABS) --- */
 .admin-nav-tabs {
     display: flex;
     gap: 15px;
@@ -1269,17 +1249,14 @@
     min-height: 220px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
     border-top: 4px solid #ffa502;
-    /* Borde naranja por defecto (pendiente) */
 }
 
 .report-card.movie {
     border-top-color: #ff4757;
-    /* Rojo para películas */
 }
 
 .report-card.tv {
     border-top-color: #1e90ff;
-    /* Azul para series */
 }
 
 

@@ -1,7 +1,3 @@
-/* ===================================================== */
-/* HOME PAGE - ESTILOS MODULARES (Exclusivos)           */
-/* ===================================================== */
-
 .content-section {
     margin-bottom: 30px;
 }
@@ -14,7 +10,6 @@
     margin-bottom: 0px;
 }
 
-/* FILTER BUTTONS (Exclusivo Home) */
 .filter-controls {
     display: flex;
     gap: 12px;
@@ -33,7 +28,7 @@
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    white-space: nowrap; /* Prohibido romperse */
+    white-space: nowrap;
 }
 
 .filter-btn:hover {
@@ -50,7 +45,6 @@
     box-shadow: 0 5px 15px rgba(255, 69, 0, 0.3);
 }
 
-/* CAROUSEL LOADER (Matrix Animation - Layout ONLY) */
 .carousel-loader {
     width: 100%;
     height: 350px;
@@ -74,4 +68,4 @@
         width: auto !important;
         min-width: 100px;
     }
-}
+}

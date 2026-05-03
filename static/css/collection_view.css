@@ -1,17 +1,10 @@
-/* ===================================================== */
-/* COLLECTION VIEW - PROFESSIONAL NETFLIX-STYLE GRID   */
-/* ===================================================== */
-
-/* 1. CONTAINER & WRAPPERS */
 .cast-page-container {
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
-    /* fadeIn removed to match Home parity */
 }
 
-/* Forzar que el contenedor global de base.html se abra en esta página */
 .container {
     width: 100% !important;
     max-width: 100% !important;
@@ -19,7 +12,6 @@
     min-height: 80vh;
 }
 
-/* 2. HEADER STYLES */
 .cast-header-wrapper {
     margin-bottom: 20px;
     padding: 0;
@@ -48,16 +40,13 @@
     opacity: 0.8;
 }
 
-/* 3. GRID SYSTEM & DYNAMICS */
 .collection-grid-premium {
     display: grid !important;
     width: 100% !important;
     margin-bottom: 20px;
 }
 
-/* Card Architecture is now global in style.css */
 
-/* 7. PAGINATION */
 .pagination-controls-numbers {
     display: flex;
     justify-content: center;
@@ -95,7 +84,6 @@
     box-shadow: 0 5px 15px rgba(255, 69, 0, 0.3);
 }
 
-/* 8. EMPTY STATE */
 .empty-msg-collection-premium {
     text-align: center;
     padding: 100px 20px;
@@ -113,7 +101,6 @@
     opacity: 0.5;
 }
 
-/* 9. MEDIA QUERIES (RESPONSIVE) */
 @media (max-width: 600px) {
     .container {
         padding: 20px 15px !important;
@@ -121,7 +108,6 @@
 
     .cast-main-header {
         flex-direction: column;
-        /* Apilamos flecha y título */
         align-items: center;
         text-align: center;
         gap: 15px;
@@ -133,7 +119,6 @@
 
     .cast-title {
         font-size: 1.8rem;
-        /* Tamaño más cómodo para móvil */
         line-height: 1.2;
     }
 
@@ -141,20 +126,16 @@
         font-size: 14px;
     }
 
-    /* Ajuste de Paginación para móviles */
     .pagination-controls-numbers {
         gap: 6px !important;
-        /* Menos espacio entre botones */
     }
 
     .page-number,
     .page-btn-nav {
         width: 32px !important;
-        /* Botones más compactos */
         height: 32px !important;
         font-size: 13px !important;
         border-radius: 8px !important;
     }
 }
 
-/* View-specific animations removed in favor of global style.css */

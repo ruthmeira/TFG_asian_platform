@@ -1,6 +1,6 @@
-/* ===================================================== */
-/* VARIABLES & RESET */
-/* ===================================================== */
+
+
+
 
 :root {
     --primary: #ff4500;
@@ -16,11 +16,10 @@
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ===================================================== */
-/* GLOBAL RENDER STABILITY SHIELD (Anti-Ghosting)      */
-/* ===================================================== */
-/* Blindaje maestro para evitar fallos de repintado en elementos críticos. 
-   Usamos selectores específicos para no romper transformaciones especiales. */
+
+
+
+
 .navbar,
 .modal-content,
 .modal-overlay,
@@ -44,20 +43,20 @@
     box-sizing: border-box;
 }
 
-/* ===================================================== */
-/* PREMIUM GLOBAL ANIMATIONS (Motor Principal) */
-/* ===================================================== */
+
+
+
 @keyframes zoomInBounce {
     0% {
         opacity: 0;
         transform: scale(0.9);
-        /* Inicio suave desde 0.9 */
+        
     }
 
     80% {
         opacity: 0.95;
         transform: scale(1.01);
-        /* Pequeño rebote */
+        
     }
 
     100% {
@@ -66,13 +65,13 @@
     }
 }
 
-/* ===================================================== */
-/* GLOBAL MATRIX (RAIN) EFFECT Logic                     */
-/* ===================================================== */
+
+
+
 .matrix-container {
     position: absolute;
     top: -50px;
-    /* Offset para que la lluvia nazca desde arriba */
+    
     left: 0;
     width: 100%;
     height: 125%;
@@ -125,9 +124,9 @@
     }
 }
 
-/* ===================================================== */
-/* GLOBAL LOADERS (Matrix & Shimmer Effect)              */
-/* ===================================================== */
+
+
+
 .shimmer-text {
     font-family: 'Outfit', sans-serif;
     font-size: clamp(0.7rem, 8vw, 1.4rem);
@@ -180,7 +179,7 @@
     position: relative;
 }
 
-/* Global Navigation Progress Bar */
+
 .loader-bar {
     position: fixed;
     top: 0;
@@ -215,7 +214,7 @@ body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
-    /* Evitar scroll horizontal */
+    
     -webkit-text-size-adjust: 100%;
 }
 
@@ -238,12 +237,12 @@ main {
     min-height: 80vh;
 }
 
-/* Utilities */
+
 .hidden {
     display: none !important;
 }
 
-/* Global Empty States / No Info */
+
 .no-platforms {
     font-size: 0.9rem;
     color: var(--text-muted);
@@ -259,9 +258,9 @@ main {
     color: var(--text-muted);
 }
 
-/* ===================================================== */
-/* BOTONES DE REDES SOCIALES (Global) */
-/* ===================================================== */
+
+
+
 .social-btn {
     color: var(--text-muted);
     text-decoration: none;
@@ -284,9 +283,9 @@ main {
     transform: translateY(-3px);
 }
 
-/* ===================================================== */
-/* BOTONES DE ACCIÓN (Ver más / Filmografía) */
-/* ===================================================== */
+
+
+
 .btn-more {
     background: rgba(255, 69, 0, 0.08);
     border: 1px solid var(--primary);
@@ -317,7 +316,7 @@ main {
     margin-bottom: 20px;
 }
 
-/* Modal Tráiler (Global) */
+
 .trailer-modal {
     position: fixed;
     top: 0;
@@ -402,9 +401,9 @@ main {
     height: 100%;
 }
 
-/* ===================================================== */
-/* NAVBAR (Glassmorphism & Sticky) */
-/* ===================================================== */
+
+
+
 
 .navbar {
     position: sticky;
@@ -439,7 +438,7 @@ main {
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
-    /* Enlaces a la derecha en escritorio */
+    
     align-items: center;
     gap: 20px;
 }
@@ -486,7 +485,7 @@ main {
     display: flex;
     align-items: center;
     gap: 10px;
-    /* Reducción táctica para que quepa todo */
+    
 }
 
 .nav-links a {
@@ -499,7 +498,7 @@ main {
     align-items: center;
     gap: 5px;
     white-space: nowrap;
-    /* PROHIBIDO ROMPERSE EN DOS LÍNEAS */
+    
 }
 
 .nav-links a:hover,
@@ -517,7 +516,7 @@ main {
     display: flex;
     align-items: center;
     gap: 8px;
-    /* Espacio entre icono y texto */
+    
     transition: transform 0.2s ease;
 }
 
@@ -525,12 +524,12 @@ main {
     transform: scale(1.05);
 }
 
-/* ===================================================== */
-/* FOOTER SIMPLE */
-/* ===================================================== */
 
 
-/* Alerts (Flash Messages) - Premium Unified System */
+
+
+
+
 .alert-success,
 .alert-error {
     padding: 12px 18px;
@@ -563,9 +562,9 @@ main {
 }
 
 
-/* ===================================================== */
-/* PRIME PAGE HEADER (Unified Premium System) */
-/* ===================================================== */
+
+
+
 .prime-header {
     margin-bottom: clamp(10px, 1.5vw, 20px);
     display: flex;
@@ -575,7 +574,7 @@ main {
     padding-bottom: 25px;
     width: 100%;
     gap: 20px;
-    /* Evitar colisión entre texto y botones */
+    
 }
 
 .prime-header.no-border {
@@ -590,7 +589,7 @@ main {
     text-align: left;
     flex: 1;
     min-width: 0;
-    /* Permitir que el texto se ajuste si es necesario */
+    
 }
 
 .prime-title {
@@ -620,7 +619,7 @@ main {
     align-items: center;
     gap: 12px;
     flex-shrink: 0;
-    /* Impedir que los botones se encojan */
+    
 }
 
 @media (max-width: 750px) {
@@ -644,9 +643,9 @@ main {
 }
 
 
-/* ===================================================== */
-/* CONTENT SECTIONS */
-/* ===================================================== */
+
+
+
 
 .content-section {
     margin-bottom: 60px;
@@ -658,18 +657,18 @@ main {
     font-weight: 600;
 }
 
-/* ===================================================== */
-/* GLOBAL CARDS (Coherencia Total) */
-/* ===================================================== */
-/* ESTANDARIZACIÓN TOTAL DE TARJETAS (Global) */
+
+
+
+
 .card-link {
     width: 175px;
-    /* ANCHO ESTÁNDAR DESKTOP */
+    
     flex: 0 0 auto;
     display: block;
     text-decoration: none;
     color: inherit;
-    /* EFECTO PREMIUM GLOBAL (Versión Suave de Home) */
+    
     animation: zoomInBounce 0.5s cubic-bezier(0.2, 1.0, 0.3, 1) backwards;
     transition: var(--transition);
     transform-origin: center;
@@ -684,9 +683,9 @@ main {
     position: relative;
     flex: 0 0 auto;
     width: 100%;
-    /* FLEXIBILIDAD TOTAL */
+    
     max-width: 175px;
-    /* TOPE DE ANCHO */
+    
     background: var(--bg-card);
     border-radius: 12px;
     overflow: hidden;
@@ -703,7 +702,7 @@ main {
     transition: var(--transition);
 }
 
-/* INTERACCIÓN GLOBAL PREMUM */
+
 .card-link:hover .card {
     transform: translateY(-8px);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
@@ -723,11 +722,11 @@ main {
 .card-body h4 {
     margin: 0 0 6px 0;
     font-size: clamp(12px, 1.1vw, 15px);
-    /* Fuente fluida adaptativa */
+    
     font-weight: 600;
     line-height: 1.3;
     color: #fff;
-    /* UNA SOLA LÍNEA REGLAMENTARIA */
+    
     display: -webkit-box;
     -webkit-line-clamp: 1;
     line-clamp: 1;
@@ -743,7 +742,7 @@ main {
     color: var(--text-muted);
     font-weight: 400;
     line-height: 1.2;
-    /* UNA SOLA LÍNEA REGLAMENTARIA */
+    
     display: -webkit-box;
     -webkit-line-clamp: 1;
     line-clamp: 1;
@@ -805,9 +804,9 @@ main {
     text-transform: uppercase;
 }
 
-/* ===================================================== */
-/* GLOBAL COMPONENTS (Shared across pages) */
-/* ===================================================== */
+
+
+
 
 .section-header {
     display: flex;
@@ -844,9 +843,9 @@ main {
 }
 
 
-/* ===================================================== */
-/* NAVIGATION LINKS (Shared) */
-/* ===================================================== */
+
+
+
 .back-link-premium {
     display: inline-flex;
     align-items: center;
@@ -870,26 +869,26 @@ main {
     font-size: 14px;
 }
 
-/* ===================================================== */
-/* CARD LINKS */
-/* ===================================================== */
 
 
-/* ===================================================== */
-/* PREMIUM MEDIA CAROUSEL (Global) */
-/* ===================================================== */
+
+
+
+
+
+
 .media-carousel {
     display: flex;
     overflow-x: auto;
     overflow-y: hidden;
     gap: 10px;
     padding: 20px 0 15px 5px;
-    /* Distancia original recuperada */
+    
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
 }
 
-/* Scrollbar Premium Global (Look Original Recuperado) */
+
 .media-carousel::-webkit-scrollbar {
     height: 6px;
 }
@@ -899,7 +898,7 @@ main {
     border-radius: 10px;
 }
 
-/* Cascada de animación Global para Carruseles (Tiempos de Home) */
+
 .media-carousel .card-link:nth-child(1) {
     animation-delay: 0.05s;
 }
@@ -924,7 +923,7 @@ main {
     animation-delay: 0.3s;
 }
 
-/* Cascada de animación para Rejillas (View Collection) */
+
 .collection-grid-premium .card-link:nth-child(1) {
     animation-delay: 0.05s;
 }
@@ -962,17 +961,17 @@ main {
 }
 
 
-/* CERO EFECTOS PARA ACTUALIZACIONES AJAX (Instantáneo) */
+
 .ajax-update .card-link {
     animation: none !important;
 }
 
 
-/* Footer Unified */
 
-/* ===================================================== */
-/* FOOTER SIMPLE (Global) */
-/* ===================================================== */
+
+
+
+
 .footer {
     width: 100%;
     background: #1a1715;
@@ -1012,14 +1011,14 @@ main {
     line-height: 1.6;
 }
 
-/* ===================================================== */
-/* MEDIA QUERIES (Responsive) */
-/* ===================================================== */
+
+
+
 
 @media (max-width: 750px) {
     .navbar {
         padding: 15px 15px;
-        /* Consistent alignment with container */
+        
     }
 
     .navbar-wrapper {
@@ -1032,7 +1031,7 @@ main {
 
     .nav-links {
         display: none;
-        /* Oculto por defecto en móvil */
+        
         width: 100%;
         background: transparent;
         backdrop-filter: none;
@@ -1051,13 +1050,13 @@ main {
 
     .nav-links.active {
         display: flex;
-        /* Se muestra y ocupa espacio físico */
+        
         opacity: 1;
     }
 
     .navbar-wrapper {
         flex-wrap: wrap;
-        /* Permite que el menú baje a la siguiente línea */
+        
     }
 
     .nav-links a {
@@ -1092,7 +1091,7 @@ main {
         justify-content: center !important;
     }
 
-    /* OPTIMIZACIÓN SELECTIVA DE SCROLL (SIN ROMPER RENDERIZADO) */
+    
     .media-carousel,
     .cast-scroll-container,
     .known-for-grid,
@@ -1150,13 +1149,13 @@ main {
     text-decoration: none !important;
 }
 
-/* ===================================================== */
-/* SCROLL TO TOP BUTTON (Global Utility) */
-/* ===================================================== */
 
-/* ===================================================== */
-/* GLOBAL CUSTOM REGION DROPDOWN (Perfect Version)       */
-/* ===================================================== */
+
+
+
+
+
+
 .custom-region-dropdown {
     position: relative;
     width: 100%;
@@ -1388,7 +1387,7 @@ main {
     transform: translateY(0);
 }
 
-/* Response adjustment */
+
 @media (max-width: 750px) {
     .scroll-to-top {
         bottom: 20px;
@@ -1398,9 +1397,9 @@ main {
     }
 }
 
-/* ===================================================== */
-/* REGION SELECTOR FLAGS (GLOBAL)                        */
-/* ===================================================== */
+
+
+
 .flag {
     font-family: "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif !important;
     font-size: 1.3rem;
@@ -1410,10 +1409,10 @@ main {
     vertical-align: middle;
 }
 
-/* ===================================================== */
-/* GLOBAL PROVIDER ICONS OVERRIDES                       */
-/* ===================================================== */
-/* Scale horizontal logos for better legibility */
+
+
+
+
 div[data-id="344"] svg,
 div[data-provider-id="344"] svg,
 div[data-id="1773"] svg,
@@ -1421,13 +1420,13 @@ div[data-provider-id="1773"] svg {
     transform: scale(1.3);
 }
 
-/* Hover effects for all provider circles */
+
 .platform-circle:hover svg,
 .platform-circle-detail:hover svg {
     transform: scale(1.1);
 }
 
-/* Specific hover for the horizontal ones */
+
 div[data-id="344"]:hover svg,
 div[data-provider-id="344"]:hover svg,
 div[data-id="1773"]:hover svg,
@@ -1435,9 +1434,9 @@ div[data-provider-id="1773"]:hover svg {
     transform: scale(1.4);
 }
 
-/* ===================================================== */
-/* GLOBAL GRID MOTOR (Search & Collections)              */
-/* ===================================================== */
+
+
+
 .search-grid,
 .collection-grid,
 .collection-grid-premium {
@@ -1463,8 +1462,8 @@ div[data-provider-id="1773"]:hover svg {
     grid-template-columns: 1fr;
 }
 
-/* GLOBAL HERO SEARCH BAR (Home & Search)                */
-/* ===================================================== */
+
+
 
 .home-hero-search {
     width: 100%;
@@ -1474,7 +1473,7 @@ div[data-provider-id="1773"]:hover svg {
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     padding: 15px 0;
     margin: -15px -15px 25px -15px;
-    /* Pull up to stick and give space below */
+    
     width: calc(100% + 30px);
     display: flex;
     justify-content: center;
@@ -1568,9 +1567,9 @@ div[data-provider-id="1773"]:hover svg {
     }
 }
 
-/* ===================================================== */
-/* SHIORI GLOBAL CONFIRMATION & REPORT MODAL SYSTEM      */
-/* ===================================================== */
+
+
+
 .shiori-confirm-overlay {
     position: fixed;
     top: 0;

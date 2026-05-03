@@ -1,10 +1,8 @@
 .cast-page-container {
     margin-bottom: 20px;
     width: 100%;
-    /* Eliminada la animación de entrada global para que resalten las tarjetas */
 }
 
-/* Headers unified in style.css */
 
 .collection-section {
     margin-bottom: clamp(40px, 6vw, 65px);
@@ -37,7 +35,6 @@
     font-weight: 400;
 }
 
-/* Empty state premium */
 .empty-msg-collection {
     color: var(--text-muted);
     padding: 40px;
@@ -58,19 +55,14 @@
     opacity: 0.2;
 }
 
-/* Carousels now use global .media-carousel in style.css */
 
-/* Card styles and entrance animations now handled globally in style.css */
 
-/* REPARTO / SEASON LINK HARMONIZATION */
 .view-all-link {
     font-size: clamp(0.55rem, 3.5vw, 0.9rem);
-    /* Fluidez total para que no empuje */
     font-weight: 600;
 }
 
 @media (max-width: 600px) {
-    /* Matching Home section titles */
     .section-title {
         font-size: clamp(0.65rem, 5vw, 1.25rem) !important;
         white-space: nowrap;

@@ -1,6 +1,6 @@
-/* ===================================================== */
-/* PERSON DETAIL - CLEANED & OPTIMIZED */
-/* ===================================================== */
+
+
+
 
 .person-detail-container {
     max-width: 100%;
@@ -48,7 +48,7 @@
     font-size: 8rem;
 }
 
-/* Redes Sociales */
+
 .person-socials {
     display: flex;
     justify-content: center;
@@ -71,7 +71,7 @@
     display: none !important;
 }
 
-/* Report Button Container */
+
 .person-report-container {
     width: 100%;
     margin-top: -2px;
@@ -86,7 +86,7 @@
     height: 42px;
 }
 
-/* Info Sidebar */
+
 .person-info-sidebar h3 {
     margin-top: 0;
     font-size: 1.2rem;
@@ -126,7 +126,7 @@
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Contenido Derecha */
+
 .person-content-side {
     flex: 1;
     display: flex;
@@ -153,10 +153,10 @@
 .known-for-section h2 {
     font-size: 1.5rem;
     color: var(--primary);
-    /* Título en Naranja global */
+    
     font-weight: 700;
     margin-bottom: 20px;
-    /* Un poco más de aire con las cards */
+    
     margin-top: 0;
     text-align: center;
 }
@@ -192,22 +192,22 @@
     width: 100%;
 }
 
-/* ===================================================== */
-/* RESPONSIVE DESIGN (Móvil hasta 600px) */
-/* ===================================================== */
+
+
+
 @media (max-width: 600px) {
     .person-detail-container {
         flex-direction: column;
         gap: 25px;
     }
 
-    /* El truco de contents para reordenar piezas aisladas */
+    
     .person-poster-side,
     .person-content-side {
         display: contents;
     }
 
-    /* ORDEN MAESTRO POR PIEZAS */
+    
     .person-photo {
         order: 1;
         max-width: clamp(200px, 60vw, 250px);
@@ -225,7 +225,7 @@
         width: 100%;
         display: flex;
         justify-content: center;
-        margin-top: -8px; /* Pegado a las redes */
+        margin-top: -8px; 
         margin-bottom: 10px;
     }
 
@@ -273,7 +273,7 @@
     }
 
 
-    /* CENTRADO DE TÍTULOS NECESARIOS EN MÓVIL */
+    
     .biography-section h2,
     .person-info-sidebar h3 {
         text-align: center;
@@ -293,9 +293,9 @@
     }
 }
 
-/* ===================================================== */
-/* PROJECTS LOADER (Identical to Home Carousel Loader) */
-/* ===================================================== */
+
+
+
 .projects-loader {
     width: 100%;
     height: 350px;
@@ -367,7 +367,7 @@
     }
 }
 
-/* Fallback Proyectos Vacíos */
+
 .no-projects-msg {
     width: 100%;
     max-width: 800px;

@@ -1,7 +1,3 @@
-/* ===================================================== */
-/* EXPLORE PAGE - ESTILOS MODULARES */
-/* ===================================================== */
-
 .explore-container {
     display: flex;
     gap: 40px;
@@ -10,13 +6,11 @@
     margin-bottom: 20px;
 }
 
-/* Sidebar de Filtros */
 .filter-sidebar {
     flex: 0 0 325px;
     background: rgba(20, 20, 20, 0.6);
     padding: clamp(20px, 3vw, 35px) 25px;
     padding-right: 15px;
-    /* Más espacio para el scrollbar */
     border-radius: 28px;
     position: sticky;
     top: 100px;
@@ -26,28 +20,22 @@
     max-height: calc(100vh - 140px);
     overflow-y: auto;
     overflow-x: hidden;
-    /* Evitar saltos horizontales */
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
 }
 
-/* Scrollbar Premium Inset (Metido dentro) */
 .filter-sidebar::-webkit-scrollbar {
     width: 10px;
-    /* Un poco más ancho para el padding interno */
 }
 
 .filter-sidebar::-webkit-scrollbar-track {
     background: transparent;
-    /* Carril invisible, como quieres */
     margin: 15px 0;
 }
 
 .filter-sidebar::-webkit-scrollbar-thumb {
     background: var(--primary);
-    /* Naranja puro y sólido */
     background-clip: padding-box;
     border: 2px solid transparent;
-    /* Reduzco un poco el margen para que se vea más sólida */
     border-radius: 12px;
 }
 
@@ -96,7 +84,6 @@
     width: 100%;
     padding: 14px 18px;
     background: rgba(0, 0, 0, 0.4);
-    /* Fondo más profundo */
     border: 1px solid rgba(255, 255, 255, 0.08);
     color: white;
     border-radius: 14px;
@@ -109,11 +96,9 @@
     outline: none;
     border-color: var(--primary) !important;
     background: #2a1a15 !important;
-    /* Brillo interior de Auth/Profile */
     box-shadow: 0 0 15px rgba(255, 69, 0, 0.15) !important;
 }
 
-/* Quitar flechas del input de año */
 .no-spin::-webkit-inner-spin-button,
 .no-spin::-webkit-outer-spin-button {
     -webkit-appearance: none;
@@ -125,7 +110,6 @@
     appearance: none;
 }
 
-/* Excepción para el buscador de regiones: SIN brillo ni fondo */
 #region-search-input:focus {
     background: transparent !important;
     box-shadow: none !important;
@@ -133,13 +117,11 @@
 }
 
 
-/* Regiones sincronizadas con el estilo global */
 .custom-region-dropdown {
     width: 100%;
     margin: 10px 0 25px 0;
 }
 
-/* Chips de Género */
 .genre-collapsible-btn {
     width: 100%;
     background: rgba(0, 0, 0, 0.3);
@@ -199,7 +181,6 @@
     border-color: transparent;
 }
 
-/* Keyword Tagging */
 .keyword-tags-container {
     display: flex;
     flex-wrap: wrap;
@@ -222,7 +203,6 @@
     color: white;
 }
 
-/* Resultados */
 .explore-results {
     flex: 1;
 }
@@ -250,13 +230,11 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
     font-size: 1.4rem;
-    /* Reducción de tamaño para elegancia */
     font-weight: 900;
     margin-right: 5px;
 }
 
 
-/* Platforms Redesign in Sidebar */
 .platform-circles-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -294,7 +272,6 @@
     max-width: 45px;
 }
 
-/* PAGINACIÓN POR NÚMEROS */
 .pagination-controls-numbers {
     display: none;
     justify-content: center;
@@ -345,7 +322,6 @@
 }
 
 
-/* Keyword Tagging */
 .keyword-tags-container {
     display: flex;
     flex-wrap: wrap;
@@ -444,9 +420,7 @@
     color: var(--primary);
 }
 
-/* ===================================================== */
-/* RESPONSIVE: MOBILE (600px) */
-/* ===================================================== */
+
 @media (max-width: 600px) {
     .explore-container {
         flex-direction: column;
@@ -457,7 +431,6 @@
         flex: 1 1 auto;
         width: 100%;
         position: relative;
-        /* Quitar sticky */
         top: 0;
         max-height: none;
         padding: 25px 20px;
@@ -483,9 +456,7 @@
     }
 }
 
-/* ===================================================== */
-/* AUTO-LOAD PAUSE BUTTON (Filmografía Style) */
-/* ===================================================== */
+
 .load-more-wrapper {
     display: none;
     justify-content: center;
