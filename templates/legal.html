@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - SHIORI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/legal.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="legal-container">
+    <div class="legal-header">
+        <h1 class="legal-title">{{ title }}</h1>
+        <p class="legal-last-updated">Última actualización: 3 de mayo, 2026</p>
+    </div>
+
+    <div class="legal-content">
+        {% block legal_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %}

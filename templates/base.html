@@ -78,12 +78,48 @@
     </main>
 
     
-    <footer class="footer">
-        <div class="footer-simple">
-            <div class="logo">
-                SHIORI
+    <footer class="shiori-footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <!-- Branding & About -->
+                <div class="footer-column branding">
+                    <h2 class="footer-logo">SHIORI</h2>
+                    <p class="footer-tagline">Tu portal definitivo para el entretenimiento asiático. Explora, organiza y mantente al día con tus dramas, películas y programas favoritos.</p>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="footer-column">
+                    <h3 class="footer-title">Plataforma</h3>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('home') }}">Inicio</a></li>
+                        <li><a href="{{ url_for('explore') }}">Explorar Contenido</a></li>
+                        <li><a href="{{ url_for('calendar_view') }}">Calendario de Estrenos</a></li>
+                        <li><a href="{{ url_for('collections') }}">Mis Colecciones</a></li>
+                    </ul>
+                </div>
+
+                <!-- Support & Legal -->
+                <div class="footer-column">
+                    <h3 class="footer-title">Comunidad</h3>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('legal_pages', type='terms') }}">Términos de Uso</a></li>
+                        <li><a href="{{ url_for('legal_pages', type='privacy') }}">Política de Privacidad</a></li>
+                        <li><a href="{{ url_for('legal_pages', type='cookies') }}">Cookies</a></li>
+                        <li><a href=" {{ url_for('legal_pages', type='contact') }} ">Contacto</a></li>
+                    </ul>
+                </div>
+
+                <!-- TMDB Attribution -->
+                <div class="footer-column tmdb-attribution">
+                    <h3 class="footer-title">Fuente</h3>
+                    <img src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_2-d537fb228cf3ded904ef09b136fe3fec72548ebc1fea3fbbd1ad9e36364db38b.svg" alt="TMDB Logo" class="tmdb-logo">
+                    <p class="tmdb-text">Este producto utiliza la API de TMDB pero no está respaldado ni certificado por TMDB.</p>
+                </div>
             </div>
-            <p>&copy; 2026 SHIORI - Tu Crónica Asiática. Hecho con ❤️ para los fans de Asia.</p>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 SHIORI. Todos los derechos reservados.</p>
+            </div>
         </div>
     </footer>
 
