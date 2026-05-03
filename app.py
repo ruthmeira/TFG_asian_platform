@@ -237,14 +237,21 @@ def process_watch_providers(providers_data, region):
     return watch_providers
 
 app = Flask(__name__)
-load_dotenv()
+load_dotenv(override=True)
 
 # Permitir HTTP local para OAuth (Google permite localhost)
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost:3306/asian_platform'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+# Corrección obligatoria para Supabase (PostgreSQL)
+if app.config['SQLALCHEMY_DATABASE_URI'] and app.config['SQLALCHEMY_DATABASE_URI'].startswith("postgres://"):
+    app.config['SQLALCHEMY_DATABASE_URI'] = app.config['SQLALCHEMY_DATABASE_URI'].replace("postgres://", "postgresql://", 1)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'secret_key')
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "pool_pre_ping": True,
+    "pool_recycle": 300,
+}
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 # --- CONFIGURACIÓN DE CORREO GMAIL ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -618,7 +625,7 @@ def get_top_20(api_key, media_type, time_window):
                     summary['type'] = api_media_type # Aseguramos el tipo para el enlace
                     final_list.append(summary)
                     seen_ids.add(item_id)
-                    print(f"✅ Top {media_type} [Summary]: {summary['title']} [{summary['flag']}]")
+                    print(f"Top {media_type} [Summary]: {summary['title']} [{summary['flag']}]")
                 
                 if len(final_list) >= 20: break
         page += 1
@@ -632,20 +639,20 @@ def refresh_trending_cache(window):
     """
     api_key = os.getenv("TMDB_API_KEY")
     if not api_key:
-        print(f"❌ Error: TMDB_API_KEY no encontrada al refrescar caché {window}")
+        print(f"Error: TMDB_API_KEY no encontrada al refrescar cache {window}")
         return
 
-    print(f"🔄 [BACKGROUND] Refrescando caché de {window} con TMDB...")
+    print(f"[BACKGROUND] Refrescando cache de {window} con TMDB...")
     try:
         api_cache[window]['series'] = get_top_20(api_key, 'tv', window)
         api_cache[window]['movies'] = get_top_20(api_key, 'movie', window)
         api_cache[window]['shows'] = get_top_20(api_key, 'show', window)
         api_cache[window]['last_updated'] = time.time()
         # Log más detallado para confirmar el reemplazo de datos
-        print(f"✅ [BACKGROUND] Caché {window} reemplazada con éxito con 20 nuevos items por categoría.")
-        print(f"⏰ Próxima actualización programada según intervalo.")
+        print(f"[BACKGROUND] Cache {window} reemplazada con exito con 20 nuevos items por categoria.")
+        print(f"Proxima actualizacion programada segun intervalo.")
     except Exception as e:
-        print(f"❌ [BACKGROUND] Error al refrescar caché {window}: {e}")
+        print(f"[BACKGROUND] Error al refrescar cache {window}: {e}")
 
 # --- INICIALIZACIÓN DEL PLANIFICADOR (SCHEDULER) ---
 # Usamos misfire_grace_time=300 (5 min) para que si el servidor está ocupado, el job se ejecute aunque se pase unos minutos
