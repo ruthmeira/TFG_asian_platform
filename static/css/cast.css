@@ -39,7 +39,7 @@
     align-items: flex-start;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 750px) {
     .cast-columns-container {
         grid-template-columns: 1fr;
         gap: 30px;
@@ -209,7 +209,7 @@
     }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 750px) {
     .cast-full-section .section-title {
         cursor: pointer;
     }

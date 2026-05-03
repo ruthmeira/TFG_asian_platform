@@ -733,7 +733,7 @@
     margin: 5px 0;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 750px) {
     .reputation-summary-card {
         padding: 20px;
         border-radius: 25px;

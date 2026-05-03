@@ -421,7 +421,7 @@
 }
 
 
-@media (max-width: 600px) {
+@media (max-width: 750px) {
     .explore-container {
         flex-direction: column;
         gap: 25px;

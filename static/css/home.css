@@ -59,7 +59,8 @@
     border: 1.5px solid rgba(255, 69, 0, 0.3);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 750px) {
+    .prime-header { margin-top: 20px; }
     .carousel-loader { height: 250px; }
     .filter-controls { justify-content: center; flex-wrap: wrap; width: 100%; gap: 10px; }
     .filter-btn { 

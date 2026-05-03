@@ -343,7 +343,7 @@
     .calendar-day { padding: 8px; min-height: 100px; }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 750px) {
     .calendar-grid { 
         grid-template-columns: repeat(7, 1fr); 
         padding: 8px;

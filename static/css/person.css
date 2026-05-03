@@ -195,7 +195,7 @@
 
 
 
-@media (max-width: 600px) {
+@media (max-width: 750px) {
     .person-detail-container {
         flex-direction: column;
         gap: 25px;

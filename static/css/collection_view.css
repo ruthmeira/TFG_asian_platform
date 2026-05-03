@@ -101,7 +101,7 @@
     opacity: 0.5;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 750px) {
     .container {
         padding: 20px 15px !important;
     }

@@ -62,7 +62,7 @@
     font-weight: 600;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 750px) {
     .section-title {
         font-size: clamp(0.65rem, 5vw, 1.25rem) !important;
         white-space: nowrap;
