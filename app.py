@@ -1617,6 +1617,7 @@ def admin_toggle_ban(user_id):
         try:
             ReviewVote.query.filter_by(user_id=user_id).delete()
             ReviewReport.query.filter_by(user_id=user_id).delete()
+            MediaReport.query.filter_by(user_id=user_id).delete()
             
             CollectionItem.query.filter_by(user_id=user_id).delete(synchronize_session=False)
             
@@ -1694,6 +1695,7 @@ def delete_account():
         
         ReviewVote.query.filter_by(user_id=user_id).delete()
         ReviewReport.query.filter_by(user_id=user_id).delete()
+        MediaReport.query.filter_by(user_id=user_id).delete()
         
         user_reviews = Review.query.filter_by(user_id=user_id).all()
         for r in user_reviews:

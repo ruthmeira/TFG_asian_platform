@@ -198,7 +198,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const isAction = !href || href.startsWith('#') || href.startsWith('javascript:');
         const isDownload = link.hasAttribute('download');
 
-        if (target === '_blank' || isExternal || isAction || isDownload) {
+        if (target === '_blank' || isExternal || isAction || isDownload || link.classList.contains('no-loader')) {
             return;
         }
 

@@ -8,7 +8,7 @@
 <div class="explore-container">
     <aside class="filter-sidebar">
         <h3><i class="fas fa-sliders-h"></i> Filtros</h3>
-        <form action="{{ url_for('explore') }}" method="GET">
+        <form action="{{ url_for('explore') }}" method="GET" class="no-loader">
             <div class="filter-group keyword-tagging-group">
                 <label><i class="fas fa-search"></i> Palabras clave</label>
                 <div class="keyword-tags-container" id="keyword-tags-list">
@@ -289,7 +289,7 @@
 
             <div class="filter-actions">
                 <button type="submit" class="apply-filters-btn">Aplicar Filtros</button>
-                <a href="{{ url_for('explore') }}" id="clear-filters-btn" class="clear-filters-btn">
+                <a href="{{ url_for('explore') }}" id="clear-filters-btn" class="clear-filters-btn no-loader">
                     <i class="fas fa-undo"></i> Borrar Filtros
                 </a>
             </div>
