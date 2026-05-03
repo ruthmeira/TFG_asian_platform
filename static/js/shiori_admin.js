@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // MODERACIÓN INSTANTÁNEA (AJAX)
+    
     const moderateBtns = document.querySelectorAll('.moderate-action');
     moderateBtns.forEach(btn => {
         btn.addEventListener('click', async function(e) {
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = this.getAttribute('data-url');
             const card = this.closest('.admin-review-card');
             
-            // Feedback visual inmediato (deshabilitar botones)
+            
             const parent = this.parentElement;
             const buttons = parent.querySelectorAll('button');
             buttons.forEach(b => b.disabled = true);
@@ -64,8 +64,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             try {
                 const response = await fetch(url, { method: 'POST' });
-                // Como las rutas actuales de admin en app.py devuelven redirect, 
-                // pero fetch las sigue, si el status es OK (200), asumimos éxito.
+                
+                
                 if (response.ok) {
                     card.style.opacity = '0';
                     card.style.transform = 'translateX(20px)';
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     setTimeout(() => {
                         card.remove();
-                        // Si no quedan tarjetas, mostrar estado vacío
+                        
                         const remaining = document.querySelectorAll('.admin-review-card');
                         if (remaining.length === 0) {
                             const grid = document.querySelector('.admin-reviews-grid');
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Interceptar submit directo por si acaso
+        
         banForm.addEventListener('submit', function(e) {
             e.preventDefault();
             if (getIsBanned()) performBanAction();
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // BUSCADOR EN TIEMPO REAL PARA LA CÁRCEL
+    
     const prisonSearch = document.getElementById('prison-search-input');
     if (prisonSearch) {
         prisonSearch.addEventListener('input', function() {
@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-            // Gestionar el estado vacío si el buscador no encuentra nada
+            
             const emptyState = document.querySelector('.prison-empty');
             if (!hasResults) {
                 if (!emptyState) {
@@ -173,8 +173,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } else {
                 if (emptyState) {
-                    // Si el emptyState era el original (Cárcel Vacía), solo lo ocultamos si hay query
-                    // Si es el de búsqueda, lo ocultamos siempre si hay resultados
+                    
+                    
                     emptyState.style.display = 'none';
                 }
             }
@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// GESTIÓN DE REPORTES DE DATOS (AJAX)
+
 window.resolveReport = async function(reportId) {
     const card = document.getElementById(`report-${reportId}`);
     const btn = card.querySelector('.resolve-d');
@@ -202,9 +202,9 @@ window.resolveReport = async function(reportId) {
             
             setTimeout(() => {
                 card.remove();
-                // Verificar si quedan reportes
+                
                 if (document.querySelectorAll('.report-card').length === 0) {
-                    location.reload(); // Recargamos para mostrar el empty state
+                    location.reload(); 
                 }
             }, 400);
         } else {

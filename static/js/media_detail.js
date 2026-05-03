@@ -1,7 +1,4 @@
-/**
- * MEDIA DETAIL PAGE LOGIC
- * Includes Trailer Modal, Favorites, and Collection management.
- */
+
 
 window.MediaDetail = (() => {
     function init(container = document) {
@@ -18,7 +15,7 @@ window.MediaDetail = (() => {
         const closeModal = trailerModal.querySelector('#close-modal');
         const overlay = trailerModal.querySelector('.modal-overlay');
 
-        // The key is usually in a data attribute for modularity
+        
         const key = trailerBtn.dataset.key;
 
         const open = () => {
@@ -114,7 +111,7 @@ window.MediaDetail = (() => {
     return { init };
 })();
 
-// Auto-initialization if media-detail-container is present
+
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.querySelector('.media-detail-container');
     if (container && window.MediaDetail) {
@@ -122,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Silent Prefetch (Speed Triangle)
+
 window.addEventListener('load', () => {
     setTimeout(() => {
         const path = window.location.pathname;

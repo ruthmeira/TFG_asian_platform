@@ -1,7 +1,4 @@
-/**
- * EXPLORE PAGE ADVANCED LOGIC
- * High-performance streaming, caching, pre-fetching and modular UI components.
- */
+
 
 window.ExploreApp = (() => {
     let state = {
@@ -10,13 +7,13 @@ window.ExploreApp = (() => {
         filters: {},
         currentPage: 1,
         totalPages: Infinity,
-        pageCache: {}, // { 1: { html: '...', done: false } }
+        pageCache: {}, 
         apiPageMap: { 1: { page: 1, skip: 0 } },
         fetchingPages: new Set(),
         abortControllers: {},
         isLoadingMore: false,
         selectedKeywords: [],
-        autoLimit: 20 // Límite inicial de 400 (20 páginas * 20 items)
+        autoLimit: 20 
     };
 
     const selectors = {
@@ -43,7 +40,7 @@ window.ExploreApp = (() => {
         state.genresByType = config.genresByType || {};
         state.filters = config.filters || {};
 
-        // Init Components
+        
         initRegionDropdown();
         initFilterChips();
         initKeywordTagging();
@@ -51,7 +48,7 @@ window.ExploreApp = (() => {
         initYearFilter();
         initAutoLoadControl();
 
-        // Initial Load
+        
         loadItems(1);
     }
 
@@ -61,26 +58,26 @@ window.ExploreApp = (() => {
             btn.onclick = () => {
                 const wrapper = document.querySelector(selectors.autoLoadWrapper);
                 if (wrapper) wrapper.style.display = 'none';
-                state.autoLimit += 20; // Extendemos el permiso otros 400 resultados
+                state.autoLimit += 20; 
                 loadItems(state.currentPage + 1);
             };
         }
     }
 
-    // --- REGION DROPDOWN ---
+    
     function initRegionDropdown() {
         SHIORI.initRegionSelector({
             containerId: 'region-dropdown-container',
             countries: state.countries,
             onSelect: (country) => {
                 state.filters.watch_region = country.code;
-                loadItems(1); // Recargar rejilla con la nueva región
+                loadItems(1); 
             }
         });
     }
 
 
-    // --- FILTER CHIPS ---
+    
     function initFilterChips() {
         const typeInput = document.getElementById('media-type-input');
         const statusInput = document.getElementById('status-input');
@@ -120,7 +117,7 @@ window.ExploreApp = (() => {
             allowEmpty: true
         });
 
-        // Platforms logic
+        
         if (toggleProviders) {
             toggleProviders.onclick = function () {
                 this.classList.toggle('active');
@@ -147,7 +144,7 @@ window.ExploreApp = (() => {
                 updateProvidersText();
             };
 
-            // Set initial state
+            
             if (state.filters.watch_providers && state.filters.watch_providers.split('|').includes(icon.dataset.id)) {
                 icon.classList.add('active');
             }
@@ -221,7 +218,7 @@ window.ExploreApp = (() => {
         const repopulate = (container, input, filterKey, toggleBtn, def) => {
             if (!container) return;
             container.innerHTML = '';
-            // Add 'Todos/Ninguno' chip
+            
             const firstChip = document.createElement('div');
             firstChip.className = 'genre-chip active';
             firstChip.dataset.id = "";
@@ -246,7 +243,7 @@ window.ExploreApp = (() => {
         repopulate(genreChipsExclude, document.getElementById('genre-input-exclude'), 'without_genre', document.getElementById('toggle-exclude'), 'Ninguno');
     }
 
-    // --- KEYWORD TAGGING ---
+    
     function initKeywordTagging() {
         const searchInput = document.querySelector(selectors.kwSearchInput);
         const suggestions = document.querySelector(selectors.kwSuggestions);
@@ -328,12 +325,12 @@ window.ExploreApp = (() => {
         };
     }
 
-    // --- YEAR FILTER ---
+    
     function initYearFilter() {
         const yearInput = document.getElementById('year-input');
         if (!yearInput) return;
 
-        // Initial value if exists
+        
         if (yearInput.value) state.filters.year = yearInput.value.trim();
 
         yearInput.oninput = (e) => {
@@ -341,21 +338,21 @@ window.ExploreApp = (() => {
         };
     }
 
-    // --- INFINITE SCROLL & STREAMING ---
+    
     function initInfiniteScroll() {
         const trigger = document.getElementById('infinite-scroll-trigger');
         if (!trigger) return;
 
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && !state.isLoadingMore && state.currentPage < state.totalPages && state.currentPage < state.autoLimit) {
-                state.isLoadingMore = true; // Reserva inmediata
+                state.isLoadingMore = true; 
                 loadItems(state.currentPage + 1);
             }
         }, { rootMargin: '400px' });
 
         observer.observe(trigger);
 
-        // Form handling
+        
         const filterForm = document.querySelector('.filter-sidebar form');
         if (filterForm) {
             filterForm.onsubmit = (e) => {
@@ -372,7 +369,7 @@ window.ExploreApp = (() => {
         state.fetchingPages.clear();
         state.pageCache = {};
         state.apiPageMap = { 1: { page: 1, skip: 0 } };
-        state.totalPages = Infinity; // Reset para nuevos filtros sin límites fijos
+        state.totalPages = Infinity; 
         loadItems(page);
     }
 
@@ -381,7 +378,7 @@ window.ExploreApp = (() => {
         state.currentPage = page;
         state.isLoadingMore = true;
 
-        // OCULTAMOS EL BOTÓN AL EMPEZAR CUALQUIER CARGA
+        
         const autoLoadWrapper = document.querySelector(selectors.autoLoadWrapper);
         if (autoLoadWrapper) autoLoadWrapper.style.display = 'none';
 
@@ -467,15 +464,15 @@ window.ExploreApp = (() => {
             state.isLoadingMore = false;
             const wrapper = document.querySelector(selectors.autoLoadWrapper);
             if (wrapper) wrapper.style.display = 'none';
-            // Si ya no hay más páginas, ocultamos el trigger para evitar bucles
+            
             if (trigger) trigger.style.display = 'none';
         }
     }
 
     async function prefetchPage(page) {
         if (page > 500 || state.fetchingPages.has(page)) return;
-        // Same logic as loadItems but without injecting immediately if not scrolled down
-        // For simplicity in this modular version, we keep prefetch lean
+        
+        
     }
 
     function animateValue(obj, start, end, duration) {
@@ -492,7 +489,7 @@ window.ExploreApp = (() => {
     return { init };
 })();
 
-// Auto-initialization if data element is present
+
 document.addEventListener('DOMContentLoaded', () => {
     const dataEl = document.getElementById('explore-data');
     if (dataEl && window.ExploreApp) {

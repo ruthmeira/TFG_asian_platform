@@ -4,12 +4,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const query = urlParams.get('q');
     const sidebarItems = document.querySelectorAll('.sidebar-item');
     
-    // Almacén global para filtrado por sidebar
+    
     window.currentSearchResults = { movie: [], series: [], program: [], person: [], keyword: [] };
     window.activeFilter = 'movie';
     window.isStreaming = true;
 
-    // --- 1. ACTIVAR SIDEBAR AL INSTANTE (Máxima Prioridad) ---
+    
     sidebarItems.forEach(item => {
         item.onclick = (e) => {
             sidebarItems.forEach(i => i.classList.remove('active'));
@@ -23,11 +23,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 resultsGrid.classList.remove('list-layout');
             }
             
-            // Re-renderizar lo que ya tenemos
+            
             resultsGrid.innerHTML = '';
             renderAllKnown();
             
-            // Si el stream sigue vivo y el grid está vacío para esta categoría, poner un mini-loader
+            
             if (window.isStreaming && resultsGrid.innerHTML === '') {
                 resultsGrid.innerHTML = getMatrixLoader(`Buscando ${item.innerText.replace(/[0-9]/g, '').trim()}...`);
             }
@@ -39,10 +39,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // Inicializar grid
+    
     resultsGrid.innerHTML = getMatrixLoader('Explorando catálogo asiático...');
 
-    // --- 2. INICIAR STREAMING ---
+    
     try {
         const response = await fetch(`/api/search/unified?q=${encodeURIComponent(query)}`);
         if (!response.body) throw new Error("Flujo no soportado");
@@ -88,9 +88,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.currentSearchResults[cat].push(item);
         updateSidebarCounters();
 
-        // Si lo que llega coincide con lo que el usuario está viendo ahora, pintarlo
+        
         if (window.activeFilter === cat) {
-            // Quitar loader específico si existía
+            
             const loader = resultsGrid.querySelector('.search-loader');
             if (loader) loader.remove();
 
@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function renderAllKnown() {
         const filter = window.activeFilter;
-        // Solo renderizar la categoría activa
+        
         const items = window.currentSearchResults[filter] || [];
         items.forEach(item => {
             if (filter === 'movie' || filter === 'series' || filter === 'program') {
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // --- HELPERS DE RENDERIZACIÓN ---
+    
 
     function createMediaCard(item, cat) {
         const link = document.createElement('a');
@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const label = cat === 'movie' ? 'Película' : (cat === 'program' ? 'Programa' : 'Serie');
         
-        // Optimización Shiori: Calidad w342 para nitidez total
+        
         let poster = item.image || '/static/img/no-poster.png';
         if (poster.includes('/w185/')) {
             poster = poster.replace('/w185/', '/w342/');

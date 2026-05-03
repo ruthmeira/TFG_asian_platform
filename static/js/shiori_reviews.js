@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // FUNCIÓN MADRE: VINCULAR EVENTOS SHIORI
+    
     const attachShioriEvents = () => {
-        // LÓGICA DE VOTO OPTIMISTA SHIORI
+        
         document.querySelectorAll('.engagement-btn').forEach(btn => {
             const newBtn = btn.cloneNode(true);
             btn.parentNode.replaceChild(newBtn, btn);
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
 
-        // LÓGICA DE BORRADO
+        
         document.querySelectorAll('.btn-delete-shiori-btn').forEach(btn => {
             const newBtn = btn.cloneNode(true);
             btn.parentNode.replaceChild(newBtn, btn);
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
 
-        // LÓGICA DE REPORTE (BOTÓN)
+        
         document.querySelectorAll('.btn-report-shiori-btn').forEach(btn => {
             const newBtn = btn.cloneNode(true);
             btn.parentNode.replaceChild(newBtn, btn);
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     };
 
-    // GESTIÓN DE MODALES SHIORI
+    
     const reviewModal = document.getElementById('review-modal');
     const writeReviewBtn = document.getElementById('write-review-btn');
     const closeReviewBtn = document.getElementById('close-review-modal');
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let reviewIdToDelete = null;
     let reviewIdToReport = null;
 
-    // ACTUALIZACIÓN DINÁMICA DEL RATING (0.5)
+    
     const sliderRating = document.getElementById('rating-range-shiori');
     const displayRating = document.getElementById('rating-value-shiori');
     const labelRating = document.getElementById('rating-label-shiori');
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const val = parseFloat(sliderRating.value);
         displayRating.textContent = val.toFixed(1);
 
-        // Etiquetas dinámicas según la nota
+        
         if (val <= 0) labelRating.textContent = "Horrible... 🏮🏮";
         else if (val <= 2) labelRating.textContent = "No me ha gustado 🏮";
         else if (val <= 4) labelRating.textContent = "Un poco aburrida 🥱";
@@ -108,14 +108,14 @@ document.addEventListener('DOMContentLoaded', function () {
         else if (val < 10) labelRating.textContent = "¡Increíble! ✨";
         else labelRating.textContent = "¡OBRA MAESTRA! ❤️";
 
-        // Efecto Progress Bar Neón
+        
         const percentage = (val / 10) * 100;
         sliderRating.style.background = `linear-gradient(to right, var(--primary) ${percentage}%, rgba(255, 255, 255, 0.1) ${percentage}%)`;
     };
 
     if (sliderRating) {
         sliderRating.addEventListener('input', updateSliderUI);
-        // Botones de precisión (+/- 0.5)
+        
         if (starMin) {
             starMin.addEventListener('click', () => {
                 sliderRating.value = Math.max(0, parseFloat(sliderRating.value) - 0.5);
@@ -128,10 +128,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 updateSliderUI();
             });
         }
-        updateSliderUI(); // Inicialización
+        updateSliderUI(); 
     }
 
-    // ABRIR/CERRAR MODAL OPINIÓN
+    
     if (writeReviewBtn && reviewModal) {
         writeReviewBtn.addEventListener('click', () => {
             reviewModal.classList.remove('hidden');
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // FUNCIÓN DE REFRESCO UNIVERSAL (Para que todo se actualice sin recargar)
+    
     const refreshShioriData = async () => {
         try {
             const refreshRes = await fetch(window.location.href);
@@ -162,22 +162,22 @@ document.addEventListener('DOMContentLoaded', function () {
             const parser = new DOMParser();
             const doc = parser.parseFromString(refreshHTML, 'text/html');
             
-            // 1. Rejilla de opiniones
+            
             const newGrid = doc.querySelector('.reviews-shiori-grid');
             const currentGrid = document.querySelector('.reviews-shiori-grid');
             if (newGrid && currentGrid) {
                 currentGrid.innerHTML = newGrid.innerHTML;
-                attachShioriEvents(); // Volvemos a vincular eventos a los nuevos elementos
+                attachShioriEvents(); 
             }
 
-            // 2. Actualizar Nota Media en la Cabecera
+            
             const newRating = doc.getElementById('shiori-rating-val');
             const currentRating = document.getElementById('shiori-rating-val');
             if (newRating && currentRating) {
                 currentRating.textContent = newRating.textContent;
             }
 
-            // 3. Actualizar Contador de Opiniones
+            
             const newCount = doc.querySelector('.shiori-count');
             const currentCount = document.querySelector('.shiori-count');
             if (newCount && currentCount) {
@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // GESTIÓN DE REPORTES
+    
     if (cancelReportBtn) {
         cancelReportBtn.addEventListener('click', () => {
             reportConfirmModal.classList.remove('show');
@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const response = await fetch(`/review/${reviewIdToReport}/report`, { method: 'POST' });
                     const result = await response.json();
                     
-                    // Icono dinámico según la categoría
+                    
                     let iconClass = 'info-circle';
                     let statusClass = 'icon-info-shiori';
                     if (result.category === 'success') {
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         statusClass = 'icon-success-shiori';
                     }
                     
-                    // METAMORFOSIS DEL CONTENIDO
+                    
                     confirmBox.innerHTML = `
                         <div class="confirm-icon ${statusClass}">
                             <i class="fas fa-${iconClass}"></i>
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // SUBMIT FORMULARIO (PUBLISH/EDIT)
+    
     if (reviewForm) {
         const commentArea = document.getElementById('review-comment');
         const charCounter = reviewForm.querySelector('.char-counter');
@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // CIERRE CLICK FUERA
+    
     window.addEventListener('click', (e) => {
         if (e.target === deleteConfirmModal) {
             deleteConfirmModal.classList.remove('show');
@@ -343,6 +343,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // LLAMADA INICIAL
+    
     attachShioriEvents();
 });

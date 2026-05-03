@@ -1,7 +1,4 @@
-/**
- * HOME PAGE MODULE
- * Handles Trending Carousels, Window Switching (day/week), and AJAX loading.
- */
+
 
 window.HomeApp = (() => {
     let currentWindow = 'day';
@@ -11,7 +8,7 @@ window.HomeApp = (() => {
         currentWindow = config.activeWindow || 'day';
         const serverData = config.serverData;
         
-        // Initialize cache if server data is present
+        
         const hasData = serverData && (serverData.series.length > 0 || serverData.movies.length > 0 || serverData.shows.length > 0);
         if (hasData) {
             trendingCache[currentWindow] = serverData;
@@ -20,7 +17,7 @@ window.HomeApp = (() => {
             loadAllCarousels(currentWindow);
         }
 
-        // Background pre-fetch of the other window
+        
         const otherWindow = currentWindow === 'day' ? 'week' : 'day';
         if (!trendingCache[otherWindow]) {
             loadAllCarousels(otherWindow, true);
@@ -51,13 +48,13 @@ window.HomeApp = (() => {
     function switchWindow(windowType, url, push = false) {
         currentWindow = windowType;
         
-        // Update UI buttons
+        
         document.querySelectorAll('.filter-btn').forEach(btn => {
             const btnWindow = btn.dataset.window || 'day';
             btn.classList.toggle('active', btnWindow === windowType);
         });
 
-        // if (push) history.pushState({ window: windowType }, '', url); // Línea eliminada para mantener URL limpia
+        
 
         if (trendingCache[windowType]) {
             renderFromCache(trendingCache[windowType]);
@@ -87,7 +84,7 @@ window.HomeApp = (() => {
                         renderItems(document.getElementById(`carousel-${type}`), items, apiType, label);
                     }
                 } else if (!silent && windowType === currentWindow) {
-                    // Retry if empty (TMDB sometimes throttles)
+                    
                     setTimeout(() => loadType(windowType, type, apiType, label, silent), 2000);
                 }
             })
@@ -161,7 +158,7 @@ window.HomeApp = (() => {
     return { init };
 })();
 
-// Auto-initialization if data element is present
+
 document.addEventListener('DOMContentLoaded', () => {
     const dataEl = document.getElementById('home-data');
     if (dataEl && window.HomeApp) {

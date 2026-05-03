@@ -1,12 +1,9 @@
-/**
- * PROFILE PAGE JAVASCRIPT
- * Handles specialized interactions for Profile pages
- */
+
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // 1. IMAGE PREVIEW (Real-time avatar update)
-    // Only handles the specific preview on Edit Profile
+    
+    
     const profileInput = document.getElementById('profile_image');
     if (profileInput) {
         profileInput.addEventListener('change', function (e) {
@@ -33,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 3. DELETE ACCOUNT MODAL (Profile Actions)
+    
     const openDelBtn = document.getElementById('open-delete-account-btn');
     const delModal = document.getElementById('delete-account-modal');
     const cancelDelBtn = document.getElementById('cancel-delete-account-btn');
@@ -56,6 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // NOTE: Password toggle and CapsLock warning are handled globally in main.js
-    // to avoid redundant event listeners and flickering.
+    
+    
 });

@@ -1,14 +1,7 @@
-/**
- * AJAX COLLECTION RADAR 🧠🚀
- * Gestiona la carga de tarjetas y paginación sin recargas de página.
- */
-
 let currentColumns = -1;
 let resizeTimeout;
 
-/**
- * Función principal para cargar contenido por AJAX
- */
+
 async function loadCollectionPage(page = 1, perPage = null, useAnimation = true, replaceHistory = false) {
     const gridContainer = document.getElementById('ajax-collection-container');
     if (!gridContainer) return;
@@ -26,7 +19,6 @@ async function loadCollectionPage(page = 1, perPage = null, useAnimation = true,
     gridContainer.style.pointerEvents = 'none';
     const status = window.location.pathname.split('/').filter(p => p).pop();
 
-    // LIMPIEZA ATÓMICA
     gridContainer.innerHTML = ''; 
 
     try {
@@ -35,16 +27,13 @@ async function loadCollectionPage(page = 1, perPage = null, useAnimation = true,
 
         gridContainer.innerHTML = html;
 
-        // AUTO-SCROLL: Subimos al inicio para ver las nuevas tarjetas
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        // CONSTRUCCIÓN DE URL LIMPIA
         let newUrl = `/collections/${status}`;
         if (parseInt(page) > 1) {
             newUrl += `?page=${page}`;
         }
 
-        // GESTIÓN DE HISTORIAL PROFESIONAL
         if (replaceHistory) {
             window.history.replaceState({ path: newUrl }, '', newUrl);
         } else {
@@ -58,9 +47,7 @@ async function loadCollectionPage(page = 1, perPage = null, useAnimation = true,
     }
 }
 
-/**
- * Calcula el número ideal de tarjetas basándose en el grid real
- */
+
 function calculateIdealPerPage() {
     const grid = document.querySelector('.collection-grid-premium');
     if (!grid) return 16; 
@@ -79,9 +66,7 @@ function calculateIdealPerPage() {
     return columns * rows;
 }
 
-/**
- * Radar de cambio de columnas
- */
+
 function monitorGridResize() {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
@@ -101,7 +86,6 @@ function monitorGridResize() {
     }, 500);
 }
 
-// Inicialización
 window.addEventListener('load', () => {
     window.addEventListener('resize', monitorGridResize);
 
@@ -124,9 +108,6 @@ window.addEventListener('load', () => {
         const ideal = calculateIdealPerPage();
         const currentCards = document.querySelectorAll('.card-link').length;
         
-        // CORRECCIÓN DE REJILLA PERFECTA:
-        // Si el número de tarjetas actual no es múltiplo de las columnas (el ideal),
-        // recargamos por AJAX para que la rejilla se vea siempre completa.
         if (currentCards !== ideal && currentCards > 0) {
              const currentPage = urlParams.get('page') || 1;
              loadCollectionPage(currentPage, ideal, false, true);

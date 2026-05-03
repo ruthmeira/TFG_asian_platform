@@ -1,15 +1,7 @@
-/**
- * AUTH JAVASCRIPT
- * Handles specialized components for Auth & Profile pages
- */
-
 window.AuthApp = (function() {
     
-    /**
-     * Initializes the Custom Region Dropdown using the global SHIORI engine
-     */
+
     function initRegionDropdown(config) {
-        // Delegamos la lógica al motor central de main.js
         SHIORI.initRegionSelector({
             containerId: config.containerId,
             countries: config.countries,
@@ -23,7 +15,6 @@ window.AuthApp = (function() {
     };
 })();
 
-// Auto-initialization for specific pages
 document.addEventListener('DOMContentLoaded', () => {
     const registerData = document.getElementById('register-data');
     const profileData = document.getElementById('profile-data');

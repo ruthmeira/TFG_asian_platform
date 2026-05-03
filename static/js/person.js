@@ -4,20 +4,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const showMoreContainer = document.getElementById('show-more-container');
     const showMoreBtn = document.getElementById('show-more-btn');
 
-    // 1. CARGA DE PROYECTOS (Async)
+    
     if (personId) {
         const loader = document.getElementById('projects-loader');
         const hint = worksGrid.dataset.countryHint || '';
         fetch(`/api/person/${personId}/projects?h=${hint}`)
             .then(response => response.text())
             .then(html => {
-                // Quitar cargador de golpe
+                
                 if (loader) loader.remove();
 
                 worksGrid.innerHTML = html;
                 const items = worksGrid.querySelectorAll('.card-link');
 
-                // Mantenemos tu lógica de 8 iniciales
+                
                 items.forEach((item, index) => {
                     if (index >= 8) {
                         item.classList.add('hidden-work');
@@ -36,19 +36,19 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
-    // 2. TU LÓGICA ORIGINAL DE MOSTRAR MÁS
+    
     showMoreBtn?.addEventListener('click', function () {
         const hiddenItems = document.querySelectorAll('.hidden-work');
         hiddenItems.forEach((item, index) => {
             setTimeout(() => {
                 item.style.display = 'block';
                 item.classList.remove('hidden-work');
-            }, index * 50); // Tu Cascada original
+            }, index * 50); 
         });
         showMoreContainer.style.display = 'none';
     });
 
-    // 3. TU LÓGICA ORIGINAL DE BIOGRAFÍA
+    
     const bioText = document.getElementById('bio-text');
     const toggleBtn = document.getElementById('bio-toggle');
 
