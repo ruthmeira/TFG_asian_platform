@@ -4,20 +4,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const showMoreContainer = document.getElementById('show-more-container');
     const showMoreBtn = document.getElementById('show-more-btn');
 
-    
+
     if (personId) {
         const loader = document.getElementById('projects-loader');
         const hint = worksGrid.dataset.countryHint || '';
         fetch(`/api/person/${personId}/projects?h=${hint}`)
             .then(response => response.text())
             .then(html => {
-                
+
                 if (loader) loader.remove();
 
                 worksGrid.innerHTML = html;
                 const items = worksGrid.querySelectorAll('.card-link');
 
-                
+
                 items.forEach((item, index) => {
                     if (index >= 8) {
                         item.classList.add('hidden-work');
@@ -36,19 +36,19 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
-    
+
     showMoreBtn?.addEventListener('click', function () {
         const hiddenItems = document.querySelectorAll('.hidden-work');
         hiddenItems.forEach((item, index) => {
             setTimeout(() => {
                 item.style.display = 'block';
                 item.classList.remove('hidden-work');
-            }, index * 50); 
+            }, index * 50);
         });
         showMoreContainer.style.display = 'none';
     });
 
-    
+
     const bioText = document.getElementById('bio-text');
     const toggleBtn = document.getElementById('bio-toggle');
 

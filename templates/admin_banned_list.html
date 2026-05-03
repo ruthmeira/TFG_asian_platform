@@ -33,7 +33,7 @@
         <div class="banned-user-card">
             <div class="banned-user-avatar">
                 {% if user.profile_image %}
-                <img src="{{ url_for('static', filename=user.profile_image) }}" class="admin-avatar-main">
+                <img src="{{ user.profile_image if user.profile_image.startswith('http') else url_for('static', filename=user.profile_image) }}" class="admin-avatar-main">
                 {% else %}
                 <div class="admin-avatar-fallback">{{ user.username[0]|upper }}</div>
                 {% endif %}

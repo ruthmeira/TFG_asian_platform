@@ -7,6 +7,9 @@
 {% endblock %}
 
 {% block content %}
+<button id="scroll-to-top" class="scroll-to-top" title="Volver Arriba">
+    <i class="fas fa-chevron-up"></i>
+</button>
 <div class="person-detail-container">
     <aside class="person-poster-side">
         <div class="person-photo">
@@ -22,7 +25,7 @@
         {% if person.socials and (person.socials.instagram or person.socials.twitter or person.socials.tiktok or
         person.socials.facebook or person.socials.youtube or person.socials.homepage) %}
         <div class="person-socials">
-            
+
             <div class="social-group">
                 {% for platform, url in person.socials.items() %}
                 {% if url and platform != 'homepage' %}
@@ -33,13 +36,13 @@
                 {% endfor %}
             </div>
 
-            
+
             {% if (person.socials.instagram or person.socials.twitter or person.socials.tiktok or
             person.socials.facebook or person.socials.youtube) and person.socials.homepage %}
             <span class="link-divider">|</span>
             {% endif %}
 
-            
+
             {% if person.socials.homepage %}
             <div class="social-group">
                 <a href="{{ person.socials.homepage }}" target="_blank" class="social-btn" title="Sitio Web Oficial">
@@ -50,7 +53,7 @@
         </div>
         {% endif %}
 
-        
+
         {% if current_user.is_authenticated %}
         <div class="person-report-container">
             <button id="open-report-modal-btn" class="btn-report-data-premium" title="Reportar error en los datos">
@@ -102,7 +105,7 @@
         <h1 class="person-name">{{ person.name }}</h1>
 
         <section class="biography-section">
-            <h2>Biografía</h2> 
+            <h2>Biografía</h2>
             <div class="bio-wrapper">
                 <p class="bio-text" id="bio-text">
                     {% if person.biography and 'No tenemos una biografía' in person.biography %}
@@ -112,8 +115,7 @@
                     {{ person.biography | safe }}
                 </p>
             </div>
-            <button id="bio-toggle" class="btn-read-more">Leer más <i
-                    class="fas fa-chevron-down"></i></button>
+            <button id="bio-toggle" class="btn-read-more">Leer más <i class="fas fa-chevron-down"></i></button>
         </section>
 
         <section class="known-for-section">
@@ -140,8 +142,9 @@
                 </div>
             </div>
 
-            <div class="known-for-grid" id="works-grid" data-person-id="{{ person.id }}" data-country-hint="{{ person.country_hint }}">
-                
+            <div class="known-for-grid" id="works-grid" data-person-id="{{ person.id }}"
+                data-country-hint="{{ person.country_hint }}">
+
             </div>
 
             <div id="show-more-container" style="display: none;" class="show-more-container">
@@ -160,12 +163,14 @@
             </div>
             <h3>Corregir datos de Persona</h3>
         </div>
-        <p class="data-report-info">¿Has detectado un error? Ayúdanos a mejorar informando qué campo está incorrecto en TMDB.</p>
+        <p class="data-report-info">¿Has detectado un error? Ayúdanos a mejorar informando qué campo está incorrecto en
+            TMDB.</p>
 
         <div id="data-report-alert-container"></div>
 
-        <form action="{{ url_for('report_media_data', media_type='person', media_id=person.id) }}" method="POST" id="data-report-form" class="no-loader">
-            
+        <form action="{{ url_for('report_media_data', media_type='person', media_id=person.id) }}" method="POST"
+            id="data-report-form" class="no-loader">
+
             <input type="hidden" name="field_type" id="selected-field-type" required>
             <input type="hidden" name="media_title" value="{{ person.name }}">
 
@@ -173,7 +178,8 @@
                 <label>Selecciona la sección con el error:</label>
 
                 <div class="report-options-list">
-                    {% for opt in ["Nombre", "Biografía", "Redes Sociales", "Sexo", "Nacimiento", "También conocido como", "Fecha de muerte", "Link oficial"] %}
+                    {% for opt in ["Nombre", "Biografía", "Redes Sociales", "Sexo", "Nacimiento", "También conocido
+                    como", "Fecha de muerte", "Link oficial"] %}
                     <div class="report-option-item" onclick="selectReportOption(this, '{{ opt }}')">
                         <div class="radio-circle"></div>
                         <span class="report-option-text">{{ opt }}</span>
@@ -184,8 +190,8 @@
 
             <div class="form-group-shiori">
                 <label>Mensaje o información correcta</label>
-                <textarea name="description" id="report-description-area" class="shiori-textarea-premium" 
-                          placeholder="Ej: El nombre correcto es X, la fecha de nacimiento está mal..." required></textarea>
+                <textarea name="description" id="report-description-area" class="shiori-textarea-premium"
+                    placeholder="Ej: El nombre correcto es X, la fecha de nacimiento está mal..." required></textarea>
             </div>
 
             <div class="confirm-actions">
@@ -196,6 +202,8 @@
     </div>
 </div>
 {% endblock %}
+
+
 
 
 

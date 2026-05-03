@@ -1,5 +1,3 @@
-
-
 .no-data-container {
     display: flex;
     align-items: center;
@@ -35,18 +33,18 @@
     display: flex;
     gap: clamp(20px, 4vw, 60px);
     margin-bottom: 20px;
-    
+
     align-items: flex-start;
-    
+
     animation: fadeIn 0.4s ease;
     width: 100%;
     min-height: 800px;
-    
+
 }
 
 .media-poster {
     flex: 0 0 clamp(260px, 25vw, 340px);
-    
+
     position: sticky;
     top: 100px;
     display: flex;
@@ -93,12 +91,14 @@
     transition: var(--transition);
 }
 
-.fav-btn-action:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateY(-3px);
-    border-color: var(--primary);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    color: var(--primary);
+@media (hover: hover) {
+    .fav-btn-action:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-3px);
+        border-color: var(--primary);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        color: var(--primary);
+    }
 }
 
 .fav-btn-action.active {
@@ -120,7 +120,7 @@
     align-items: center;
     gap: 15px;
     margin-bottom: 0;
-    
+
 }
 
 .links-group {
@@ -152,12 +152,14 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.btn-trailer:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateY(-3px);
-    border-color: var(--primary);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    color: var(--primary);
+@media (hover: hover) {
+    .btn-trailer:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-3px);
+        border-color: var(--primary);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        color: var(--primary);
+    }
 }
 
 .poster-actions .btn-report-data-premium {
@@ -172,27 +174,27 @@
 .media-info {
     flex: 1;
     min-width: 0;
-    
+
     background: var(--glass-bg);
     padding: clamp(20px, 4vw, 50px);
-    
+
     border-radius: 32px;
     backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
-    
+
     transform: translateZ(0);
     will-change: transform;
 }
 
 .media-info h1 {
     font-size: clamp(2rem, 5vw, 3.2rem);
-    
+
     font-weight: 800;
     margin-bottom: 25px;
     letter-spacing: -1px;
     line-height: 1.2;
     display: block;
-    
+
 }
 
 .detail-year {
@@ -201,7 +203,7 @@
     font-size: clamp(1.2rem, 3vw, 2rem);
     margin-left: 10px;
     display: inline;
-    
+
     vertical-align: baseline;
     white-space: nowrap;
 }
@@ -209,17 +211,17 @@
 .detail-meta {
     display: flex;
     flex-wrap: wrap;
-    
+
     gap: clamp(15px, 2vw, 30px);
     margin-bottom: 40px;
     padding: clamp(15px, 2vw, 25px);
-    
+
     background: rgba(255, 255, 255, 0.04);
-    
+
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 24px;
     backdrop-filter: blur(10px);
-    
+
     transform: translateZ(0);
     will-change: transform, opacity;
 }
@@ -252,7 +254,7 @@
     color: var(--primary);
     display: block;
     margin-bottom: 10px;
-    
+
 }
 
 .overview-text {
@@ -287,9 +289,11 @@
     box-shadow: 0 10px 20px rgba(255, 69, 0, 0.3);
 }
 
-#collection-toggle:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 30px rgba(255, 69, 0, 0.5);
+@media (hover: hover) {
+    #collection-toggle:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(255, 69, 0, 0.5);
+    }
 }
 
 #collection-options {
@@ -335,10 +339,12 @@
     font-weight: 500;
 }
 
-.collection-option:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    padding-left: 22px;
+@media (hover: hover) {
+    .collection-option:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        padding-left: 22px;
+    }
 }
 
 .collection-option.active {
@@ -359,7 +365,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
-    
+
 }
 
 .season-card-full {
@@ -374,20 +380,24 @@
     align-items: flex-start;
 }
 
-.season-poster-mini {
+.season-poster-detail {
     flex: 0 0 clamp(100px, 15vw, 135px);
     height: clamp(145px, 21vw, 195px);
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.season-poster-mini img {
+.season-poster-detail img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    
+
     transform: translateZ(0);
 }
 
@@ -405,13 +415,13 @@
     margin-bottom: clamp(4px, 1vw, 8px);
     width: 100%;
     gap: clamp(8px, 1.5vw, 15px);
-    
-    
+
+
 }
 
 .season-title-row h3 {
     font-size: clamp(0.95rem, 1.6vw, 1.5rem);
-    
+
     color: #fff;
     font-weight: 800;
     margin: 0;
@@ -419,7 +429,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     min-width: 0;
-    
+
 }
 
 .season-rating {
@@ -429,14 +439,14 @@
     border-radius: 50px;
     font-weight: 800;
     font-size: clamp(11px, 0.8vw, 13px);
-    
+
     border: 1px solid rgba(255, 69, 0, 0.25);
     box-shadow: 0 0 15px rgba(255, 69, 0, 0.15);
     display: flex;
     align-items: center;
     gap: 6px;
     flex-shrink: 0;
-    
+
 }
 
 .season-rating i {
@@ -453,7 +463,7 @@
     color: #fff;
     opacity: 0.95;
     flex-wrap: wrap;
-    
+
 }
 
 .season-year strong {
@@ -462,7 +472,7 @@
 
 .season-ep-count {
     color: var(--primary);
-    
+
 }
 
 .season-dot {
@@ -477,7 +487,7 @@
     color: rgba(255, 255, 255, 0.65);
     margin: 0;
     display: block;
-    
+
 }
 
 
@@ -487,7 +497,7 @@
 
 .detail-watch p:first-child {
     margin-bottom: 10px;
-    
+
     color: var(--primary);
     font-size: clamp(1.1rem, 2.5vw, 1.5rem);
     font-weight: 700;
@@ -546,7 +556,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
-    
+
 }
 
 .cast-scroll-container {
@@ -554,15 +564,15 @@
     gap: clamp(15px, 2vw, 25px);
     overflow-x: auto;
     padding: 15px 5px 10px 5px;
-    
+
     scroll-behavior: smooth;
     width: 100%;
-    
+
     transform: rotateX(180deg);
     -ms-transform: rotateX(180deg);
-    
+
     -webkit-transform: rotateX(180deg);
-    
+
 }
 
 
@@ -585,7 +595,7 @@
     align-items: center;
     text-align: center;
     flex: 0 0 clamp(85px, 10vw, 105px);
-    
+
     transform: rotateX(180deg) translateZ(0);
     -ms-transform: rotateX(180deg) translateZ(0);
     -webkit-transform: rotateX(180deg) translateZ(0);
@@ -639,7 +649,7 @@
     color: var(--primary);
     display: block;
     margin-bottom: 10px;
-    
+
 }
 
 .keywords-list-wrapper {
@@ -660,11 +670,13 @@
     text-transform: capitalize;
 }
 
-.keyword-tag:hover {
-    background: rgba(255, 69, 0, 0.1);
-    color: var(--primary);
-    border-color: var(--primary);
-    transform: translateY(-2px);
+@media (hover: hover) {
+    .keyword-tag:hover {
+        background: rgba(255, 69, 0, 0.1);
+        color: var(--primary);
+        border-color: var(--primary);
+        transform: translateY(-2px);
+    }
 }
 
 
@@ -745,9 +757,11 @@
     box-shadow: 0 10px 20px rgba(255, 69, 0, 0.3);
 }
 
-.btn-review-primary:hover {
-    transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 15px 30px rgba(255, 69, 0, 0.5);
+@media (hover: hover) {
+    .btn-review-primary:hover {
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 15px 30px rgba(255, 69, 0, 0.5);
+    }
 }
 
 .btn-review-muted {
@@ -762,8 +776,10 @@
     transition: var(--transition);
 }
 
-.btn-review-muted:hover {
-    background: rgba(255, 255, 255, 0.15);
+@media (hover: hover) {
+    .btn-review-muted:hover {
+        background: rgba(255, 255, 255, 0.15);
+    }
 }
 
 .no-reviews-placeholder {
@@ -831,9 +847,11 @@
     transition: 0.3s;
 }
 
-.btn-close-modal:hover {
-    opacity: 1;
-    transform: rotate(90deg);
+@media (hover: hover) {
+    .btn-close-modal:hover {
+        opacity: 1;
+        transform: rotate(90deg);
+    }
 }
 
 
@@ -862,7 +880,7 @@
     gap: 15px;
     max-width: 360px;
     margin: 15px auto 30px;
-    
+
 }
 
 .range-shiori-container i {
@@ -873,10 +891,12 @@
     transition: 0.2s;
 }
 
-.range-shiori-container i:hover {
-    color: var(--primary);
-    opacity: 1;
-    transform: scale(1.2);
+@media (hover: hover) {
+    .range-shiori-container i:hover {
+        color: var(--primary);
+        opacity: 1;
+        transform: scale(1.2);
+    }
 }
 
 .range-shiori-wrapper {
@@ -966,9 +986,11 @@
     transition: 0.3s;
 }
 
-.btn-submit-full-shiori:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 30px rgba(255, 69, 0, 0.4);
+@media (hover: hover) {
+    .btn-submit-full-shiori:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(255, 69, 0, 0.4);
+    }
 }
 
 .hidden {
@@ -988,7 +1010,7 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 24px;
     padding: 25px 25px 12px 25px;
-    
+
     transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     width: 100%;
     position: relative;
@@ -998,7 +1020,7 @@
 
 .review-body-shiori {
     margin-top: 15px;
-    
+
 }
 
 
@@ -1010,7 +1032,7 @@
     margin-top: 15px;
     padding-top: 12px;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
-    
+
 }
 
 .review-engagement-shiori {
@@ -1033,9 +1055,11 @@
     border-radius: 12px;
 }
 
-.engagement-btn:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.05);
+@media (hover: hover) {
+    .engagement-btn:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.05);
+    }
 }
 
 .like-btn.active {
@@ -1062,16 +1086,20 @@
     display: flex;
 }
 
-.btn-delete-shiori-btn:hover {
-    color: #ff4757;
-    background: rgba(255, 71, 87, 0.1);
-    transform: scale(1.1);
+@media (hover: hover) {
+    .btn-delete-shiori-btn:hover {
+        color: #ff4757;
+        background: rgba(255, 71, 87, 0.1);
+        transform: scale(1.1);
+    }
 }
 
-.shiori-review-card:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.15);
-    transform: translateY(-2px);
+@media (hover: hover) {
+    .shiori-review-card:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+    }
 }
 
 .review-header {
@@ -1079,7 +1107,7 @@
     justify-content: space-between;
     align-items: flex-start;
     gap: 15px;
-    
+
 }
 
 .user-info {
@@ -1087,9 +1115,9 @@
     align-items: center;
     gap: 12px;
     flex: 1;
-    
+
     min-width: 0;
-    
+
 }
 
 .user-avatar-shiori {
@@ -1100,7 +1128,7 @@
     border: 2px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     flex-shrink: 0;
-    
+
     aspect-ratio: 1 / 1;
 }
 
@@ -1117,7 +1145,7 @@
     font-size: 1rem;
     box-shadow: 0 4px 10px rgba(255, 69, 0, 0.3);
     flex-shrink: 0;
-    
+
     aspect-ratio: 1 / 1;
 }
 
@@ -1125,7 +1153,7 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
-    
+
 }
 
 .user-name {
@@ -1147,12 +1175,12 @@
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    
+
 }
 
 .shiori-heart-rating {
     color: #ff4757;
-    
+
     filter: drop-shadow(0 0 5px rgba(255, 71, 87, 0.4));
     margin-right: 8px;
     font-size: 1.1rem;
@@ -1182,7 +1210,7 @@
     margin: 0;
     font-style: italic;
     overflow-wrap: break-word;
-    
+
     word-wrap: break-word;
     word-break: break-word;
 }
@@ -1199,10 +1227,12 @@
     margin-left: 10px;
 }
 
-.btn-report-shiori-btn:hover {
-    color: #ffa502;
-    transform: scale(1.15);
-    opacity: 1;
+@media (hover: hover) {
+    .btn-report-shiori-btn:hover {
+        color: #ffa502;
+        transform: scale(1.15);
+        opacity: 1;
+    }
 }
 
 .shiori-report {
@@ -1211,9 +1241,11 @@
     box-shadow: 0 4px 15px rgba(255, 165, 2, 0.4) !important;
 }
 
-.shiori-report:hover {
-    background: #ffbc4d !important;
-    box-shadow: 0 8px 25px rgba(255, 165, 2, 0.6) !important;
+@media (hover: hover) {
+    .shiori-report:hover {
+        background: #ffbc4d !important;
+        box-shadow: 0 8px 25px rgba(255, 165, 2, 0.6) !important;
+    }
 }
 
 .report-icon {
@@ -1272,7 +1304,7 @@
 
 @media (max-width: 750px) {
 
-    
+
     .media-detail-container {
         flex-direction: column;
         min-height: auto;
@@ -1285,13 +1317,13 @@
         align-items: center;
         text-align: center;
         gap: 15px;
-        
+
     }
 
     .media-poster img {
         max-width: clamp(200px, 60vw, 250px);
         margin-bottom: 0px;
-        
+
     }
 
     .media-info {
@@ -1322,12 +1354,12 @@
 
 @media (max-width: 450px) {
 
-    
+
     .media-info h1 {
         font-size: 1.8rem;
     }
 
-    
+
     .detail-season-preview h2 {
         justify-content: space-between !important;
         flex-direction: row !important;
@@ -1345,27 +1377,39 @@
         gap: 15px;
     }
 
-    .season-poster-mini {
-        width: 100% !important;
-        height: 180px !important;
-        
+    .detail-season-preview .season-card-full .season-poster-detail {
+        width: 125px !important;
+        min-width: 125px !important;
+        max-width: 125px !important;
+        height: 185px !important;
+        min-height: 185px !important;
+        max-height: 185px !important;
+        margin-bottom: 15px;
         display: flex !important;
         justify-content: center !important;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        margin-bottom: 5px;
-        overflow: visible !important;
+        align-items: center !important;
+        background: #1a1a1a !important;
+        border-radius: 12px;
+        overflow: hidden;
+        flex-shrink: 0 !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
     }
 
-    .season-poster-mini img {
-        width: 120px !important;
-        height: 180px !important;
-        object-fit: cover;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+    .detail-season-preview .season-card-full .season-poster-detail img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+    }
+
+    .detail-season-preview .season-card-full .season-poster-detail .no-poster-mini {
+        width: 100% !important;
+        height: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 2.5rem !important;
+        color: rgba(255, 255, 255, 0.2) !important;
     }
 
     .season-info-mini {

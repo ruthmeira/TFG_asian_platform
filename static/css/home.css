@@ -31,10 +31,12 @@
     white-space: nowrap;
 }
 
-.filter-btn:hover {
-    background: #1a1a1a;
-    color: var(--text-main);
-    border-color: #333;
+@media (hover: hover) {
+    .filter-btn:hover {
+        background: #1a1a1a;
+        color: var(--text-main);
+        border-color: #333;
+    }
 }
 
 .filter-btn.active {

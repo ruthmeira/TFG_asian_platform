@@ -88,12 +88,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     
     const scrollTopBtn = document.getElementById('scroll-to-top');
-    const footer = document.querySelector('.footer');
+    const footer = document.querySelector('.shiori-footer');
 
     if (scrollTopBtn) {
         window.addEventListener('scroll', () => {
             
-            if (window.scrollY > 400) {
+            if (window.scrollY > 800) {
                 scrollTopBtn.classList.add('visible');
             } else {
                 scrollTopBtn.classList.remove('visible');

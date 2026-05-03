@@ -281,10 +281,12 @@
     transition: 0.3s ease;
 }
 
-.reporter-tag:hover {
-    background: var(--primary);
-    color: #fff !important;
-    border-color: var(--primary);
+@media (hover: hover) {
+    .reporter-tag:hover {
+        background: var(--primary);
+        color: #fff !important;
+        border-color: var(--primary);
+    }
 }
 
 .reporter-tag.toxic-alert {
@@ -305,11 +307,13 @@
     border: 1px solid rgba(46, 213, 115, 0.2);
 }
 
-.btn-admin-action.resolve-d:hover {
-    background: #2ed573;
-    color: #fff !important;
-    border-color: #2ed573;
-    box-shadow: 0 8px 20px rgba(46, 213, 115, 0.3);
+@media (hover: hover) {
+    .btn-admin-action.resolve-d:hover {
+        background: #2ed573;
+        color: #fff !important;
+        border-color: #2ed573;
+        box-shadow: 0 8px 20px rgba(46, 213, 115, 0.3);
+    }
 }
 
 .admin-review-actions-dual {
@@ -361,10 +365,12 @@
     border: 1px solid rgba(255, 71, 87, 0.1);
 }
 
-.btn-admin-action.accept-d:hover {
-    background: #ff4757;
-    color: #fff;
-    box-shadow: 0 10px 20px rgba(255, 71, 87, 0.3);
+@media (hover: hover) {
+    .btn-admin-action.accept-d:hover {
+        background: #ff4757;
+        color: #fff;
+        box-shadow: 0 10px 20px rgba(255, 71, 87, 0.3);
+    }
 }
 
 .btn-admin-action.reject-d {
@@ -373,10 +379,12 @@
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.btn-admin-action.reject-d:hover {
-    background: #fff;
-    color: #000;
-    box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+@media (hover: hover) {
+    .btn-admin-action.reject-d:hover {
+        background: #fff;
+        color: #000;
+        box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+    }
 }
 
 .admin-user-link,
@@ -389,9 +397,11 @@
     display: inline-block;
 }
 
-.admin-user-link:hover {
-    transform: scale(1.05);
-    color: var(--primary) !important;
+@media (hover: hover) {
+    .admin-user-link:hover {
+        transform: scale(1.05);
+        color: var(--primary) !important;
+    }
 }
 
 .admin-empty-state {
@@ -607,11 +617,13 @@
     gap: 15px;
 }
 
-.btn-shiori-ban:hover {
-    background: #ff4757;
-    color: #fff;
-    box-shadow: 0 15px 40px rgba(255, 71, 87, 0.4);
-    transform: translateY(-3px);
+@media (hover: hover) {
+    .btn-shiori-ban:hover {
+        background: #ff4757;
+        color: #fff;
+        box-shadow: 0 15px 40px rgba(255, 71, 87, 0.4);
+        transform: translateY(-3px);
+    }
 }
 
 .btn-shiori-ban.is-banned {
@@ -620,11 +632,13 @@
     border-color: rgba(46, 213, 115, 0.25);
 }
 
-.btn-shiori-ban.is-banned:hover {
-    background: #2ed573;
-    color: #fff;
-    box-shadow: 0 15px 40px rgba(46, 213, 115, 0.4);
-    transform: translateY(-3px);
+@media (hover: hover) {
+    .btn-shiori-ban.is-banned:hover {
+        background: #2ed573;
+        color: #fff;
+        box-shadow: 0 15px 40px rgba(46, 213, 115, 0.4);
+        transform: translateY(-3px);
+    }
 }
 
 .btn-nuclear-purge-mini {
@@ -641,11 +655,13 @@
     letter-spacing: 1px;
 }
 
-.btn-nuclear-purge-mini:hover {
-    color: #fff;
-    border-color: #ff4757;
-    border-style: solid;
-    background: rgba(255, 71, 87, 0.05);
+@media (hover: hover) {
+    .btn-nuclear-purge-mini:hover {
+        color: #fff;
+        border-color: #ff4757;
+        border-style: solid;
+        background: rgba(255, 71, 87, 0.05);
+    }
 }
 
 .forensic-snapshot {
@@ -944,17 +960,21 @@
     box-shadow: 0 10px 25px rgba(255, 71, 87, 0.3);
 }
 
-.confirm-btn.shiori-cancel:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: #fff;
-    transform: translateY(-2px);
+@media (hover: hover) {
+    .confirm-btn.shiori-cancel:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: #fff;
+        transform: translateY(-2px);
+    }
 }
 
-.confirm-btn.shiori-ban-action:hover {
-    background: #ff6b81;
-    color: #fff;
-    box-shadow: 0 15px 35px rgba(255, 71, 87, 0.5);
-    transform: translateY(-2px);
+@media (hover: hover) {
+    .confirm-btn.shiori-ban-action:hover {
+        background: #ff6b81;
+        color: #fff;
+        box-shadow: 0 15px 35px rgba(255, 71, 87, 0.5);
+        transform: translateY(-2px);
+    }
 }
 
 .icon-success-shiori {
@@ -984,11 +1004,13 @@
     transition: 0.3s;
 }
 
-.btn-shiori-banned-list:hover {
-    background: #ff4757;
-    color: #fff;
-    box-shadow: 0 10px 25px rgba(255, 71, 87, 0.3);
-    transform: translateY(-2px);
+@media (hover: hover) {
+    .btn-shiori-banned-list:hover {
+        background: #ff4757;
+        color: #fff;
+        box-shadow: 0 10px 25px rgba(255, 71, 87, 0.3);
+        transform: translateY(-2px);
+    }
 }
 
 #prison-search-input {
@@ -1121,9 +1143,11 @@
     gap: 10px;
 }
 
-.btn-examine-dossier:hover {
-    background: #fff;
-    color: #000;
+@media (hover: hover) {
+    .btn-examine-dossier:hover {
+        background: #fff;
+        color: #000;
+    }
 }
 
 .prison-empty {
@@ -1149,11 +1173,13 @@
     width: fit-content;
 }
 
-.btn-report-data-premium:hover {
-    background: rgba(255, 69, 0, 0.1);
-    border-color: rgba(255, 69, 0, 0.3);
-    color: var(--primary);
-    transform: translateY(-2px);
+@media (hover: hover) {
+    .btn-report-data-premium:hover {
+        background: rgba(255, 69, 0, 0.1);
+        border-color: rgba(255, 69, 0, 0.3);
+        color: var(--primary);
+        transform: translateY(-2px);
+    }
 }
 
 .admin-nav-tabs {
@@ -1179,9 +1205,11 @@
     border: 1px solid transparent;
 }
 
-.admin-nav-link:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.05);
+@media (hover: hover) {
+    .admin-nav-link:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.05);
+    }
 }
 
 .admin-nav-link.active {
@@ -1225,8 +1253,10 @@
 }
 
 
-.media-title-link-premium a:hover {
-    color: var(--primary);
+@media (hover: hover) {
+    .media-title-link-premium a:hover {
+        color: var(--primary);
+    }
 }
 
 .reports-grid {
@@ -1327,8 +1357,10 @@
     transition: 0.3s;
 }
 
-.media-title-link a:hover {
-    color: var(--primary);
+@media (hover: hover) {
+    .media-title-link a:hover {
+        color: var(--primary);
+    }
 }
 
 .report-field-info {
@@ -1388,9 +1420,11 @@
     border: 1px solid rgba(46, 213, 115, 0.1);
 }
 
-.btn-resolve:hover {
-    background: #2ed573;
-    color: #fff;
+@media (hover: hover) {
+    .btn-resolve:hover {
+        background: #2ed573;
+        color: #fff;
+    }
 }
 
 .btn-dismiss {
@@ -1399,9 +1433,11 @@
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.btn-dismiss:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
+@media (hover: hover) {
+    .btn-dismiss:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+    }
 }
 
 

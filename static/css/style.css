@@ -302,11 +302,13 @@ main {
     gap: 10px;
 }
 
-.btn-more:hover {
-    background: var(--primary);
-    color: #fff;
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(255, 69, 0, 0.2);
+@media (hover: hover) {
+    .btn-more:hover {
+        background: var(--primary-gradient);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(255, 69, 0, 0.3);
+    }
 }
 
 .show-more-container {
@@ -384,10 +386,12 @@ main {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.close-modal:hover {
-    background: var(--primary);
-    transform: rotate(90deg) scale(1.1);
-    box-shadow: 0 0 20px rgba(255, 69, 0, 0.4);
+@media (hover: hover) {
+    .close-modal:hover {
+        background: var(--primary);
+        transform: rotate(90deg) scale(1.1);
+        box-shadow: 0 0 20px rgba(255, 69, 0, 0.4);
+    }
 }
 
 .video-wrapper {
@@ -460,8 +464,10 @@ main {
     transition: var(--transition);
 }
 
-.logo a:hover {
-    color: var(--primary);
+@media (hover: hover) {
+    .logo a:hover {
+        color: var(--primary);
+    }
 }
 
 .shiori-logo-icon {
@@ -502,9 +508,11 @@ main {
     
 }
 
-.nav-links a:hover,
-.nav-links a.active {
-    color: var(--primary);
+@media (hover: hover) {
+    .nav-links a:hover,
+    .nav-links a.active {
+        color: var(--primary);
+    }
 }
 
 .login-btn {
@@ -521,8 +529,10 @@ main {
     transition: transform 0.2s ease;
 }
 
-.login-btn:hover {
-    transform: scale(1.05);
+@media (hover: hover) {
+    .login-btn:hover {
+        transform: scale(1.05);
+    }
 }
 
 
@@ -704,13 +714,15 @@ main {
 }
 
 
-.card-link:hover .card {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-}
+@media (hover: hover) {
+    .card-link:hover .card {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
 
-.card-link:hover img {
-    transform: scale(1.05);
+    .card-link:hover img {
+        transform: scale(1.05);
+    }
 }
 
 .card-body {
@@ -839,8 +851,10 @@ main {
     gap: 8px;
 }
 
-.view-all-link:hover {
-    color: var(--primary);
+@media (hover: hover) {
+    .view-all-link:hover {
+        color: var(--primary);
+    }
 }
 
 
@@ -862,8 +876,10 @@ main {
     white-space: nowrap;
 }
 
-.back-link-premium:hover {
-    color: var(--primary);
+@media (hover: hover) {
+    .back-link-premium:hover {
+        color: var(--primary);
+    }
 }
 
 .back-link-premium i {
@@ -1085,11 +1101,13 @@ main {
     width: fit-content;
 }
 
-.credit-info a.name:hover,
-.credit-info-row a.name:hover,
-.work-card:hover .work-title {
-    color: var(--primary);
-    text-decoration: none !important;
+@media (hover: hover) {
+    .credit-info a.name:hover,
+    .credit-info-row a.name:hover,
+    .work-card:hover .work-title {
+        color: var(--primary);
+        text-decoration: none !important;
+    }
 }
 
 .cast-avatar a,
@@ -1105,10 +1123,12 @@ main {
     transition: var(--transition);
 }
 
-.cast-avatar a:hover,
-.credit-photo-small a:hover {
-    transform: scale(1.05);
-    text-decoration: none !important;
+@media (hover: hover) {
+    .cast-avatar a:hover,
+    .credit-photo-small a:hover {
+        transform: scale(1.05);
+        text-decoration: none !important;
+    }
 }
 
 
@@ -1140,9 +1160,11 @@ main {
     height: 52px;
 }
 
-.region-dropdown-btn:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.2);
+@media (hover: hover) {
+    .region-dropdown-btn:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
 }
 
 .selected-region {
@@ -1276,9 +1298,11 @@ main {
     gap: 12px;
 }
 
-.region-item:hover,
-.region-item.selected {
-    background: rgba(255, 69, 0, 0.1);
+@media (hover: hover) {
+    .region-item:hover,
+    .region-item.selected {
+        background: rgba(255, 69, 0, 0.1);
+    }
 }
 
 .region-item.selected {
@@ -1383,17 +1407,21 @@ div[data-provider-id="1773"] svg {
 }
 
 
-.platform-circle:hover svg,
-.platform-circle-detail:hover svg {
-    transform: scale(1.1);
+@media (hover: hover) {
+    .platform-circle:hover svg,
+    .platform-circle-detail:hover svg {
+        transform: scale(1.1);
+    }
 }
 
 
-div[data-id="344"]:hover svg,
-div[data-provider-id="344"]:hover svg,
-div[data-id="1773"]:hover svg,
-div[data-provider-id="1773"]:hover svg {
-    transform: scale(1.4);
+@media (hover: hover) {
+    div[data-id="344"]:hover svg,
+    div[data-provider-id="344"]:hover svg,
+    div[data-id="1773"]:hover svg,
+    div[data-provider-id="1773"]:hover svg {
+        transform: scale(1.4);
+    }
 }
 
 
@@ -1462,10 +1490,12 @@ div[data-provider-id="1773"]:hover svg {
     transition: var(--transition);
 }
 
-.search-bar-inline:focus-within {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--primary);
-    box-shadow: 0 0 20px rgba(255, 69, 0, 0.15);
+@media (hover: hover) {
+    .search-bar-inline:focus-within {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--primary);
+        box-shadow: 0 0 20px rgba(255, 69, 0, 0.15);
+    }
 }
 
 .search-icon-mini {
@@ -1501,9 +1531,11 @@ div[data-provider-id="1773"]:hover svg {
     box-shadow: 0 5px 15px rgba(255, 69, 0, 0.2);
 }
 
-.search-btn-mini:hover {
-    transform: scale(1.03);
-    box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
+@media (hover: hover) {
+    .search-btn-mini:hover {
+        transform: scale(1.03);
+        box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
+    }
 }
 
 @media (max-width: 750px) {
@@ -1613,9 +1645,11 @@ div[data-provider-id="1773"]:hover svg {
     border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.confirm-btn.shiori-cancel:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
+@media (hover: hover) {
+    .confirm-btn.shiori-cancel:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+    }
 }
 
 .btn-report-data-premium {
@@ -1635,12 +1669,14 @@ div[data-provider-id="1773"]:hover svg {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.btn-report-data-premium:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateY(-3px);
-    border-color: var(--primary);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    color: var(--primary);
+@media (hover: hover) {
+    .btn-report-data-premium:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-3px);
+        border-color: var(--primary);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        color: var(--primary);
+    }
 }
 
 #data-report-modal .shiori-confirm-box {
@@ -1690,8 +1726,10 @@ div[data-provider-id="1773"]:hover svg {
     border-radius: 6px;
 }
 
-.report-option-item:hover {
-    background: rgba(255, 255, 255, 0.05);
+@media (hover: hover) {
+    .report-option-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
 }
 
 .report-option-item.selected {
@@ -1860,9 +1898,11 @@ div[data-provider-id="1773"]:hover svg {
     transition: var(--transition);
 }
 
-.footer-links a:hover {
-    color: var(--primary);
-    padding-left: 5px;
+@media (hover: hover) {
+    .footer-links a:hover {
+        color: var(--primary);
+        padding-left: 5px;
+    }
 }
 
 .social-links {
@@ -1885,11 +1925,13 @@ div[data-provider-id="1773"]:hover svg {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.social-links a:hover {
-    background: var(--primary-gradient);
-    border-color: transparent;
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(255, 69, 0, 0.3);
+@media (hover: hover) {
+    .social-links a:hover {
+        background: var(--primary-gradient);
+        border-color: transparent;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(255, 69, 0, 0.3);
+    }
 }
 
 .tmdb-attribution {
@@ -1944,10 +1986,6 @@ div[data-provider-id="1773"]:hover svg {
         flex-direction: column;
         align-items: center;
     }
-    .footer-title::after {
-        left: 50%;
-        transform: translateX(-50%);
-    }
 }
 
 @media (max-width: 750px) {
@@ -1962,6 +2000,10 @@ div[data-provider-id="1773"]:hover svg {
         grid-template-columns: 1fr;
         gap: 30px;
         text-align: center;
+    }
+    .footer-title::after {
+        left: 50%;
+        transform: translateX(-50%);
     }
     .footer-column.branding {
         grid-column: span 1;

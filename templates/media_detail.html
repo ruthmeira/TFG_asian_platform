@@ -73,7 +73,7 @@
                 data-media-subtype="{{ media.media_subtype }}" data-title="{{ media.display_title }}"
                 data-original-title="{{ media.original_title or media.original_name }}"
                 data-vote_average="{{ media.vote_average }}" data-flag="{{ media.flag or '🌏' }}"
-                data-poster="{{ media.poster_path }}">
+                data-poster="{{ media.poster_path if media.poster_path else '' }}">
                 <i class="fas fa-heart"></i>
                 <span>Favoritos</span>
             </button>
@@ -320,7 +320,7 @@
             </div>
 
             <div class="season-card-full">
-                <div class="season-poster-mini">
+                <div class="season-poster-detail">
                     {% if media.last_season.poster_path %}
                     <img src="https://image.tmdb.org/t/p/w185{{ media.last_season.poster_path }}"
                         alt="{{ media.last_season.name }}">
@@ -446,10 +446,9 @@
                 <div class="review-header">
                     <div class="user-info">
                         {% if r.user.profile_image %}
-                        <img src="{{ url_for('static', filename=r.user.profile_image) }}" class="user-avatar-shiori"
+                        <img src="{{ r.user.profile_image if r.user.profile_image.startswith('http') else url_for('static', filename=r.user.profile_image) }}" class="user-avatar-shiori"
                             onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden')">
-                        <div class="user-avatar-initial-shiori hidden">{{ r.user.username[0]|upper }}
-                        </div>
+                        <div class="user-avatar-initial-shiori hidden">{{ r.user.username[0]|upper }}</div>
                         {% else %}
                         <div class="user-avatar-initial-shiori">{{ r.user.username[0]|upper }}</div>
                         {% endif %}

@@ -137,9 +137,11 @@
     transition: all 0.3s;
 }
 
-.genre-collapsible-btn:hover {
-    border-color: rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.05);
+@media (hover: hover) {
+    .genre-collapsible-btn:hover {
+        border-color: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.05);
+    }
 }
 
 .genre-collapsible-btn.active {
@@ -299,13 +301,15 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.page-number:hover,
-.page-btn-nav:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.4);
-    color: #fff;
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+@media (hover: hover) {
+    .page-number:hover,
+    .page-btn-nav:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.4);
+        color: #fff;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+    }
 }
 
 .page-number.active {
@@ -390,10 +394,12 @@
     box-shadow: 0 10px 20px rgba(255, 69, 0, 0.2);
 }
 
-.apply-filters-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 30px rgba(255, 69, 0, 0.4);
-    filter: brightness(1.1);
+@media (hover: hover) {
+    .apply-filters-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(255, 69, 0, 0.4);
+        filter: brightness(1.1);
+    }
 }
 
 .clear-filters-btn {
@@ -414,10 +420,12 @@
     gap: 8px;
 }
 
-.clear-filters-btn:hover {
-    background: rgba(255, 69, 0, 0.1);
-    border-color: var(--primary);
-    color: var(--primary);
+@media (hover: hover) {
+    .clear-filters-btn:hover {
+        background: rgba(255, 69, 0, 0.1);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
 }
 
 

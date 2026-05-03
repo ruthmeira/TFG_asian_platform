@@ -36,7 +36,7 @@
                 <div class="avatar-preview-container">
                     <div class="avatar-circle-clean large preview" id="avatarPreview">
                         {% if current_user.profile_image %}
-                        <img src="{{ url_for('static', filename=current_user.profile_image) }}"
+                        <img src="{{ current_user.profile_image if current_user.profile_image.startswith('http') else url_for('static', filename=current_user.profile_image) }}"
                             alt="{{ current_user.username }}" class="avatar-img-clean">
                         {% else %}
                         <span class="avatar-initial">{{ current_user.username[0] | upper }}</span>

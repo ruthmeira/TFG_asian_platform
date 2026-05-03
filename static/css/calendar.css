@@ -57,11 +57,13 @@
     font-size: 1.2rem;
 }
 
-.nav-btn:hover {
-    background: var(--primary);
-    border-color: var(--primary);
-    transform: scale(1.1);
-    box-shadow: 0 0 15px rgba(255, 69, 0, 0.3);
+@media (hover: hover) {
+    .nav-btn:hover {
+        background: var(--primary);
+        border-color: var(--primary);
+        transform: scale(1.1);
+        box-shadow: 0 0 15px rgba(255, 69, 0, 0.3);
+    }
 }
 
 .calendar-grid {
@@ -96,10 +98,12 @@
     overflow: hidden;
 }
 
-.calendar-day:not(.empty):hover {
-    border-color: var(--primary);
-    background: var(--day-hover);
-    transform: translateY(-3px);
+@media (hover: hover) {
+    .calendar-day:not(.empty):hover {
+        border-color: var(--primary);
+        background: var(--day-hover);
+        transform: translateY(-3px);
+    }
 }
 
 .calendar-day.today {
@@ -142,9 +146,11 @@
     transition: var(--transition);
 }
 
-.event-item:hover {
-    background: var(--primary);
-    transform: translateX(3px);
+@media (hover: hover) {
+    .event-item:hover {
+        background: var(--primary);
+        transform: translateX(3px);
+    }
 }
 
 .event-indicator {
@@ -257,9 +263,11 @@
     transition: var(--transition);
 }
 
-.modal-close:hover {
-    color: var(--primary);
-    transform: rotate(90deg);
+@media (hover: hover) {
+    .modal-close:hover {
+        color: var(--primary);
+        transform: rotate(90deg);
+    }
 }
 
 .daily-events-list {
@@ -301,10 +309,12 @@
     align-items: center;
 }
 
-.daily-event-card:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--primary);
-    transform: translateX(5px);
+@media (hover: hover) {
+    .daily-event-card:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--primary);
+        transform: translateX(5px);
+    }
 }
 
 .daily-event-poster {

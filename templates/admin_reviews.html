@@ -42,7 +42,7 @@
             <div class="author-dossier">
                 <div class="reviewer-meta">
                     {% if review.user and review.user.profile_image %}
-                    <img src="{{ url_for('static', filename=review.user.profile_image) }}" class="admin-avatar-thumb">
+                    <img src="{{ review.user.profile_image if review.user.profile_image.startswith('http') else url_for('static', filename=review.user.profile_image) }}" class="admin-avatar-thumb">
                     {% else %}
                     <div class="admin-avatar-initial">{{ review.user.username[0]|upper if review.user else '?' }}</div>
                     {% endif %}

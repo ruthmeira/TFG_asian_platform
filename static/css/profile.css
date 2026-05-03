@@ -210,18 +210,19 @@ main.container {
     
 }
 
-.stat-crystal-link:hover .stat-crystal {
-    background: rgba(255, 255, 255, 0.12);
-    
-    border-color: rgba(255, 255, 255, 0.25);
-    
+@media (hover: hover) {
+    .stat-crystal-link:hover .stat-crystal {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.25);
+    }
 }
 
-.stat-crystal-link:hover i {
-    transform: scale(1.05);
-    
-    background: var(--primary-gradient);
-    color: white;
+@media (hover: hover) {
+    .stat-crystal-link:hover i {
+        transform: scale(1.05);
+        background: var(--primary-gradient);
+        color: white;
+    }
 }
 
 
@@ -270,11 +271,13 @@ main.container {
     box-shadow: 0 10px 20px rgba(255, 69, 0, 0.2);
 }
 
-.profile-btn.highlight:hover {
-    transform: translateY(-3px);
-    background: rgba(255, 255, 255, 0.15) !important;
-    box-shadow: 0 15px 30px rgba(255, 69, 0, 0.4);
-    color: var(--primary) !important;
+@media (hover: hover) {
+    .profile-btn.highlight:hover {
+        transform: translateY(-3px);
+        background: rgba(255, 255, 255, 0.15) !important;
+        box-shadow: 0 15px 30px rgba(255, 69, 0, 0.4);
+        color: var(--primary) !important;
+    }
 }
 
 .profile-btn.outline {
@@ -284,11 +287,13 @@ main.container {
     box-shadow: 0 10px 20px rgba(255, 69, 0, 0.3);
 }
 
-.profile-btn.outline:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 30px rgba(255, 69, 0, 0.5);
-    filter: brightness(1.1);
-    color: #fff !important;
+@media (hover: hover) {
+    .profile-btn.outline:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(255, 69, 0, 0.5);
+        filter: brightness(1.1);
+        color: #fff !important;
+    }
 }
 
 .profile-btn.danger {
@@ -298,12 +303,14 @@ main.container {
     backdrop-filter: blur(10px);
 }
 
-.profile-btn.danger:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: var(--primary);
-    border-color: var(--primary);
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+@media (hover: hover) {
+    .profile-btn.danger:hover {
+        background: rgba(255, 255, 255, 0.15);
+        color: var(--primary);
+        border-color: var(--primary);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
 }
 
 
@@ -444,10 +451,12 @@ main.container {
     gap: 8px;
 }
 
-.change-photo-btn:hover {
-    background: var(--primary);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 69, 0, 0.3);
+@media (hover: hover) {
+    .change-photo-btn:hover {
+        background: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 69, 0, 0.3);
+    }
 }
 
 
@@ -555,8 +564,10 @@ main.container {
     transition: color 0.3s;
 }
 
-.edit-mode .input-group .password-toggle:hover {
-    color: var(--primary);
+@media (hover: hover) {
+    .edit-mode .input-group .password-toggle:hover {
+        color: var(--primary);
+    }
 }
 
 .edit-mode .input-group input:focus {
@@ -638,9 +649,11 @@ main.container {
     border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.btn-secondary:hover {
-    color: white;
-    transform: translateX(-5px);
+@media (hover: hover) {
+    .btn-secondary:hover {
+        color: white;
+        transform: translateX(-5px);
+    }
 }
 
 .save-profile-btn {
@@ -661,10 +674,12 @@ main.container {
     box-shadow: 0 10px 20px rgba(255, 69, 0, 0.3);
 }
 
-.save-profile-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 30px rgba(255, 69, 0, 0.5);
-    filter: brightness(1.1);
+@media (hover: hover) {
+    .save-profile-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(255, 69, 0, 0.5);
+        filter: brightness(1.1);
+    }
 }
 
 .save-profile-btn:active {

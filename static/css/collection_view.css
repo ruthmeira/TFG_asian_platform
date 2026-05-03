@@ -72,10 +72,12 @@
     transition: all 0.3s ease;
 }
 
-.page-number:hover,
-.page-btn-nav:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: var(--primary);
+@media (hover: hover) {
+    .page-number:hover,
+    .page-btn-nav:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--primary);
+    }
 }
 
 .page-number.active {

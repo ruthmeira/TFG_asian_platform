@@ -21,7 +21,7 @@
     <div class="profile-user-info-clean">
         <div class="avatar-circle-clean">
             {% if current_user.profile_image %}
-                <img src="{{ url_for('static', filename=current_user.profile_image) }}" alt="{{ current_user.username }}" class="avatar-img-clean">
+                <img src="{{ current_user.profile_image if current_user.profile_image.startswith('http') else url_for('static', filename=current_user.profile_image) }}" alt="{{ current_user.username }}" class="avatar-img-clean">
             {% else %}
                 {{ current_user.username[0] | upper }}
             {% endif %}

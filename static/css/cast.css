@@ -139,8 +139,10 @@
     will-change: transform;
 }
 
-.credit-info-row .name:hover {
-    color: var(--primary);
+@media (hover: hover) {
+    .credit-info-row .name:hover {
+        color: var(--primary);
+    }
 }
 
 .credit-info-row .role {
@@ -173,8 +175,10 @@
     user-select: none;
 }
 
-.dept-subtitle:hover {
-    background: linear-gradient(90deg, rgba(255, 69, 0, 0.2) 0%, transparent 100%);
+@media (hover: hover) {
+    .dept-subtitle:hover {
+        background: linear-gradient(90deg, rgba(255, 69, 0, 0.2) 0%, transparent 100%);
+    }
 }
 
 .dept-subtitle .dept-info {

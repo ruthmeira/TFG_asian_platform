@@ -65,9 +65,11 @@
     border-bottom: none;
 }
 
-.sidebar-item:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
+@media (hover: hover) {
+    .sidebar-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+    }
 }
 
 .sidebar-item.active {
@@ -162,10 +164,12 @@
     transition: all 0.3s ease;
 }
 
-.person-row-link:hover .person-row-card {
-    background: rgba(255, 255, 255, 0.08);
-    transform: translateY(-2px);
-    border-color: rgba(255, 255, 255, 0.15);
+@media (hover: hover) {
+    .person-row-link:hover .person-row-card {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-2px);
+        border-color: rgba(255, 255, 255, 0.15);
+    }
 }
 
 .person-avatar-mini {
@@ -229,10 +233,12 @@
     font-size: 1.1rem;
 }
 
-.person-row-link:hover .person-arrow {
-    color: var(--primary);
-    transform: translateX(5px);
-    transition: all 0.3s ease;
+@media (hover: hover) {
+    .person-row-link:hover .person-arrow {
+        color: var(--primary);
+        transform: translateX(5px);
+        transition: all 0.3s ease;
+    }
 }
 
 .keyword-row {
@@ -250,10 +256,12 @@
     transition: all 0.3s ease;
 }
 
-.keyword-row:hover {
-    background: rgba(255, 255, 255, 0.08);
-    transform: translateY(-2px);
-    border-color: rgba(255, 255, 255, 0.15);
+@media (hover: hover) {
+    .keyword-row:hover {
+        background: rgba(255, 255, 255, 0.08);
+        transform: translateY(-2px);
+        border-color: rgba(255, 255, 255, 0.15);
+    }
 }
 
 .keyword-icon {

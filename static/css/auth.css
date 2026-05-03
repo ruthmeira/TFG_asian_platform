@@ -83,8 +83,10 @@
     z-index: 5;
 }
 
-.password-toggle:hover {
-    color: var(--primary);
+@media (hover: hover) {
+    .password-toggle:hover {
+        color: var(--primary);
+    }
 }
 
 .auth-card input {
@@ -170,8 +172,10 @@
     font-weight: 500;
 }
 
-.forgot-password:hover {
-    text-decoration: underline;
+@media (hover: hover) {
+    .forgot-password:hover {
+        text-decoration: underline;
+    }
 }
 
 .auth-card button[type="submit"] {
@@ -191,10 +195,12 @@
     box-shadow: 0 10px 25px rgba(255, 69, 0, 0.3);
 }
 
-.auth-card button[type="submit"]:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 15px 35px rgba(255, 69, 0, 0.5);
-    filter: brightness(1.15);
+@media (hover: hover) {
+    .auth-card button[type="submit"]:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 15px 35px rgba(255, 69, 0, 0.5);
+        filter: brightness(1.15);
+    }
 }
 
 .auth-footer-links {
@@ -213,8 +219,10 @@
     transition: all 0.3s;
 }
 
-.auth-footer-links a:hover {
-    color: var(--primary);
+@media (hover: hover) {
+    .auth-footer-links a:hover {
+        color: var(--primary);
+    }
 }
 
 .separator {
@@ -262,11 +270,13 @@
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.google-btn:hover {
-    background: rgba(255, 255, 255, 0.12) !important;
-    border-color: rgba(255, 255, 255, 0.25) !important;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
-    transform: translateY(-3px);
+@media (hover: hover) {
+    .google-btn:hover {
+        background: rgba(255, 255, 255, 0.12) !important;
+        border-color: rgba(255, 255, 255, 0.25) !important;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+        transform: translateY(-3px);
+    }
 }
 
 .google-icon {
