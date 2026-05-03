@@ -2,7 +2,7 @@ from flask import Flask, jsonify, render_template, request, redirect, url_for, f
 import json
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_mail import Mail, Message
-from authlib.integrations.flask_client import OAuth  # Nueva importación
+from authlib.integrations.flask_client import OAuth
 from deep_translator import GoogleTranslator
 from dotenv import load_dotenv
 from models import db, User, CollectionItem, Review, ReviewVote, ReviewReport, ModerationLog, MediaEvent, MediaReport
@@ -20,16 +20,11 @@ import threading
 GLOBAL_COUNTRIES_LIST = [{"code": "AL", "name": "Albania", "emoji": "🇦🇱"}, {"code": "DE", "name": "Alemania", "emoji": "🇩🇪"}, {"code": "AD", "name": "Andorra", "emoji": "🇦🇩"}, {"code": "AO", "name": "Angola", "emoji": "🇦🇴"}, {"code": "AG", "name": "Antigua y Barbuda", "emoji": "🇦🇬"}, {"code": "SA", "name": "Arabia Saudí", "emoji": "🇸🇦"}, {"code": "DZ", "name": "Argelia", "emoji": "🇩🇿"}, {"code": "AR", "name": "Argentina", "emoji": "🇦🇷"}, {"code": "AU", "name": "Australia", "emoji": "🇦🇺"}, {"code": "AT", "name": "Austria", "emoji": "🇦🇹"}, {"code": "AZ", "name": "Azerbaiyán", "emoji": "🇦🇿"}, {"code": "BS", "name": "Bahamas", "emoji": "🇧🇸"}, {"code": "BB", "name": "Barbados", "emoji": "🇧🇧"}, {"code": "BH", "name": "Baréin", "emoji": "🇧🇭"}, {"code": "BZ", "name": "Belice", "emoji": "🇧🇿"}, {"code": "BM", "name": "Bermudas", "emoji": "🇧🇲"}, {"code": "BY", "name": "Bielorrusia", "emoji": "🇧🇾"}, {"code": "BO", "name": "Bolivia", "emoji": "🇧🇴"}, {"code": "BA", "name": "Bosnia-Herzegovina", "emoji": "🇧🇦"}, {"code": "BR", "name": "Brasil", "emoji": "🇧🇷"}, {"code": "BG", "name": "Bulgaria", "emoji": "🇧🇬"}, {"code": "BF", "name": "Burkina Faso", "emoji": "🇧🇫"}, {"code": "BE", "name": "Bélgica", "emoji": "🇧🇪"}, {"code": "CV", "name": "Cabo Verde", "emoji": "🇨🇻"}, {"code": "CM", "name": "Camerún", "emoji": "🇨🇲"}, {"code": "CA", "name": "Canadá", "emoji": "🇨🇦"}, {"code": "CN", "name": "China", "emoji": "🇨🇳"}, {"code": "QA", "name": "Catar", "emoji": "🇶🇦"}, {"code": "TD", "name": "Chad", "emoji": "🇹🇩"}, {"code": "CL", "name": "Chile", "emoji": "🇨🇱"}, {"code": "CY", "name": "Chipre", "emoji": "🇨🇾"}, {"code": "VA", "name": "Ciudad del Vaticano", "emoji": "🇻🇦"}, {"code": "CO", "name": "Colombia", "emoji": "🇨🇴"}, {"code": "KR", "name": "Corea del Sur", "emoji": "🇰🇷"}, {"code": "CR", "name": "Costa Rica", "emoji": "🇨🇷"}, {"code": "CI", "name": "Costa de Marfil", "emoji": "🇨🇮"}, {"code": "HR", "name": "Croacia", "emoji": "🇭🇷"}, {"code": "CU", "name": "Cuba", "emoji": "🇨🇺"}, {"code": "DK", "name": "Dinamarca", "emoji": "🇩🇰"}, {"code": "EC", "name": "Ecuador", "emoji": "🇪🇨"}, {"code": "EG", "name": "Egipto", "emoji": "🇪🇬"}, {"code": "SV", "name": "El Salvador", "emoji": "🇸🇻"}, {"code": "AE", "name": "Emiratos Árabes Unidos", "emoji": "🇦🇪"}, {"code": "SK", "name": "Eslovaquia", "emoji": "🇸🇰"}, {"code": "SI", "name": "Eslovenia", "emoji": "🇸🇮"}, {"code": "ES", "name": "España", "emoji": "🇪🇸"}, {"code": "US", "name": "Estados Unidos", "emoji": "🇺🇸"}, {"code": "EE", "name": "Estonia", "emoji": "🇪🇪"}, {"code": "PH", "name": "Filipinas", "emoji": "🇵🇭"}, {"code": "FI", "name": "Finlandia", "emoji": "🇫🇮"}, {"code": "FJ", "name": "Fiyi", "emoji": "🇫🇯"}, {"code": "FR", "name": "Francia", "emoji": "🇫🇷"}, {"code": "GH", "name": "Ghana", "emoji": "🇬🇭"}, {"code": "GI", "name": "Gibraltar", "emoji": "🇬🇮"}, {"code": "GR", "name": "Grecia", "emoji": "🇬🇷"}, {"code": "GP", "name": "Guadalupe", "emoji": "🇬🇵"}, {"code": "GT", "name": "Guatemala", "emoji": "🇬🇹"}, {"code": "GF", "name": "Guayana Francesa", "emoji": "🇬🇫"}, {"code": "GQ", "name": "Guinea Ecuatorial", "emoji": "🇬🇶"}, {"code": "GY", "name": "Guyana", "emoji": "🇬🇾"}, {"code": "HN", "name": "Honduras", "emoji": "🇭🇳"}, {"code": "HU", "name": "Hungría", "emoji": "🇭🇺"}, {"code": "IN", "name": "India", "emoji": "🇮🇳"}, {"code": "ID", "name": "Indonesia", "emoji": "🇮🇩"}, {"code": "IQ", "name": "Iraq", "emoji": "🇮🇶"}, {"code": "IE", "name": "Irlanda", "emoji": "🇮🇪"}, {"code": "IS", "name": "Islandia", "emoji": "🇮🇸"}, {"code": "TC", "name": "Islas Turcas y Caicos", "emoji": "🇹🇨"}, {"code": "IL", "name": "Israel", "emoji": "🇮🇱"}, {"code": "IT", "name": "Italia", "emoji": "🇮🇹"}, {"code": "JM", "name": "Jamaica", "emoji": "🇯🇲"}, {"code": "JP", "name": "Japón", "emoji": "🇯🇵"}, {"code": "JO", "name": "Jordania", "emoji": "🇯🇴"}, {"code": "KE", "name": "Kenia", "emoji": "🇰🇪"}, {"code": "XK", "name": "Kosovo", "emoji": "🇽🇰"}, {"code": "KW", "name": "Kuwait", "emoji": "🇰🇼"}, {"code": "LV", "name": "Letonia", "emoji": "🇱🇻"}, {"code": "LY", "name": "Libia", "emoji": "🇱🇾"}, {"code": "LI", "name": "Liechtenstein", "emoji": "🇱🇮"}, {"code": "LT", "name": "Lituania", "emoji": "🇱🇹"}, {"code": "LU", "name": "Luxemburgo", "emoji": "🇱🇺"}, {"code": "LB", "name": "Líbano", "emoji": "🇱🇧"}, {"code": "MO", "name": "Macao", "emoji": "🇲🇴"}, {"code": "MK", "name": "Macedonia", "emoji": "🇲🇰"}, {"code": "MG", "name": "Madagascar", "emoji": "🇲🇬"}, {"code": "MY", "name": "Malasía", "emoji": "🇲🇾"}, {"code": "MW", "name": "Malaui", "emoji": "🇲🇼"}, {"code": "ML", "name": "Mali", "emoji": "🇲🇱"}, {"code": "MT", "name": "Malta", "emoji": "🇲🇹"}, {"code": "MA", "name": "Marruecos", "emoji": "🇲🇦"}, {"code": "MU", "name": "Mauricio", "emoji": "🇲🇺"}, {"code": "MD", "name": "Moldavia", "emoji": "🇲🇩"}, {"code": "ME", "name": "Montenegro", "emoji": "🇲🇪"}, {"code": "MZ", "name": "Mozambique", "emoji": "🇲🇿"}, {"code": "MX", "name": "México", "emoji": "🇲🇽"}, {"code": "MC", "name": "Mónaco", "emoji": "🇲🇨"}, {"code": "NI", "name": "Nicaragua", "emoji": "🇳🇮"}, {"code": "NG", "name": "Nigeria", "emoji": "🇳🇬"}, {"code": "NO", "name": "Noruega", "emoji": "🇳🇴"}, {"code": "NZ", "name": "Nueva Zelanda", "emoji": "🇳🇿"}, {"code": "NE", "name": "Níger", "emoji": "🇳🇪"}, {"code": "OM", "name": "Omán", "emoji": "🇴🇲"}, {"code": "PK", "name": "Pakistán", "emoji": "🇵🇰"}, {"code": "PA", "name": "Panamá", "emoji": "🇵🇦"}, {"code": "PG", "name": "Papúa Nueva Guinea", "emoji": "🇵🇬"}, {"code": "PY", "name": "Paraguay", "emoji": "🇵🇾"}, {"code": "NL", "name": "Países Bajos", "emoji": "🇳🇱"}, {"code": "PE", "name": "Perú", "emoji": "🇵🇪"}, {"code": "PF", "name": "Polinesia Francesa", "emoji": "🇵🇫"}, {"code": "PL", "name": "Polonia", "emoji": "🇵🇱"}, {"code": "PT", "name": "Portugal", "emoji": "🇵🇹"}, {"code": "HK", "name": "RAE de Hong Kong (China)", "emoji": "🇭🇰"}, {"code": "GB", "name": "Reino Unido", "emoji": "🇬🇧"}, {"code": "CZ", "name": "República Checa", "emoji": "🇨🇿"}, {"code": "CD", "name": "República Democrática del Congo", "emoji": "🇨🇩"}, {"code": "DO", "name": "República Dominicana", "emoji": "🇩🇴"}, {"code": "RO", "name": "Rumanía", "emoji": "🇷🇴"}, {"code": "RU", "name": "Rusia", "emoji": "🇷🇺"}, {"code": "SM", "name": "San Marino", "emoji": "🇸🇲"}, {"code": "LC", "name": "Santa Lucía", "emoji": "🇱🇨"}, {"code": "SN", "name": "Senegal", "emoji": "🇸🇳"}, {"code": "RS", "name": "Serbia", "emoji": "🇷🇸"}, {"code": "SC", "name": "Seychelles", "emoji": "🇸🇨"}, {"code": "SG", "name": "Singapur", "emoji": "🇸🇬"}, {"code": "ZA", "name": "Sudáfrica", "emoji": "🇿🇦"}, {"code": "SE", "name": "Suecia", "emoji": "🇸🇪"}, {"code": "CH", "name": "Suiza", "emoji": "🇨🇭"}, {"code": "TH", "name": "Tailandia", "emoji": "🇹🇭"}, {"code": "TW", "name": "Taiwán", "emoji": "🇹🇼"}, {"code": "TZ", "name": "Tanzania", "emoji": "🇹🇿"}, {"code": "PS", "name": "Territorios Palestinos", "emoji": "🇵🇸"}, {"code": "TT", "name": "Trinidad y Tobago", "emoji": "🇹🇹"}, {"code": "TR", "name": "Turquía", "emoji": "🇹🇷"}, {"code": "TN", "name": "Túnez", "emoji": "🇹🇳"}, {"code": "UA", "name": "Ucrania", "emoji": "🇺🇦"}, {"code": "UG", "name": "Uganda", "emoji": "🇺🇬"}, {"code": "UY", "name": "Uruguay", "emoji": "🇺🇾"}, {"code": "VE", "name": "Venezuela", "emoji": "🇻🇪"}, {"code": "YE", "name": "Yemen", "emoji": "🇾🇪"}, {"code": "ZM", "name": "Zambia", "emoji": "🇿🇲"}, {"code": "ZW", "name": "Zimbabue", "emoji": "🇿🇼"}]
 
 
-# Mapa de banderas para acceso rápido en plantillas
 REGIONS_MAP = {c['code']: c['emoji'] for c in GLOBAL_COUNTRIES_LIST}
 
-# --- CONSTANTES MAESTRAS ASIÁTICAS (Foco Total: 18 Países) ---
 ASIA_LANGUAGES = [
-    # Corea, Japón, China y regiones
     'ko', 'ja', 'zh', 'cn', 'yue', 'bo', 'ug', 'mn',
-    # Sudeste Asiático (Países ASEAN)
     'th', 'vi', 'tl', 'fil', 'id', 'ms', 'km', 'my', 'lo',
-    # Sur de Asia (India y Nepal)
     'hi', 'ne', 'ta', 'te', 'ml', 'kn', 'bn', 'mr', 'gu', 'pa', 'ur', 'or', 'as', 'sd', 'ks'
 ]
 ASIA_COUNTRIES = [
@@ -49,9 +44,8 @@ ASIA_LANG_NAMES = {
     'bn':'Bengalí', 'mr':'Maratí', 'gu':'Guyaratí', 'pa':'Panyabí', 'ur':'Urdu', 'or':'Oriya',
     'as':'Asamés', 'sd':'Sindi', 'ks':'Cachemiro', 'bo':'Tibetano', 'ug':'Uigur'
 }
-GENRES_PROGRAMAS = [10764, 99, 10763, 10767] # Reality, Docu, Noticias, Talk Show
+GENRES_PROGRAMAS = [10764, 99, 10763, 10767]
 
-# --- MAPEOS DE TRADUCCIÓN Y CÓDIGOS ---
 LANG_TO_COUNTRY_MAP = {
     'ko':'KR','ja':'JP','th':'TH','vi':'VN','hi':'IN',
     'id':'ID','tl':'PH','fil':'PH','ms':'MY','mn':'MN',
@@ -70,7 +64,6 @@ GENRE_MAP_ES = {'Action & Adventure': 'Acción y Aventura', 'Kids': 'Infantil', 
 STATUS_MAP_ES = {'Ended':'Finalizada','Returning Series':'En emisión','Planned':'Planeada','Canceled':'Cancelada','In Production':'En producción','Released':'Estrenada'}
 DEPT_MAP_ES = {"Directing": "Dirección", "Writing": "Guion", "Production": "Producción", "Art": "Arte", "Camera": "Cámara", "Costume & Make-Up": "Vestuario y Maquillaje", "Visual Effects": "Efectos Visuales", "Sound": "Sonido", "Editing": "Edición", "Crew": "Equipo", "Lighting": "Iluminación", "Actors": "Actores"}
 
-# Datos para filtros de exploración
 ASIA_COUNTRIES_DATA = {
     'KR': 'Corea del Sur', 'JP': 'Japón', 'CN': 'China', 'TW': 'Taiwán', 
     'HK': 'Hong Kong', 'MO': 'Macao', 'MN': 'Mongolia', 'TH': 'Tailandia', 
@@ -96,7 +89,6 @@ GENRES_BY_TYPE = {
     }
 }
 
-# --- UTILIDADES MAESTRAS ---
 tmdb_session = requests.Session()
 
 
@@ -128,7 +120,6 @@ def get_media_flag(item, det_res=None, country_hint=None):
          paises_prod = [c['iso_3166_1'].upper() for c in det_res.get('production_countries', [])]
     
     todos_paises = list(set(paises_origin + paises_prod))
-    # Para mantener el orden de prioridad del registro original (TV tiene primacía en origin_country)
     paises_ordenados = []
     if item.get('origin_country'): 
         for p in item['origin_country']:
@@ -141,35 +132,26 @@ def get_media_flag(item, det_res=None, country_hint=None):
     lang = item.get('original_language', '').lower()
     c_sug = LANG_TO_COUNTRY_MAP.get(lang)
 
-    # REGLA 1: COINCIDENCIA IDIOMA-PAÍS (Prioridad Inteligente y Respeto al Orden)
-    # Refinamiento para co-producciones Chinas/HK/TW (Tal como pidió el usuario)
     if lang in ['zh', 'cn', 'yue']:
-        # Si el PRIMER país ya es de habla china, manda el orden oficial
         if paises_ordenados and paises_ordenados[0] in ['CN', 'HK', 'TW', 'MO']:
             return ASIA_FLAGS_MAP[paises_ordenados[0]]
             
-        # Si el primero no lo es, buscamos el "match" más lógico segun dialecto
         if lang == 'yue' and 'HK' in paises_ordenados: return ASIA_FLAGS_MAP['HK']
         if lang in ['zh', 'cn'] and 'CN' in paises_ordenados: return ASIA_FLAGS_MAP['CN']
         
-        # Por si acaso, si hay algun territorio chino en la lista aunque no sea el primero
         for p in ['CN', 'HK', 'TW', 'MO']:
             if p in paises_ordenados: return ASIA_FLAGS_MAP[p]
 
-    # Caso estándar (Corea -> KR, Japón -> JP, etc.)
     if c_sug and c_sug in paises_ordenados:
         return ASIA_FLAGS_MAP.get(c_sug, '🌏')
 
-    # REGLA 2: NO COINCIDE IDIOMA-PAÍS -> EL PRIMER PAÍS ASIÁTICO REGISTRADO
     if paises_ordenados:
         for p in paises_ordenados:
             if p in ASIA_FLAGS_MAP: return ASIA_FLAGS_MAP[p]
 
-    # REGLA 3: FALLBACK POR IDIOMA (Para consistencia en Home, Explorar y Personas)
     if c_sug and c_sug in ASIA_FLAGS_MAP:
         return ASIA_FLAGS_MAP[c_sug]
 
-    # REGLA 4: FALLBACK POR ARTISTA (Lugar de nacimiento como último recurso absoluto)
     if country_hint in ASIA_FLAGS_MAP:
         return ASIA_FLAGS_MAP[country_hint]
         
@@ -189,16 +171,12 @@ def get_tiered_field(raw, field='title', media_type='movie'):
     if field == 'title' or field == 'name':
         f_key = 'title' if (field == 'title' and media_type == 'movie') else 'name'
         
-        # 1. ES
         val = res_es.get(f_key)
         if val and val != orig_val: return val
-        # 2. MX
         val = res_mx.get(f_key)
         if val and val != orig_val: return val
-        # 3. EN
         val = res_en.get(f_key)
         if val: return val
-        # 4. ORIGINAL (Salvavidas final)
         return orig_val or "-"
 
     if field == 'overview':
@@ -239,11 +217,9 @@ def process_watch_providers(providers_data, region):
 app = Flask(__name__)
 load_dotenv(override=True)
 
-# Permitir HTTP local para OAuth (Google permite localhost)
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
-# Corrección obligatoria para Supabase (PostgreSQL)
 if app.config['SQLALCHEMY_DATABASE_URI'] and app.config['SQLALCHEMY_DATABASE_URI'].startswith("postgres://"):
     app.config['SQLALCHEMY_DATABASE_URI'] = app.config['SQLALCHEMY_DATABASE_URI'].replace("postgres://", "postgresql://", 1)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -253,7 +229,6 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
 }
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
-# --- CONFIGURACIÓN DE CORREO GMAIL ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -265,7 +240,6 @@ mail = Mail(app)
 
 db.init_app(app)
  
-# --- CONFIGURACIÓN DE UPLOAD ---
 UPLOAD_FOLDER = 'static/uploads/profiles'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -275,7 +249,6 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-# --- CONFIGURACIÓN GOOGLE OAUTH ---
 oauth = OAuth(app)
 google = oauth.register(
     name='google',
@@ -296,8 +269,6 @@ def ensure_session_id():
     if 'session_id' not in session:
         session['session_id'] = str(uuid.uuid4())
 
-# --- CACHÉ DE CONTEXTO POR USUARIO (Speed Triangle) ---
-# Guardamos solo el último medio procesado PARA CADA USUARIO
 USER_CONTEXT_CACHES = {}
 
 def get_cached_media(media_id, media_type):
@@ -316,7 +287,6 @@ def set_cached_media(media_id, data, user_region=None):
         session['session_id'] = str(uuid.uuid4())
         u_id = session['session_id']
     
-    # Pre-procesamos los providers para esa región específica
     data['cached_watch_providers'] = process_watch_providers(data.get('watch/providers', {}), user_region)
     data['cached_user_region'] = user_region
     
@@ -328,10 +298,8 @@ def set_cached_media(media_id, data, user_region=None):
     }
     cleanup_user_caches()
 
-# Limpieza periódica de memoria (opcional) cada 200 entradas borramos las más viejas
 def cleanup_user_caches():
     if len(USER_CONTEXT_CACHES) > 500:
-        # Borrado simple por antigüedad (las primeras llaves)
         keys_to_del = list(USER_CONTEXT_CACHES.keys())[:100]
         for k in keys_to_del:
             USER_CONTEXT_CACHES.pop(k, None)
@@ -355,13 +323,11 @@ def get_media_summary(m_id, m_type, country_hint=None, include_db=True):
     res_es = fetch_json(url)
     if not res_es or not res_es.get('id'): return None
     
-    # Extraer traducciones (Solo ES, MX y Salvavidas EN)
     trans = res_es.get('translations', {}).get('translations', [])
     t_es = next((x['data'] for x in trans if x['iso_3166_1'] == 'ES'), {})
     t_mx = next((x['data'] for x in trans if x['iso_3166_1'] == 'MX'), {})
     t_en = next((x['data'] for x in trans if x['iso_639_1'] == 'en'), {})
 
-    # REGLA DE 3 (ES > MX > EN > Original)
     best_title = t_es.get('title') or t_es.get('name') or \
                  t_mx.get('title') or t_mx.get('name') or \
                  t_en.get('title') or t_en.get('name') or \
@@ -383,7 +349,6 @@ def get_media_summary(m_id, m_type, country_hint=None, include_db=True):
         is_prod = any(gid in GENRES_PROGRAMAS for gid in genre_ids)
         summary['media_subtype'] = 'Programa' if is_prod else 'Serie'
     
-    # Puntuación de Shiori (Comunidad)
     if include_db:
         try:
             with app.app_context():
@@ -400,7 +365,6 @@ def get_media_summary(m_id, m_type, country_hint=None, include_db=True):
             summary['shiori_count'] = 0
             print(f"⚠️ Error cargando rating Shiori para {m_id}: {e}")
     else:
-        # Valores por defecto para ser llenados por el batch
         summary['shiori_rating'] = 0
         summary['shiori_count'] = 0
         
@@ -439,12 +403,11 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        identifier = request.form['email']  # email o username
+        identifier = request.form['email']
         password = request.form['password']
         user = User.query.filter_by(email=identifier).first() or User.query.filter_by(username=identifier).first()
         
         if user and user.check_password(password):
-            # --- VERIFICACIÓN DE BANEO SHIORI ---
             if user.is_banned:
                 flash("Tu cuenta ha sido bloqueada permanentemente por administración de Shiori. Acceso denegado. Si crees que es un error, contacta con contacto.shiori@gmail.com", "error")
                 return redirect(url_for('login'))
@@ -457,10 +420,8 @@ def login():
             flash("Credenciales incorrectas")
     return render_template('login.html')
 
-# --- RUTAS GOOGLE OAUTH ---
 @app.route('/login/google')
 def login_google():
-    # Detectamos la intención (si viene de register o de login normal)
     action = request.args.get('action', 'login')
     session['google_auth_action'] = action
     session['google_auth_next'] = request.args.get('next')
@@ -472,24 +433,19 @@ def login_google():
 def google_authorize():
     try:
         token = google.authorize_access_token()
-        # En Authlib 1.0+, el token ya suele incluir la información del usuario si hay OpenID
         user_info = token.get('userinfo')
         if not user_info:
-            # Si no, la pedimos manualmente
             resp = google.get('userinfo')
             user_info = resp.json()
         
         email = user_info['email']
         name = user_info.get('name', email.split('@')[0])
         
-        # Buscar usuario por email
         user = User.query.filter_by(email=email).first()
         action = session.get('google_auth_action', 'login')
         
         if not user:
             if action == 'register':
-                # Solo creamos el usuario si viene explícitamente de la página de registro
-                # Generar nombre de usuario único
                 base_username = name.replace(" ", "").lower()
                 username = base_username
                 counter = 1
@@ -498,13 +454,10 @@ def google_authorize():
                     counter += 1
                     
                 user = User(username=username, email=email)
-                # IMPORTANTE: Como tu DB pide que no sea NULL, ponemos un marcador interno.
-                # El usuario no se logueará nunca con esta clave, entrará via Google.
                 user.set_password("OAUTH_GOOGLE_USER")
                 db.session.add(user)
                 db.session.commit()
             else:
-                # Si viene de Login normal y no existe, mostramos el error útil de antes
                 flash("No encontramos ninguna cuenta de SHIORI vinculada a este correo. Regístrate primero para poder conectar con Google.", "error")
                 return redirect(url_for('login'))
         
@@ -512,13 +465,11 @@ def google_authorize():
             flash("Esta cuenta ha sido bloqueada permanentemente de Shiori. Acceso denegado. Si crees que es un error, contacta con contacto.shiori@gmail.com", "error")
             return redirect(url_for('login'))
 
-        # Loguear al usuario existente con sesión persistente (por comodidad)
         login_user(user, remember=True)
         next_page = session.pop('google_auth_next', None)
         return redirect(next_page or url_for('home'))
     except Exception as e:
         print(f"❌ Error en Google Auth: {str(e)}")
-        # Miramos si el usuario intentaba registrarse o entrar
         action = session.get('google_auth_action', 'login')
         flash("Error de autenticación con Google. Por favor, reintenta o usa login normal.", "error")
         return redirect(url_for(action))
@@ -537,9 +488,7 @@ def forgot_password():
             try:
                 msg = Message("SHIORI - Reestablecer Contraseña 🏮",
                               recipients=[user.email])
-                # Plantilla HTML con el diseño premium
                 msg.html = render_template('emails/reset_password_email.html', reset_url=reset_url)
-                # Fallback en texto plano por seguridad
                 msg.body = f"Para reestablecer tu contraseña en SHIORI, haz clic en el siguiente enlace: {reset_url}"
                 
                 mail.send(msg)
@@ -548,7 +497,6 @@ def forgot_password():
                 flash("Error al enviar el email de recuperación.", "error")
                 return redirect(url_for('forgot_password'))
         
-        # Mensaje unificado amigable (si existe o si no)
         flash("🏮 ¡Enviado! Si el correo es correcto, recibirás el enlace en tu buzón en breves momentos.", "success")
         return redirect(url_for('forgot_password'))
     return render_template('forgot_password.html')
@@ -570,7 +518,6 @@ def reset_password(token):
         new_password = request.form['password']
         user.set_password(new_password)
         db.session.commit()
-        # Loguear automáticamente con sesión persistente tras resetear
         login_user(user, remember=True)
         return redirect(url_for('home'))
 
@@ -582,7 +529,6 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
-# --- HOME & TMDB ---
 
 api_cache = {'day': {'series': [], 'movies': [], 'shows': [], 'last_updated': 0, 'expire': 14400},
              'week': {'series': [], 'movies': [], 'shows': [], 'last_updated': 0, 'expire': 86400}}
@@ -608,21 +554,18 @@ def get_top_20(api_key, media_type, time_window):
             lang = item.get('original_language', '').lower()
             countries = [c.upper() for c in item.get('origin_country', [])]
             
-            # --- FILTRADO ASIÁTICO ---
             is_asian = lang in ASIA_LANGUAGES or any(c in ASIA_COUNTRIES for c in countries)
             
             if is_asian and item_id not in seen_ids and item.get('poster_path'):
-                # --- Filtro de subcategoría (Series vs Programas) ---
                 if api_media_type == 'tv':
                     genre_ids = item.get('genre_ids', [])
                     es_no_ficcion = any(g in genre_ids for g in GENRES_PROGRAMAS)
                     if media_type == 'tv' and es_no_ficcion: continue
                     if media_type == 'show' and not es_no_ficcion: continue
 
-                # --- UNIFICACIÓN MAESTRA ---
                 summary = get_media_summary(item_id, api_media_type)
                 if summary:
-                    summary['type'] = api_media_type # Aseguramos el tipo para el enlace
+                    summary['type'] = api_media_type
                     final_list.append(summary)
                     seen_ids.add(item_id)
                     print(f"Top {media_type} [Summary]: {summary['title']} [{summary['flag']}]")
@@ -648,14 +591,11 @@ def refresh_trending_cache(window):
         api_cache[window]['movies'] = get_top_20(api_key, 'movie', window)
         api_cache[window]['shows'] = get_top_20(api_key, 'show', window)
         api_cache[window]['last_updated'] = time.time()
-        # Log más detallado para confirmar el reemplazo de datos
         print(f"[BACKGROUND] Cache {window} reemplazada con exito con 20 nuevos items por categoria.")
         print(f"Proxima actualizacion programada segun intervalo.")
     except Exception as e:
         print(f"[BACKGROUND] Error al refrescar cache {window}: {e}")
 
-# --- INICIALIZACIÓN DEL PLANIFICADOR (SCHEDULER) ---
-# Usamos misfire_grace_time=300 (5 min) para que si el servidor está ocupado, el job se ejecute aunque se pase unos minutos
 scheduler = BackgroundScheduler()
 
 scheduler.add_job(
@@ -664,8 +604,8 @@ scheduler.add_job(
     seconds=14400, 
     args=['day'],
     id='refresh_day',
-    misfire_grace_time=3600, # Margen de 1 hora para no saltar si hay retraso
-    coalesce=True            # Si hay varios retrasos, ejecutar solo una vez
+    misfire_grace_time=3600,
+    coalesce=True
 )
 
 scheduler.add_job(
@@ -679,15 +619,11 @@ scheduler.add_job(
 )
 
 
-# Forzar una carga inicial de TODO (en paralelo) para que las primeras personas no tengan que esperar
 with app.app_context():
-    # Solo disparamos la inicial si el caché de 'day' está vacío (indica reinicio o primer arranque)
     if not api_cache['day']['series']:
-        # Lanzamos dos hilos de forma paralela para acelerar el arranque
         threading.Thread(target=refresh_trending_cache, args=['day']).start()
         threading.Thread(target=refresh_trending_cache, args=['week']).start()
  
-# --- HYDRATION HELPERS ---
 def hydrate_trending_ratings(items):
     """
     Actualiza las notas de Shiori en tiempo real para una lista de items de tendencias.
@@ -718,10 +654,6 @@ def home():
     if window not in ['day', 'week']: 
         window = 'day'
     
-    # MODO HÍBRIDO: 
-    # - Si el caché tiene datos, los mandamos (SSR rápido).
-    # - Si la caché está vacía, MANDAMOS LISTAS VACÍAS para no bloquear el servidor.
-    #   El JS de index.html detectará que no hay caché y lanzará el AJAX.
     cache = api_cache[window]
     trending_data = {
         'series': cache.get('series', []),
@@ -729,7 +661,6 @@ def home():
         'shows': cache.get('shows', [])
     }
     
-    # Hidratamos ratings en tiempo real para el SSR inicial
     for cat in trending_data:
         hydrate_trending_ratings(trending_data[cat])
     
@@ -741,7 +672,7 @@ def home():
 def api_trending():
     api_key = os.getenv("TMDB_API_KEY")
     window = request.args.get('window', 'day')
-    media_type = request.args.get('type', 'series') # series, movies, shows
+    media_type = request.args.get('type', 'series')
     
     if window not in ['day', 'week']: 
         window = 'day'
@@ -749,29 +680,25 @@ def api_trending():
     current_time = time.time()
     cache = api_cache[window]
     
-    # Mapeo interno de tipos
     type_map = {
         'series': 'tv',
         'movies': 'movie',
         'shows': 'show'
     }
     
-    # Si el cache del tipo específico está vacío, disparamos carga manual
     if not cache.get(media_type):
         api_type = type_map.get(media_type, 'tv')
         print(f"⚠️ Caché {window}/{media_type} vacía. Realizando carga manual de emergencia...")
         cache[media_type] = get_top_20(api_key, api_type, window)
         cache['last_updated'] = current_time
     
-    # Devolvemos solo lo solicitado para optimizar carga paralela
     items = cache.get(media_type, [])
-    hydrate_trending_ratings(items) # Hidratación en tiempo real
+    hydrate_trending_ratings(items)
 
     return jsonify({
         media_type: items
     })
 
-# --- PROFILE ---
 @app.route('/profile')
 @login_required
 def profile():
@@ -804,7 +731,6 @@ def edit_profile():
         current_user.email = email
         current_user.region = region
 
-        # --- Lógica de Foto de Perfil ---
         file = request.files.get('profile_image')
         if file and file.filename != '' and allowed_file(file.filename):
             filename = secure_filename(f"user_{current_user.id}_{int(time.time())}_{file.filename}")
@@ -821,7 +747,6 @@ def edit_profile():
     
     return render_template('edit_profile.html', countries_list=GLOBAL_COUNTRIES_LIST, regions_map=REGIONS_MAP)
 
-# --- HELPER DE HIDRATACIÓN (Tu idea de carga por ID) ---
 def hydrate_collection_items(items):
     """
     Toma una lista de CollectionItems y busca su info REAL en TMDB en paralelo.
@@ -830,7 +755,6 @@ def hydrate_collection_items(items):
     if not items: return []
     
     def fetch_and_update(item):
-        # Usamos tu función get_media_summary que ya gestiona banderas e idiomas
         summary = get_media_summary(item.media_id, item.media_type)
         if summary:
             item.title = summary['title']
@@ -840,25 +764,21 @@ def hydrate_collection_items(items):
             item.media_subtype = summary['media_subtype']
         return item
 
-    # Ejecutamos en paralelo para que 18 items carguen en < 0.5s
     with ThreadPoolExecutor(max_workers=10) as executor:
         return list(executor.map(fetch_and_update, items))
 
-# --- COLLECTIONS ---
 @app.route('/collections')
 @login_required
 def collections():
     statuses = ['Viendo', 'Visto', 'Pendiente', 'Abandonado']
     user_collections = {}
-    t_counts = {} # Usamos un nombre más único: t_counts (total counts)
+    t_counts = {}
     
-    # 1. Cargamos favoritos
     fav_query = CollectionItem.query.filter_by(user_id=current_user.id, is_favorite=True)
     t_counts['favoritos'] = fav_query.count()
     favorites = fav_query.order_by(CollectionItem.created_at.desc()).limit(16).all()
     hydrate_collection_items(favorites)
     
-    # 2. Cargamos el resto por estados
     for status in statuses:
         status_query = CollectionItem.query.filter_by(user_id=current_user.id, status=status)
         t_counts[status] = status_query.count()
@@ -866,7 +786,6 @@ def collections():
         hydrate_collection_items(items)
         user_collections[status] = items
 
-    # 3. Ratings de Shiori (Optimizado en bloque)
     all_items = favorites + [item for sublist in user_collections.values() for item in sublist]
     if all_items:
         ratings_raw = db.session.query(
@@ -901,11 +820,8 @@ def view_collection(status):
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     items = pagination.items
 
-    # HIDRATACIÓN: Aquí es donde ocurre la magia de tu idea
-    # Pedimos los 16 de esta página a TMDB para que estén actualizados
     hydrate_collection_items(items)
 
-    # Ratings Shiori (Optimizado)
     if items:
         ratings_raw = db.session.query(
             Review.media_id, Review.media_type, db.func.avg(Review.rating)
@@ -914,7 +830,6 @@ def view_collection(status):
         for item in items:
             item.shiori_rating = ratings_map.get((item.media_id, item.media_type), 0)
 
-    # SI ES AJAX, ENVIAMOS SOLO LA REJILLA (Sin cabecera ni navbar)
     if ajax:
         return render_template('partials/collection_grid.html', 
                              items=items, 
@@ -930,7 +845,6 @@ def view_collection(status):
                           per_page=per_page)
 
 
-# --- AJAX FAVORITE / COLLECTION ---
 @app.route('/toggle_favorite', methods=['POST'])
 @login_required
 def toggle_favorite():
@@ -941,13 +855,11 @@ def toggle_favorite():
 
     if item:
         item.is_favorite = not item.is_favorite
-        # LÓGICA DE BORRADO: Si ya no es favorito y no tiene estado asignado
         if not item.is_favorite and not item.status:
             db.session.delete(item)
             db.session.commit()
             return jsonify({'favorite': False, 'deleted': True})
     else:
-        # Si no existe, lo creamos con los datos que envía tu JS
         item = CollectionItem(
             user_id=current_user.id,
             media_id=media_id,
@@ -961,9 +873,8 @@ def toggle_favorite():
             media_subtype=data.get('media_subtype', 'Serie')
         )
         db.session.add(item)
-        db.session.flush() # Para obtener el ID del item antes del commit
+        db.session.flush()
         
-        # Lanzamos sincronización de calendario en segundo plano
         threading.Thread(target=sync_media_calendar_data, args=(item.id,)).start()
 
     db.session.commit()
@@ -979,25 +890,21 @@ def toggle_status():
     item = CollectionItem.query.filter_by(user_id=current_user.id, media_id=media_id).first()
 
     if item:
-        # Si pulsas el botón que ya está activo, quitamos el status (toggle)
         if item.status == new_status:
             item.status = None
         else:
             item.status = new_status
-            # Actualizamos título y poster por si acaso
             item.title = data.get('title')
             item.original_title = data.get('original_title')
             item.poster_path = data.get('poster')
             item.vote_average = data.get('vote_average')
             item.flag = data.get('flag')
             
-        # LÓGICA DE BORRADO: Si tras el cambio no hay status ni es favorito
         if not item.status and not item.is_favorite:
             db.session.delete(item)
             db.session.commit()
             return jsonify({'current_status': None, 'deleted': True})
     else:
-        # Si no existe, creamos el registro
         item = CollectionItem(
             user_id=current_user.id,
             media_id=media_id,
@@ -1013,16 +920,13 @@ def toggle_status():
         db.session.add(item)
         db.session.flush()
         
-        # Lanzamos sincronización de calendario en segundo plano
         threading.Thread(target=sync_media_calendar_data, args=(item.id,)).start()
     
     db.session.commit()
     return jsonify({'current_status': item.status})
 
 
-# --- CALENDAR (Asian Monthly Calendar) ---
 
-# --- CALENDAR (MOTOR INSTANTÁNEO SHIORI) ---
 def sync_media_calendar_data(item_id):
     """
     Sincroniza TODAS las fechas de una serie o película en la base de datos local.
@@ -1037,11 +941,9 @@ def sync_media_calendar_data(item_id):
         m_id, m_type = item.media_id, item.media_type
         u_region = item.user.region or 'ES'
         
-        # Limpiamos eventos antiguos para este item
         MediaEvent.query.filter_by(collection_item_id=item.id).delete()
         
         try:
-            # Triple consulta para títulos y fechas
             urls = {
                 'es': f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=es-ES&append_to_response=release_dates",
                 'mx': f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=es-MX&append_to_response=release_dates",
@@ -1066,7 +968,6 @@ def sync_media_calendar_data(item_id):
                                 d_only = rd_obj.get('release_date', '').split('T')[0]
                                 if d_only: found_events.append({'date': d_only, 'label': label})
                 
-                # Guardamos solo fechas únicas para no saturar
                 seen_dates = set()
                 for ev in found_events:
                     if ev['date'] not in seen_dates:
@@ -1078,7 +979,6 @@ def sync_media_calendar_data(item_id):
                         db.session.add(new_ev)
                         seen_dates.add(ev['date'])
             else:
-                # SERIES: Recorremos las temporadas (máximo las últimas 5 por eficiencia)
                 seasons = raw['es'].get('seasons') or raw['en'].get('seasons') or []
                 category = "Programa" if any(g.get('id') in GENRES_PROGRAMAS for g in (raw['es'].get('genres') or [])) else "Serie"
                 
@@ -1124,7 +1024,6 @@ def api_calendar_events():
     start_date = datetime(year, month, 1).date()
     end_date = datetime(year, month, last_day).date()
 
-    # Consulta ultra-rápida a la DB local
     events_query = db.session.query(MediaEvent, CollectionItem).join(CollectionItem).filter(
         CollectionItem.user_id == current_user.id,
         MediaEvent.event_date >= start_date,
@@ -1147,20 +1046,16 @@ def api_calendar_events():
     return jsonify(all_events)
 
 
-# --- RUTAS DE MEDIA (REFACTORIZADAS) ---
 @app.route('/media/<media_type>/<int:media_id>')
 def media_detail(media_type, media_id):
-    # 1. ¿Está en caché de contexto?
     cached = get_cached_media(media_id, media_type)
     
-    # Lógica de Auth y Región (Siempre fresca)
     current_status, is_favorite = (None, False)
     user_region = current_user.region if (current_user.is_authenticated and current_user.region) else None
     if current_user.is_authenticated:
         item = CollectionItem.query.filter_by(user_id=current_user.id, media_id=media_id, media_type=media_type).first()
         if item: current_status, is_favorite = item.status, item.is_favorite
 
-    # DATOS DE SHIORI (Rating y Opiniones de la comunidad)
     from sqlalchemy.orm import joinedload, subqueryload
     shiori_rating = db.session.query(db.func.avg(Review.rating)).filter_by(media_id=media_id, media_type=media_type, status='approved').scalar() or 0
     shiori_count = Review.query.filter_by(media_id=media_id, media_type=media_type, status='approved').count()
@@ -1173,7 +1068,6 @@ def media_detail(media_type, media_id):
         user_review = Review.query.filter_by(user_id=current_user.id, media_id=media_id, media_type=media_type).first()
 
     if cached:
-        # Pre-procesar providers si la región cambió o no estaban
         if cached.get('cached_user_region') != user_region:
             cached['cached_watch_providers'] = process_watch_providers(cached.get('watch/providers', {}), user_region)
             cached['cached_user_region'] = user_region
@@ -1200,7 +1094,6 @@ def media_detail(media_type, media_id):
     api_key = os.getenv("TMDB_API_KEY")
     is_tv = media_type == 'tv' or ('show' in request.path)
     
-    # 2. ÚNICA OLEADA DE PETICIONES (Sin cascada)
     append_base = "external_ids,videos,keywords,watch/providers,translations,recommendations"
     append_credits = ",aggregate_credits" if is_tv else ",credits"
     
@@ -1222,19 +1115,15 @@ def media_detail(media_type, media_id):
 
 
 
-    # Paridad de Portada: Si ES no tiene portada, buscamos en MX o EN
     if not res.get('poster_path'):
         res['poster_path'] = raw['mx'].get('poster_path') or raw['en'].get('poster_path')
 
     lang = res.get('original_language', '').lower()
-    # PROCESAMIENTO TÍTULO / OVERVIEW
     res['display_title'] = get_tiered_field(raw, 'title', 'movie' if media_type == 'movie' else 'tv')
     res['overview'] = get_tiered_field(raw, 'overview', 'movie' if media_type == 'movie' else 'tv')
 
-    # Trailers & Social
     ext_ids = res.get('external_ids', {})
     
-    # Unificación total de Redes en Media
     res['social_links'] = {}
     for k in ['instagram', 'twitter', 'facebook', 'tiktok']:
         val = ext_ids.get(f'{k}_id')
@@ -1253,7 +1142,6 @@ def media_detail(media_type, media_id):
     if not res['trailer_key']:
         res['trailer_key'] = next((v['key'] for v in raw['en'].get('videos', {}).get('results', []) if v['type'] == 'Trailer' and v['site'] == 'YouTube'), None)
 
-    # Status, Genres, Flags
     if 'genres' in res: 
         for g in res['genres']: g['name'] = GENRE_MAP_ES.get(g['name'], g['name'])
     res['status'] = STATUS_MAP_ES.get(res.get('status'), res.get('status'))
@@ -1261,7 +1149,6 @@ def media_detail(media_type, media_id):
     
     res['flag'] = get_media_flag(res, res)
 
-    # RECOMENDACIONES FILTRADAS (Asian Only & Enriquecidas con Paridad de Card)
     recs_es = raw['es'].get('recommendations', {}).get('results', [])
     recs_mx = raw['mx'].get('recommendations', {}).get('results', [])
     recs_en = raw['en'].get('recommendations', {}).get('results', [])
@@ -1276,30 +1163,25 @@ def media_detail(media_type, media_id):
         r_countries = [c.upper() for c in r.get('origin_country', [])]
         is_r_asian = r_lang in ASIA_LANGUAGES or any(c in ASIA_COUNTRIES for c in r_countries)
         
-        # Paridad de Datos (Regla de 3)
         r_mx = mx_map.get(rid, {})
         r_en = en_map.get(rid, {})
         
         if is_r_asian:
-            # Sincronizar Poster y Título con el resto de la web
             r['poster_path'] = r.get('poster_path') or r_mx.get('poster_path') or r_en.get('poster_path')
             
-            if r['poster_path']: # Solo si tenemos imagen
+            if r['poster_path']:
                 m_type_r = r.get('media_type') or ('movie' if (r.get('title') or r_mx.get('title')) else 'tv')
                 r['media_type_fixed'] = m_type_r
                 
-                # Título: ES > MX > EN
                 r['display_title'] = r.get('title') or r.get('name') or \
                                      r_mx.get('title') or r_mx.get('name') or \
                                      r_en.get('title') or r_en.get('name') or "-"
                 
-                # Subtítulo original
                 r['original_title_h6'] = r.get('original_title') or r.get('original_name') or \
                                          r_mx.get('original_title') or r_mx.get('original_name') or "-"
                 
                 r['flag'] = get_media_flag(r, r)
                 
-                # Etiqueta de Subtipo
                 if m_type_r == 'movie':
                     r['tipo_label'] = 'Película'
                 else:
@@ -1310,7 +1192,6 @@ def media_detail(media_type, media_id):
                 asia_recs.append(r)
         if len(asia_recs) >= 8: break
     
-    # Motor de Ratings en Bloque para Recommendations
     if asia_recs:
         rec_ids = [it['id'] for it in asia_recs]
         rec_ratings = db.session.query(
@@ -1323,11 +1204,9 @@ def media_detail(media_type, media_id):
 
     res['recommendations_processed'] = asia_recs
 
-    # TEMPORADAS (Usa info de Wave 1)
     last_season = None
     has_multiple_seasons = False
     if is_tv:
-        # LÓGICA DE EPISODIOS INTELIGENTE (Detecta el más reciente y decide etiqueta)
         last_meta = res.get('last_episode_to_air', {}) or {}
         next_meta = res.get('next_episode_to_air', {}) or {}
         l_date = last_meta.get('air_date')
@@ -1371,16 +1250,13 @@ def media_detail(media_type, media_id):
     res['has_multiple_seasons'] = has_multiple_seasons
     res['last_episode_date_formatted'] = res.get('smart_episode_date')
 
-    # Procesado final
     ert = res.get('episode_run_time') or [0]
     runtime = res.get('runtime') or (ert[0] if is_tv and ert else 0)
     res['runtime_formatted'] = f"{runtime // 60}h {runtime % 60}m" if runtime > 60 else f"{runtime}m"
     res['original_language_name'] = ASIA_LANG_NAMES.get(lang, lang.upper())
 
-    # DETERMINAR MEJOR FUENTE DE CRÉDITOS (Using TMDB Translation Info)
     def get_best_credits_source(r_es, r_mx, r_en, tv=False):
         key = 'aggregate_credits' if tv else 'credits'
-        # Los nombres de actores y personajes son universales; el inglés es la fuente más completa
         return r_en.get(key, {})
 
     credits_master = get_best_credits_source(raw['es'], raw['mx'], raw['en'], is_tv)
@@ -1410,7 +1286,6 @@ def media_detail(media_type, media_id):
     res['keywords_processed'] = res.get('keywords', {}).get('results' if is_tv else 'keywords', [])[:15]
     res['raw_data'] = raw
     
-    # GUARDAR EN CACHÉ Y RENDERIZAR
     set_cached_media(media_id, res, user_region)
     watch_providers = process_watch_providers(res.get('watch/providers', {}), user_region)
     return render_template('media_detail.html', 
@@ -1435,7 +1310,7 @@ def media_detail(media_type, media_id):
 @login_required
 def vote_review(review_id):
     data = request.get_json() or {}
-    vote_type = data.get('vote_type') # 'like' o 'dislike'
+    vote_type = data.get('vote_type')
     if vote_type not in ['like', 'dislike']:
         return jsonify({'message': 'Voto no válido'}), 400
     
@@ -1470,7 +1345,6 @@ def vote_review(review_id):
 @login_required
 def delete_review(review_id):
     review = Review.query.get_or_404(review_id)
-    # El Administrador Shiori puede borrar cualquier opinión
     if review.user_id != current_user.id and not current_user.is_admin:
         return jsonify({'message': 'No tienes permiso para borrar esta opinión.', 'category': 'error'}), 403
     
@@ -1510,7 +1384,6 @@ def report_media_data(media_type, media_id):
         return redirect(url_for('media_detail', media_type=media_type, media_id=media_id))
     
     try:
-        # VALIDACIÓN: No permitir más de un reporte PENDIENTE del mismo usuario para la misma sección de esta media
         existing_report = MediaReport.query.filter_by(
             user_id=current_user.id,
             media_id=media_id,
@@ -1525,7 +1398,6 @@ def report_media_data(media_type, media_id):
                 'message': f'Ya has enviado un reporte para la sección "{field_type}" de esta obra que está pendiente de revisión.'
             })
 
-        # Si no viene en el form, intentamos buscarlo
         if not media_title:
 
             cached = get_cached_media(media_id, media_type)
@@ -1566,56 +1438,46 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# --- RUTA PANEL ADMINISTRACIÓN: MODERACIÓN AVANZADA SHIORI ---
 @app.route('/admin/reviews')
 @login_required
 @admin_required
 def admin_reviews():
-    # Buscamos todas las reseñas que requieren atención (por filtro o por reporte)
     reviews_to_moderate = Review.query.filter(
         (Review.status == 'pending') | (Review.report_count > 0)
     ).order_by(Review.report_count.desc(), Review.created_at.asc()).all()
     
-    # Enriquecemos con estadísticas de reputación antes de mandar al template
     for r in reviews_to_moderate:
-        # ¿Cuántas veces le hemos borrado cosas a este autor?
         r.author_strikes = ModerationLog.query.filter_by(author_id=r.user_id, action='deleted_review').count()
         
-        # ¿Cómo de fiables son las personas que han reportado?
         for report in r.reports:
-            # ¿Cuántas denuncias "falsas" (rechazadas) ha hecho este reportero?
             report.reporter_toxic_level = ModerationLog.query.filter_by(reporter_id=report.user_id, action='dismissed_report').count()
             
-        # ¿Cuántas veces hemos rechazado ya denuncias contra esta misma opinión?
         r.previous_rejections = ModerationLog.query.filter_by(review_id=r.id, action='dismissed_report').count()
         r.previous_approvals = ModerationLog.query.filter_by(review_id=r.id, action='approved_after_filter').count()
         
     return render_template('admin_reviews.html', reviews=reviews_to_moderate)
 
-# ACCIÓN: ACEPTAR REPORTE (Borrar opinión e historial)
 @app.route('/admin/review/<int:review_id>/accept_report', methods=['POST'])
 @login_required
 @admin_required
 def admin_accept_report(review_id):
     review = Review.query.get_or_404(review_id)
-    # 1. Registrar la acción para el historial (El autor recibe un strike)
     for report in review.reports:
          log = ModerationLog(
              author_id=review.user_id, 
              reporter_id=report.user_id, 
              review_id=review.id, 
-             review_content_snapshot=review.comment, # CAPTURA FORENSE
+             review_content_snapshot=review.comment,
              action='deleted_review', 
              reason='user_report'
          )
          db.session.add(log)
     
-    # Si viene por filtro automático (no hay reporteros)
     if not review.reports:
         log = ModerationLog(
             author_id=review.user_id, 
             review_id=review.id, 
-            review_content_snapshot=review.comment, # CAPTURA FORENSE
+            review_content_snapshot=review.comment,
             action='deleted_review', 
             reason='auto_filter'
         )
@@ -1625,25 +1487,22 @@ def admin_accept_report(review_id):
     db.session.commit()
     return redirect(url_for('admin_reviews'))
 
-# ACCIÓN: RECHAZAR REPORTE (Mantener opinión y marcar reportero como "tóxico")
 @app.route('/admin/review/<int:review_id>/reject_report', methods=['POST'])
 @login_required
 @admin_required
 def admin_reject_report(review_id):
     review = Review.query.get_or_404(review_id)
     
-    # Marcamos a todos los que denunciaron esta reseña con un "fallo" (falsas denuncias)
     for report in review.reports:
         log = ModerationLog(
-            reporter_id=report.user_id, # Solo guardamos al "PENSADOR" del reporte falso para su castigo
+            reporter_id=report.user_id,
             review_id=review.id, 
-            review_content_snapshot=review.comment, # CAPTURA para ver qué denunció injustamente
+            review_content_snapshot=review.comment,
             action='dismissed_report', 
             reason='user_report'
         )
         db.session.add(log)
     
-    # Si viene por filtro (limpiar filtro de palabras)
     if not review.reports:
         log = ModerationLog(
             author_id=review.user_id, 
@@ -1655,7 +1514,6 @@ def admin_reject_report(review_id):
 
     review.status = 'approved'
     review.report_count = 0
-    # Borrar los reportes físicos ya procesados
     ReviewReport.query.filter_by(review_id=review_id).delete()
     
     db.session.commit()
@@ -1668,24 +1526,18 @@ def admin_reject_report(review_id):
 def admin_user_history(user_id):
     target_user = User.query.get_or_404(user_id)
     
-    # 1. Opiniones Aceptadas (Vivas y aprobadas actualmente)
     approved_reviews_count = Review.query.filter_by(user_id=user_id, status='approved').count()
     
-    # 2. Opiniones Borradas (Strikes)
     author_logs = ModerationLog.query.filter_by(author_id=user_id, action='deleted_review').order_by(ModerationLog.created_at.desc()).all()
     deleted_reviews_count = len(author_logs)
     
-    # 3. Denuncias Aceptadas (Aciertos del usuario como reportero)
     accepted_reports_count = ModerationLog.query.filter_by(reporter_id=user_id, action='deleted_review').count()
     
-    # 4. Denuncias Rechazadas (Toxicidad del usuario como reportero)
     reporter_logs = ModerationLog.query.filter_by(reporter_id=user_id, action='dismissed_report').order_by(ModerationLog.created_at.desc()).all()
     rejected_reports_count = len(reporter_logs)
     
-    # 5. Reportes de Datos Resueltos (Aciertos en corrección de BD)
     data_reports_resolved = MediaReport.query.filter_by(user_id=user_id, status='resolved').count()
     
-    # 6. Reportes de Datos Ignorados (Errores o ruido)
     data_reports_ignored = MediaReport.query.filter_by(user_id=user_id, status='ignored').count()
     
     return render_template('admin_user_history.html', 
@@ -1701,14 +1553,12 @@ def admin_user_history(user_id):
 
 
 
-# ACCIÓN: BANEAR / DESBANEAR USUARIO (Bloqueos definitivos con limpieza de datos)
 @app.route('/admin/user/<int:user_id>/toggle_ban', methods=['POST'])
 @login_required
 @admin_required
 def admin_toggle_ban(user_id):
     target_user = User.query.get_or_404(user_id)
     
-    # 0. Evitar que el admin se banee a sí mismo
     if target_user.id == current_user.id:
         flash("🛑 No puedes banearte a ti mismo, Sensei.", "error")
         return redirect(url_for('admin_user_history', user_id=user_id))
@@ -1716,14 +1566,11 @@ def admin_toggle_ban(user_id):
     new_status = not target_user.is_banned
     target_user.is_banned = new_status
     
-    # --- SI SE BANEA, PURGAMOS SU ACTIVIDAD PÚBLICA PERO MANTENEMOS SU BIBLIOTECA (COLECCIONES) ---
     if new_status:
         try:
-            # 1. Borrar Votos y Reportes HECHOS por él (Limpieza de ruido en el sistema)
             ReviewVote.query.filter_by(user_id=user_id).delete()
             ReviewReport.query.filter_by(user_id=user_id).delete()
             
-            # 2. Borrar sus Opiniones (Y registrar evidencia en ModerationLog antes de borrar)
             user_reviews = Review.query.filter_by(user_id=user_id).all()
             for r in user_reviews:
                 log = ModerationLog(
@@ -1741,7 +1588,6 @@ def admin_toggle_ban(user_id):
             db.session.rollback()
             return jsonify({'category': 'error', 'message': f"Error en la purga: {str(e)}"}), 500
     else:
-        # Si se desbanea, simplemente lo activamos
         message = f"Usuario {target_user.username} reactivado. Su biblioteca personal está intacta."
 
     db.session.commit()
@@ -1764,7 +1610,6 @@ def admin_banned_list():
 @login_required
 @admin_required
 def admin_data_reports():
-    # Recuperamos solo los reportes pendientes
     reports = MediaReport.query.filter_by(status='pending').order_by(MediaReport.created_at.desc()).all()
     return render_template('admin_data_reports.html', reports=reports)
 
@@ -1796,31 +1641,25 @@ def dismiss_data_report(report_id):
 def delete_account():
     user_id = current_user.id
     try:
-        # 1. Borrar Calendario (Eventos de sus colecciones)
         c_items = CollectionItem.query.filter_by(user_id=user_id).all()
         c_ids = [item.id for item in c_items]
         if c_ids:
             MediaEvent.query.filter(MediaEvent.collection_item_id.in_(c_ids)).delete(synchronize_session=False)
 
-        # 2. Borrar Colecciones
         CollectionItem.query.filter_by(user_id=user_id).delete(synchronize_session=False)
         
-        # 2. Borrar Votos y Reportes HECHOS por el usuario
         ReviewVote.query.filter_by(user_id=user_id).delete()
         ReviewReport.query.filter_by(user_id=user_id).delete()
         
-        # 3. Borrar sus Opiniones (Y por cascada en models.py, sus votos y reportes recibidos)
         user_reviews = Review.query.filter_by(user_id=user_id).all()
         for r in user_reviews:
             db.session.delete(r)
         
-        # 4. Borrar el Usuario
         user = User.query.get(user_id)
 
         db.session.delete(user)
         db.session.commit()
         
-        # 5. Cerrar Sesión
         logout_user()
         return redirect(url_for('home'))
     except Exception as e:
@@ -1832,14 +1671,12 @@ def delete_account():
 @app.route('/media/<media_type>/<int:media_id>/review', methods=['POST'])
 @login_required
 def post_review(media_type, media_id):
-    rating = request.form.get('rating', type=float) # Restaurado Float para 7.5, etc.
+    rating = request.form.get('rating', type=float)
     comment = request.form.get('comment', '').strip()
     
-    # Validamos que esté en rango (incluyendo 0.0)
     if rating is None or rating < 0 or rating > 10.0:
         return jsonify({'message': 'La puntuación debe estar entre 0 y 10.', 'category': 'error'}), 400
 
-    # --- FILTRO AUTOMÁTICO DE PALABRAS ---
     BAD_WORDS = ["insulto1", "insulto2", "spam", "foll", "mierd", "put", "idiot"]
     final_status = 'approved'
     for word in BAD_WORDS:
@@ -1883,38 +1720,31 @@ def post_review(media_type, media_id):
 def seasons(media_id):
     meses_f = ['ene.', 'feb.', 'mar.', 'abr.', 'may.', 'jun.', 'jul.', 'ago.', 'sep.', 'oct.', 'nov.', 'dic.']
     cached = get_cached_media(media_id, 'tv')
-    # Si tenemos los datos cacheados y además ya procesamos las temporadas antes, las usamos
     u_id = session.get('session_id')
     if cached and u_id and USER_CONTEXT_CACHES.get(u_id, {}).get('seasons_data'):
         return render_template('seasons.html', series=cached, seasons=USER_CONTEXT_CACHES[u_id]['seasons_data'])
 
     api_key = os.getenv('TMDB_API_KEY')
     
-    # Si tenemos el cache del media pero no las temporadas procesadas, lo hacemos ahora
     if cached:
         response = cached
         raw_seasons = sorted(response.get('seasons', []), key=lambda x: x.get('season_number', 0))
         data_mx = cached['raw_data']['mx']
         data_en = cached['raw_data']['en']
     else:
-        # Petición de emergencia si entran directo por URL (Paralelizada REAL)
         urls = {
             'es': f"https://api.themoviedb.org/3/tv/{media_id}?api_key={api_key}&language=es-ES&append_to_response=external_ids",
             'mx': f"https://api.themoviedb.org/3/tv/{media_id}?api_key={api_key}&language=es-MX",
             'en': f"https://api.themoviedb.org/3/tv/{media_id}?api_key={api_key}&language=en-US"
         }
         with ThreadPoolExecutor(max_workers=3) as executor:
-            # Lanzamos los 3 a la vez
             futures = {name: executor.submit(fetch_json, url) for name, url in urls.items()}
-            # Recolectamos todo (esperando solo al que más tarde, no sumándolos)
             raw = {name: future.result() for name, future in futures.items()}
         
         response = raw['es']
-        # Título tiered fallback
         response['display_title'] = get_tiered_field(raw, 'title', 'tv')
         response['overview'] = get_tiered_field(raw, 'overview', 'tv')
         
-        # LÓGICA SMART (Emergency path)
         last_meta = response.get('last_episode_to_air', {}) or {}
         next_meta = response.get('next_episode_to_air', {}) or {}
         l_date = last_meta.get('air_date')
@@ -1929,11 +1759,10 @@ def seasons(media_id):
                 response['smart_episode_date'] = f"{dt_target.day} {meses_f[dt_target.month-1]} {dt_target.year}"
             except: pass
 
-        series = response # Para mantener el nombre esperado en el render
+        series = response
         raw_seasons = sorted(series.get('seasons', []), key=lambda x: x.get('season_number', 0))
         data_mx, data_en = raw['mx'], raw['en']
 
-    # --- PROCESADO DE TEMPORADAS (OPTIMIZADO O(1) + PARALELO) ---
     all_seasons = []
     
     mx_dict = {x.get('season_number'): x for x in data_mx.get('seasons', [])}
@@ -1948,7 +1777,6 @@ def seasons(media_id):
         if not s.get('poster_path'):
             s['poster_path'] = s_mx.get('poster_path') or s_en.get('poster_path')
         
-        # Lógica de nombre inteligente: Si en ES/MX es genérico (Temporada 1), usamos el de EN si es descriptivo
         name_es = s.get('name')
         name_mx = s_mx.get('name')
         name_en = s_en.get('name')
@@ -1956,7 +1784,6 @@ def seasons(media_id):
         def is_generic(n):
             if not n: return True
             nl = n.lower()
-            # Detecta "Temporada X" o "Season X"
             return nl.startswith("temporada") or nl.startswith("season")
 
         if is_generic(name_es):
@@ -1965,14 +1792,13 @@ def seasons(media_id):
             elif name_en and not is_generic(name_en):
                 s['name'] = name_en
             else:
-                s['name'] = name_es # Se queda como está si ninguno tiene nombre real
+                s['name'] = name_es
 
         if not s.get('overview') or not clean_overview(s.get('overview')):
             s['overview'] = get_tiered_field({'es': s, 'mx': s_mx, 'en': s_en}, 'overview', 'tv')
         
         all_seasons.append(s)
 
-    # Guardamos en caché de contexto el resultado de las temporadas para rapidez total
     if u_id and u_id in USER_CONTEXT_CACHES:
         USER_CONTEXT_CACHES[u_id]['seasons_data'] = all_seasons
     return render_template('seasons.html', series=response, seasons=all_seasons)
@@ -1991,7 +1817,6 @@ def media_cast(media_type, media_id):
         res = cached
         raw = res.get('raw_data', {})
     else:
-        # Petición de emergencia
         append_credits = 'aggregate_credits' if is_tv else 'credits'
         urls = {
             'es': f"https://api.themoviedb.org/3/{media_type}/{media_id}?api_key={api_key}&language=es-ES&append_to_response=translations",
@@ -2001,18 +1826,14 @@ def media_cast(media_type, media_id):
         with ThreadPoolExecutor(max_workers=3) as executor:
             futures = {name: executor.submit(fetch_json, url) for name, url in urls.items()}
             raw = {name: future.result() for name, future in futures.items()}
-        # Títulos con Fallback centralizado
         res = raw['es']
         res['display_title'] = get_tiered_field(raw, 'title', media_type)
         res['raw_data'] = raw
 
-    # DETERMINAR FUENTE DE CRÉDITOS (English-first Strategy)
     def get_best_credits_source(r_es, r_mx, r_en, tv=False):
         key = 'aggregate_credits' if tv else 'credits'
-        # Priorizamos el inglés por mayor completitud en nombres propios de cast y crew
         return r_en.get(key, {})
 
-    # Fallback si por algún motivo 'raw' no tiene los datos (ej: cache viejo)
     if not 'raw' in locals() or not raw or 'es' not in raw or ('en' in raw and ('aggregate_credits' if is_tv else 'credits') not in raw['en']):
         append_credits = 'aggregate_credits' if is_tv else 'credits'
         urls_raw = {
@@ -2026,7 +1847,6 @@ def media_cast(media_type, media_id):
     credits_master = get_best_credits_source(raw['es'], raw['mx'], raw['en'], is_tv)
     final_cast, final_crew = credits_master.get('cast', []), credits_master.get('crew', [])
     
-    # Normalizamos los roles y equipos como COPIAS para no afectar al caché global
     final_cast_display = []
     final_crew_display = []
     
@@ -2054,13 +1874,11 @@ def media_cast(media_type, media_id):
                 parts = []
                 for j in sorted_jobs:
                     job_name = j.get('job', '').strip() or "Staff"
-                    # Mapeo sutil si es necesario, pero TMDB suele darlos en inglés o según el idioma de la api
                     parts.append(f"{job_name} <small style='opacity:0.6'>({j['episode_count']} episodio{'s' if j['episode_count']!=1 else ''})</small>")
                 
                 m['job'] = ", ".join(parts)
             final_crew_display.append(m)
     else:
-        # PELÍCULAS: Reparto estándar desde la mejor fuente
         for a_orig in final_cast:
             a = a_orig.copy()
             a['name'] = a.get('name', '')
@@ -2096,7 +1914,6 @@ def explore():
     sort_by = request.args.get('sort_by', 'popularity.desc')
     status_id = request.args.get('status', '')
     watch_providers = request.args.get('watch_providers', '')
-    # Priorizar la región del usuario si está identificado, si no usar España (ES) como reserva
     default_region = current_user.region if (current_user.is_authenticated and current_user.region) else 'ES'
     watch_region = request.args.get('watch_region', default_region)
     keywords = request.args.get('keywords', '')
@@ -2117,7 +1934,6 @@ def explore():
                            available_countries=GLOBAL_COUNTRIES_LIST,
                            regions_map=REGIONS_MAP)
 
-# --- API EXPLORE ---
 
 @app.route('/api/explore')
 def api_explore():
@@ -2133,17 +1949,14 @@ def api_explore():
     watch_region = request.args.get('watch_region', 'ES')
     keywords = request.args.get('keywords', '')
     page = request.args.get('page', 1, type=int) 
-    # Punto de inicio real y cuántos saltar (Sync para no repetir ni saltar series)
     api_start_page = request.args.get('api_page', page, type=int) 
     api_skip = request.args.get('api_skip', 0, type=int) 
     
     today = datetime.now().strftime('%Y-%m-%d')
     target_type = 'movie' if media_type == 'movie' else 'tv'
-    # Filtro de programas: Reality(10764), Docu(99), Noticias(10763), Talk(10767)
     genres_programas_or = "|".join(map(str, GENRES_PROGRAMAS))
     genres_programas_and = ",".join(map(str, GENRES_PROGRAMAS))
 
-    # Normalización de sort_by para evitar errores entre Movie/TV
     if target_type == 'movie' and 'first_air_date' in sort_by:
         sort_by = sort_by.replace('first_air_date', 'primary_release_date')
     elif target_type == 'tv' and 'primary_release_date' in sort_by:
@@ -2151,9 +1964,9 @@ def api_explore():
 
     def generate():
         final_items_count = 0
-        seen_ids = set() # Escudo anti-duplicados
+        seen_ids = set()
         current_api_page = api_start_page
-        to_skip = api_skip # Ítems de la primera página a ignorar (ya vistos)
+        to_skip = api_skip
         max_pages_to_scan = current_api_page + 10 
         
         last_api_page = current_api_page
@@ -2170,9 +1983,7 @@ def api_explore():
             else:
                 url += f"&primary_release_date.lte={today}"
 
-            # --- FILTRADO DE ADN (Búsqueda inicial) ---
             if country_code: 
-                # Si hay país, permitimos búsqueda por idiomas asiáticos + Inglés (para catch global como Pachinko)
                 url += f"&with_origin_country={country_code}"
                 url += f"&with_original_language={'|'.join(ASIA_LANGUAGES + ['en'])}"
             else:
@@ -2190,7 +2001,6 @@ def api_explore():
                 keyword_ids = [k.split('_')[0] for k in keywords.split('|') if k]
                 if keyword_ids: url += f"&with_keywords={'|'.join(keyword_ids)}"
 
-            # Gestión de Géneros
             with_ids = []
             without_ids = []
             if target_type == 'tv':
@@ -2230,7 +2040,6 @@ def api_explore():
                     yield json.dumps({'total_results': total_results, 'total_pages': total_pages}) + '\n'
                     total_metadata_sent = True
                 
-                # 1. BATCH QUERY DE NOTAS SHIORI (Para toda la página actual)
                 page_ids = [it.get('id') for it in results if it.get('id')]
                 ratings_map = {}
                 if page_ids:
@@ -2248,12 +2057,9 @@ def api_explore():
                         
                         ratings_map = {r[0]: {'avg': round(float(r[2]), 1), 'count': r[3]} for r in ratings_data}
 
-                # 2. ENRIQUECER CON TRADUCCIONES (Mantenemos tu Regla de 3)
-                # Pasamos include_db=False porque ya tenemos las notas en el ratings_map
                 with ThreadPoolExecutor(max_workers=20) as executor:
                     full_summaries = list(executor.map(lambda x: get_media_summary(x.get('id'), target_type, include_db=False), results))
                 
-                # 3. INYECTAR NOTAS DEL BATCH QUERY
                 for s in full_summaries:
                     if s:
                         r_data = ratings_map.get(s['id'], {'avg': 0, 'count': 0})
@@ -2280,14 +2086,11 @@ def api_explore():
                     to_skip -= 1
                     continue
 
-                # REGLA DE FILTRADO (País y Género ya procesados en summary)
                 if country_code:
                     requested_flag = ASIA_FLAGS_MAP.get(country_code.upper())
                     if requested_flag and summary['flag'] != requested_flag:
                         continue 
 
-                # Inyectar datos para la plantilla explore_items.html
-                # (Asegurando compatibilidad con los nombres de variables antiguos)
                 summary['display_title'] = summary['title']
                 summary['original_title_h6'] = summary['original_title']
                 summary['tipo_label'] = summary['media_subtype']
@@ -2330,7 +2133,6 @@ def api_keywords_search():
 def person_detail(person_id):
     api_key = os.getenv("TMDB_API_KEY")
     
-    # --- LANZADERA 1: ESPAÑA, MÉXICO, EEUU (OPTIMIZADA) ---
     initial_urls = {
         "es": f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=es-ES&append_to_response=external_ids,translations",
         "mx": f"https://api.themoviedb.org/3/person/{person_id}?api_key={api_key}&language=es-MX",
@@ -2347,11 +2149,9 @@ def person_detail(person_id):
     if not res or 'id' not in res: return "Error", 404
 
 
-    # --- NOMBRE (Directamente del inglés como fuente maestra) ---
     res['name'] = res_en.get('name') or res.get('name') or "-"
 
 
-    # --- FUSIÓN INTELIGENTE DE BIOGRAFÍAS (Tiered) ---
     res['biography'] = get_tiered_field(results, 'biography', 'person') or "No tenemos una biografía disponible de momento."
 
     birthday = res.get('birthday')
@@ -2384,7 +2184,6 @@ def person_detail(person_id):
     res['aka_list'] = res.get('also_known_as', [])
     if not res['aka_list']: res['aka_list'] = ["-"]
 
-    # Deteción de origen (Hint para banderas de proyectos)
     place = res.get('place_of_birth', '').lower() if res.get('place_of_birth') else ""
     country_hint = ""
     if 'taiwan' in place: country_hint = 'TW'
@@ -2399,11 +2198,9 @@ def person_detail(person_id):
 def api_person_projects(person_id):
     api_key = os.getenv("TMDB_API_KEY")
 
-    # 1. LANZADERA DE CRÉDITOS (A single call for combined credits)
     url = f"https://api.themoviedb.org/3/person/{person_id}/combined_credits?api_key={api_key}&language=es-ES"
     credits_res = fetch_json(url)
 
-    # 2. FILTRADO Y ORDENACIÓN INICIAL (Top 60 Relevantes)
     all_credits = credits_res.get('cast', []) + credits_res.get('crew', [])
     def relevance_key(x):
         genre_ids = x.get('genre_ids', [])
@@ -2422,7 +2219,6 @@ def api_person_projects(person_id):
         top_works.append(w)
         if len(top_works) >= 60: break
 
-    # 3. LANZADERA DE PRECISIÓN CON get_media_summary
     hint = request.args.get('h')
     
     def process_work(w):
@@ -2431,14 +2227,12 @@ def api_person_projects(person_id):
     with ThreadPoolExecutor(max_workers=20) as executor:
         summaries = list(executor.map(process_work, top_works))
 
-    # 4. PROCESADO FINAL CON METADATA COMPLETA
     known_for = []
     for w_base, summary in zip(top_works, summaries):
         if not summary: continue
         
         media_type = w_base.get('media_type', 'movie')
         
-        # Metadatos de compatibilidad para person_items.html
         summary['display_title'] = summary['title']
         summary['original_title_h6'] = summary.get('original_title', '')
         summary['media_type_fixed'] = media_type
@@ -2467,11 +2261,9 @@ def api_search_unified():
 
     def generate():
         try:
-            # --- MOTOR DE BÚSQUEDA MULTITAREA (Ondas Sincronizadas) ---
             seen_media_ids = set()
             ROLE_MAP = {'Acting': 'Actuación', 'Directing': 'Dirección', 'Production': 'Producción', 'Writing': 'Guion', 'Editing': 'Montaje', 'Art': 'Arte', 'Sound': 'Sonido', 'Camera': 'Cámara', 'Visual Effects': 'Efectos Visuales', 'Costume & Make-Up': 'Vestuario', 'Crew': 'Equipo'}
             
-            # 1. Obtener primera página de TODO para calcular totales
             with ThreadPoolExecutor(max_workers=4) as executor:
                 f_p1 = executor.submit(fetch_json, f"https://api.themoviedb.org/3/search/person?api_key={api_key}&language=en-US&query={q_safe}&include_adult=false&page=1")
                 f_k1 = executor.submit(fetch_json, f"https://api.themoviedb.org/3/search/keyword?api_key={api_key}&query={q_safe}&page=1")
@@ -2487,7 +2279,6 @@ def api_search_unified():
             
             max_p_total = max(total_p, total_k, total_m, total_t)
             
-            # Función interna para procesar media (Películas/Series)
             def process_media_batch(batch, m_type):
                 asian_items = []
                 for item in batch:
@@ -2522,8 +2313,6 @@ def api_search_unified():
                             'image': f"https://image.tmdb.org/t/p/w300{item.get('poster_path')}" if item.get('poster_path') else None,
                             'rating': item.get('vote_average', 0), 'flag': ASIA_FLAGS_MAP.get(c_code, '🌏')
                         }, ensure_ascii=False) + '\n'
-                        # No podemos usar yield aquí en un loop anidado si no retornamos generator, 
-                        # así que lo manejaremos fuera.
 
             def enrich_with_translation(media_item, m_type_fixed):
                 it_id = media_item.get('id')
@@ -2540,7 +2329,6 @@ def api_search_unified():
                 except: pass
                 return media_item
 
-            # --- BUCLE DE ONDAS ---
             for current_page in range(1, max_p_total + 1):
                 futures = {}
                 with ThreadPoolExecutor(max_workers=4) as wave_executor:
@@ -2553,9 +2341,7 @@ def api_search_unified():
                     if current_page <= total_t:
                         futures['t'] = t1 if current_page == 1 else wave_executor.submit(fetch_json, f"https://api.themoviedb.org/3/search/tv?api_key={api_key}&query={q_safe}&page={current_page}")
 
-                # --- PROCESAR RESULTADOS DE LA ONDA ---
                 
-                # A. Personas
                 if 'p' in futures:
                     res = futures['p'] if current_page == 1 else futures['p'].result()
                     for p in res.get('results', []):
@@ -2567,7 +2353,6 @@ def api_search_unified():
                             'department': ROLE_MAP.get(role_en, role_en)
                         }, ensure_ascii=False) + '\n'
 
-                # B. Keywords
                 if 'k' in futures:
                     res = futures['k'] if current_page == 1 else futures['k'].result()
                     for kw in res.get('results', []):
@@ -2575,7 +2360,6 @@ def api_search_unified():
                             'category': 'keyword', 'id': kw.get('id'), 'type': 'keyword', 'title': kw.get('name', '').capitalize()
                         }, ensure_ascii=False) + '\n'
 
-                # C. Media (Películas + Series) - Requiere traducción
                 media_batch = []
                 if 'm' in futures:
                     res = futures['m'] if current_page == 1 else futures['m'].result()
@@ -2584,7 +2368,6 @@ def api_search_unified():
                     res = futures['t'] if current_page == 1 else futures['t'].result()
                     media_batch.extend([(item, 'tv') for item in res.get('results', [])])
 
-                # Filtrado asiático y recolección de IDs para el Batch Query
                 asian_items_to_process = []
                 asian_ids = []
                 for item, m_type in media_batch:
@@ -2598,7 +2381,6 @@ def api_search_unified():
                         asian_ids.append(m_id)
 
                 if asian_items_to_process:
-                    # 1. BATCH QUERY: Traer todas las notas Shiori de esta página de golpe
                     with app.app_context():
                         ratings_data = db.session.query(
                             Review.media_id, 
@@ -2610,18 +2392,14 @@ def api_search_unified():
                             Review.status == 'approved'
                         ).group_by(Review.media_id, Review.media_type).all()
                         
-                        # Mapa rápido para acceso instantáneo
                         ratings_map = {(r[0], r[1]): {'avg': round(float(r[2]), 1), 'count': r[3]} for r in ratings_data}
 
-                    # 2. ENRIQUECER CON TRADUCCIONES (Mantenemos tu Regla de 3 intacta)
                     with ThreadPoolExecutor(max_workers=10) as t_executor:
-                        # Pasamos include_db=False porque ya tenemos las notas en el ratings_map
                         enriched = list(t_executor.map(lambda x: (get_media_summary(x[0]['id'], x[1], include_db=False), x[1], x[0]['id']), asian_items_to_process))
                         
                         for summary, original_m_type, it_id in enriched:
                             if not summary: continue
                             
-                            # Inyectar la nota del batch query
                             shiori = ratings_map.get((it_id, original_m_type), {'avg': 0, 'count': 0})
                             
                             yield json.dumps({
@@ -2650,7 +2428,6 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     
-    # Arrancar el scheduler solo en el proceso principal (evita duplicados al recargar en desarrollo)
     if not os.environ.get('WERKZEUG_RUN_MAIN'):
         scheduler.start()
         
