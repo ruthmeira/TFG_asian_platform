@@ -19,6 +19,7 @@ APScheduler==3.10.4
 # --- UTILIDADES & TMDB ---
 requests==2.32.5
 beautifulsoup4==4.12.3
+deep-translator==1.11.4
 
 # --- PRODUCCIÓN (PARA ORACLE) ---
 gunicorn==21.2.0

@@ -1,12 +1,13 @@
 from flask import Flask, jsonify, render_template, request, redirect, url_for, flash, session, Response, stream_with_context
 import json
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_mail import Mail, Message
 from authlib.integrations.flask_client import OAuth
 from deep_translator import GoogleTranslator
 from dotenv import load_dotenv
-from models import db, User, CollectionItem, Review, ReviewVote, ReviewReport, ModerationLog, MediaEvent, MediaReport
-from datetime import datetime
+from models import db, User, CollectionItem, Review, ReviewVote, ReviewReport, ModerationLog, MediaReport
+from datetime import datetime, timezone
 from apscheduler.schedulers.background import BackgroundScheduler
 import requests
 import os
@@ -218,6 +219,7 @@ app = Flask(__name__)
 load_dotenv(override=True)
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 if app.config['SQLALCHEMY_DATABASE_URI'] and app.config['SQLALCHEMY_DATABASE_URI'].startswith("postgres://"):
@@ -426,7 +428,7 @@ def login_google():
     session['google_auth_action'] = action
     session['google_auth_next'] = request.args.get('next')
     
-    redirect_uri = url_for('google_authorize', _external=True)
+    redirect_uri = url_for('google_authorize', _external=True, _scheme='https')
     return google.authorize_redirect(redirect_uri)
 
 @app.route('/login/google/authorize')
@@ -618,6 +620,69 @@ scheduler.add_job(
     coalesce=True
 )
 
+def sync_all_media_changes():
+    """
+    Sincronizador Pro: Busca cambios en TMDB y actualiza Shiori si es necesario.
+    Se ejecuta una vez al día.
+    """
+    api_key = os.getenv("TMDB_API_KEY")
+    if not api_key: return
+
+    print("[SYNC-GLOBAL] Iniciando sincronización diaria con TMDB...")
+    
+    # 1. Obtener lista de IDs únicos en Shiori
+    with app.app_context():
+        unique_medias = db.session.query(CollectionItem.media_id, CollectionItem.media_type).distinct().all()
+    
+    if not unique_medias: return
+
+    # 2. Obtener IDs que han cambiado en TMDB en las últimas 24h
+    changed_ids = set()
+    for m_type in ['movie', 'tv']:
+        res = fetch_json(f"https://api.themoviedb.org/3/{m_type}/changes?api_key={api_key}")
+        for item in res.get('results', []):
+            changed_ids.add((item['id'], m_type))
+
+    # 3. Cruzar datos: ¿Ha cambiado algo de lo que tenemos nosotros?
+    to_update = [m for m in unique_medias if (m.media_id, m.media_type) in changed_ids]
+    
+    if not to_update:
+        print("[SYNC-GLOBAL] Nada que actualizar hoy. ¡Todo al día!")
+        return
+
+    print(f"[SYNC-GLOBAL] Detectados {len(to_update)} medios con cambios. Actualizando...")
+    
+    for m_id, m_type in to_update:
+        summary = get_media_summary(m_id, m_type, include_db=False)
+        if summary:
+            print(f"   🔄 Sincronizando: {summary.get('title', m_id)}")
+            with app.app_context():
+                CollectionItem.query.filter_by(media_id=m_id, media_type=m_type).update({
+                    "title": summary['title'],
+                    "original_title": summary.get('original_title'),
+                    "poster_path": summary['poster_path'],
+                    "vote_average": summary.get('vote_average'),
+                    "flag": summary['flag'],
+                    "media_subtype": summary['media_subtype']
+                })
+                db.session.commit()
+                db.session.remove()
+                
+        # 4. También actualizamos los episodios del calendario (en segundo plano)
+        sync_media_calendar_data(m_id, m_type)
+    
+    print("[SYNC-GLOBAL] Sincronización finalizada con éxito.")
+
+# Programar el sincronizador para que corra una vez al día (cada 86400 segundos)
+scheduler.add_job(
+    func=sync_all_media_changes,
+    trigger="interval",
+    seconds=86400,
+    id='sync_media_changes',
+    misfire_grace_time=3600,
+    coalesce=True
+)
+
 
 with app.app_context():
     if not api_cache['day']['series']:
@@ -667,6 +732,20 @@ def home():
     return render_template('index.html', 
                            active_window=window, 
                            trending_data=trending_data)
+
+@app.route('/legal/<type>')
+def legal_pages(type):
+    legal_titles = {
+        'terms': 'Términos de Uso',
+        'privacy': 'Política de Privacidad',
+        'cookies': 'Política de Cookies',
+        'contact': 'Contacto'
+    }
+    
+    if type not in legal_titles:
+        return redirect(url_for('home'))
+        
+    return render_template(f'legal/{type}.html', title=legal_titles[type])
  
 @app.route('/api/trending')
 def api_trending():
@@ -747,25 +826,6 @@ def edit_profile():
     
     return render_template('edit_profile.html', countries_list=GLOBAL_COUNTRIES_LIST, regions_map=REGIONS_MAP)
 
-def hydrate_collection_items(items):
-    """
-    Toma una lista de CollectionItems y busca su info REAL en TMDB en paralelo.
-    Esto garantiza que posters y títulos estén siempre actualizados.
-    """
-    if not items: return []
-    
-    def fetch_and_update(item):
-        summary = get_media_summary(item.media_id, item.media_type)
-        if summary:
-            item.title = summary['title']
-            item.poster_path = summary['poster_path']
-            item.vote_average = summary['vote_average']
-            item.flag = summary['flag']
-            item.media_subtype = summary['media_subtype']
-        return item
-
-    with ThreadPoolExecutor(max_workers=10) as executor:
-        return list(executor.map(fetch_and_update, items))
 
 @app.route('/collections')
 @login_required
@@ -777,25 +837,30 @@ def collections():
     fav_query = CollectionItem.query.filter_by(user_id=current_user.id, is_favorite=True)
     t_counts['favoritos'] = fav_query.count()
     favorites = fav_query.order_by(CollectionItem.created_at.desc()).limit(16).all()
-    hydrate_collection_items(favorites)
     
     for status in statuses:
         status_query = CollectionItem.query.filter_by(user_id=current_user.id, status=status)
         t_counts[status] = status_query.count()
         items = status_query.order_by(CollectionItem.created_at.desc()).limit(16).all()
-        hydrate_collection_items(items)
         user_collections[status] = items
 
-    all_items = favorites + [item for sublist in user_collections.values() for item in sublist]
-    if all_items:
+    # 1. Obtener todos los IDs de la colección para una sola consulta de ratings
+    all_raw_items = favorites + [item for sublist in user_collections.values() for item in sublist]
+    all_ids = [it.media_id for it in all_raw_items]
+    
+    ratings_map = {}
+    if all_ids:
+        # Una sola consulta para TODA la página
         ratings_raw = db.session.query(
-            Review.media_id, Review.media_type, db.func.avg(Review.rating)
-        ).filter_by(status='approved').group_by(Review.media_id, Review.media_type).all()
-        
-        ratings_map = {(r[0], r[1]): round(float(r[2]), 1) for r in ratings_raw}
-        
-        for item in all_items:
-            item.shiori_rating = ratings_map.get((item.media_id, item.media_type), 0)
+            Review.media_id, Review.media_type, db.func.avg(Review.rating), db.func.count(Review.id)
+        ).filter(Review.media_id.in_(all_ids), Review.status == 'approved').group_by(Review.media_id, Review.media_type).all()
+        ratings_map = {(r[0], r[1]): {'avg': round(float(r[2]), 1), 'count': r[3]} for r in ratings_raw}
+
+        # Inyectamos los resultados en cada item
+        for item in all_raw_items:
+            r_info = ratings_map.get((item.media_id, item.media_type), {'avg': 0, 'count': 0})
+            item.shiori_rating = r_info['avg']
+            item.shiori_count = r_info['count']
 
     return render_template('collections.html', collections=user_collections, favorites=favorites, counts=t_counts)
 
@@ -820,7 +885,6 @@ def view_collection(status):
     pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     items = pagination.items
 
-    hydrate_collection_items(items)
 
     if items:
         ratings_raw = db.session.query(
@@ -875,7 +939,7 @@ def toggle_favorite():
         db.session.add(item)
         db.session.flush()
         
-        threading.Thread(target=sync_media_calendar_data, args=(item.id,)).start()
+        threading.Thread(target=sync_media_calendar_data, args=(item.media_id, item.media_type)).start()
 
     db.session.commit()
     return jsonify({'favorite': item.is_favorite})
@@ -920,93 +984,76 @@ def toggle_status():
         db.session.add(item)
         db.session.flush()
         
-        threading.Thread(target=sync_media_calendar_data, args=(item.id,)).start()
+        threading.Thread(target=sync_media_calendar_data, args=(item.media_id, item.media_type)).start()
     
     db.session.commit()
     return jsonify({'current_status': item.status})
 
 
 
-def sync_media_calendar_data(item_id):
+def sync_media_calendar_data(m_id, m_type):
     """
-    Sincroniza TODAS las fechas de una serie o película en la base de datos local.
-    Usa la Triple Confirmación (ES > MX > EN) y no bloquea al usuario.
+    Sincroniza episodios en la tabla GLOBAL compartida. 
+    Si ya existen y son recientes, no hace nada (ahorro de API).
     """
     with app.app_context():
-        from models import MediaEvent, CollectionItem
-        item = CollectionItem.query.get(item_id)
-        if not item: return
-
-        api_key = os.getenv("TMDB_API_KEY")
-        m_id, m_type = item.media_id, item.media_type
-        u_region = item.user.region or 'ES'
+        from models import GlobalEpisode
+        from datetime import timedelta
         
-        MediaEvent.query.filter_by(collection_item_id=item.id).delete()
+        # 1. ¿Ya tenemos los episodios y están frescos (menos de 24h)?
+        existing = GlobalEpisode.query.filter_by(media_id=m_id, media_type=m_type).first()
+        if existing and (datetime.now(timezone.utc) - existing.last_updated.replace(tzinfo=timezone.utc)) < timedelta(hours=24):
+            return 
+
+        print(f"[CALENDAR-SYNC] 🔄 Actualizando episodios globales para {m_type} {m_id}...")
+        api_key = os.getenv("TMDB_API_KEY")
         
         try:
-            urls = {
-                'es': f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=es-ES&append_to_response=release_dates",
-                'mx': f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=es-MX&append_to_response=release_dates",
-                'en': f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=en-US&append_to_response=release_dates"
-            }
-            with ThreadPoolExecutor(max_workers=3) as executor:
-                f_to_n = {executor.submit(fetch_json, url): name for name, url in urls.items()}
-                raw = {f_to_n[f]: f.result() for f in f_to_n}
-
+            # Borramos lo viejo para esta serie específica en la tabla global
+            GlobalEpisode.query.filter_by(media_id=m_id, media_type=m_type).delete()
+            
             if m_type == 'movie':
-                found_events = []
-                priority_names = {'ES': 'España', 'MX': 'México', 'US': 'EE. UU.'}
-                for lang in ['es', 'mx', 'en']:
-                    r_data = raw[lang]
-                    if r_data.get('release_date'):
-                        found_events.append({'date': r_data['release_date'], 'label': "Película: Estreno Original"})
-                    for res in r_data.get('release_dates', {}).get('results', []):
-                        iso = res.get('iso_3166_1', '').upper()
-                        if iso in priority_names or iso == u_region:
-                            label = f"Película: Estreno en {priority_names.get(iso, iso)}"
-                            for rd_obj in res.get('release_dates', []):
-                                d_only = rd_obj.get('release_date', '').split('T')[0]
-                                if d_only: found_events.append({'date': d_only, 'label': label})
-                
-                seen_dates = set()
-                for ev in found_events:
-                    if ev['date'] not in seen_dates:
-                        new_ev = MediaEvent(
-                            collection_item_id=item.id,
-                            event_type=ev['label'],
-                            event_date=datetime.strptime(ev['date'][:10], '%Y-%m-%d').date()
-                        )
-                        db.session.add(new_ev)
-                        seen_dates.add(ev['date'])
+                url = f"https://api.themoviedb.org/3/movie/{m_id}?api_key={api_key}&language=es-ES"
+                res = fetch_json(url)
+                if res and res.get('release_date'):
+                    new_ev = GlobalEpisode(
+                        media_id=m_id, media_type='movie',
+                        air_date=datetime.strptime(res['release_date'], '%Y-%m-%d').date(),
+                        title=res.get('title', 'Estreno')
+                    )
+                    db.session.add(new_ev)
             else:
-                seasons = raw['es'].get('seasons') or raw['en'].get('seasons') or []
-                category = "Programa" if any(g.get('id') in GENRES_PROGRAMAS for g in (raw['es'].get('genres') or [])) else "Serie"
+                url_base = f"https://api.themoviedb.org/3/tv/{m_id}?api_key={api_key}&language=es-ES"
+                res_base = fetch_json(url_base)
+                if not res_base: return
                 
-                for s_meta in seasons[-5:]:
-                    s_num = s_meta.get('season_number')
-                    if s_num == 0: continue
-                    s_url = f"https://api.themoviedb.org/3/tv/{m_id}/season/{s_num}?api_key={api_key}&language=en-US"
-                    s_data = fetch_json(s_url)
-                    for ep in s_data.get('episodes', []):
-                        if ep.get('air_date'):
-                            is_first = (ep.get('episode_number') == 1)
-                            label = f"{category}: Estreno" if (is_first and s_num == 1) else \
-                                    f"{category}: Nueva T{s_num}" if is_first else \
-                                    f"{category}: T{s_num} E{ep.get('episode_number')}"
-                            
-                            new_ev = MediaEvent(
-                                collection_item_id=item.id,
-                                event_type=label,
-                                event_date=datetime.strptime(ep['air_date'], '%Y-%m-%d').date(),
-                                season_number=s_num,
-                                episode_number=ep.get('episode_number')
-                            )
-                            db.session.add(new_ev)
+                seasons = res_base.get('seasons', [])
+                for s in seasons:
+                    s_num = s.get('season_number')
+                    if s_num == 0: continue 
+                    
+                    url_s = f"https://api.themoviedb.org/3/tv/{m_id}/season/{s_num}?api_key={api_key}&language=es-ES"
+                    res_s = fetch_json(url_s)
+                    if res_s and res_s.get('episodes'):
+                        for ep in res_s['episodes']:
+                            if ep.get('air_date'):
+                                new_ep = GlobalEpisode(
+                                    media_id=m_id, media_type='tv',
+                                    season_number=s_num,
+                                    episode_number=ep.get('episode_number'),
+                                    air_date=datetime.strptime(ep['air_date'], '%Y-%m-%d').date(),
+                                    title=ep.get('name', f"Episodio {ep.get('episode_number')}")
+                                )
+                                db.session.add(new_ep)
             
             db.session.commit()
-            print(f"📅 [SYNC] Calendario actualizado para {item.title}")
+            print(f"[CALENDAR-SYNC] ✅ Episodios de {m_id} sincronizados.")
         except Exception as e:
-            print(f"❌ [SYNC] Error en calendario de {m_id}: {e}")
+            db.session.rollback()
+            print(f"[CALENDAR-SYNC] ❌ Error sincronizando {m_id}: {e}")
+        finally:
+            db.session.remove()
+
 
 @app.route('/calendar')
 @login_required
@@ -1020,25 +1067,37 @@ def api_calendar_events():
     year = request.args.get('year', datetime.now().year, type=int)
     
     import calendar
+    from models import GlobalEpisode
     last_day = calendar.monthrange(year, month)[1]
     start_date = datetime(year, month, 1).date()
     end_date = datetime(year, month, last_day).date()
 
-    events_query = db.session.query(MediaEvent, CollectionItem).join(CollectionItem).filter(
+    # Hacemos un JOIN entre tu colección y los episodios GLOBALES
+    events_query = db.session.query(GlobalEpisode, CollectionItem).join(
+        CollectionItem,
+        (GlobalEpisode.media_id == CollectionItem.media_id) & 
+        (GlobalEpisode.media_type == CollectionItem.media_type)
+    ).filter(
         CollectionItem.user_id == current_user.id,
-        MediaEvent.event_date >= start_date,
-        MediaEvent.event_date <= end_date
+        GlobalEpisode.air_date >= start_date,
+        GlobalEpisode.air_date <= end_date
     ).all()
 
     all_events = []
     for event, item in events_query:
+        # Construimos el texto del evento (Ej: "T2 E5: Nombre")
+        if event.media_type == 'tv':
+            label = f"T{event.season_number} E{event.episode_number}: {event.title}"
+        else:
+            label = f"Estreno: {event.title}"
+
         all_events.append({
             'id': item.media_id,
             'type': item.media_type,
             'title': item.title,
-            'date': event.event_date.isoformat(),
+            'date': event.air_date.isoformat(),
             'poster': item.poster_path,
-            'event_type': event.event_type,
+            'event_type': label,
             'subtype': item.media_subtype
         })
     
@@ -1568,9 +1627,14 @@ def admin_toggle_ban(user_id):
     
     if new_status:
         try:
+            # 1. Borrar votos y reportes de reseñas
             ReviewVote.query.filter_by(user_id=user_id).delete()
             ReviewReport.query.filter_by(user_id=user_id).delete()
             
+            # 2. Borrar colecciones (al borrarlas, el calendario ya no mostrará nada para este usuario)
+            CollectionItem.query.filter_by(user_id=user_id).delete(synchronize_session=False)
+            
+            # 3. Borrar reseñas y guardar log de moderación
             user_reviews = Review.query.filter_by(user_id=user_id).all()
             for r in user_reviews:
                 log = ModerationLog(
@@ -1583,12 +1647,12 @@ def admin_toggle_ban(user_id):
                 db.session.add(log)
                 db.session.delete(r) 
             
-            message = f"BANEO APLICADO. Se ha purgado la actividad pública de {target_user.username}. Sus colecciones y calendario se han preservado."
+            message = f"BANEO TOTAL APLICADO. Se ha purgado TODA la información de {target_user.username} (Colecciones, Calendario y Reseñas)."
         except Exception as e:
             db.session.rollback()
-            return jsonify({'category': 'error', 'message': f"Error en la purga: {str(e)}"}), 500
+            return jsonify({'category': 'error', 'message': f"Error en la purga total: {str(e)}"}), 500
     else:
-        message = f"Usuario {target_user.username} reactivado. Su biblioteca personal está intacta."
+        message = f"Usuario {target_user.username} reactivado. Nota: Su actividad anterior fue eliminada durante el baneo."
 
     db.session.commit()
     return jsonify({
@@ -1693,7 +1757,7 @@ def post_review(media_type, media_id):
         review.comment = comment
         review.status = final_status
         review.media_title = media_title
-        review.created_at = datetime.utcnow()
+        review.created_at = datetime.now(timezone.utc)
         msg = "Tu opinión ha sido actualizada." if final_status == 'approved' else "Tu opinión contiene palabras sensibles y será revisada."
         response_cat = 'success'
     else:
@@ -2431,4 +2495,5 @@ if __name__ == '__main__':
     if not os.environ.get('WERKZEUG_RUN_MAIN'):
         scheduler.start()
         
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host='0.0.0.0', port=port)
