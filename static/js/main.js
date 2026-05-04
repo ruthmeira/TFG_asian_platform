@@ -312,14 +312,18 @@ document.addEventListener("DOMContentLoaded", function () {
     function initDataReport() {
         const openBtn = document.getElementById('open-report-modal-btn');
         const modal = document.getElementById('data-report-modal');
-        const closeBtn = document.getElementById('close-data-modal');
         const confirmBox = modal ? modal.querySelector('.shiori-confirm-box') : null;
 
         if (!openBtn || !modal || !confirmBox) return;
 
-        
         const originalContent = confirmBox.innerHTML;
         modal.dataset.originalHtml = originalContent;
+
+        const close = () => {
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+            setTimeout(() => { confirmBox.innerHTML = originalContent; }, 300);
+        };
 
         openBtn.onclick = (e) => {
             e.preventDefault();
@@ -327,17 +331,11 @@ document.addEventListener("DOMContentLoaded", function () {
             document.body.style.overflow = 'hidden';
         };
 
-        const close = () => {
-            modal.classList.remove('show');
-            document.body.style.overflow = '';
-            
-            setTimeout(() => { confirmBox.innerHTML = originalContent; }, 300);
-        };
-
-        if (closeBtn) closeBtn.onclick = close;
-        modal.onclick = (e) => {
-            if (e.target === modal) close();
-        };
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal || e.target.id === 'close-data-modal' || e.target.id === 'finish-data-report') {
+                close();
+            }
+        });
     }
 
     initDataReport();

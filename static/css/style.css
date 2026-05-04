@@ -827,6 +827,16 @@ main {
     text-transform: uppercase;
 }
 
+.auth-page-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 0;
+    padding: 0; 
+}
+
 
 
 
@@ -1832,9 +1842,7 @@ div[data-provider-id="1773"] svg {
     border-radius: 10px;
 }
 
-/* ==========================================================================
-   SHIORI PREMIUM FOOTER
-   ========================================================================== */
+
 .shiori-footer {
     background-color: #1a1715;
     border-top: 1px solid #2a221d;
@@ -1842,6 +1850,10 @@ div[data-provider-id="1773"] svg {
     margin-top: 80px;
     position: relative;
     overflow: hidden;
+}
+
+main.auth-page-wrapper + .shiori-footer {
+    margin-top: 0;
 }
 
 .footer-container {
@@ -1985,7 +1997,6 @@ div[data-provider-id="1773"] svg {
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Responsive Footer */
 @media (max-width: 1000px) {
     .footer-grid {
         grid-template-columns: 1fr 1fr;
