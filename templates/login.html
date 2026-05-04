@@ -86,7 +86,7 @@
     </div>
 
     <div class="auth-footer-links">
-        <a href="{{ url_for('register') }}">¿No tienes cuenta? Registrate aquí</a>
+        <a href="{{ url_for('register', next=request.args.get('next')) }}">¿No tienes cuenta? Registrate aquí</a>
     </div>
 </div>
 

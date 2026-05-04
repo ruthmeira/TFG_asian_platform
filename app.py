@@ -280,6 +280,9 @@ google = oauth.register(
 )
 
 login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+login_manager.login_message = "Por favor, inicia sesión para acceder a esta página."
+login_manager.login_message_category = "info"
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -417,7 +420,8 @@ def register():
         db.session.commit()
         login_user(new_user)
         flash("Cuenta creada correctamente. ¡Bienvenido!", "success")
-        return redirect(url_for('explore'))
+        next_page = request.args.get('next')
+        return redirect(next_page or url_for('explore'))
     
     return render_template('register.html', countries_list=GLOBAL_COUNTRIES_LIST, regions_map=REGIONS_MAP)
 
