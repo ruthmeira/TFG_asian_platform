@@ -20,6 +20,9 @@ from concurrent.futures import ThreadPoolExecutor
 from werkzeug.utils import secure_filename
 from itsdangerous import URLSafeTimedSerializer
 import threading
+
+load_dotenv(override=True)
+
 try:
     from supabase import create_client, Client
 except ImportError:
@@ -235,7 +238,6 @@ def process_watch_providers(providers_data, region):
     return watch_providers
 
 app = Flask(__name__)
-load_dotenv(override=True)
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
