@@ -20,6 +20,7 @@ from concurrent.futures import ThreadPoolExecutor
 from werkzeug.utils import secure_filename
 from itsdangerous import URLSafeTimedSerializer
 import threading
+from functools import wraps
 
 load_dotenv(override=True)
 
@@ -344,25 +345,25 @@ def get_media_summary(m_id, m_type, country_hint=None, include_db=True):
     Optimizado: 1 sola llamada usando append_to_response=translations.
     """
     api_key = os.getenv("TMDB_API_KEY")
-    url = f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=es-ES&append_to_response=translations"
+    urls = {
+        'es': f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=es-ES&append_to_response=translations",
+        'mx': f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=es-MX",
+        'en': f"https://api.themoviedb.org/3/{m_type}/{m_id}?api_key={api_key}&language=en-US"
+    }
     
-    res_es = fetch_json(url)
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        future_to_url = {executor.submit(fetch_json, url): name for name, url in urls.items()}
+        raw = {future_to_url[future]: future.result() for future in future_to_url}
+
+    res_es = raw['es']
     if not res_es or not res_es.get('id'): return None
     
-    trans = res_es.get('translations', {}).get('translations', [])
-    t_es = next((x['data'] for x in trans if x['iso_3166_1'] == 'ES'), {})
-    t_mx = next((x['data'] for x in trans if x['iso_3166_1'] == 'MX'), {})
-    t_en = next((x['data'] for x in trans if x['iso_639_1'] == 'en'), {})
-
-    best_title = t_es.get('title') or t_es.get('name') or \
-                 t_mx.get('title') or t_mx.get('name') or \
-                 t_en.get('title') or t_en.get('name') or \
-                 res_es.get('original_title') or res_es.get('original_name') or "-"
+    best_title = get_tiered_field(raw, 'title', m_type)
 
     summary = {
         'id': res_es.get('id'),
         'title': best_title,
-        'poster_path': res_es.get('poster_path'),
+        'poster_path': res_es.get('poster_path') or raw['mx'].get('poster_path') or raw['en'].get('poster_path'),
         'vote_average': res_es.get('vote_average', 0),
         'original_title': res_es.get('original_title' if m_type=='movie' else 'original_name'),
         'flag': get_media_flag(res_es, res_es, country_hint=country_hint)
@@ -662,9 +663,15 @@ def sync_all_media_changes():
 
     changed_ids = set()
     for m_type in ['movie', 'tv']:
-        res = fetch_json(f"https://api.themoviedb.org/3/{m_type}/changes?api_key={api_key}")
-        for item in res.get('results', []):
-            changed_ids.add((item['id'], m_type))
+        first_res = fetch_json(f"https://api.themoviedb.org/3/{m_type}/changes?api_key={api_key}&page=1")
+        total_pages = first_res.get('total_pages', 1)
+        
+        for page in range(1, total_pages + 1):
+            res = first_res if page == 1 else fetch_json(f"https://api.themoviedb.org/3/{m_type}/changes?api_key={api_key}&page={page}")
+            results = res.get('results', [])
+            if not results: break
+            for item in results:
+                changed_ids.add((item['id'], m_type))
 
     to_update = [m for m in unique_medias if (m.media_id, m.media_type) in changed_ids]
     
@@ -690,7 +697,8 @@ def sync_all_media_changes():
                 db.session.commit()
                 db.session.remove()
                 
-        sync_media_calendar_data(m_id, m_type)
+            print(f"   📅 Actualizando fechas en calendario para: {summary.get('title', m_id)}")
+            sync_media_calendar_data(m_id, m_type)
     
     print("[SYNC-GLOBAL] Sincronización finalizada con éxito.")
 
@@ -1520,7 +1528,6 @@ def report_media_data(media_type, media_id):
 
 
 
-from functools import wraps
 
 def admin_required(f):
     @wraps(f)

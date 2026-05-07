@@ -115,7 +115,9 @@
                     {{ person.biography | safe }}
                 </p>
             </div>
-            <button id="bio-toggle" class="btn-read-more">Leer más <i class="fas fa-chevron-down"></i></button>
+            {% if person.biography and 'No tenemos una biografía' not in person.biography %}
+            <button id="bio-toggle" class="btn-read-more" style="display: none;">Leer más <i class="fas fa-chevron-down"></i></button>
+            {% endif %}
         </section>
 
         <section class="known-for-section">
