@@ -222,23 +222,23 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     
-    if (cancelReportBtn) {
-        cancelReportBtn.addEventListener('click', () => {
-            reportConfirmModal.classList.remove('show');
-            reviewIdToReport = null;
-        });
-    }
+    if (reportConfirmModal) {
+        const confirmBox = reportConfirmModal.querySelector('.shiori-confirm-box');
+        const originalContent = confirmBox ? confirmBox.innerHTML : '';
 
-    if (confirmReportBtn) {
-        confirmReportBtn.addEventListener('click', async function () {
-            if (reviewIdToReport) {
-                const originalContent = reportConfirmModal.querySelector('.shiori-confirm-box').innerHTML;
-                const confirmBox = reportConfirmModal.querySelector('.shiori-confirm-box');
-                
+        reportConfirmModal.addEventListener('click', async function (e) {
+            const cancelBtn = e.target.closest('#cancel-report-btn');
+            if (cancelBtn) {
+                reportConfirmModal.classList.remove('show');
+                reviewIdToReport = null;
+                return;
+            }
+
+            const confirmBtn = e.target.closest('#confirm-report-btn');
+            if (confirmBtn && reviewIdToReport) {
                 try {
                     const response = await fetch(`/review/${reviewIdToReport}/report`, { method: 'POST' });
                     const result = await response.json();
-                    
                     
                     let iconClass = 'info-circle';
                     let statusClass = 'icon-info-shiori';
@@ -247,31 +247,39 @@ document.addEventListener('DOMContentLoaded', function () {
                         statusClass = 'icon-success-shiori';
                     }
                     
+                    if (confirmBox) {
+                        confirmBox.innerHTML = `
+                            <div class="confirm-icon ${statusClass}">
+                                <i class="fas fa-${iconClass}"></i>
+                            </div>
+                            <h3>${result.category === 'success' ? '¡Hecho!' : 'Aviso Shiori'}</h3>
+                            <p>${result.message}</p>
+                            <div class="confirm-actions">
+                                <button class="confirm-btn shiori-cancel" id="finish-report" style="flex: 1;">Entendido</button>
+                            </div>
+                        `;
+                    }
                     
-                    confirmBox.innerHTML = `
-                        <div class="confirm-icon ${statusClass}">
-                            <i class="fas fa-${iconClass}"></i>
-                        </div>
-                        <h3>${result.category === 'success' ? '¡Hecho!' : 'Aviso Shiori'}</h3>
-                        <p>${result.message}</p>
-                        <div class="confirm-actions">
-                            <button class="confirm-btn shiori-cancel" id="finish-report" style="flex: 1;">Entendido</button>
-                        </div>
-                    `;
-                    
-                    document.getElementById('finish-report').addEventListener('click', () => {
-                        reportConfirmModal.classList.remove('show');
-                        setTimeout(() => { confirmBox.innerHTML = originalContent; }, 300);
-                        reviewIdToReport = null;
-                    });
+                    const finishBtn = document.getElementById('finish-report');
+                    if (finishBtn) {
+                        finishBtn.addEventListener('click', () => {
+                            reportConfirmModal.classList.remove('show');
+                            setTimeout(() => { 
+                                if (confirmBox && originalContent) confirmBox.innerHTML = originalContent; 
+                            }, 300);
+                            reviewIdToReport = null;
+                        });
+                    }
                     
                 } catch (error) {
                     console.error('Error al reportar:', error);
                     reportConfirmModal.classList.remove('show');
+                    if (confirmBox && originalContent) confirmBox.innerHTML = originalContent;
                 }
             }
         });
     }
+
 
     
     if (reviewForm) {
