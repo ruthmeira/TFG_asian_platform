@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Allow: /explore
+Allow: /search
+Allow: /person/
+Allow: /media/
+Disallow: /login
+Disallow: /register
+Disallow: /logout
+Disallow: /api/
+Disallow: /admin/
+Disallow: /edit_profile
+Disallow: /delete_account
+Disallow: /forgot_password
+Disallow: /reset_password/
+
+Sitemap: https://www.myshiori.org/robots.txt

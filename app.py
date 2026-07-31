@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request, redirect, url_for, flash, session, Response, stream_with_context
+from flask import Flask, jsonify, render_template, request, redirect, url_for, flash, session, Response, stream_with_context, send_from_directory
 import json
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -740,6 +740,10 @@ def hydrate_trending_ratings(items):
             m_id = it.get('id')
             m_type = it.get('type')
             it['shiori_rating'] = ratings_map.get((m_id, m_type), 0.0)
+
+@app.route('/robots.txt')
+def robots():
+    return send_from_directory(app.static_folder, 'robots.txt')
 
 @app.route('/')
 def home():
