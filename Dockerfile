@@ -1,6 +1,7 @@
 FROM python:3.10-slim
 
 ENV PYTHONUNBUFFERED True
+ENV PORT=7860
 
 WORKDIR /app
 
